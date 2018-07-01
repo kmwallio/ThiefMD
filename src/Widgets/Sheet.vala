@@ -1,3 +1,5 @@
+using ThiefMD.Controllers;
+
 namespace ThiefMD.Widgets {
     /**
      * Sheet
@@ -12,6 +14,15 @@ namespace ThiefMD.Widgets {
             _sheet_path = sheet_path;
             label = sheet_path;
             stdout.printf("Creating %s\n", sheet_path);
+
+            clicked.connect (() => {
+                stdout.printf ("Clicked\n");
+                SheetManager.load_sheet (this);
+            });
+        }
+
+        public string file_path () {
+            return _sheet_path;
         }
     }
 }

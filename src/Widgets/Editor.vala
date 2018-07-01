@@ -1,3 +1,5 @@
+using ThiefMD.Controllers;
+
 namespace ThiefMD.Widgets {
     public class Editor : Gtk.SourceView {
         public static new Gtk.SourceBuffer buffer;
@@ -7,6 +9,7 @@ namespace ThiefMD.Widgets {
         public GtkSpell.Checker spell = null;
         public Gtk.TextTag warning_tag;
         public Gtk.TextTag error_tag;
+        private int last_width;
 
         public signal void changed ();
 
@@ -41,6 +44,19 @@ namespace ThiefMD.Widgets {
                     spell.detach ();
                 }
             }
+        }
+
+        private bool autosave () {
+            var settings = AppSettings.get_default ();
+
+            //
+            // Make sure we're not swapping files
+            //
+            if (!FileManager.disable_save) {
+                // @TODO: Implement saving
+            }
+
+            return settings.autosave;
         }
 
         public Editor () {
@@ -103,16 +119,14 @@ namespace ThiefMD.Widgets {
             is_modified = false;
 
             if (settings.autosave == true) {
-                Timeout.add (10000, () => {
-                    return true;
-                });
+                Timeout.add (10000, autosave);
             }
 
             //
             // Register for redrawing of window for handling margins and other
             // redrawing
             //
-            Timeout.add(250, () => {
+            Timeout.add(100, () => {
                 dynamic_margins();
                 return true;
             });
@@ -172,7 +186,20 @@ namespace ThiefMD.Widgets {
             w = get_allocated_width ();
             h = get_allocated_height ();
 
-            // stdout.printf("Width: %d, Height: %d\n", w, h);
+            // Early start may return 1
+            if (w < 50) {
+                return;
+            }
+
+            // Margin increases the width
+            w = w - (left_margin * 2);
+
+            if (w > last_width - 5 && w < last_width + 5) {
+                return;
+            }
+            last_width = w;
+
+            stdout.printf("Width: %d, Height: %d\n", w, h);
 
             // If ThiefMD is Full Screen, add additional padding
             p = (settings.fullscreen) ? 5 : 0;

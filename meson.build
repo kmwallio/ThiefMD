@@ -51,6 +51,9 @@ executable(
     'src/Widgets/Sheets.vala',
     'src/Widgets/Sheet.vala',
     'src/Widgets/Editor.vala',
+    'src/Controllers/FileManager.vala',
+    'src/Controllers/Dialogs.vala',
+    'src/Controllers/SheetManager.vala',
     c_args: c_args,
     dependencies: [
         dependency('granite'),

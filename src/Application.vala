@@ -1,29 +1,44 @@
 using ThiefMD;
 using ThiefMD.Widgets;
+namespace ThiefMD {
+    public class ThiefApp : Gtk.Application {
+        private static ThiefApp _instance;
+        public Gtk.ApplicationWindow main_window;
+        public Headerbar toolbar;
 
-public class ThiefApp : Gtk.Application {
+        public ThiefApp () {
+            Object (
+                application_id: "com.github.kmwallio.theifmd",
+                flags: ApplicationFlags.FLAGS_NONE
+            );
+        }
 
-    public ThiefApp () {
-        Object (
-            application_id: "com.github.kmwallio.theifmd",
-            flags: ApplicationFlags.FLAGS_NONE
-        );
-    }
+        protected override void activate () {
+            var settings = AppSettings.get_default ();
 
-    protected override void activate () {
-        var main_window = new Gtk.ApplicationWindow (this);
-        var toolbar = new Widgets.Headerbar ();
-        main_window.set_titlebar (toolbar);
-        main_window.default_height = 640;
-        main_window.default_width = 800;
-        main_window.title = "ThiefMD";
-        //main_window.add (new Sheets("/home/kmwallio/Dropbox/DnD/World"));
-        main_window.add (new Editor());
-        main_window.show_all ();
-    }
+            main_window = new Gtk.ApplicationWindow (this);
+            toolbar = new Headerbar ();
+            var pane = new Gtk.Paned(Gtk.Orientation.HORIZONTAL);
+            
+            pane.add1(new Sheets("/home/kmwallio/Dropbox/DnD/World"));
+            pane.add2(new Editor());
 
-    public static int main (string[] args) {
-        var app = new ThiefApp ();
-        return app.run (args);
+            main_window.set_titlebar (toolbar);
+            main_window.default_height = settings.window_height;
+            main_window.default_width = settings.window_width;
+            main_window.title = "ThiefMD";
+            main_window.add (pane);
+            main_window.show_all ();
+        }
+
+        public static ThiefApp get_instance () {
+            return _instance;
+        }
+
+        public static int main (string[] args) {
+            var app = new ThiefApp ();
+            _instance = app;
+            return app.run (args);
+        }
     }
 }
