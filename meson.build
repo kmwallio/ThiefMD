@@ -7,6 +7,12 @@ project('com.github.kmwallio.thiefmd', ['vala', 'c'],
 gnome = import('gnome')
 i18n = import('i18n')
 
+# Compile the GResources for this project
+asresources = gnome.compile_resources(
+    'as-resources', 'data/app.gresource.xml',
+    source_dir: 'data',
+    c_name: 'as'
+)
 
 # Set this for convenience
 conf = configuration_data()
@@ -54,6 +60,7 @@ executable(
     'src/Controllers/FileManager.vala',
     'src/Controllers/Dialogs.vala',
     'src/Controllers/SheetManager.vala',
+    asresources,
     c_args: c_args,
     dependencies: [
         dependency('granite'),

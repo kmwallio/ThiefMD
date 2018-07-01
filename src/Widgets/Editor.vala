@@ -183,23 +183,9 @@ namespace ThiefMD.Widgets {
         public void dynamic_margins() {
             var settings = AppSettings.get_default ();
             int w, h, m, p;
-            w = get_allocated_width ();
-            h = get_allocated_height ();
 
-            // Early start may return 1
-            if (w < 50) {
-                return;
-            }
-
-            // Margin increases the width
-            w = w - (left_margin * 2);
-
-            if (w > last_width - 5 && w < last_width + 5) {
-                return;
-            }
-            last_width = w;
-
-            stdout.printf("Width: %d, Height: %d\n", w, h);
+            ThiefApp.get_instance ().main_window.get_size (out w, out h);
+            w = w - ThiefApp.get_instance ().pane_position;
 
             // If ThiefMD is Full Screen, add additional padding
             p = (settings.fullscreen) ? 5 : 0;
@@ -225,8 +211,8 @@ namespace ThiefMD.Widgets {
             // Check for typewriter scrolling and adjust bottom margin to
             // compensate
             if (settings.typewriter_scrolling) {
-                bottom_margin = (int)(h * (1 - Constants.TYPEWRITER_POSITION));
-                top_margin = (int)(h * Constants.TYPEWRITER_POSITION);
+                bottom_margin = (int)(h * (1 - Constants.TYPEWRITER_POSITION)) - 20;
+                top_margin = (int)(h * Constants.TYPEWRITER_POSITION) - 20;
             } else {
                 bottom_margin = Constants.BOTTOM_MARGIN;
                 top_margin = Constants.TOP_MARGIN;
