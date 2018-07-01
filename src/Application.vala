@@ -17,7 +17,8 @@ public class ThiefApp : Gtk.Application {
         main_window.default_height = 640;
         main_window.default_width = 800;
         main_window.title = "ThiefMD";
-        main_window.add (new Sheets("/home/kmwallio/Dropbox/DnD/World"));
+        //main_window.add (new Sheets("/home/kmwallio/Dropbox/DnD/World"));
+        main_window.add (new Editor());
         main_window.show_all ();
     }
 

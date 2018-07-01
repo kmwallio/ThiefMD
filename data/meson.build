@@ -9,6 +9,11 @@ install_data(
 )
 
 install_data(
+    meson.project_name() + '.gschema.xml',
+    install_dir: join_paths(get_option('datadir'), 'glib-2.0', 'schemas')
+)
+
+install_data(
     join_paths('schemes', 'thiefmd.xml'),
     install_dir: join_paths(get_option('datadir'), 'gtksourceview-3.0', 'styles')
 )
@@ -20,5 +25,5 @@ install_data(
 
 install_data(
     join_paths('font', 'iAWriterDuospace-Regular.ttf'),
-    install_dir: join_paths(get_option('datadir'), 'fonts', 'truetype', 'quilt')
+    install_dir: join_paths(get_option('datadir'), 'fonts', 'truetype', 'thiefmd')
 )
