@@ -48,6 +48,8 @@ executable(
     'src/Application.vala',
     'src/Constants/AppSettings.vala',
     'src/Widgets/HeaderBar.vala',
+    'src/Widgets/Sheets.vala',
+    'src/Widgets/Sheet.vala',
     c_args: c_args,
     dependencies: [
         dependency('granite'),

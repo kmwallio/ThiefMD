@@ -15,7 +15,7 @@ public class ThiefApp : Gtk.Application {
         main_window.set_titlebar(toolbar);
         main_window.default_height = 300;
         main_window.default_width = 300;
-        main_window.title = "Hello World";
+        main_window.title = "ThiefMD";
         main_window.show_all ();
     }
 
