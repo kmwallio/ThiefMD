@@ -50,6 +50,7 @@ executable(
     'src/Widgets/HeaderBar.vala',
     'src/Widgets/Sheets.vala',
     'src/Widgets/Sheet.vala',
+    'src/Widgets/Editor.vala',
     c_args: c_args,
     dependencies: [
         dependency('granite'),

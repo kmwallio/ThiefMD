@@ -1,6 +1,13 @@
 namespace ThiefMD.Widgets {
+    /**
+     * Sheet
+     * 
+     * Button Widget pointing to a file on the system.
+     */
     public class Sheet : Gtk.Button {
         private string _sheet_path;
+        private bool _selected;
+
         public Sheet (string sheet_path) {
             _sheet_path = sheet_path;
             label = sheet_path;
