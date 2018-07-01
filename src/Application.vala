@@ -22,6 +22,7 @@ namespace ThiefMD {
             
             pane.add1(new Sheets("/home/kmwallio/Dropbox/DnD/World"));
             pane.add2(new Editor());
+            pane.set_position((int)(settings.window_width * 0.2));
 
             main_window.set_titlebar (toolbar);
             main_window.default_height = settings.window_height;
