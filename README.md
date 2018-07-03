@@ -1,12 +1,10 @@
-# ![](data/images/icon.png) ThiefMD
+# ThiefMD
 
-Ulysses inspired markdown editor.
+ThiefMD is a [Markdown](https://en.wikipedia.org/wiki/Markdown) editor that helps with organization and management.  It is heavily inspired by [Ulysses](https://ulysses.app).  Initial code was based on work from [Quilter](https://github.com/lainsce/quilter).
 
 ## Font
 
-### [Courier Prime Sans](https://github.com/quoteunquoteapps/CourierPrimeSans)
-
-[Courier Prime Sans](https://quoteunquoteapps.com/courierprime/) from [Quote-Unquote Apps](https://quoteunquoteapps.com).
+The included for is [iA Writer Duospace](https://github.com/iaolo/iA-Fonts).  It is licensed under the [SIL Open Font License](data/font/LICENSE.md).
 
 ## Dependencies
 
@@ -30,6 +28,13 @@ $ meson build && cd build
 $ meson configure -Dprefix=/usr
 $ sudo ninja install
 ```
+
+## Planning
+
+ * Typewriter Scrolling
+ * Sheet Management
+ * Export
+ * Theming
 
 ## Acknowledgements
 

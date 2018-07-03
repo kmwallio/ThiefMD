@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2018 Miles Wallio <mwallio@gmail.com> -->
+<component type="desktop">
+  <id>com.github.kmwallio.thiefmd.desktop</id>
+  <metadata_license>GPL3</metadata_license>
+  <name>ThiefMD</name>
+  <summary>A plain yet rich markdown editor</summary>
+  <description>
+    <p>A markdown editor that aims to provide similar functionality to Ulysses.</p>
+  </description>
+</component>

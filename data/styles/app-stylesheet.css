@@ -1,0 +1,18 @@
+@define-color colorPrimary #EFEFEF;
+@define-color textColorPrimary #0C0C0C;
+
+.thiefmd-toolbar {
+    border-bottom-color: transparent;
+    border-bottom-width: 1px;
+    background: @colorPrimary;
+    color: @textColorPrimary;
+    box-shadow: 0 1px transparent inset;
+}
+
+actionbar,
+.action-bar {
+    border-top-color: transparent;
+    background: @colorPrimary;
+    color: @textColorPrimary;
+    box-shadow: 0 1px transparent inset;
+}

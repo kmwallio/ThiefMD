@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=ThiefMD
+GenericName=Thief Markdown Editor
+Comment=A plain yet rich writing environment
+Categories=Office;Accessories;
+Exec=com.github.kmwallio.thiefmd
+Icon=application-default-icon
+Terminal=false
+Type=Application
+X-GNOME-Gettext-Domain=thiefmd
+Keywords=markdown;text;editor;
