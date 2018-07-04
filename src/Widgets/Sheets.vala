@@ -1,3 +1,5 @@
+using ThiefMD;
+using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
     /**
@@ -18,10 +20,20 @@ namespace ThiefMD.Widgets {
             add (_view);
 
             debug ("Got %s\n", _sheets_dir);
-            load_sheets ();
+            if (_sheets_dir == "") {
+                show_empty ();
+            } else {
+                load_sheets ();
+            }
         }
 
-        private void load_sheets () {
+        private void show_empty () {
+            Gtk.Label empty = new Gtk.Label("Select an item from the Library to open.");
+            _view.add(empty);
+        }
+
+        public void load_sheets () {
+            var settings = AppSettings.get_default ();
             _sheets = new List<Sheet>();
 
             //
@@ -39,6 +51,11 @@ namespace ThiefMD.Widgets {
                         Sheet sheet = new Sheet (path);
                         _sheets.append (sheet);
                         _view.add (sheet);
+                        
+                        if (settings.last_file == path) {
+                            sheet.active = true;
+                            SheetManager.load_sheet (sheet);
+                        }
                     }
                 }
             } catch (Error e) {

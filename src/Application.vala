@@ -53,6 +53,12 @@ namespace ThiefMD {
         protected override void activate () {
             var settings = AppSettings.get_default ();
 
+            string start_dir = "";
+            if (settings.last_file != "") {
+                start_dir = settings.last_file.substring(0, settings.last_file.last_index_of("/"));
+                stdout.printf ("Starting with %s\n", start_dir);
+            }
+
             main_window = new Gtk.ApplicationWindow (this);
             toolbar = new Headerbar ();
             edit_view_content = new Editor();
@@ -61,7 +67,7 @@ namespace ThiefMD {
             edit_view = new Gtk.ScrolledWindow (null, null);
             edit_view.add (edit_view_content);
             
-            sheets_pane.add1(new Sheets("/home/kmwallio/Dropbox/DnD/World"));
+            sheets_pane.add1(new Sheets(start_dir));
             sheets_pane.add2(edit_view);
             sheets_pane.set_position(settings.view_sheets_width);
 

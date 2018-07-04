@@ -38,6 +38,11 @@ namespace ThiefMD {
         public int view_library_width { get; set; }
         public string last_file { get; set; }
         public string spellcheck_language { get; set; }
+        public string library_list { get; set; }
+
+        public string[] library () {
+            return library_list.split(";");
+        }
 
         private static AppSettings? instance;
         public static unowned AppSettings get_default () {

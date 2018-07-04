@@ -50,6 +50,11 @@
             <summary>Last opened file</summary>
             <description>The last opened file in ThiefMD</description>
         </key>
+        <key name="library-list" type="s">
+            <default>''</default>
+            <summary>List of Directories</summary>
+            <description>Semi-color separated List of Directories to include in the Library</description>
+        </key>
         <key name="spellcheck" type="b">
             <default>true</default>
             <summary>Enable spellcheck</summary>
