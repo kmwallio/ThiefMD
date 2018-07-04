@@ -1,6 +1,7 @@
 @define-color colorPrimary #EFEFEF;
 @define-color colorPrimaryActive #DFDFDF;
 @define-color textColorPrimary #0C0C0C;
+@define-color textColorActive #000000;
 
 .thiefmd-toolbar {
     border-bottom-color: transparent;
@@ -25,4 +26,5 @@ actionbar,
 
 .thief-list-sheet-active {
     background: @colorPrimaryActive;
+    color: @textColorActive;
 }
