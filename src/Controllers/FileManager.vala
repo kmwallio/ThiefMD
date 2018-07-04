@@ -176,7 +176,7 @@ namespace ThiefMD.Controllers.FileManager {
 
     public bool open_file (string file_path) {
         bool file_opened = false;
-        var lock = new FileLock();
+        var lock = new FileLock ();
         var settings = AppSettings.get_default ();
 
         try {
@@ -185,19 +185,80 @@ namespace ThiefMD.Controllers.FileManager {
 
             if (file.query_exists ()) {
                 string filename = file.get_path ();
-                stdout.printf("Reading %s\n", filename);
+                debug ("Reading %s\n", filename);
                 GLib.FileUtils.get_contents (filename, out text);
                 Widgets.Editor.buffer.text = text;
                 settings.last_file = filename;
                 file_opened = true;
             } else {
-                stdout.printf("File does not exist\n");
+                warning ("File does not exist\n");
             }
         } catch (Error e) {
-            stdout.printf ("Error: %s", e.message);
+            warning ("Error: %s", e.message);
         }
 
         return file_opened;
+    }
+
+    public string get_file_contents (string file_path) {
+        var lock = new FileLock ();
+        string file_contents = "";
+
+        try {
+            var file = File.new_for_path (file_path);
+
+            if (file.query_exists ()) {
+                string filename = file.get_path ();
+                debug ("Reading %s\n", filename);
+                GLib.FileUtils.get_contents (filename, out file_contents);
+            } else {
+                warning ("File does not exist\n");
+            }
+        } catch (Error e) {
+            warning ("Error: %s", e.message);
+        }
+
+        return file_contents;
+    }
+
+    public string get_file_lines (string file_path, int lines, bool non_empty = true) {
+        var lock = new FileLock ();
+        string file_contents = "";
+
+        if (lines <= 0) {
+            return get_file_contents(file_path);
+        }
+
+        try {
+            var file = File.new_for_path (file_path);
+
+            if (file.query_exists ()) {
+                string filename = file.get_path ();
+                debug ("Reading %s\n", filename);
+
+                var input = new DataInputStream (file.read ());
+                int lines_read = 0;
+                string line;
+
+                while (((line = input.read_line (null)) != null) && (lines_read < lines)) {
+                    if ((!non_empty) || (line.chomp() != "")) {
+                        file_contents += ((lines_read == 0) ? "" :"\n") + line.chomp();
+                        lines_read++;
+                    }
+                }
+
+                if (lines_read == 1) {
+                    file_contents += "\n";
+                }
+
+            } else {
+                warning ("File does not exist\n");
+            }
+        } catch (Error e) {
+            warning ("Error: %s", e.message);
+        }
+
+        return file_contents;
     }
 
     public void open () throws Error {
@@ -300,7 +361,7 @@ namespace ThiefMD.Controllers.FileManager {
             Thread.usleep(150);
         }
 
-        stdout.printf ("*** Lock acq\n");
+        debug ("*** Lock acq\n");
 
         disable_save = true;
     }
@@ -308,6 +369,6 @@ namespace ThiefMD.Controllers.FileManager {
     public static void release_lock () {
         disable_save = false;
 
-        stdout.printf ("*** Lock rel\n");
+        debug ("*** Lock rel\n");
     }
 }

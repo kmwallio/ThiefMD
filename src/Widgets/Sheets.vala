@@ -13,10 +13,12 @@ namespace ThiefMD.Widgets {
         public Sheets (string path) {
             _sheets_dir = path;
             _view = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            stdout.printf ("Got %s\n", _sheets_dir);
+
+            set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
             add (_view);
+
+            debug ("Got %s\n", _sheets_dir);
             load_sheets ();
-            set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         }
 
         private void load_sheets () {

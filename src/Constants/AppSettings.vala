@@ -10,6 +10,9 @@ namespace ThiefMD {
 
         // Typewriter Position
         public const double TYPEWRITER_POSITION = 0.45;
+
+        // Number of lines to preview
+        public const int SHEET_PREVIEW_LINES = 3;
     }
 
     public class AppSettings : Granite.Services.Settings {

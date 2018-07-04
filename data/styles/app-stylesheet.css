@@ -16,3 +16,12 @@ actionbar,
     color: @textColorPrimary;
     box-shadow: 0 1px transparent inset;
 }
+
+.thief-list-sheet {
+    border-bottom: 1px solid #0c0c0c;
+    border-radius: 0;
+}
+
+.thief-list-sheet-active {
+    background: #000000;
+}
