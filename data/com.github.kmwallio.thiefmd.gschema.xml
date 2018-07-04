@@ -1,5 +1,20 @@
 <schemalist>
     <schema id="com.github.kmwallio.thiefmd" path="/com/github/kmwallio/thiefmd/">
+        <key name="view-state" type="i">
+            <default>3</default>
+            <summary>View Mode Enum</summary>
+            <description>Current view mode defining if sheets or library is in view.</description>
+        </key>
+        <key name="view-sheets-width" type="i">
+            <default>200</default>
+            <summary>Sheets View Width</summary>
+            <description>Current width of the sheets view.</description>
+        </key>
+        <key name="view-library-width" type="i">
+            <default>200</default>
+            <summary>Library View Width</summary>
+            <description>Current width of the library view.</description>
+        </key>
         <key name="window-x" type="i">
             <default>-1</default>
             <summary>Window position</summary>

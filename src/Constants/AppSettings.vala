@@ -13,6 +13,10 @@ namespace ThiefMD {
 
         // Number of lines to preview
         public const int SHEET_PREVIEW_LINES = 3;
+
+        // Max time for animations in milliseconds
+        public const int ANIMATION_TIME = 250;
+        public const int ANIMATION_FRAMES = 30;
     }
 
     public class AppSettings : Granite.Services.Settings {
@@ -29,6 +33,9 @@ namespace ThiefMD {
         public int window_width { get; set; }
         public int window_x { get; set; }
         public int window_y { get; set; }
+        public int view_state { get; set; }
+        public int view_sheets_width { get; set; }
+        public int view_library_width { get; set; }
         public string last_file { get; set; }
         public string spellcheck_language { get; set; }
 

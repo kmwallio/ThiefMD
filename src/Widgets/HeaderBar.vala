@@ -1,7 +1,10 @@
+using ThiefMD.Controllers;
+
 namespace ThiefMD.Widgets {
     public class Headerbar : Gtk.HeaderBar {
         private static Headerbar? instance = null;
 
+        private Gtk.Button change_view_button;
         private Gtk.Button search_button;
         private Gtk.Button new_sheet;
 
@@ -29,11 +32,20 @@ namespace ThiefMD.Widgets {
             new_sheet.tooltip_text = (_("New Sheet"));
             new_sheet.set_image (new Gtk.Image.from_icon_name ("document-new", Gtk.IconSize.LARGE_TOOLBAR));
 
+            change_view_button = new Gtk.Button ();
+            change_view_button.has_tooltip = true;
+            change_view_button.tooltip_text = (_("Change View"));
+            change_view_button.set_image (new Gtk.Image.from_icon_name("document-page-setup", Gtk.IconSize.LARGE_TOOLBAR));
+            change_view_button.clicked.connect(() => {
+                UI.toggle_view();
+            });
+
             search_button = new Gtk.Button ();
             search_button.has_tooltip = true;
             search_button.tooltip_text = (_("Search"));
             search_button.set_image (new Gtk.Image.from_icon_name ("edit-find", Gtk.IconSize.LARGE_TOOLBAR));
 
+            pack_start(change_view_button);
             pack_start(new_sheet);
             pack_start(search_button);
 

@@ -7,7 +7,7 @@ namespace ThiefMD {
         public Headerbar toolbar;
         public Gtk.ScrolledWindow edit_view;
         public Editor edit_view_content;
-        public Gtk.Paned pane;
+        public Gtk.Paned sheets_pane;
 
         public ThiefApp () {
             Object (
@@ -18,7 +18,7 @@ namespace ThiefMD {
 
         public int pane_position {
             get {
-                return pane.get_position ();
+                return sheets_pane.get_position ();
             }
         }
 
@@ -56,14 +56,14 @@ namespace ThiefMD {
             main_window = new Gtk.ApplicationWindow (this);
             toolbar = new Headerbar ();
             edit_view_content = new Editor();
-            pane = new Gtk.Paned(Gtk.Orientation.HORIZONTAL);
+            sheets_pane = new Gtk.Paned(Gtk.Orientation.HORIZONTAL);
 
             edit_view = new Gtk.ScrolledWindow (null, null);
             edit_view.add (edit_view_content);
             
-            pane.add1(new Sheets("/home/kmwallio/Dropbox/DnD/World"));
-            pane.add2(edit_view);
-            pane.set_position((int)(settings.window_width * 0.2));
+            sheets_pane.add1(new Sheets("/home/kmwallio/Dropbox/DnD/World"));
+            sheets_pane.add2(edit_view);
+            sheets_pane.set_position(settings.view_sheets_width);
 
 
             var provider = new Gtk.CssProvider ();
@@ -74,7 +74,7 @@ namespace ThiefMD {
             main_window.default_height = settings.window_height;
             main_window.default_width = settings.window_width;
             main_window.title = "ThiefMD";
-            main_window.add (pane);
+            main_window.add (sheets_pane);
             is_fullscreen = false;
 
             main_window.show_all ();
