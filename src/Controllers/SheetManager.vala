@@ -23,7 +23,7 @@ namespace ThiefMD.Controllers.SheetManager {
 
         loaded_file = FileManager.open_file (sheet.file_path());
         _currentSheet = sheet;
-        _currentSheet.active = false;
+        _currentSheet.active = true;
 
         debug ("Tried to load %s (%s)\n", sheet.file_path (), (loaded_file) ? "success" : "failed");
 

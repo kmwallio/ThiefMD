@@ -50,7 +50,7 @@ namespace ThiefMD.Widgets {
         public void redraw () {
             string file_contents = FileManager.get_file_lines (_sheet_path, 3);
             if (file_contents.chomp() != "") {
-                _label_buffer = SheetManager.mini_mark(file_contents);
+                _label_buffer = "<small>" + SheetManager.mini_mark(file_contents) + "</small>";
             } else {
                 _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of("/") + 1) + "</b>";
             }
