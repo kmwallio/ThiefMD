@@ -26,6 +26,7 @@ meson
 ```bash
 $ meson build && cd build
 $ meson configure -Dprefix=/usr
+$ ninja
 $ sudo ninja install
 ```
 
