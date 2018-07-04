@@ -11,6 +11,7 @@ namespace ThiefMD.Widgets {
         private string _sheets_dir;
         private List<Sheet> _sheets;
         private Gtk.Box _view;
+        Gtk.Label _empty;
 
         public Sheets (string path) {
             _sheets_dir = path;
@@ -20,7 +21,7 @@ namespace ThiefMD.Widgets {
             add (_view);
 
             debug ("Got %s\n", _sheets_dir);
-            if (_sheets_dir == "") {
+            if (_sheets_dir == "" || !FileUtils.test(path, FileTest.IS_DIR)) {
                 show_empty ();
             } else {
                 load_sheets ();
@@ -28,13 +29,15 @@ namespace ThiefMD.Widgets {
         }
 
         private void show_empty () {
-            Gtk.Label empty = new Gtk.Label("Select an item from the Library to open.");
-            _view.add(empty);
+            _empty = new Gtk.Label("Select an item from the Library to open.");
+            _view.add(_empty);
         }
 
         public void load_sheets () {
             var settings = AppSettings.get_default ();
+            _view.remove(_empty);
             _sheets = new List<Sheet>();
+            bool added = false;
 
             //
             // Scan over provided directory for Markdown files
@@ -51,6 +54,7 @@ namespace ThiefMD.Widgets {
                         Sheet sheet = new Sheet (path);
                         _sheets.append (sheet);
                         _view.add (sheet);
+                        added = true;
                         
                         if (settings.last_file == path) {
                             sheet.active = true;
@@ -60,6 +64,10 @@ namespace ThiefMD.Widgets {
                 }
             } catch (Error e) {
                 stderr.printf(e.message);
+            }
+
+            if (!added) {
+                show_empty();
             }
         }
     }

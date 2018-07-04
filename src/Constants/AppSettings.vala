@@ -44,6 +44,46 @@ namespace ThiefMD {
             return library_list.split(";");
         }
 
+        public void validate_library () {
+            string[] current_library = library();
+            string new_library = "";
+
+            foreach (string item in current_library) {
+                if ((item != "") && (FileUtils.test(item, FileTest.IS_DIR))) {
+                    if (new_library == "") {
+                        new_library = item;
+                    } else {
+                        new_library += ";" + item;
+                    }
+                }
+            }
+
+            library_list = new_library;
+        }
+
+        public bool add_to_library (string folder) {
+            string[] current_library = library();
+
+            // Validate the directory exists
+            if ((folder == "") || (!FileUtils.test(folder, FileTest.IS_DIR))) {
+                return false;
+            }
+
+            foreach (string item in current_library) {
+                if (item == folder) {
+                    return true;
+                }
+            }
+
+            if (library_list == "") {
+                library_list = folder;
+            } else {
+                library_list += ";" + folder;
+            }
+
+            return true;
+        }
+
         private static AppSettings? instance;
         public static unowned AppSettings get_default () {
             if (instance == null) {
