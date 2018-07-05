@@ -38,8 +38,8 @@ namespace ThiefMD.Widgets {
                         stdout.printf ("Removing %s\n", _selected._path);
                         _all_sheets.remove (_selected);
                         settings.remove_from_library (_selected._path);
-                        //_lib_store.remove (ref remove_node);
-                        ThiefApp.get_instance ().refresh_library ();
+                        _lib_store.remove (ref remove_node);
+                        //ThiefApp.get_instance ().refresh_library ();
                     }
                 });
                 menu.show_all ();
@@ -85,18 +85,17 @@ namespace ThiefMD.Widgets {
             string[] library = settings.library ();
 
             TreeIter root;
-            _lib_store.append (out root, null);
 
             foreach (string lib in library) {
                 if (lib == "") {
                     continue;
                 }
+                _lib_store.append (out root, null);
                 stdout.printf (lib + "\n");
                 LibPair pair = new LibPair(lib);
                 _lib_store.set (root, 0, pair._title, 1, pair, -1);
                 _all_sheets.append (pair);
                 parse_dir(lib, root);
-                _lib_store.append (out root, null);
             }
         }
 
