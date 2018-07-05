@@ -48,6 +48,16 @@ namespace ThiefMD.Widgets {
             return true;
         }
 
+        public bool has_sheets (string path) {
+            foreach (LibPair pair in _all_sheets) {
+                if (pair._sheets.get_sheets_path() == path) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public Sheets get_sheets (string path) {
             foreach (LibPair pair in _all_sheets) {
                 if (pair._sheets.get_sheets_path() == path) {
@@ -79,7 +89,7 @@ namespace ThiefMD.Widgets {
             return p;
         }
 
-        private void parse_library () {
+        public void parse_library () {
             var settings = AppSettings.get_default ();
             settings.validate_library ();
             string[] library = settings.library ();
@@ -90,12 +100,14 @@ namespace ThiefMD.Widgets {
                 if (lib == "") {
                     continue;
                 }
-                _lib_store.append (out root, null);
-                stdout.printf (lib + "\n");
-                LibPair pair = new LibPair(lib);
-                _lib_store.set (root, 0, pair._title, 1, pair, -1);
-                _all_sheets.append (pair);
-                parse_dir(lib, root);
+                if (!has_sheets (lib)) {
+                    _lib_store.append (out root, null);
+                    stdout.printf (lib + "\n");
+                    LibPair pair = new LibPair(lib);
+                    _lib_store.set (root, 0, pair._title, 1, pair, -1);
+                    _all_sheets.append (pair);
+                    parse_dir(lib, root);
+                }
             }
         }
 

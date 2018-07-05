@@ -55,13 +55,7 @@ namespace ThiefMD {
         }
 
         public void refresh_library () {
-            int cur_pos = library_pane.get_position ();
-            library_pane.remove (library);
-            library = new Library ();
-            library_pane.add1 (library);
-            library_pane.set_position (cur_pos);
-            library_pane.show_all ();
-            library.expand_all ();
+            library.parse_library ();
         }
 
         protected override void activate () {
