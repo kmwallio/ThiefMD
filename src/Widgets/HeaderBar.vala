@@ -1,3 +1,4 @@
+using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
@@ -26,6 +27,7 @@ namespace ThiefMD.Widgets {
         }
 
         private void build_ui () {
+            var settings = AppSettings.get_default ();
             set_title ("ThiefMD");
 
             new_sheet = new Gtk.MenuButton ();
@@ -53,7 +55,19 @@ namespace ThiefMD.Widgets {
             pack_start(search_button);
 
             set_show_close_button (true);
+            settings.changed.connect (update_header);
             this.show_all ();
+        }
+
+        private void update_header () {
+            var settings = AppSettings.get_default ();
+
+            if (settings.show_filename && settings.last_file != "") {
+                string file_name = settings.last_file.substring(settings.last_file.last_index_of("/") + 1);
+                set_title ("ThiefMD: " + file_name);
+            } else {
+                set_title ("ThiefMD");
+            }
         }
     }
 }

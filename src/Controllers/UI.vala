@@ -5,18 +5,32 @@ namespace ThiefMD.Controllers.UI {
 
     private int _hop = 0;
     private bool _moving = false;
+    private bool _init = false;
+    private bool _show_filename = false;
 
     public void toggle_view () {
         var settings = AppSettings.get_default ();
 
+        if (!_init) {
+            _init = true;
+            _show_filename = settings.show_filename;
+        }
+
+        if (_moving) {
+            return;
+        }
+
         settings.view_state = (settings.view_state + 1) % 3;
         
         if (settings.view_state == 0) {
+            settings.show_filename = _show_filename;
             show_sheets_and_library ();
         } else if (settings.view_state == 1) {
             // hide library
         } else if (settings.view_state == 2) {
             hide_sheets();
+            _show_filename = settings.show_filename;
+            settings.show_filename = true;
         }
         stdout.printf ("View mode: %d\n", settings.view_state);
     }
@@ -45,6 +59,8 @@ namespace ThiefMD.Controllers.UI {
         }
     }
 
+    // There's totally a GTK thing that supports animation, but I haven't found where to
+    // steal the code from yet
     public void hide_sheets () {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
