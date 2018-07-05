@@ -16,7 +16,7 @@ namespace ThiefMD {
 
         // Max time for animations in milliseconds
         public const int ANIMATION_TIME = 250;
-        public const int ANIMATION_FRAMES = 30;
+        public const int ANIMATION_FRAMES = 15;
     }
 
     public class AppSettings : Granite.Services.Settings {
