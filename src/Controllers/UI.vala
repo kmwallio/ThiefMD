@@ -5,6 +5,22 @@ namespace ThiefMD.Controllers.UI {
     private bool _init = false;
     private bool _show_filename = false;
 
+    // Returns the old sheets, but puts in the new one
+    public Sheets set_sheets (Sheets sheet) {
+        if (sheet == null) {
+            return null;
+        }
+        var settings = AppSettings.get_default ();
+        ThiefApp instance = ThiefApp.get_instance ();
+        var old = instance.library_pane.get_child2 ();
+        int cur_pos = instance.library_pane.get_position ();
+        instance.library_pane.remove (old);
+        instance.library_pane.add2 (sheet);
+        instance.library_pane.set_position (cur_pos);
+        instance.library_pane.show_all();
+        return (Sheets) old;
+    }
+
     public void toggle_view () {
         var settings = AppSettings.get_default ();
 
@@ -18,7 +34,22 @@ namespace ThiefMD.Controllers.UI {
         }
 
         settings.view_state = (settings.view_state + 1) % 3;
-        
+
+        show_view ();
+    }
+
+    public void show_view () {
+        var settings = AppSettings.get_default ();
+
+        if (!_init) {
+            _init = true;
+            _show_filename = settings.show_filename;
+        }
+
+        if (_moving) {
+            return;
+        }
+
         if (settings.view_state == 0) {
             settings.show_filename = _show_filename;
 

@@ -33,7 +33,7 @@ namespace ThiefMD.Widgets {
         }
 
         private void show_empty () {
-            _empty = new Gtk.Label("Select an item from the Library to open.");
+            _empty = new Gtk.Label("Select an item from\nthe Library to open\nor create a new Sheet.");
             _view.add(_empty);
         }
 

@@ -180,11 +180,12 @@ namespace ThiefMD.Widgets {
             buffer.place_cursor (start);
         }
 
-        public void dynamic_margins() {
+        public void dynamic_margins () {
             var settings = AppSettings.get_default ();
             int w, h, m, p;
 
             ThiefApp.get_instance ().main_window.get_size (out w, out h);
+
             w = w - ThiefApp.get_instance ().pane_position;
 
             // If ThiefMD is Full Screen, add additional padding

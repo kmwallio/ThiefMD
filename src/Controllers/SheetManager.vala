@@ -3,6 +3,7 @@ using ThiefMD.Widgets;
 
 namespace ThiefMD.Controllers.SheetManager {
     private Sheet _currentSheet;
+    private Sheets _current_sheets;
     public static Subscription sub;
 
     public class Subscription {
@@ -15,6 +16,11 @@ namespace ThiefMD.Controllers.SheetManager {
         public void state_change () {
             changed ();
         }
+    }
+
+    public void set_sheets (Sheets sheets) {
+        _current_sheets = sheets;
+        UI.set_sheets (sheets);
     }
 
     public static bool load_sheet (Sheet sheet) {
@@ -46,15 +52,25 @@ namespace ThiefMD.Controllers.SheetManager {
 
     public static void new_sheet (string file_name) {
         var settings = AppSettings.get_default ();
+        string parent_dir = "";
+        Sheets sheet;
 
-        if (_currentSheet != null) {
+        if (_current_sheets == null) {
             // Save the current file
             if (settings.last_file != "") {
                 FileManager.save_work_file ();
             }
 
             // Attempt to create the sheet and switch to it
-            Sheets sheet = _currentSheet.get_parent_sheets ();
+            sheet = _currentSheet.get_parent_sheets ();
+            parent_dir = sheet.get_sheets_path ();
+        } else {
+            sheet = _current_sheets;
+            parent_dir = sheet.get_sheets_path ();
+        }
+
+        // Create the file and refresh
+        if (parent_dir != "") {
             if (FileManager.create_sheet(sheet.get_sheets_path (), file_name)) {
                 sheet.load_sheets ();
             }

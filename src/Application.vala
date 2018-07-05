@@ -1,5 +1,7 @@
 using ThiefMD;
 using ThiefMD.Widgets;
+using ThiefMD.Controllers;
+
 namespace ThiefMD {
     public class ThiefApp : Gtk.Application {
         private static ThiefApp _instance;
@@ -61,6 +63,10 @@ namespace ThiefMD {
                 debug ("Starting with %s\n", start_dir);
             }
 
+            if (settings.library_list == "") {
+                settings.add_to_library (start_dir);
+            }
+
             main_window = new Gtk.ApplicationWindow (this);
             toolbar = new Headerbar ();
             edit_view_content = new Editor ();
@@ -85,11 +91,20 @@ namespace ThiefMD {
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
             main_window.set_titlebar (toolbar);
+            if (settings.window_height < 600) {
+                settings.window_height = 600;
+            }
+            if (settings.window_width < 800) {
+                settings.window_width = 800;
+            }
             main_window.default_height = settings.window_height;
             main_window.default_width = settings.window_width;
             main_window.title = "ThiefMD";
             main_window.add (sheets_pane);
             is_fullscreen = false;
+
+            // Restore preview view
+            UI.show_view ();
 
             main_window.show_all ();
         }
