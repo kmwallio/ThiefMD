@@ -31,7 +31,7 @@ namespace ThiefMD.Widgets {
             _label_buffer = "<b>" + sheet_path.substring(sheet_path.last_index_of("/") + 1) + "</b>";
             _label = new Gtk.Label(_label_buffer);
             _label.use_markup = true;
-            _label.lines = Constants.SHEET_PREVIEW_LINES;
+            _label.set_ellipsize (Pango.EllipsizeMode.END);
             _label.xalign = 0;
 
             var header_context = this.get_style_context ();
@@ -55,7 +55,7 @@ namespace ThiefMD.Widgets {
         }
 
         public void redraw () {
-            string file_contents = FileManager.get_file_lines (_sheet_path, 3);
+            string file_contents = FileManager.get_file_lines (_sheet_path, Constants.SHEET_PREVIEW_LINES);
             if (file_contents.chomp() != "") {
                 _label_buffer = "<small>" + SheetManager.mini_mark(file_contents) + "</small>";
             } else {

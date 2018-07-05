@@ -8,7 +8,7 @@ namespace ThiefMD.Widgets {
      * Library or file tree view
      */
     public class Library : TreeView {
-
+        private List<LibPair> _all_sheets;
         private TreeStore _lib_store;
 
         public Library () {
@@ -18,6 +18,17 @@ namespace ThiefMD.Widgets {
             set_model (_lib_store);
             insert_column_with_attributes (-1, "Library", new CellRendererText (), "text", 0, null);
             get_selection ().changed.connect (on_selection);
+        }
+
+        public Sheets get_sheets (string path) {
+            foreach (LibPair pair in _all_sheets) {
+                if (pair._sheets.get_sheets_path() == path) {
+                    return pair._sheets;
+                }
+            }
+
+            debug ("Could not find last opened project in library\n");
+            return new Sheets(path);
         }
 
         private void on_selection (TreeSelection selected) {
@@ -50,6 +61,7 @@ namespace ThiefMD.Widgets {
                 stdout.printf (lib + "\n");
                 LibPair pair = new LibPair(lib);
                 _lib_store.set (root, 0, pair._title, 1, pair, -1);
+                _all_sheets.append (pair);
                 parse_dir(lib, root);
             }
         }
@@ -68,6 +80,7 @@ namespace ThiefMD.Widgets {
                     if (FileUtils.test(path, FileTest.IS_DIR)) {
                         _lib_store.append (out child, iter);
                         LibPair pair = new LibPair(path);
+                        _all_sheets.append (pair);
                         // Append dir to list
                         _lib_store.set (child, 0, pair._title, 1, pair, -1);
                         parse_dir (path, child);

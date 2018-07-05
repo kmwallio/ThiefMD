@@ -1,3 +1,13 @@
+.undershoot.top, .undershoot.right, .undershoot.bottom, .undershoot.left {
+    background-image: none;
+    border: 0;
+}
+
+.undershoot, .undershoottop, .undershootright, .undershootbottom, .undershootleft {
+    background-image: none;
+    border: 0;
+}
+
 .color-button {
     border-bottom-left-radius: 4px;
     border-top-left-radius: 4px;

@@ -8,7 +8,7 @@ namespace ThiefMD.Controllers.UI {
     // Returns the old sheets, but puts in the new one
     public Sheets set_sheets (Sheets sheet) {
         if (sheet == null) {
-            return null;
+            return sheet;
         }
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();

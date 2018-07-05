@@ -78,7 +78,8 @@ namespace ThiefMD {
             edit_view.add (edit_view_content);
 
             library_pane.add1(library);
-            library_pane.add2(new Sheets(start_dir));
+            Sheets start_sheet = library.get_sheets (start_dir);
+            library_pane.add2(start_sheet);
             library_pane.set_position(settings.view_library_width);
             
             sheets_pane.add1(library_pane);
