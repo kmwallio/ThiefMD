@@ -32,6 +32,7 @@ namespace ThiefMD.Controllers.FileManager {
     }
 
     private void save_work_file () {
+        var lock = new FileLock ();
         var settings = AppSettings.get_default ();
         var file = File.new_for_path (settings.last_file);
 

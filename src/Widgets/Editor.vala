@@ -22,6 +22,7 @@ namespace ThiefMD.Widgets {
         public static new Gtk.SourceBuffer buffer;
         public bool is_modified { get; set; default = false; }
         public bool should_scroll { get; set; default = false; }
+        public bool should_save { get; set; default = false; }
         public File file;
         public GtkSpell.Checker spell = null;
         public Gtk.TextTag warning_tag;
@@ -69,8 +70,9 @@ namespace ThiefMD.Widgets {
             //
             // Make sure we're not swapping files
             //
-            if (!FileManager.disable_save) {
-                // @TODO: Implement saving
+            if (should_save) {
+                FileManager.save_work_file ();
+                should_save = false;
             }
 
             return settings.autosave;
@@ -173,6 +175,17 @@ namespace ThiefMD.Widgets {
 
         public void on_text_modified () {
             should_scroll = true;
+
+            // Mark as we should save the file
+            // If no autosave, schedule a save.
+            if (!should_save) {
+                var settings = AppSettings.get_default ();
+                if (!settings.autosave) {
+                    Timeout.add (10000, autosave);
+                }
+                should_save = true;
+            }
+
             if (is_modified) {
                 changed ();
                 is_modified = false;
