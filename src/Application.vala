@@ -12,6 +12,7 @@ namespace ThiefMD {
         public Library library;
         public Gtk.Paned sheets_pane;
         public Gtk.Paned library_pane;
+        public Gtk.ScrolledWindow library_view;
 
         public ThiefApp () {
             Object (
@@ -77,11 +78,14 @@ namespace ThiefMD {
             library = new Library ();
             sheets_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             library_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+            library_view = new Gtk.ScrolledWindow (null, null);
+            library_view.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
 
             edit_view = new Gtk.ScrolledWindow (null, null);
             edit_view.add (edit_view_content);
 
-            library_pane.add1 (library);
+            library_view.add (library);
+            library_pane.add1 (library_view);
             library.expand_all ();
             Sheets start_sheet = library.get_sheets (start_dir);
             library_pane.add2 (start_sheet);

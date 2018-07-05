@@ -17,7 +17,7 @@ namespace ThiefMD.Controllers.UI {
         instance.library_pane.remove (old);
         instance.library_pane.add2 (sheet);
         instance.library_pane.set_position (cur_pos);
-        instance.library_pane.show_all();
+        instance.library_pane.show_all ();
         return (Sheets) old;
     }
 
