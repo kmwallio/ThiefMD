@@ -62,7 +62,7 @@ namespace ThiefMD.Widgets {
                     debug("Found %s \n", file_name);
                     string path = Path.build_filename(_sheets_dir, file_name);
                     if ((!FileUtils.test(path, FileTest.IS_DIR)) &&
-                        (path.has_suffix(".md"))) {
+                        (path.has_suffix(".md") || path.has_suffix(".markdown"))) {
 
                         Sheet sheet = new Sheet (path, this);
                         _sheets.append (sheet);

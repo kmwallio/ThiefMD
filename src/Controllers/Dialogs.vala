@@ -35,6 +35,7 @@ namespace ThiefMD.Controllers.Dialogs {
             var filter1 = new Gtk.FileFilter ();
             filter1.set_filter_name (_("Markdown files"));
             filter1.add_pattern ("*.md");
+            filter1.add_pattern ("*.markdown");
             chooser.add_filter (filter1);
 
             var filter = new Gtk.FileFilter ();
