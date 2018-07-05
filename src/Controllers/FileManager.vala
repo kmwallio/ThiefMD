@@ -394,7 +394,7 @@ namespace ThiefMD.Controllers.FileManager {
         }
 
         if (tries == 15) {
-            stdout.printf ("*** Broke out ***\n");
+            debug ("*** Broke out ***\n");
         }
 
         debug ("*** Lock acq\n");

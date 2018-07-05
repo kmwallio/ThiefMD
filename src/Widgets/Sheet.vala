@@ -47,7 +47,7 @@ namespace ThiefMD.Widgets {
 
             redraw ();
             show_all ();
-            stdout.printf ("Creating %s\n", sheet_path);
+            debug ("Creating %s\n", sheet_path);
         }
 
         public Sheets get_parent_sheets () {

@@ -58,7 +58,7 @@ namespace ThiefMD {
             string start_dir = "";
             if (settings.last_file != "") {
                 start_dir = settings.last_file.substring(0, settings.last_file.last_index_of("/"));
-                stdout.printf ("Starting with %s\n", start_dir);
+                debug ("Starting with %s\n", start_dir);
             }
 
             main_window = new Gtk.ApplicationWindow (this);

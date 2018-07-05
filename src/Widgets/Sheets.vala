@@ -57,7 +57,7 @@ namespace ThiefMD.Widgets {
                 Dir dir = Dir.open(_sheets_dir, 0);
                 string? file_name = null;
                 while ((file_name = dir.read_name()) != null) {
-                    stdout.printf("Found %s \n", file_name);
+                    debug("Found %s \n", file_name);
                     string path = Path.build_filename(_sheets_dir, file_name);
                     if ((!FileUtils.test(path, FileTest.IS_DIR)) &&
                         (path.has_suffix(".md"))) {
