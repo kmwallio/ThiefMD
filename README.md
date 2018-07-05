@@ -16,6 +16,10 @@ Still a work in progress, but this shows the sheets and editor view.  Sheets ren
 
 Still working on the Library, but showing the different view modes.
 
+*Currently you can add to the library, but not delete.  There is no way to reorder the library or move sheets...*
+
+![](screenshots/typewriter_scrolling.gif)
+
 ## Dependencies
 
 ```
@@ -40,12 +44,19 @@ $ ninja
 $ sudo ninja install
 ```
 
+## Features
+
+ * Basic library at the moment
+ * Switch between documents
+ * Hide Library and Document Switcher
+
 ## Planning
 
- * Typewriter Scrolling
  * Sheet Management
+ * Better library organization
  * Export
  * Theming
+ * Shortcut key bindings
 
 ## Acknowledgements
 
