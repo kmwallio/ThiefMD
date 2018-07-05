@@ -61,6 +61,23 @@ namespace ThiefMD {
             library_list = new_library;
         }
 
+        public void remove_from_library (string path) {
+            string[] current_library = library();
+            string new_library = "";
+
+            foreach (string item in current_library) {
+                if ((item != "") && (FileUtils.test(item, FileTest.IS_DIR)) && (item != path)) {
+                    if (new_library == "") {
+                        new_library = item;
+                    } else {
+                        new_library += ";" + item;
+                    }
+                }
+            }
+
+            library_list = new_library;
+        }
+
         public bool add_to_library (string folder) {
             string[] current_library = library();
 

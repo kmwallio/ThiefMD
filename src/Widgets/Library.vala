@@ -10,6 +10,8 @@ namespace ThiefMD.Widgets {
     public class Library : TreeView {
         private List<LibPair> _all_sheets;
         private TreeStore _lib_store;
+        private LibPair _selected;
+        private TreeIter _selected_node;
 
         public Library () {
             stdout.printf ("Setting up library\n");
@@ -18,6 +20,32 @@ namespace ThiefMD.Widgets {
             set_model (_lib_store);
             insert_column_with_attributes (-1, "Library", new CellRendererText (), "text", 0, null);
             get_selection ().changed.connect (on_selection);
+
+        }
+
+        public override bool button_press_event(Gdk.EventButton event) {
+            base.button_press_event (event);
+
+            if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3) {
+                Gtk.Menu menu = new Gtk.Menu ();
+                Gtk.MenuItem menu_item = new Gtk.MenuItem.with_label ("Remove from Library");
+                menu.attach_to_widget (this, null);
+                menu.add (menu_item);
+                menu_item.activate.connect (() => {
+                    var settings = AppSettings.get_default ();
+                    TreeIter remove_node = _selected_node;
+                    if (_selected != null && _all_sheets.find (_selected) != null) {
+                        stdout.printf ("Removing %s\n", _selected._path);
+                        _all_sheets.remove (_selected);
+                        settings.remove_from_library (_selected._path);
+                        //_lib_store.remove (ref remove_node);
+                        ThiefApp.get_instance ().refresh_library ();
+                    }
+                });
+                menu.show_all ();
+                menu.popup (null, null, null, event.button, event.time);
+            }
+            return true;
         }
 
         public Sheets get_sheets (string path) {
@@ -36,6 +64,8 @@ namespace ThiefMD.Widgets {
             TreeIter iter;
             if (selected.get_selected (out model, out iter)) {
                 LibPair p = convert_selection (model, iter);
+                _selected = p;
+                _selected_node = iter;
                 debug ("Selected: %s\n", p._path);
                 SheetManager.set_sheets(p._sheets);
                 return;
@@ -58,6 +88,9 @@ namespace ThiefMD.Widgets {
             _lib_store.append (out root, null);
 
             foreach (string lib in library) {
+                if (lib == "") {
+                    continue;
+                }
                 stdout.printf (lib + "\n");
                 LibPair pair = new LibPair(lib);
                 _lib_store.set (root, 0, pair._title, 1, pair, -1);
