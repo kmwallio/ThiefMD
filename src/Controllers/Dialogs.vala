@@ -26,19 +26,34 @@ namespace ThiefMD.Controllers.Dialogs {
         } else if (action == Gtk.FileChooserAction.SAVE) {
             chooser.add_button ("_Save", Gtk.ResponseType.ACCEPT);
             chooser.set_do_overwrite_confirmation (true);
+        } else if (action == Gtk.FileChooserAction.SELECT_FOLDER) {
+            chooser.add_button ("_Add to Library", Gtk.ResponseType.ACCEPT);
         }
 
-        var filter1 = new Gtk.FileFilter ();
-        filter1.set_filter_name (_("Markdown files"));
-        filter1.add_pattern ("*.md");
-        chooser.add_filter (filter1);
 
-        var filter = new Gtk.FileFilter ();
-        filter.set_filter_name (_("All files"));
-        filter.add_pattern ("*");
-        chooser.add_filter (filter);
+        if (action != Gtk.FileChooserAction.SELECT_FOLDER) {
+            var filter1 = new Gtk.FileFilter ();
+            filter1.set_filter_name (_("Markdown files"));
+            filter1.add_pattern ("*.md");
+            chooser.add_filter (filter1);
+
+            var filter = new Gtk.FileFilter ();
+            filter.set_filter_name (_("All files"));
+            filter.add_pattern ("*");
+            chooser.add_filter (filter);
+        }
 
         return chooser;
+    }
+
+    public string select_folder_dialog () {
+        var chooser = create_file_chooser (_("Add to Library"), Gtk.FileChooserAction.SELECT_FOLDER);
+        string path = "";
+        if (chooser.run () == Gtk.ResponseType.ACCEPT) {
+            path = chooser.get_file ().get_path ();
+        }
+        chooser.destroy ();
+        return path;
     }
 
     public File display_open_dialog () {
@@ -49,7 +64,7 @@ namespace ThiefMD.Controllers.Dialogs {
         if (chooser.run () == Gtk.ResponseType.ACCEPT)
             file = chooser.get_file ();
 
-        chooser.destroy();
+        chooser.destroy ();
         return file;
     }
 
@@ -61,7 +76,7 @@ namespace ThiefMD.Controllers.Dialogs {
         if (chooser.run () == Gtk.ResponseType.ACCEPT)
             file = chooser.get_file ();
 
-        chooser.destroy();
+        chooser.destroy ();
         return file;
     }
 

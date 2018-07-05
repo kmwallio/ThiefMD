@@ -59,7 +59,7 @@ executable(
     'src/Widgets/Editor.vala',
     'src/Widgets/Library.vala',
     'src/Widgets/NewSheet.vala',
-    'src/Widgets/QuickPrefernces.vala',
+    'src/Widgets/QuickPreferences.vala',
     'src/Controllers/FileManager.vala',
     'src/Controllers/Dialogs.vala',
     'src/Controllers/SheetManager.vala',

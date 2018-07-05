@@ -63,6 +63,7 @@ namespace ThiefMD.Widgets {
                 _lib_store.set (root, 0, pair._title, 1, pair, -1);
                 _all_sheets.append (pair);
                 parse_dir(lib, root);
+                _lib_store.append (out root, null);
             }
         }
 

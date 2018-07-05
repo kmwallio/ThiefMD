@@ -9,6 +9,7 @@ namespace ThiefMD.Widgets {
         private Gtk.Button search_button;
         private Gtk.Button add_library_button;
         private Gtk.MenuButton new_sheet;
+        private Gtk.MenuButton menu_button;
         private NewSheet new_sheet_widget;
 
         public Headerbar () {
@@ -42,7 +43,7 @@ namespace ThiefMD.Widgets {
             change_view_button.has_tooltip = true;
             change_view_button.tooltip_text = (_("Change View"));
             change_view_button.set_image (new Gtk.Image.from_icon_name("document-page-setup", Gtk.IconSize.LARGE_TOOLBAR));
-            change_view_button.clicked.connect(() => {
+            change_view_button.clicked.connect (() => {
                 UI.toggle_view();
             });
 
@@ -50,6 +51,16 @@ namespace ThiefMD.Widgets {
             add_library_button.has_tooltip = true;
             add_library_button.tooltip_text = (_("Add Folder to Library"));
             add_library_button.set_image (new Gtk.Image.from_icon_name ("folder-new", Gtk.IconSize.LARGE_TOOLBAR));
+            add_library_button.clicked.connect (() => {
+                string new_lib = Dialogs.select_folder_dialog ();
+                if (FileUtils.test(new_lib, FileTest.IS_DIR)) {
+                    if (settings.add_to_library (new_lib)) {
+                        // Refresh
+                        ThiefApp instance = ThiefApp.get_instance ();
+                        instance.refresh_library ();
+                    }
+                }
+            });
 
 
             //  search_button = new Gtk.Button ();
@@ -57,11 +68,19 @@ namespace ThiefMD.Widgets {
             //  search_button.tooltip_text = (_("Search"));
             //  search_button.set_image (new Gtk.Image.from_icon_name ("edit-find", Gtk.IconSize.LARGE_TOOLBAR));
 
+            menu_button = new Gtk.MenuButton ();
+            menu_button.has_tooltip = true;
+            menu_button.tooltip_text = (_("Settings"));
+            menu_button.set_image (new Gtk.Image.from_icon_name ("open-menu", Gtk.IconSize.LARGE_TOOLBAR));
+            menu_button.popover = new QuickPreferences ();
+
             pack_start (change_view_button);
             pack_start (add_library_button);
             // Need to find a better way to do this
             pack_start (new Gtk.Label("                          "));
             pack_start (new_sheet);
+
+            pack_end (menu_button);
 
             set_show_close_button (true);
             settings.changed.connect (update_header);

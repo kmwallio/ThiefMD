@@ -54,6 +54,16 @@ namespace ThiefMD {
             }
         }
 
+        public void refresh_library () {
+            int cur_pos = library_pane.get_position ();
+            library_pane.remove (library);
+            library = new Library ();
+            library_pane.add1 (library);
+            library_pane.set_position (cur_pos);
+            library_pane.show_all ();
+            library.expand_all ();
+        }
+
         protected override void activate () {
             var settings = AppSettings.get_default ();
 
@@ -77,14 +87,15 @@ namespace ThiefMD {
             edit_view = new Gtk.ScrolledWindow (null, null);
             edit_view.add (edit_view_content);
 
-            library_pane.add1(library);
+            library_pane.add1 (library);
+            library.expand_all ();
             Sheets start_sheet = library.get_sheets (start_dir);
-            library_pane.add2(start_sheet);
-            library_pane.set_position(settings.view_library_width);
+            library_pane.add2 (start_sheet);
+            library_pane.set_position (settings.view_library_width);
             
-            sheets_pane.add1(library_pane);
-            sheets_pane.add2(edit_view);
-            sheets_pane.set_position(settings.view_library_width + settings.view_sheets_width);
+            sheets_pane.add1 (library_pane);
+            sheets_pane.add2 (edit_view);
+            sheets_pane.set_position (settings.view_library_width + settings.view_sheets_width);
 
 
             var provider = new Gtk.CssProvider ();
@@ -106,6 +117,10 @@ namespace ThiefMD {
 
             // Restore preview view
             UI.show_view ();
+
+            settings.changed.connect (() => {
+                main_window.show_all ();
+            });
 
             main_window.show_all ();
         }
