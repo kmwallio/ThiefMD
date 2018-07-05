@@ -76,15 +76,17 @@ namespace ThiefMD.Widgets {
                 Dir dir = Dir.open (str_dir, 0);
                 string? file_name = null;
                 while ((file_name = dir.read_name()) != null) {
-                    debug ("Found %s \n", file_name);
-                    string path = Path.build_filename (str_dir, file_name);
-                    if (FileUtils.test(path, FileTest.IS_DIR)) {
-                        _lib_store.append (out child, iter);
-                        LibPair pair = new LibPair(path);
-                        _all_sheets.append (pair);
-                        // Append dir to list
-                        _lib_store.set (child, 0, pair._title, 1, pair, -1);
-                        parse_dir (path, child);
+                    if (!file_name.has_prefix(".")) {
+                        debug ("Found %s \n", file_name);
+                        string path = Path.build_filename (str_dir, file_name);
+                        if (FileUtils.test(path, FileTest.IS_DIR)) {
+                            _lib_store.append (out child, iter);
+                            LibPair pair = new LibPair(path);
+                            _all_sheets.append (pair);
+                            // Append dir to list
+                            _lib_store.set (child, 0, pair._title, 1, pair, -1);
+                            parse_dir (path, child);
+                        }
                     }
                 }
             } catch (Error e) {
