@@ -32,7 +32,7 @@ namespace ThiefMD.Controllers.UI {
             _show_filename = settings.show_filename;
             settings.show_filename = true;
         }
-        stdout.printf ("View mode: %d\n", settings.view_state);
+        debug ("View mode: %d\n", settings.view_state);
     }
 
     public void show_sheets_and_library () {
@@ -65,7 +65,7 @@ namespace ThiefMD.Controllers.UI {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
 
-        stdout.printf ("Hiding sheets (%d)\n", instance.sheets_pane.get_position ());
+        debug ("Hiding sheets (%d)\n", instance.sheets_pane.get_position ());
         if (instance.sheets_pane.get_position () > 0) {
             _moving = false;
             settings.view_sheets_width = instance.sheets_pane.get_position ();
