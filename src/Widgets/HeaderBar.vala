@@ -7,6 +7,7 @@ namespace ThiefMD.Widgets {
 
         private Gtk.Button change_view_button;
         private Gtk.Button search_button;
+        private Gtk.Button add_library_button;
         private Gtk.MenuButton new_sheet;
         private NewSheet new_sheet_widget;
 
@@ -45,14 +46,22 @@ namespace ThiefMD.Widgets {
                 UI.toggle_view();
             });
 
-            search_button = new Gtk.Button ();
-            search_button.has_tooltip = true;
-            search_button.tooltip_text = (_("Search"));
-            search_button.set_image (new Gtk.Image.from_icon_name ("edit-find", Gtk.IconSize.LARGE_TOOLBAR));
+            add_library_button = new Gtk.Button ();
+            add_library_button.has_tooltip = true;
+            add_library_button.tooltip_text = (_("Add Folder to Library"));
+            add_library_button.set_image (new Gtk.Image.from_icon_name ("folder-new", Gtk.IconSize.LARGE_TOOLBAR));
 
-            pack_start(change_view_button);
-            pack_start(new_sheet);
-            pack_start(search_button);
+
+            //  search_button = new Gtk.Button ();
+            //  search_button.has_tooltip = true;
+            //  search_button.tooltip_text = (_("Search"));
+            //  search_button.set_image (new Gtk.Image.from_icon_name ("edit-find", Gtk.IconSize.LARGE_TOOLBAR));
+
+            pack_start (change_view_button);
+            pack_start (add_library_button);
+            // Need to find a better way to do this
+            pack_start (new Gtk.Label("                          "));
+            pack_start (new_sheet);
 
             set_show_close_button (true);
             settings.changed.connect (update_header);
