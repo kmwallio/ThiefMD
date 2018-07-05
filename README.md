@@ -16,7 +16,9 @@ Still a work in progress, but this shows the sheets and editor view.  Sheets ren
 
 Still working on the Library, but showing the different view modes.
 
-*Currently you can add to the library, but not delete.  There is no way to reorder the library or move sheets...*
+![](screenshots/library_remove.gif)
+
+Basic library management.
 
 ![](screenshots/typewriter_scrolling.gif)
 
