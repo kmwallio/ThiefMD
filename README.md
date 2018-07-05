@@ -12,6 +12,10 @@ The included for is [iA Writer Duospace](https://github.com/iaolo/iA-Fonts).  It
 
 Still a work in progress, but this shows the sheets and editor view.  Sheets render a preview of the first few lines of a file, or shows the file name.
 
+![](screenshots/panel_animation.gif)
+
+Still working on the Library, but showing the different view modes.
+
 ## Dependencies
 
 ```

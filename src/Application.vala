@@ -7,7 +7,9 @@ namespace ThiefMD {
         public Headerbar toolbar;
         public Gtk.ScrolledWindow edit_view;
         public Editor edit_view_content;
+        public Library library;
         public Gtk.Paned sheets_pane;
+        public Gtk.Paned library_pane;
 
         public ThiefApp () {
             Object (
@@ -61,15 +63,21 @@ namespace ThiefMD {
 
             main_window = new Gtk.ApplicationWindow (this);
             toolbar = new Headerbar ();
-            edit_view_content = new Editor();
-            sheets_pane = new Gtk.Paned(Gtk.Orientation.HORIZONTAL);
+            edit_view_content = new Editor ();
+            library = new Library ();
+            sheets_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+            library_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
 
             edit_view = new Gtk.ScrolledWindow (null, null);
             edit_view.add (edit_view_content);
+
+            library_pane.add1(library);
+            library_pane.add2(new Sheets(start_dir));
+            library_pane.set_position(settings.view_library_width);
             
-            sheets_pane.add1(new Sheets(start_dir));
+            sheets_pane.add1(library_pane);
             sheets_pane.add2(edit_view);
-            sheets_pane.set_position(settings.view_sheets_width);
+            sheets_pane.set_position(settings.view_library_width + settings.view_sheets_width);
 
 
             var provider = new Gtk.CssProvider ();

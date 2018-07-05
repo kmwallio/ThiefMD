@@ -57,6 +57,7 @@ executable(
     'src/Widgets/Sheets.vala',
     'src/Widgets/Sheet.vala',
     'src/Widgets/Editor.vala',
+    'src/Widgets/Library.vala',
     'src/Widgets/NewSheet.vala',
     'src/Controllers/FileManager.vala',
     'src/Controllers/Dialogs.vala',
