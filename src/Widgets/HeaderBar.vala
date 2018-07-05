@@ -6,7 +6,8 @@ namespace ThiefMD.Widgets {
 
         private Gtk.Button change_view_button;
         private Gtk.Button search_button;
-        private Gtk.Button new_sheet;
+        private Gtk.MenuButton new_sheet;
+        private NewSheet new_sheet_widget;
 
         public Headerbar () {
             var header_context = this.get_style_context ();
@@ -27,10 +28,12 @@ namespace ThiefMD.Widgets {
         private void build_ui () {
             set_title ("ThiefMD");
 
-            new_sheet = new Gtk.Button ();
+            new_sheet = new Gtk.MenuButton ();
+            new_sheet_widget = new NewSheet ();
             new_sheet.has_tooltip = true;
             new_sheet.tooltip_text = (_("New Sheet"));
             new_sheet.set_image (new Gtk.Image.from_icon_name ("document-new", Gtk.IconSize.LARGE_TOOLBAR));
+            new_sheet.popover = new_sheet_widget;
 
             change_view_button = new Gtk.Button ();
             change_view_button.has_tooltip = true;

@@ -28,6 +28,10 @@ namespace ThiefMD.Widgets {
             }
         }
 
+        public string get_sheets_path () {
+            return _sheets_dir;
+        }
+
         private void show_empty () {
             _empty = new Gtk.Label("Select an item from the Library to open.");
             _view.add(_empty);
@@ -36,6 +40,13 @@ namespace ThiefMD.Widgets {
         public void load_sheets () {
             var settings = AppSettings.get_default ();
             _view.remove(_empty);
+
+            if (_sheets != null) {
+                foreach (Sheet sheet in _sheets) {
+                    _view.remove (sheet);
+                }
+            }
+
             _sheets = new List<Sheet>();
             bool added = false;
 
@@ -51,7 +62,7 @@ namespace ThiefMD.Widgets {
                     if ((!FileUtils.test(path, FileTest.IS_DIR)) &&
                         (path.has_suffix(".md"))) {
 
-                        Sheet sheet = new Sheet (path);
+                        Sheet sheet = new Sheet (path, this);
                         _sheets.append (sheet);
                         _view.add (sheet);
                         added = true;

@@ -12,6 +12,7 @@ namespace ThiefMD.Widgets {
         private bool _selected;
         private Gtk.Label _label;
         private string _label_buffer;
+        private Sheets _parent;
 
         public bool active {
             set {
@@ -24,8 +25,9 @@ namespace ThiefMD.Widgets {
             }
         }
 
-        public Sheet (string sheet_path) {
+        public Sheet (string sheet_path, Sheets parent) {
             _sheet_path = sheet_path;
+            _parent = parent;
             _label_buffer = "<b>" + sheet_path.substring(sheet_path.last_index_of("/") + 1) + "</b>";
             _label = new Gtk.Label(_label_buffer);
             _label.use_markup = true;
@@ -46,6 +48,10 @@ namespace ThiefMD.Widgets {
             redraw ();
             show_all ();
             stdout.printf ("Creating %s\n", sheet_path);
+        }
+
+        public Sheets get_parent_sheets () {
+            return _parent;
         }
 
         public void redraw () {

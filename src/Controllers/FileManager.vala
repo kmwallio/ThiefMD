@@ -346,6 +346,31 @@ namespace ThiefMD.Controllers.FileManager {
         view.is_modified = false;
     }
 
+    public static bool create_sheet (string parent_folder, string file_name) {
+        var lock = new FileLock ();
+        File parent_dir = File.new_for_path (parent_folder);
+        bool file_created = false;
+
+        if (parent_dir.query_exists ()) {
+            var new_file = parent_dir.get_child (file_name);
+            // Make sure the file doesn't exist.
+            if (!new_file.query_exists ()) {
+                string buffer = "";
+                uint8[] binbuffer = buffer.data;
+
+                try {
+                    save_file (new_file, binbuffer);
+                    open_file (new_file.get_path ());
+                    file_created = true;
+                } catch (Error e) {
+                    warning ("Exception found: "+ e.message);
+                }
+            }
+        }
+
+        return file_created;
+    }
+
     public class FileLock {
         public FileLock () {
             FileManager.acquire_lock ();
