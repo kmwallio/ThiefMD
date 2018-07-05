@@ -223,6 +223,69 @@ namespace ThiefMD.Controllers.FileManager {
         return file_contents;
     }
 
+    public string get_file_lines_yaml (string file_path, int lines, bool non_empty = true) {
+        var lock = new FileLock ();
+        string file_contents = "";
+
+        if (lines <= 0) {
+            return get_file_contents(file_path);
+        }
+
+        try {
+            var file = File.new_for_path (file_path);
+            Regex headers = new Regex ("^\\s*(.+)\\s*:\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            MatchInfo matches;
+
+            if (file.query_exists ()) {
+                string filename = file.get_path ();
+                debug ("Reading %s\n", filename);
+
+                var input = new DataInputStream (file.read ());
+                int lines_read = 0;
+                string line;
+                bool in_yaml = false;
+
+                while (((line = input.read_line (null)) != null) && (lines_read < lines)) {
+                    if ((!non_empty) || (line.chomp() != "")) {
+                        if (line == "---") {
+                            if (in_yaml) {
+                                in_yaml = false;
+                                continue;
+                            } else if (lines_read == 0) {
+                                in_yaml = true;
+                            }
+                        }
+                        if (!in_yaml) {
+                            file_contents += ((lines_read == 0) ? "" :"\n") + line.chomp();
+                            lines_read++;
+                        } else {
+                            if (headers.match (line, RegexMatchFlags.NOTEMPTY, out matches)) {
+                                if (matches.fetch (1).ascii_down() == "title") {
+                                    file_contents += ((lines_read == 0) ? "" :"\n") + "# " + matches.fetch (2).replace ("\"", "");
+                                    lines_read++;
+                                } else if (matches.fetch (1).ascii_down() == "date") {
+                                    file_contents += ((lines_read == 0) ? "" :"\n") + matches.fetch (2);
+                                    lines_read++;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (lines_read == 1) {
+                    file_contents += "\n";
+                }
+
+            } else {
+                warning ("File does not exist\n");
+            }
+        } catch (Error e) {
+            warning ("Error: %s", e.message);
+        }
+
+        return file_contents;
+    }
+
     public string get_file_lines (string file_path, int lines, bool non_empty = true) {
         var lock = new FileLock ();
         string file_contents = "";

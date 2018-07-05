@@ -33,7 +33,7 @@ namespace ThiefMD.Widgets {
             _file_name.set_text ("");
 
             // Check for .md extension
-            if (!file_name.has_suffix(".md") && !file_name.has_suffix(".markdown")) {
+            if (!file_name.ascii_down ().has_suffix(".md") && !file_name.ascii_down ().has_suffix(".markdown")) {
                 file_name += ".md";
             }
 
