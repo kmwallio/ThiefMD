@@ -100,6 +100,7 @@ namespace ThiefMD.Controllers.FileManager {
 
     // File I/O
     public void new_file () {
+        var lock = new FileLock ();
         debug ("New button pressed.");
         debug ("Buffer was modified. Asking user to save first.");
         var settings = AppSettings.get_default ();
@@ -157,6 +158,7 @@ namespace ThiefMD.Controllers.FileManager {
     }
 
     public bool open_from_outside (File[] files, string hint) {
+        var lock = new FileLock ();
         if (files.length > 0) {
             var file = files[0];
             string text;
@@ -262,10 +264,10 @@ namespace ThiefMD.Controllers.FileManager {
     }
 
     public void open () throws Error {
+        var lock = new FileLock ();
         debug ("Open button pressed.");
         var settings = AppSettings.get_default ();
         var file = Controllers.Dialogs.display_open_dialog ();
-        settings.last_file = file.get_path ();
 
         try {
             debug ("Opening file...");
@@ -275,6 +277,7 @@ namespace ThiefMD.Controllers.FileManager {
                 string text;
                 GLib.FileUtils.get_contents (file.get_path (), out text);
                 Widgets.Editor.buffer.text = text;
+                settings.last_file = file.get_path ();
             }
         } catch (Error e) {
             warning ("Unexpected error during open: " + e.message);
@@ -314,11 +317,11 @@ namespace ThiefMD.Controllers.FileManager {
     }
 
     public void save_as () throws Error {
+        var lock = new FileLock ();
         debug ("Save as button pressed.");
         var settings = AppSettings.get_default ();
         var file = Controllers.Dialogs.display_save_dialog ();
         settings.last_file = file.get_path ();
-        
 
         try {
             debug ("Saving file...");
@@ -357,8 +360,16 @@ namespace ThiefMD.Controllers.FileManager {
         //
         // Bad locking, but wait if we're doing file switching already
         //
-        while (disable_save) {
-            Thread.usleep(150);
+        // Misbehave after ~4 seconds of waiting...
+        //
+        int tries = 0;
+        while (disable_save && tries < 15) {
+            Thread.usleep(250);
+            tries++;
+        }
+
+        if (tries == 15) {
+            stdout.printf ("*** Broke out ***\n");
         }
 
         debug ("*** Lock acq\n");
