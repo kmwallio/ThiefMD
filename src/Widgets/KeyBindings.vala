@@ -89,6 +89,11 @@ namespace ThiefMD.Widgets {
                 if (match_keycode (Gdk.Key.F11, keycode)) {
                     settings.fullscreen = !settings.fullscreen;
                 }
+                if (match_keycode (Gdk.Key.Escape, keycode)) {
+                    if (settings.fullscreen) {
+                        settings.fullscreen = false;
+                    }
+                }
 
                 return true;
             });
