@@ -76,7 +76,8 @@ namespace ThiefMD.Controllers.SheetManager {
         string result = contents;
         try {
             Regex headers = new Regex ("^(#+)\\s(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            result = headers.replace (contents, -1, 0, "<b>\\1 \\2</b>");
+            result = result.replace ("<", "&lt;").replace (">", "&gt;");
+            result = headers.replace (result, -1, 0, "<b>\\1 \\2</b>");
         } catch (Error e) {
             warning ("Error: %s", e.message);
         }

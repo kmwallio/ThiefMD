@@ -286,6 +286,10 @@ namespace ThiefMD.Widgets {
             right_margin = m;
 
             typewriter_scrolling ();
+
+            // Keep the curson in view?
+            should_scroll = true;
+            move_typewriter_scolling ();
         }
 
         private void typewriter_scrolling () {
@@ -310,11 +314,16 @@ namespace ThiefMD.Widgets {
 
             typewriter_scrolling ();
             if (!typewriter_active && settings.typewriter_scrolling) {
+                typewriter_active = true;
                 Timeout.add(500, move_typewriter_scolling);
                 queue_draw ();
+                should_scroll = true;
+                move_typewriter_scolling ();
             } else if (typewriter_active && !settings.typewriter_scrolling) {
                 typewriter_active = false;
                 queue_draw ();
+                should_scroll = true;
+                move_typewriter_scolling ();
             }
 
             set_scheme (get_default_scheme ());
