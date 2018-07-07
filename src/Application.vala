@@ -13,6 +13,7 @@ namespace ThiefMD {
         public Gtk.Paned sheets_pane;
         public Gtk.Paned library_pane;
         public Gtk.ScrolledWindow library_view;
+        public bool ready = false;
 
         public ThiefApp () {
             Object (
@@ -101,17 +102,20 @@ namespace ThiefMD {
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
             main_window.set_titlebar (toolbar);
+            stdout.printf ("Window (%d, %d)\n", settings.window_width, settings.window_height);
             if (settings.window_height < 600) {
                 settings.window_height = 600;
             }
             if (settings.window_width < 800) {
                 settings.window_width = 800;
             }
-            main_window.default_height = settings.window_height;
-            main_window.default_width = settings.window_width;
+
+            main_window.set_default_size (settings.window_width, settings.window_height);
             main_window.title = "ThiefMD";
             main_window.add (sheets_pane);
+            main_window.hide_titlebar_when_maximized = true;
             is_fullscreen = false;
+            ready = true;
 
             // Restore preview view
             UI.show_view ();

@@ -13,7 +13,7 @@ namespace ThiefMD.Widgets {
             var typewriter_button = new Gtk.ToggleButton.with_label ((_("Typewriter Scrolling")));
             typewriter_button.set_image (new Gtk.Image.from_icon_name ("preferences-desktop-keyboard", Gtk.IconSize.SMALL_TOOLBAR));
             typewriter_button.set_always_show_image (true);
-            typewriter_button.tooltip_text = _("Enter focus mode");
+            typewriter_button.tooltip_text = _("Toggle Typewriter Scrolling");
 
             if (settings.typewriter_scrolling == false) {
                 typewriter_button.set_active (false);

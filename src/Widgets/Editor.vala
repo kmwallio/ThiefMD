@@ -29,56 +29,9 @@ namespace ThiefMD.Widgets {
         public GtkSpell.Checker spell = null;
         public Gtk.TextTag warning_tag;
         public Gtk.TextTag error_tag;
-        private int last_width;
-
-        public signal void changed ();
-
-        public bool spellcheck {
-            set {
-                if (value) {
-                    try {
-                        var settings = AppSettings.get_default ();
-                        var last_language = settings.spellcheck_language;
-                        bool language_set = false;
-                        var language_list = GtkSpell.Checker.get_language_list ();
-                        foreach (var element in language_list) {
-                            if (last_language == element) {
-                                language_set = true;
-                                spell.set_language (last_language);
-                                break;
-                            }
-                        }
-
-                        if (language_list.length () == 0) {
-                            spell.set_language (null);
-                        } else if (!language_set) {
-                            last_language = language_list.first ().data;
-                            spell.set_language (last_language);
-                        }
-                        settings.changed.connect (spellcheck_enable);
-                        spell.attach (this);
-                    } catch (Error e) {
-                        warning (e.message);
-                    }
-                } else {
-                    spell.detach ();
-                }
-            }
-        }
-
-        private bool autosave () {
-            var settings = AppSettings.get_default ();
-
-            //
-            // Make sure we're not swapping files
-            //
-            if (should_save) {
-                FileManager.save_work_file ();
-                should_save = false;
-            }
-
-            return settings.autosave;
-        }
+        private int last_width = 0;
+        private int last_height = 0;
+        private bool spellcheck_active;
 
         public Editor () {
             update_settings ();
@@ -160,6 +113,74 @@ namespace ThiefMD.Widgets {
             this.has_focus = true;
             this.set_tab_width (4);
             this.set_insert_spaces_instead_of_tabs (true);
+            spell = new GtkSpell.Checker ();
+
+            if (settings.spellcheck) {
+                spell.attach (this);
+                spellcheck_active = true;
+            } else {
+                spellcheck_active = false;
+            }
+
+            last_width = settings.window_width;
+            last_height = settings.window_height;
+        }
+
+        public signal void changed ();
+
+        public bool spellcheck {
+            set {
+                if (value && !spellcheck_active) {
+                    try {
+                        var settings = AppSettings.get_default ();
+                        var last_language = settings.spellcheck_language;
+                        bool language_set = false;
+                        var language_list = GtkSpell.Checker.get_language_list ();
+                        foreach (var element in language_list) {
+                            if (last_language == element) {
+                                language_set = true;
+                                spell.set_language (last_language);
+                                break;
+                            }
+                        }
+
+                        if (language_list.length () == 0) {
+                            spell.set_language (null);
+                        } else if (!language_set) {
+                            last_language = language_list.first ().data;
+                            spell.set_language (last_language);
+                        }
+                        spell.attach (this);
+                        spellcheck_active = true;
+                    } catch (Error e) {
+                        warning (e.message);
+                    }
+                } else {
+                    spell.detach ();
+                    spellcheck_active = false;
+                }
+            }
+        }
+
+        private bool autosave () {
+            var settings = AppSettings.get_default ();
+
+            //
+            // Make sure we're not swapping files
+            //
+            if (should_save) {
+                FileManager.save_work_file ();
+                should_save = false;
+            }
+
+            // Jamming this here for now to prevent
+            // reinit of spellcheck on resize
+            int w, h;
+            ThiefApp.get_instance ().main_window.get_size (out w, out h);
+            settings.window_width = w;
+            settings.window_height = h;
+
+            return settings.autosave;
         }
 
         private Gtk.MenuItem? get_selected (Gtk.Menu? menu) {
@@ -183,7 +204,7 @@ namespace ThiefMD.Widgets {
             if (!should_save) {
                 var settings = AppSettings.get_default ();
                 if (!settings.autosave) {
-                    Timeout.add (10000, autosave);
+                    Timeout.add (3000, autosave);
                 }
                 should_save = true;
             }
@@ -214,11 +235,22 @@ namespace ThiefMD.Widgets {
 
         public void dynamic_margins () {
             var settings = AppSettings.get_default ();
-            int w, h, m, p;
 
+            if (!ThiefApp.get_instance ().ready) {
+                return;
+            }
+
+            int w, h, m, p;
             ThiefApp.get_instance ().main_window.get_size (out w, out h);
 
             w = w - ThiefApp.get_instance ().pane_position;
+            last_height = h;
+
+            if (w == last_width) {
+                return;
+            }
+
+            last_width = w;
 
             // If ThiefMD is Full Screen, add additional padding
             p = (settings.fullscreen) ? 5 : 0;
@@ -241,11 +273,17 @@ namespace ThiefMD.Widgets {
             left_margin = m;
             right_margin = m;
 
+            typewriter_scrolling ();
+        }
+
+        private void typewriter_scrolling () {
+            var settings = AppSettings.get_default ();
+
             // Check for typewriter scrolling and adjust bottom margin to
             // compensate
             if (settings.typewriter_scrolling) {
-                bottom_margin = (int)(h * (1 - Constants.TYPEWRITER_POSITION)) - 20;
-                top_margin = (int)(h * Constants.TYPEWRITER_POSITION) - 20;
+                bottom_margin = (int)(last_height * (1 - Constants.TYPEWRITER_POSITION)) - 20;
+                top_margin = (int)(last_height * Constants.TYPEWRITER_POSITION) - 20;
             } else {
                 bottom_margin = Constants.BOTTOM_MARGIN;
                 top_margin = Constants.TOP_MARGIN;
@@ -256,7 +294,6 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             this.set_pixels_above_lines(settings.spacing);
             this.set_pixels_inside_wrap(settings.spacing);
-            dynamic_margins();
             this.set_show_line_numbers (settings.show_num_lines);
 
             if (settings.typewriter_scrolling) {
@@ -264,6 +301,9 @@ namespace ThiefMD.Widgets {
             }
 
             set_scheme (get_default_scheme ());
+
+            spellcheck_enable();
+            typewriter_scrolling ();
         }
 
         private void spellcheck_enable () {
