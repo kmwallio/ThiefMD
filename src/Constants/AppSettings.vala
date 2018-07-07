@@ -49,7 +49,7 @@ namespace ThiefMD {
             string new_library = "";
 
             foreach (string item in current_library) {
-                if ((item != "") && (FileUtils.test(item, FileTest.IS_DIR))) {
+                if ((item.chomp() != "") && (FileUtils.test(item, FileTest.IS_DIR))) {
                     if (new_library == "") {
                         new_library = item;
                     } else {
@@ -66,7 +66,7 @@ namespace ThiefMD {
             string new_library = "";
 
             foreach (string item in current_library) {
-                if ((item != "") && (FileUtils.test(item, FileTest.IS_DIR)) && (item != path)) {
+                if ((item.chomp() != "") && (FileUtils.test(item, FileTest.IS_DIR)) && (item != path)) {
                     if (new_library == "") {
                         new_library = item;
                     } else {
@@ -82,7 +82,7 @@ namespace ThiefMD {
             string[] current_library = library();
 
             // Validate the directory exists
-            if ((folder == "") || (!FileUtils.test(folder, FileTest.IS_DIR))) {
+            if ((folder.chomp() == "") || (!FileUtils.test(folder, FileTest.IS_DIR))) {
                 return false;
             }
 
@@ -92,7 +92,7 @@ namespace ThiefMD {
                 }
             }
 
-            if (library_list == "") {
+            if (library_list.chomp () == "") {
                 library_list = folder;
             } else {
                 library_list += ";" + folder;
