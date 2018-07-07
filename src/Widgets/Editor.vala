@@ -32,6 +32,7 @@ namespace ThiefMD.Widgets {
         private int last_width = 0;
         private int last_height = 0;
         private bool spellcheck_active;
+        private bool typewriter_active;
 
         public Editor () {
             update_settings ();
@@ -100,9 +101,8 @@ namespace ThiefMD.Widgets {
             // Register for redrawing of window for handling margins and other
             // redrawing
             //
-            Timeout.add(100, () => {
+            size_allocate.connect (() => {
                 dynamic_margins();
-                return true;
             });
 
             this.set_buffer (buffer);
@@ -116,12 +116,18 @@ namespace ThiefMD.Widgets {
             spell = new GtkSpell.Checker ();
 
             if (settings.spellcheck) {
+                stdout.printf ("Activate spellcheck\n");
                 spell.attach (this);
                 spellcheck_active = true;
             } else {
+                stdout.printf ("Disable spellcheck\n");
                 spellcheck_active = false;
             }
 
+            typewriter_active = settings.typewriter_scrolling;
+            if (typewriter_active) {
+                Timeout.add(500, move_typewriter_scolling);
+            }
             last_width = settings.window_width;
             last_height = settings.window_height;
         }
@@ -131,6 +137,7 @@ namespace ThiefMD.Widgets {
         public bool spellcheck {
             set {
                 if (value && !spellcheck_active) {
+                    stdout.printf ("Activate spellcheck\n");
                     try {
                         var settings = AppSettings.get_default ();
                         var last_language = settings.spellcheck_language;
@@ -155,7 +162,8 @@ namespace ThiefMD.Widgets {
                     } catch (Error e) {
                         warning (e.message);
                     }
-                } else {
+                } else if (!value && spellcheck_active) {
+                    stdout.printf ("Disable spellcheck\n");
                     spell.detach ();
                     spellcheck_active = false;
                 }
@@ -179,6 +187,10 @@ namespace ThiefMD.Widgets {
             ThiefApp.get_instance ().main_window.get_size (out w, out h);
             settings.window_width = w;
             settings.window_height = h;
+
+            if (spellcheck_active) {
+                spell.recheck_all ();
+            }
 
             return settings.autosave;
         }
@@ -284,9 +296,11 @@ namespace ThiefMD.Widgets {
             if (settings.typewriter_scrolling) {
                 bottom_margin = (int)(last_height * (1 - Constants.TYPEWRITER_POSITION)) - 20;
                 top_margin = (int)(last_height * Constants.TYPEWRITER_POSITION) - 20;
+                queue_draw ();
             } else {
                 bottom_margin = Constants.BOTTOM_MARGIN;
                 top_margin = Constants.TOP_MARGIN;
+                queue_draw ();
             }
         }
 
@@ -296,14 +310,18 @@ namespace ThiefMD.Widgets {
             this.set_pixels_inside_wrap(settings.spacing);
             this.set_show_line_numbers (settings.show_num_lines);
 
-            if (settings.typewriter_scrolling) {
+            typewriter_scrolling ();
+            if (!typewriter_active && settings.typewriter_scrolling) {
                 Timeout.add(500, move_typewriter_scolling);
+                show_all ();
+            } else if (typewriter_active && !settings.typewriter_scrolling) {
+                typewriter_active = false;
+                show_all ();
             }
 
             set_scheme (get_default_scheme ());
 
             spellcheck_enable();
-            typewriter_scrolling ();
         }
 
         private void spellcheck_enable () {

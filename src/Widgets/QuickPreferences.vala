@@ -22,13 +22,33 @@ namespace ThiefMD.Widgets {
             }
 
             typewriter_button.toggled.connect (() => {
-    			if (typewriter_button.active) {
-    				settings.typewriter_scrolling = true;
-    			} else {
-    				settings.typewriter_scrolling = false;
-    			}
-
+                if (typewriter_button.active) {
+                    settings.typewriter_scrolling = true;
+                } else {
+                    settings.typewriter_scrolling = false;
+                }
             });
+
+            var spellcheck_button = new Gtk.ToggleButton.with_label ((_("Check Spelling")));
+            spellcheck_button.set_image (new Gtk.Image.from_icon_name ("tools-check-spelling", Gtk.IconSize.SMALL_TOOLBAR));
+            spellcheck_button.set_always_show_image (true);
+            spellcheck_button.tooltip_text = _("Toggle Spellcheck");
+
+            if (settings.spellcheck == false) {
+                spellcheck_button.set_active (false);
+            } else {
+                spellcheck_button.set_active (settings.spellcheck);
+            }
+
+            spellcheck_button.toggled.connect (() => {
+                if (spellcheck_button.active) {
+                    settings.spellcheck = true;
+                } else {
+                    settings.spellcheck = false;
+                }
+            });
+
+            var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
 
             var menu_grid = new Gtk.Grid ();
             menu_grid.margin = 6;
@@ -36,10 +56,11 @@ namespace ThiefMD.Widgets {
             menu_grid.column_spacing = 12;
             menu_grid.orientation = Gtk.Orientation.VERTICAL;
             menu_grid.add (typewriter_button);
+            menu_grid.add (separator);
+            menu_grid.add (spellcheck_button);
             menu_grid.show_all ();
 
             add (menu_grid);
-            show_all ();
         }
     }
 }
