@@ -97,7 +97,7 @@ namespace ThiefMD.Widgets {
             TreeIter root;
 
             foreach (string lib in library) {
-                if (lib == "") {
+                if (lib.chomp () == "") {
                     continue;
                 }
                 if (!has_sheets (lib)) {
