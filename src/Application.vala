@@ -114,8 +114,10 @@ namespace ThiefMD {
             main_window.title = "ThiefMD";
             main_window.add (sheets_pane);
             main_window.hide_titlebar_when_maximized = true;
-            is_fullscreen = false;
+            is_fullscreen = settings.fullscreen;
             ready = true;
+
+            new KeyBindings (main_window);
 
             // Restore preview view
             UI.show_view ();

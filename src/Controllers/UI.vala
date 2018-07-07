@@ -22,6 +22,7 @@ namespace ThiefMD.Controllers.UI {
 
     public void toggle_view () {
         var settings = AppSettings.get_default ();
+        ThiefApp instance = ThiefApp.get_instance ();
 
         if (!_init) {
             _init = true;
@@ -33,6 +34,14 @@ namespace ThiefMD.Controllers.UI {
         }
 
         settings.view_state = (settings.view_state + 1) % 3;
+
+        if (settings.view_state == 2) {
+            settings.view_sheets_width = instance.sheets_pane.get_position ();
+        } else if (settings.view_state == 1) {
+            int target_sheets = instance.sheets_pane.get_position () - instance.library_pane.get_position ();
+            settings.view_sheets_width = target_sheets;
+            settings.view_library_width = instance.library_pane.get_position ();
+        }
 
         show_view ();
     }
@@ -78,8 +87,7 @@ namespace ThiefMD.Controllers.UI {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
 
-        debug ("Hiding sheets (%d)\n", instance.sheets_pane.get_position ());
-        settings.view_sheets_width = instance.sheets_pane.get_position ();
+        debug ("Showing sheets (%d)\n", instance.sheets_pane.get_position ());
         move_panes(0, settings.view_sheets_width);
     }
 
@@ -96,9 +104,16 @@ namespace ThiefMD.Controllers.UI {
         debug ("Hiding library (%d)\n", instance.library_pane.get_position ());
         if (instance.library_pane.get_position () > 0) {
             _moving = false;
-            int target_sheets = instance.sheets_pane.get_position () - instance.library_pane.get_position ();
-            settings.view_library_width = instance.library_pane.get_position ();
-            settings.view_sheets_width = target_sheets;
+            int target_sheets = 0;
+            if (instance.library_pane.get_position () > 0) {
+                target_sheets = instance.sheets_pane.get_position () - instance.library_pane.get_position ();
+            } else {
+                if (instance.sheets_pane.get_position () > 0) {
+                    target_sheets = instance.sheets_pane.get_position ();
+                } else {
+                    target_sheets = settings.view_sheets_width;
+                }
+            }
             move_panes (0, target_sheets);
         }
     }
@@ -108,7 +123,6 @@ namespace ThiefMD.Controllers.UI {
         ThiefApp instance = ThiefApp.get_instance ();
 
         debug ("Hiding sheets (%d)\n", instance.sheets_pane.get_position ());
-        settings.view_sheets_width = instance.sheets_pane.get_position ();
         move_panes(0, 0);
     }
 
