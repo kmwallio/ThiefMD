@@ -102,7 +102,7 @@ namespace ThiefMD {
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
             main_window.set_titlebar (toolbar);
-            stdout.printf ("Window (%d, %d)\n", settings.window_width, settings.window_height);
+            debug ("Window (%d, %d)\n", settings.window_width, settings.window_height);
             if (settings.window_height < 600) {
                 settings.window_height = 600;
             }
@@ -127,6 +127,13 @@ namespace ThiefMD {
             });
 
             main_window.show_all ();
+
+            // Attempt to set taskbar icon
+            try {
+                main_window.icon = Gtk.IconTheme.get_default ().load_icon ("accessories-text-editor", Gtk.IconSize.DIALOG, 0);
+            } catch (Error e) {
+                debug ("Could not set icon: %s\n", e.message);
+            }
         }
 
         public static ThiefApp get_instance () {

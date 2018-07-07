@@ -14,7 +14,7 @@ namespace ThiefMD.Widgets {
         private TreeIter _selected_node;
 
         public Library () {
-            stdout.printf ("Setting up library\n");
+            debug ("Setting up library\n");
             _lib_store = new TreeStore (2, typeof (string), typeof (LibPair));
             parse_library();
             set_model (_lib_store);
@@ -35,7 +35,7 @@ namespace ThiefMD.Widgets {
                     var settings = AppSettings.get_default ();
                     TreeIter remove_node = _selected_node;
                     if (_selected != null && _all_sheets.find (_selected) != null) {
-                        stdout.printf ("Removing %s\n", _selected._path);
+                        debug ("Removing %s\n", _selected._path);
                         _all_sheets.remove (_selected);
                         settings.remove_from_library (_selected._path);
                         _lib_store.remove (ref remove_node);
@@ -102,7 +102,7 @@ namespace ThiefMD.Widgets {
                 }
                 if (!has_sheets (lib)) {
                     _lib_store.append (out root, null);
-                    stdout.printf (lib + "\n");
+                    debug (lib + "\n");
                     LibPair pair = new LibPair(lib);
                     _lib_store.set (root, 0, pair._title, 1, pair, -1);
                     _all_sheets.append (pair);
@@ -150,7 +150,7 @@ namespace ThiefMD.Widgets {
             } else {
                 _path = path;
             }
-            stdout.printf ("Got path : %s\n", _path);
+            debug ("Got path : %s\n", _path);
             _title = _path.substring (_path.last_index_of ("/") + 1);
             _sheets = new Sheets(_path);
         }

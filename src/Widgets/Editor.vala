@@ -116,11 +116,11 @@ namespace ThiefMD.Widgets {
             spell = new GtkSpell.Checker ();
 
             if (settings.spellcheck) {
-                stdout.printf ("Activate spellcheck\n");
+                debug ("Activate spellcheck\n");
                 spell.attach (this);
                 spellcheck_active = true;
             } else {
-                stdout.printf ("Disable spellcheck\n");
+                debug ("Disable spellcheck\n");
                 spellcheck_active = false;
             }
 
@@ -137,7 +137,7 @@ namespace ThiefMD.Widgets {
         public bool spellcheck {
             set {
                 if (value && !spellcheck_active) {
-                    stdout.printf ("Activate spellcheck\n");
+                    debug ("Activate spellcheck\n");
                     try {
                         var settings = AppSettings.get_default ();
                         var last_language = settings.spellcheck_language;
@@ -163,7 +163,7 @@ namespace ThiefMD.Widgets {
                         warning (e.message);
                     }
                 } else if (!value && spellcheck_active) {
-                    stdout.printf ("Disable spellcheck\n");
+                    debug ("Disable spellcheck\n");
                     spell.detach ();
                     spellcheck_active = false;
                 }
