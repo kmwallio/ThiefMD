@@ -102,7 +102,7 @@ namespace ThiefMD.Controllers.UI {
         ThiefApp instance = ThiefApp.get_instance ();
 
         debug ("Hiding library (%d)\n", instance.library_pane.get_position ());
-        if (instance.library_pane.get_position () > 0) {
+        if (instance.library_pane.get_position () > 0 || instance.sheets_pane.get_position () <= 0) {
             _moving = false;
             int target_sheets = 0;
             if (instance.library_pane.get_position () > 0) {

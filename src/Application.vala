@@ -123,7 +123,7 @@ namespace ThiefMD {
             UI.show_view ();
 
             settings.changed.connect (() => {
-                main_window.show_all ();
+                is_fullscreen = settings.fullscreen;
             });
 
             main_window.show_all ();
