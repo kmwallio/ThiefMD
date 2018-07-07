@@ -296,11 +296,9 @@ namespace ThiefMD.Widgets {
             if (settings.typewriter_scrolling) {
                 bottom_margin = (int)(last_height * (1 - Constants.TYPEWRITER_POSITION)) - 20;
                 top_margin = (int)(last_height * Constants.TYPEWRITER_POSITION) - 20;
-                queue_draw ();
             } else {
                 bottom_margin = Constants.BOTTOM_MARGIN;
                 top_margin = Constants.TOP_MARGIN;
-                queue_draw ();
             }
         }
 
@@ -313,10 +311,10 @@ namespace ThiefMD.Widgets {
             typewriter_scrolling ();
             if (!typewriter_active && settings.typewriter_scrolling) {
                 Timeout.add(500, move_typewriter_scolling);
-                show_all ();
+                queue_draw ();
             } else if (typewriter_active && !settings.typewriter_scrolling) {
                 typewriter_active = false;
-                show_all ();
+                queue_draw ();
             }
 
             set_scheme (get_default_scheme ());
