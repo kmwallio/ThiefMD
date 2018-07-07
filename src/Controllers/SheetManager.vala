@@ -4,23 +4,16 @@ using ThiefMD.Widgets;
 namespace ThiefMD.Controllers.SheetManager {
     private Sheet _currentSheet;
     private Sheets _current_sheets;
-    public static Subscription sub;
-
-    public class Subscription {
-        public signal void changed ();
-
-        public Subscription () {
-            // No clue what I'm doing...
-        }
-
-        public void state_change () {
-            changed ();
-        }
-    }
 
     public void set_sheets (Sheets sheets) {
         _current_sheets = sheets;
         UI.set_sheets (sheets);
+    }
+
+    public static void refresh_sheet () {
+        if (_currentSheet != null) {
+            _currentSheet.redraw ();
+        }
     }
 
     public static bool load_sheet (Sheet sheet) {
@@ -43,7 +36,6 @@ namespace ThiefMD.Controllers.SheetManager {
         loaded_file = FileManager.open_file (sheet.file_path());
         _currentSheet = sheet;
         _currentSheet.active = true;
-        sub.state_change ();
 
         debug ("Tried to load %s (%s)\n", sheet.file_path (), (loaded_file) ? "success" : "failed");
 

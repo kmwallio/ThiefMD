@@ -57,6 +57,8 @@ namespace ThiefMD.Controllers.FileManager {
                 warning ("Exception found: "+ e.message);
             }
         }
+
+        SheetManager.refresh_sheet ();
     }
 
     public File setup_tmp_file () {

@@ -10,7 +10,6 @@ namespace ThiefMD.Controllers.UI {
         if (sheet == null) {
             return sheet;
         }
-        var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
         var old = instance.library_pane.get_child2 ();
         int cur_pos = instance.library_pane.get_position ();
