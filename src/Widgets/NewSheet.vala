@@ -10,6 +10,8 @@ namespace ThiefMD.Widgets {
         public NewSheet () {
             _file_name = new Gtk.Entry ();
             _file_name.set_placeholder_text (_("Sheet name"));
+            _file_name.activate.connect (new_file);
+
             _create = new Gtk.Button.with_label (_("Create"));
 
             var menu_grid = new Gtk.Grid ();
@@ -29,8 +31,12 @@ namespace ThiefMD.Widgets {
         }
 
         public void new_file () {
-            string file_name = _file_name.get_text ();
+            string file_name = _file_name.get_text ().chomp ();
             _file_name.set_text ("");
+
+            if (file_name == "") {
+                return;
+            }
 
             // Check for .md extension
             if (!file_name.ascii_down ().has_suffix(".md") && !file_name.ascii_down ().has_suffix(".markdown")) {
