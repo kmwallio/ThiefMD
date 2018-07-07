@@ -95,7 +95,7 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
-                return true;
+                return false;
             });
         }
 
