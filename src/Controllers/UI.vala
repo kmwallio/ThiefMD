@@ -189,4 +189,8 @@ namespace ThiefMD.Controllers.UI {
             return _moving;
         });
     }
+
+    public bool moving () {
+        return _moving;
+    }
 }

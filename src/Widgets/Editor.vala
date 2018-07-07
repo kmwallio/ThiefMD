@@ -354,7 +354,7 @@ namespace ThiefMD.Widgets {
 
         public bool move_typewriter_scolling () {
             var settings = AppSettings.get_default ();
-            if (should_scroll) {
+            if (should_scroll && !UI.moving ()) {
                 var cursor = buffer.get_insert ();
                 this.scroll_to_mark(cursor, 0.0, true, 0.0, Constants.TYPEWRITER_POSITION);
                 should_scroll = false;
