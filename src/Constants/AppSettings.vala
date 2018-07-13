@@ -15,7 +15,7 @@ namespace ThiefMD {
         public const int SHEET_PREVIEW_LINES = 3;
 
         // Max time for animations in milliseconds
-        public const int ANIMATION_TIME = 250;
+        public const int ANIMATION_TIME = 150;
         public const int ANIMATION_FRAMES = 15;
     }
 
