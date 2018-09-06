@@ -74,6 +74,15 @@ namespace ThiefMD {
             }
 
             main_window = new Gtk.ApplicationWindow (this);
+
+            // Attempt to set taskbar icon
+            try {
+                debug ("Settings the icon");
+                main_window.icon = Gtk.IconTheme.get_default ().load_icon ("accessories-text-editor", Gtk.IconSize.DIALOG, 0);
+            } catch (Error e) {
+                debug ("Could not set icon: %s\n", e.message);
+            }
+
             toolbar = new Headerbar ();
             edit_view_content = new Editor ();
             library = new Library ();
@@ -115,7 +124,6 @@ namespace ThiefMD {
             main_window.add (sheets_pane);
             main_window.hide_titlebar_when_maximized = true;
             is_fullscreen = settings.fullscreen;
-            ready = true;
 
             new KeyBindings (main_window);
 
@@ -126,14 +134,8 @@ namespace ThiefMD {
                 is_fullscreen = settings.fullscreen;
             });
 
+            ready = true;
             main_window.show_all ();
-
-            // Attempt to set taskbar icon
-            try {
-                main_window.icon = Gtk.IconTheme.get_default ().load_icon ("accessories-text-editor", Gtk.IconSize.DIALOG, 0);
-            } catch (Error e) {
-                debug ("Could not set icon: %s\n", e.message);
-            }
         }
 
         public static ThiefApp get_instance () {
