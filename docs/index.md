@@ -5,4 +5,4 @@ title: ThiefMD
 
 # ThiefMD
 
-Hello World!
+ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app).
