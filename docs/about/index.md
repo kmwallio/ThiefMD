@@ -27,6 +27,7 @@ Great software is built on the shoulders of giants.
     * Removing folders
     * Moving sheets between folders
     * Ordering of sheets
+
 ### Later on Markdown Support
 
 * Preview pages
