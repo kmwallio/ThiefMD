@@ -11,11 +11,11 @@ ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulys
 
 Great software is built on the shoulders of giants.
 
-## Goals
-
 * Code <s>stolen</s> *forked* from [Quilter](https://github.com/lainsce/quilter)
 * Font is [iA Writer Duospace](https://github.com/iaolo/iA-Fonts)
 * Inspired by [Ulysses](https://ulyssesapp.com/)
+
+## Goals
 
 ### Initial
 
