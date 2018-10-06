@@ -1,4 +1,4 @@
-namespace ThiefMD { 
+namespace ThiefMD {
     public class Constants {
         // Margin Constants
         public const int NARROW_MARGIN = 5;

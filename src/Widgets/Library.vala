@@ -60,7 +60,9 @@ namespace ThiefMD.Widgets {
 
         public Sheets get_sheets (string path) {
             foreach (LibPair pair in _all_sheets) {
+                debug ("Checking if %s is %s\n", path, pair._sheets.get_sheets_path());
                 if (pair._sheets.get_sheets_path() == path) {
+                    debug ("Found %s\n", path);
                     return pair._sheets;
                 }
             }

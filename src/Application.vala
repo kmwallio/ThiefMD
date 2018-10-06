@@ -125,17 +125,18 @@ namespace ThiefMD {
             main_window.hide_titlebar_when_maximized = true;
             is_fullscreen = settings.fullscreen;
 
-            new KeyBindings (main_window);
-
-            // Restore preview view
-            UI.show_view ();
-
             settings.changed.connect (() => {
                 is_fullscreen = settings.fullscreen;
             });
 
+
+            new KeyBindings (main_window);
+
             ready = true;
             main_window.show_all ();
+            // Restore preview view
+            UI.show_view ();
+            UI.set_sheets (start_sheet);
         }
 
         public static ThiefApp get_instance () {
