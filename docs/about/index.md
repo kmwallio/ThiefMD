@@ -7,6 +7,8 @@ title: About - ThiefMD
 
 ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app).
 
+While we work on supporting previewing and exporting, we recommend [grip](https://github.com/joeyespo/grip).  For exporting, we recommend [pandoc](https://pandoc.org/).
+
 # Credit
 
 Great software is built on the shoulders of giants.
