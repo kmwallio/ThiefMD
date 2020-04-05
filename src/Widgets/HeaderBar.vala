@@ -76,7 +76,7 @@ namespace ThiefMD.Widgets {
 
             pack_start (change_view_button);
             pack_start (add_library_button);
-            // Need to find a better way to do this
+            // @TODO: Need to find a better way to do this
             pack_start (new Gtk.Label("                          "));
             pack_start (new_sheet);
 
