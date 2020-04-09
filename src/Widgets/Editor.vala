@@ -244,7 +244,11 @@ namespace ThiefMD.Widgets {
                 buffer.get_iter_at_mark (out cursor_iter, cursor);;
                 start = cursor_iter;
                 end = cursor_iter;
+                // Go back 2 sentences
                 start.backward_sentence_start ();
+                start.backward_sentence_start ();
+
+                // Only forward one to not scroll too far
                 end.forward_sentence_end ();
                 scroll_text = buffer.get_text (start, end, true);
                 Preview.update_view ();
@@ -383,20 +387,11 @@ namespace ThiefMD.Widgets {
         public bool move_typewriter_scolling () {
             var settings = AppSettings.get_default ();
             var cursor = buffer.get_insert ();
-            Gtk.TextIter cursor_iter;
-            Gtk.TextIter start, end;
 
             if (should_scroll && !UI.moving ()) {
                 this.scroll_to_mark(cursor, 0.0, true, 0.0, Constants.TYPEWRITER_POSITION);
                 should_scroll = false;
             }
-
-            buffer.get_iter_at_mark (out cursor_iter, cursor);;
-            start = cursor_iter;
-            end = cursor_iter;
-            start.backward_sentence_start ();
-            end.forward_sentence_end ();
-            scroll_text = buffer.get_text (start, end, true);
 
             return settings.typewriter_scrolling;
         }

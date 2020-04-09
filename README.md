@@ -22,6 +22,10 @@ Basic library management.
 
 ![](screenshots/typewriter_scrolling.gif)
 
+Live Preview
+
+![](screenshots/preview.png)
+
 ## Dependencies
 
 ```
@@ -51,6 +55,7 @@ $ sudo ninja install
  * Basic library at the moment
  * Switch between documents
  * Hide Library and Document Switcher
+ * Live Preview
 
 ## Planning
 
@@ -65,3 +70,5 @@ $ sudo ninja install
 * Code <s>stolen</s> *forked* from [Quilter](https://github.com/lainsce/quilter)
 * Font is [iA Writer Duospace](https://github.com/iaolo/iA-Fonts)
 * Inspired by [Ulysses](https://ulyssesapp.com/)
+* Preview CSS is [Splendor](http://markdowncss.github.io/splendor/)
+* Preview Scroll stolen from [this Stackoverflow](https://stackoverflow.com/questions/8922107/javascript-scrollintoview-middle-alignment) by [Rohan Orton](https://stackoverflow.com/users/2800005/rohan-orton)

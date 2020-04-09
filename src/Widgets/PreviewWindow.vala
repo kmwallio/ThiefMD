@@ -4,8 +4,28 @@ using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
     public class PreviewWindow : Gtk.Application {
+        private static PreviewWindow? instance = null;
         Preview preview;
-        Gtk.ApplicationWindow window;
+        public Gtk.ApplicationWindow window;
+
+        public static void update_preview_title ()
+        {
+            var settings = AppSettings.get_default ();
+            if (instance != null)
+            {
+                if (settings.show_filename && settings.last_file != "") {
+                    string file_name = settings.last_file.substring(settings.last_file.last_index_of("/") + 1);
+                    instance.window.title = "Preview: " + file_name;
+                } else {
+                    instance.window.title = "Preview";
+                }
+            }
+        }
+
+        public static PreviewWindow get_instance () {
+            return instance;
+        }
+
         protected override void activate () {
             window = new Gtk.ApplicationWindow (this);
             var settings = AppSettings.get_default ();
@@ -25,16 +45,17 @@ namespace ThiefMD.Widgets {
 
             window.set_default_size(w, h - 150);
 
-            preview = Preview.get_instance ();
-            window.add (preview);
+            window.add (Preview.get_instance ());
             window.show_all ();
 
             window.delete_event.connect (this.on_delete_event);
+            instance = this;
         }
 
         public bool on_delete_event () {
-            window.remove (preview);
+            window.remove (Preview.get_instance ());
             window.show_all ();
+            instance = null;
 
             return false;
         }
