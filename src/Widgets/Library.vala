@@ -116,12 +116,15 @@ namespace ThiefMD.Widgets {
             try {
                 // Create child iter
                 TreeIter child;
-    
+
+                string excludeds = FileManager.get_file_contents (Path.build_filename (str_dir, ".thiefignore"));
+                string[] excluded = excludeds.split("\n");
+
                 // Loop through the directory
                 Dir dir = Dir.open (str_dir, 0);
                 string? file_name = null;
                 while ((file_name = dir.read_name()) != null) {
-                    if (!file_name.has_prefix(".")) {
+                    if (!file_name.has_prefix(".") && !(file_name in excluded)) {
                         debug ("Found %s \n", file_name);
                         string path = Path.build_filename (str_dir, file_name);
                         if (FileUtils.test(path, FileTest.IS_DIR)) {

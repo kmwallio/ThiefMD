@@ -208,8 +208,8 @@ namespace ThiefMD.Controllers.FileManager {
         return file_opened;
     }
 
-    public string get_file_contents (string file_path) {
-        var lock = new FileLock ();
+    public static string get_file_contents (string file_path) {
+        // var lock = new FileLock ();
         string file_contents = "";
 
         try {
