@@ -46,6 +46,10 @@ namespace ThiefMD.Widgets {
             connect_signals ();
         }
 
+        public static void update_view () {
+            get_instance ().update_html_view();
+        }
+
         public static Preview get_instance () {
             if (instance == null) {
                 instance = new Widgets.Preview ();
@@ -63,69 +67,8 @@ namespace ThiefMD.Widgets {
         }
 
         private string set_stylesheet () {
-            var settings = AppSettings.get_default ();
-            if (settings.dark_mode) {
-                string dark = Styles.quilterdark.css;
-                return dark;
-            } else if (settings.sepia_mode) {
-                string sepia = Styles.quiltersepia.css;
-                return sepia;
-            }
-
-            string normal = Styles.quilter.css;
-            return normal;
-        }
-
-        private string set_font_stylesheet () {
-            var settings = AppSettings.get_default ();
-            if (settings.preview_font == "serif") {
-                return Build.PKGDATADIR + "/font/serif.css";
-            } else if (settings.preview_font == "sans") {
-                return Build.PKGDATADIR + "/font/sans.css";
-            } else if (settings.preview_font == "mono") {
-                return Build.PKGDATADIR + "/font/mono.css";
-            }
-
-            return Build.PKGDATADIR + "/font/serif.css";
-        }
-
-        private string set_highlight_stylesheet () {
-            var settings = AppSettings.get_default ();
-            if (settings.dark_mode) {
-                return Build.PKGDATADIR + "/highlight.js/styles/dark.min.css";
-            } else if (settings.sepia_mode) {
-                return Build.PKGDATADIR + "/highlight.js/styles/sepia.min.css";
-            }
-
-            return Build.PKGDATADIR + "/highlight.js/styles/default.min.css";
-        }
-
-        private string set_latex () {
-            var settings = AppSettings.get_default ();
-            if (settings.latex) {
-                return Build.PKGDATADIR + "/katex/katex.js";
-            } else {
-                return "";
-            }
-        }
-
-        private string set_latex_user () {
-            var settings = AppSettings.get_default ();
-            if (settings.latex) {
-                this.set_custom_charset ("utf-8");
-                return Build.PKGDATADIR + "/katex/user.js";
-            } else {
-                return "";
-            }
-        }
-
-        private string set_highlight () {
-            var settings = AppSettings.get_default ();
-            if (settings.highlight) {
-                return Build.PKGDATADIR + "/highlight.js/lib/highlight.min.js";
-            } else {
-                return "";
-            }
+            var style = """@media print{*,:after,:before{background:0 0!important;color:#000!important;box-shadow:none!important;text-shadow:none!important}a,a:visited{text-decoration:underline}a[href]:after{content:" (" attr(href) ")"}abbr[title]:after{content:" (" attr(title) ")"}a[href^="#"]:after,a[href^="javascript:"]:after{content:""}blockquote,pre{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}img,tr{page-break-inside:avoid}img{max-width:100%!important}h2,h3,p{orphans:3;widows:3}h2,h3{page-break-after:avoid}}@media screen and (min-width:32rem) and (max-width:48rem){html{font-size:15px}}@media screen and (min-width:48rem){html{font-size:16px}}body{line-height:1.85}.splendor-p,p{font-size:1rem;margin-bottom:1.3rem}.splendor-h1,.splendor-h2,.splendor-h3,.splendor-h4,h1,h2,h3,h4{margin:1.414rem 0 .5rem;font-weight:inherit;line-height:1.42}.splendor-h1,h1{margin-top:0;font-size:3.998rem}.splendor-h2,h2{font-size:2.827rem}.splendor-h3,h3{font-size:1.999rem}.splendor-h4,h4{font-size:1.414rem}.splendor-h5,h5{font-size:1.121rem}.splendor-h6,h6{font-size:.88rem}.splendor-small,small{font-size:.707em}canvas,iframe,img,select,svg,textarea,video{max-width:100%}@import url(http://fonts.googleapis.com/css?family=Merriweather:300italic,300);html{font-size:18px;max-width:100%}body{color:#444;font-family:Merriweather,Georgia,serif;margin:0;max-width:100%}:not(div):not(img):not(body):not(html):not(li):not(blockquote):not(p),p{margin:1rem auto;max-width:36rem;padding:.25rem}div,div img{width:100%}blockquote p{font-size:1.5rem;font-style:italic;margin:1rem auto;max-width:48rem}li{margin-left:2rem}h1{padding:4rem 0!important}p{color:#555;height:auto;line-height:1.45}code,pre{font-family:Menlo,Monaco,"Courier New",monospace}pre{background-color:#fafafa;font-size:.8rem;overflow-x:scroll;padding:1.125em}a,a:visited{color:#3498db}a:active,a:focus,a:hover{color:#2980b9}""";
+            return style;
         }
 
         private void connect_signals () {
@@ -223,15 +166,22 @@ namespace ThiefMD.Widgets {
                 processed_mk = raw_mk;
             }
 
+            debug ("Looking for: " + Editor.scroll_text.chomp());
+
+            if (Editor.scroll_text.chomp() != "" && Editor.scroll_text.chomp().char_count () > 5)
+            {
+                processed_mk = processed_mk.replace (Editor.scroll_text, Editor.scroll_text + "<span id='thiefmark'></span>");
+            }
+
             return map;
         }
 
         private string process () {
-            string text = Widgets.SourceView.buffer.text;
+            string text = Widgets.Editor.buffer.text;
             string processed_mk;
             process_frontmatter (text, out processed_mk);
-            var mkd = new Markdown.Document.gfm_format (processed_mk.data, 0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x04000000 + 0x00400000 + 0x10000000 + 0x40000000 + 0x00000008);
-            mkd.compile (0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x00400000 + 0x04000000 + 0x40000000 + 0x10000000 + 0x00000008);
+            var mkd = new Markdown.Document.from_gfm_string (processed_mk.data, 0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x04000000 + 0x00400000 + 0x10000000 + 0x40000000);
+            mkd.compile (0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x00400000 + 0x04000000 + 0x40000000 + 0x10000000);
 
             string result;
             mkd.get_document (out result);
@@ -240,36 +190,33 @@ namespace ThiefMD.Widgets {
         }
 
         public void update_html_view () {
-            string highlight_stylesheet = set_highlight_stylesheet();
-            string highlight = set_highlight();
-            string latex = set_latex();
-            string latexuser = set_latex_user ();
-            string font_stylesheet = set_font_stylesheet ();
             string stylesheet = set_stylesheet ();
-            string build = Build.PKGDATADIR;
             string markdown = process ();
+            string text = Widgets.Editor.buffer.text;
+            string processed_mk;
+            process_frontmatter (text, out processed_mk);
             html = """
             <!doctype html>
             <html>
                 <head>
                     <meta charset=utf-8>
-                    <link rel=stylesheet href= %s />
-                    <script src=%s></script>
-                    <script>hljs.initHighlightingOnLoad();</script>
-                    <link rel=stylesheet href=%s/katex/katex.css />
-                    <script src=%s></script>
-                    <script src=%s/katex/auto.js></script>
-                    <script src=%s></script>
-                    <link rel=stylesheet href=%s />
                     <style>%s</style>
                 </head>
                 <body>
                     <div class=markdown-body>
                         %s
                     </div>
+                    <script>
+                        const element = document.getElementById('thiefmark');
+                        const elementRect = element.getBoundingClientRect();
+                        const absoluteElementTop = elementRect.top + window.pageYOffset;
+                        const middle = absoluteElementTop - (window.innerHeight / 2);
+                        window.scrollTo(0, middle);
+                    </script>
                 </body>
-            </html>""".printf(highlight_stylesheet, highlight, build, latex, build, latexuser, font_stylesheet, stylesheet, markdown);
+            </html>""".printf(stylesheet, markdown);
             this.load_html (html, "file:///");
+            // debug(html);
         }
     }
 }

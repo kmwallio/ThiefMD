@@ -122,7 +122,7 @@ namespace ThiefMD {
             main_window.set_default_size (settings.window_width, settings.window_height);
             main_window.title = "ThiefMD";
             main_window.add (sheets_pane);
-            main_window.hide_titlebar_when_maximized = true;
+            main_window.hide_titlebar_when_maximized = false;
             is_fullscreen = settings.fullscreen;
 
             settings.changed.connect (() => {

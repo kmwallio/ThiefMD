@@ -50,6 +50,16 @@ namespace ThiefMD.Widgets {
 
             var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
 
+            var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+
+            var preview_button = new Gtk.Button.with_label ((_("Preview")));
+            preview_button.has_tooltip = true;
+            preview_button.tooltip_text = _("Launch Preview");
+            preview_button.clicked.connect (() => {
+                PreviewWindow pvw = new PreviewWindow();
+                pvw.run(null);
+            });
+
             var menu_grid = new Gtk.Grid ();
             menu_grid.margin = 6;
             menu_grid.row_spacing = 6;
@@ -58,6 +68,8 @@ namespace ThiefMD.Widgets {
             menu_grid.add (typewriter_button);
             menu_grid.add (separator);
             menu_grid.add (spellcheck_button);
+            menu_grid.add (separator2);
+            menu_grid.add (preview_button);
             menu_grid.show_all ();
 
             add (menu_grid);

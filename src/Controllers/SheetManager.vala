@@ -16,6 +16,10 @@ namespace ThiefMD.Controllers.SheetManager {
         }
     }
 
+    public static Sheet get_sheet () {
+        return _currentSheet;
+    }
+
     public static bool load_sheet (Sheet sheet) {
         var settings = AppSettings.get_default ();
         bool loaded_file = false;

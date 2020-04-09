@@ -55,6 +55,7 @@ namespace ThiefMD.Widgets {
         }
 
         public void redraw () {
+            Preview.update_view ();
             string file_contents = FileManager.get_file_lines_yaml (_sheet_path, Constants.SHEET_PREVIEW_LINES);
             if (file_contents.chomp() != "") {
                 _label_buffer = "<small>" + SheetManager.mini_mark(file_contents) + "</small>";

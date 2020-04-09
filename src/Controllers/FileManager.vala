@@ -18,6 +18,7 @@
  */
 
 using ThiefMD;
+using ThiefMD.Widgets;
 
 namespace ThiefMD.Controllers.FileManager {
     public static bool disable_save = false;

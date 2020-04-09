@@ -20,7 +20,6 @@ namespace ThiefMD.Widgets {
             set_model (_lib_store);
             insert_column_with_attributes (-1, "Library", new CellRendererText (), "text", 0, null);
             get_selection ().changed.connect (on_selection);
-
         }
 
         public override bool button_press_event(Gdk.EventButton event) {

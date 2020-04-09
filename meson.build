@@ -59,6 +59,8 @@ executable(
     'src/Widgets/Editor.vala',
     'src/Widgets/Library.vala',
     'src/Widgets/NewSheet.vala',
+    'src/Widgets/Preview.vala',
+    'src/Widgets/PreviewWindow.vala',
     'src/Widgets/KeyBindings.vala',
     'src/Widgets/QuickPreferences.vala',
     'src/Controllers/FileManager.vala',
@@ -72,10 +74,13 @@ executable(
         dependency('gobject-2.0'),
         dependency('gtksourceview-3.0'),
         dependency('gtk+-3.0'),
-        dependency('gtkspell3-3.0')
+        dependency('gtkspell3-3.0'),
+        dependency('webkit2gtk-4.0'),
+        libmarkdown
     ],
     vala_args: [
-        meson.source_root() + '/vapi/config.vapi'
+        meson.source_root() + '/vapi/config.vapi',
+        meson.source_root() + '/vapi/libmarkdown.vapi'
     ],
     install : true
 )

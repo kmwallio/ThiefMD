@@ -22,9 +22,11 @@ using ThiefMD.Controllers;
 namespace ThiefMD.Widgets {
     public class Editor : Gtk.SourceView {
         public static new Gtk.SourceBuffer buffer;
+        public static string scroll_text = "";
         public bool is_modified { get; set; default = false; }
         public bool should_scroll { get; set; default = false; }
         public bool should_save { get; set; default = false; }
+        public bool should_update_preview { get; set; default = false; }
         public File file;
         public GtkSpell.Checker spell = null;
         public Gtk.TextTag warning_tag;
@@ -225,6 +227,32 @@ namespace ThiefMD.Widgets {
                 changed ();
                 is_modified = false;
             }
+
+            // Move the preview if present
+            if (!should_update_preview) {
+                Timeout.add (500, update_preview);
+                should_update_preview = true;
+            }
+        }
+
+        public bool update_preview () {
+            var cursor = buffer.get_insert ();
+            if (cursor != null) {
+                Gtk.TextIter cursor_iter;
+                Gtk.TextIter start, end;
+
+                buffer.get_iter_at_mark (out cursor_iter, cursor);;
+                start = cursor_iter;
+                end = cursor_iter;
+                start.backward_sentence_start ();
+                end.forward_sentence_end ();
+                scroll_text = buffer.get_text (start, end, true);
+                Preview.update_view ();
+            }
+
+            should_update_preview = false;
+
+            return false;
         }
 
         public void set_text (string text, bool opening = true) {
@@ -354,11 +382,22 @@ namespace ThiefMD.Widgets {
 
         public bool move_typewriter_scolling () {
             var settings = AppSettings.get_default ();
+            var cursor = buffer.get_insert ();
+            Gtk.TextIter cursor_iter;
+            Gtk.TextIter start, end;
+
             if (should_scroll && !UI.moving ()) {
-                var cursor = buffer.get_insert ();
                 this.scroll_to_mark(cursor, 0.0, true, 0.0, Constants.TYPEWRITER_POSITION);
                 should_scroll = false;
             }
+
+            buffer.get_iter_at_mark (out cursor_iter, cursor);;
+            start = cursor_iter;
+            end = cursor_iter;
+            start.backward_sentence_start ();
+            end.forward_sentence_end ();
+            scroll_text = buffer.get_text (start, end, true);
+
             return settings.typewriter_scrolling;
         }
     }
