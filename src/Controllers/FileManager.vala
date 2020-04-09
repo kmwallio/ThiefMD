@@ -229,9 +229,67 @@ namespace ThiefMD.Controllers.FileManager {
         return file_contents;
     }
 
+    public string get_yamlless_markdown (string buffer, int lines, bool non_empty = true, bool include_title = true, bool include_date = true)
+    {
+        Regex headers = new Regex ("^\\s*(.+)\\s*:\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+        MatchInfo matches;
+        var markdown = new StringBuilder ();
+        int mklines = 0;
+
+        if (buffer.length > 4 && buffer[0:4] == "---\n") {
+            int i = 0;
+            int last_newline = 3;
+            int next_newline;
+            bool valid_frontmatter = true;
+            string key = "";
+            string val = "";
+            string line = "";
+
+            while (valid_frontmatter) {
+                next_newline = buffer.index_of_char('\n', last_newline + 1);
+                if (next_newline == -1) {
+                    valid_frontmatter = false;
+                    break;
+                }
+                line = buffer[last_newline+1:next_newline];
+                last_newline = next_newline;
+
+                if (line == "---") {
+                    break;
+                }
+
+                if (headers.match (line, RegexMatchFlags.NOTEMPTY, out matches)) {
+                    if (include_title && matches.fetch (1).ascii_down() == "title") {
+                        markdown.append ("# " + matches.fetch (2).replace ("\"", "") + "\n");
+                        mklines++;
+                    } else if (include_date && matches.fetch (1).ascii_down() == "date") {
+                        markdown.append ("## " + matches.fetch (2) + "\n");
+                        mklines++;
+                    }
+                } else {
+                    valid_frontmatter = false;
+                    break;
+                }
+
+                i++;
+            }
+
+            if (!valid_frontmatter) {
+                markdown.erase ();
+                markdown.append (buffer);
+            } else {
+                markdown.append (buffer[last_newline:buffer.length]);
+            }
+        } else {
+            markdown.append (buffer);
+        }
+
+        return markdown.str;
+    }
+
     public string get_file_lines_yaml (string file_path, int lines, bool non_empty = true) {
-        var lock = new FileLock ();
-        string file_contents = "";
+        // var lock = new FileLock ();
+        var markdown = new StringBuilder ();
 
         if (lines <= 0) {
             return get_file_contents(file_path);
@@ -262,15 +320,15 @@ namespace ThiefMD.Controllers.FileManager {
                             }
                         }
                         if (!in_yaml) {
-                            file_contents += ((lines_read == 0) ? "" :"\n") + line.chomp();
+                            markdown.append (((lines_read == 0) ? "" :"\n") + line.chomp());
                             lines_read++;
                         } else {
                             if (headers.match (line, RegexMatchFlags.NOTEMPTY, out matches)) {
                                 if (matches.fetch (1).ascii_down() == "title") {
-                                    file_contents += ((lines_read == 0) ? "" :"\n") + "# " + matches.fetch (2).replace ("\"", "");
+                                    markdown.append (((lines_read == 0) ? "" :"\n") + "# " + matches.fetch (2).replace ("\"", ""));
                                     lines_read++;
                                 } else if (matches.fetch (1).ascii_down() == "date") {
-                                    file_contents += ((lines_read == 0) ? "" :"\n") + matches.fetch (2);
+                                    markdown.append (((lines_read == 0) ? "" :"\n") + matches.fetch (2));
                                     lines_read++;
                                 }
                             }
@@ -279,7 +337,7 @@ namespace ThiefMD.Controllers.FileManager {
                 }
 
                 if (lines_read == 1) {
-                    file_contents += "\n";
+                    markdown.append ("\n");
                 }
 
             } else {
@@ -289,7 +347,7 @@ namespace ThiefMD.Controllers.FileManager {
             warning ("Error: %s", e.message);
         }
 
-        return file_contents;
+        return markdown.str;
     }
 
     public string get_file_lines (string file_path, int lines, bool non_empty = true) {

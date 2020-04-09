@@ -66,6 +66,7 @@ namespace ThiefMD.Widgets {
         ) {
             return true;
         }
+
         /***
          * Splendor CSS by https://github.com/johno
          *
@@ -150,56 +151,8 @@ namespace ThiefMD.Widgets {
             }
         }
 
-        /**
-         * Process the frontmatter of a markdown document, if it exists.
-         * Returns the frontmatter data and strips the frontmatter from the markdown doc.
-         *
-         * @see http://jekyllrb.com/docs/frontmatter/
-         */
-        private string[] process_frontmatter (string raw_mk, out string processed_mk) {
-            string[] map = {};
-
-            processed_mk = null;
-
-            if (raw_mk.length > 4 && raw_mk[0:4] == "---\n") {
-                int i = 0;
-                bool valid_frontmatter = true;
-                int last_newline = 3;
-                int next_newline;
-                string line = "";
-                while (true) {
-                    next_newline = raw_mk.index_of_char('\n', last_newline + 1);
-                    if (next_newline == -1) {
-                        valid_frontmatter = false;
-                        break;
-                    }
-                    line = raw_mk[last_newline+1:next_newline];
-                    last_newline = next_newline;
-
-                    if (line == "---") {
-                        break;
-                    }
-
-                    var sep_index = line.index_of_char(':');
-                    if (sep_index != -1) {
-                        map += line[0:sep_index-1];
-                        map += line[sep_index+1:line.length];
-                    } else {
-                        valid_frontmatter = false;
-                        break;
-                    }
-
-                    i++;
-                }
-
-                if (valid_frontmatter) {
-                    processed_mk = raw_mk[last_newline:raw_mk.length];
-                }
-            }
-
-            if (processed_mk == null) {
-                processed_mk = raw_mk;
-            }
+        private bool get_preview_markdown (string raw_mk, out string processed_mk) {
+            processed_mk = FileManager.get_yamlless_markdown(raw_mk, 0, true, true, false);
 
             debug ("Looking for: " + Editor.scroll_text.chomp());
 
@@ -207,14 +160,13 @@ namespace ThiefMD.Widgets {
             {
                 processed_mk = processed_mk.replace (Editor.scroll_text, Editor.scroll_text + "<span id='thiefmark'></span>");
             }
-
-            return map;
+            return (processed_mk.chomp () != "");
         }
 
         private string process () {
             string text = Widgets.Editor.buffer.text;
             string processed_mk;
-            process_frontmatter (text, out processed_mk);
+            get_preview_markdown (text, out processed_mk);
             var mkd = new Markdown.Document.from_gfm_string (processed_mk.data, 0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x04000000 + 0x00400000 + 0x10000000 + 0x40000000);
             mkd.compile (0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x00400000 + 0x04000000 + 0x40000000 + 0x10000000);
 
