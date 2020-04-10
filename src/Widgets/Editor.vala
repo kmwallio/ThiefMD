@@ -244,13 +244,16 @@ namespace ThiefMD.Widgets {
                 buffer.get_iter_at_mark (out cursor_iter, cursor);;
                 start = cursor_iter;
                 end = cursor_iter;
-                // Go back 2 sentences
+                // Search for the current sentence
                 start.backward_sentence_start ();
-                start.backward_sentence_start ();
-
-                // Only forward one to not scroll too far
-                end.forward_sentence_end ();
                 scroll_text = buffer.get_text (start, end, true);
+                if (scroll_text.chomp () == "" || Editor.scroll_text.chomp().char_count () < 6) {
+                    // If we can't find a string to search for, search
+                    // for more than one sentence.
+                    start.backward_sentence_start ();
+                    end.forward_sentence_end ();
+                    scroll_text = buffer.get_text (start, end, true);
+                }
                 Preview.update_view ();
             }
 
