@@ -166,7 +166,54 @@ namespace ThiefMD.Widgets {
         private string process () {
             string text = Widgets.Editor.buffer.text;
             string processed_mk;
+
+            Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+
             get_preview_markdown (text, out processed_mk);
+            processed_mk = url_search.replace_eval (
+                processed_mk,
+                (ssize_t) processed_mk.size(),
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                (match_info, result) =>
+                {
+                    result.append ("(");
+                    var url = match_info.fetch (1);
+                    debug ("Found: " + url);
+                    string file = Path.build_filename (".", url);
+
+                    if (url.index_of_char(':') != -1) {
+                        result.append (url);
+                    } else if (FileUtils.test (url, FileTest.EXISTS)) {
+                        result.append(url);
+                    } else if (FileUtils.test (file, FileTest.EXISTS)) {
+                        result.append(file);
+                    } else {
+                        Sheet search_sheet = SheetManager.get_sheet ();
+                        string sheet_path = (search_sheet != null) ? Path.get_dirname (search_sheet.file_path ()) : "";
+                        int idx = 0;
+                        while (sheet_path != "") {
+                            file = Path.build_filename (sheet_path, url);
+                            if (FileUtils.test (file, FileTest.EXISTS)) {
+                                result.append(file);
+                                debug ("Local path: " + file);
+                                break;
+                            }
+
+                            idx = sheet_path.last_index_of_char ('/');
+                            if (idx != -1) {
+                                sheet_path = sheet_path[0:idx];
+                            } else {
+                                result.append(url);
+                                debug ("No local path found");
+                                break;
+                            }
+                        }
+                    }
+                    result.append (")");
+                    return false;
+                });
+
             var mkd = new Markdown.Document.from_gfm_string (processed_mk.data, 0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x04000000 + 0x00400000 + 0x10000000 + 0x40000000);
             mkd.compile (0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x00400000 + 0x04000000 + 0x40000000 + 0x10000000);
 
