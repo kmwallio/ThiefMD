@@ -154,12 +154,6 @@ namespace ThiefMD.Widgets {
         private bool get_preview_markdown (string raw_mk, out string processed_mk) {
             processed_mk = FileManager.get_yamlless_markdown(raw_mk, 0, true, true, false);
 
-            //  debug ("Looking for: " + Editor.scroll_text.chomp());
-
-            //  if (Editor.scroll_text.chomp() != "" && Editor.scroll_text.chomp().char_count () > 5)
-            //  {
-            //      processed_mk = processed_mk.replace (Editor.scroll_text, Editor.scroll_text + "<span id='thiefmark'></span>");
-            //  }
             return (processed_mk.chomp () != "");
         }
 
@@ -222,22 +216,16 @@ namespace ThiefMD.Widgets {
 
         private string get_javascript () {
             var settings = AppSettings.get_default ();
-            string script = "";
+            string script;
 
             // If typewriter scrolling is enabled, add padding to match editor
             bool typewriter_active = settings.typewriter_scrolling;
-            if (typewriter_active) {
-                script = """const element = document.getElementById('thiefmark');
-                const elementRect = element.getBoundingClientRect();
-                const absoluteElementTop = elementRect.top + window.pageYOffset;
-                const middle = absoluteElementTop - (window.innerHeight / 2);
-                window.scrollTo(0, middle);""";
-            } else {
-                script = """const element = document.getElementById('thiefmark');
-                const textOnTop = element.offsetTop;
-                const middle = textOnTop - (window.innerHeight * %f);
-                window.scrollTo(0, middle);""".printf(Editor.cursor_position);
-            }
+
+            // Find our ThiefMark and move it to the same position of the cursor
+            script = """const element = document.getElementById('thiefmark');
+            const textOnTop = element.offsetTop;
+            const middle = textOnTop - (window.innerHeight * %f);
+            window.scrollTo(0, middle);""".printf((typewriter_active) ? Constants.TYPEWRITER_POSITION : Editor.cursor_position);
 
             return script;
         }
