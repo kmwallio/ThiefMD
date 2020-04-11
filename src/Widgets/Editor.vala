@@ -18,11 +18,13 @@
  */
 
 using ThiefMD.Controllers;
+using Gdk;
 
 namespace ThiefMD.Widgets {
     public class Editor : Gtk.SourceView {
         public static new Gtk.SourceBuffer buffer;
         public static string scroll_text = "";
+        public static double cursor_position = 0;
         public bool is_modified { get; set; default = false; }
         public bool should_scroll { get; set; default = false; }
         public bool should_save { get; set; default = false; }
@@ -240,20 +242,34 @@ namespace ThiefMD.Widgets {
             if (cursor != null) {
                 Gtk.TextIter cursor_iter;
                 Gtk.TextIter start, end;
+                Widgets.Editor.buffer.get_bounds (out start, out end);
 
                 buffer.get_iter_at_mark (out cursor_iter, cursor);;
-                start = cursor_iter;
-                end = cursor_iter;
-                // Search for the current sentence
-                start.backward_sentence_start ();
-                scroll_text = buffer.get_text (start, end, true);
-                if (scroll_text.chomp () == "" || Editor.scroll_text.chomp().char_count () < 6) {
-                    // If we can't find a string to search for, search
-                    // for more than one sentence.
-                    start.backward_sentence_start ();
-                    end.forward_sentence_end ();
-                    scroll_text = buffer.get_text (start, end, true);
-                }
+                //  start = cursor_iter;
+                //  end = cursor_iter;
+                //  // Search for the current sentence
+                //  start.backward_sentence_start ();
+                //  scroll_text = buffer.get_text (start, end, true);
+                //  if (scroll_text.chomp () == "" || Editor.scroll_text.chomp().char_count () < 6) {
+                //      // If we can't find a string to search for, search
+                //      // for more than one sentence.
+                //      start.backward_sentence_start ();
+                //      end.forward_sentence_end ();
+                //      scroll_text = buffer.get_text (start, end, true);
+                //  }
+                scroll_text = buffer.get_text (start, cursor_iter, true);
+                scroll_text += "<span id='thiefmark'></span>";
+                scroll_text += buffer.get_text (cursor_iter, end, true);
+
+                // Calc cursor percentage
+                Rectangle strong;
+                Rectangle weak;
+                this.get_cursor_locations (cursor_iter, out strong, out weak);
+                int win_x, win_y;
+                this.buffer_to_window_coords (Gtk.TextWindowType.WIDGET, strong.x, strong.y, out win_x, out win_y);
+                cursor_position = win_y / (double) last_height;
+                cursor_position = (cursor_position < 0 || cursor_position > 1) ? Constants.TYPEWRITER_POSITION : cursor_position;
+                debug ("Cursor at %d, window %d, %f", win_y, last_height, cursor_position);
                 Preview.update_view ();
             }
 

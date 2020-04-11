@@ -154,17 +154,17 @@ namespace ThiefMD.Widgets {
         private bool get_preview_markdown (string raw_mk, out string processed_mk) {
             processed_mk = FileManager.get_yamlless_markdown(raw_mk, 0, true, true, false);
 
-            debug ("Looking for: " + Editor.scroll_text.chomp());
+            //  debug ("Looking for: " + Editor.scroll_text.chomp());
 
-            if (Editor.scroll_text.chomp() != "" && Editor.scroll_text.chomp().char_count () > 5)
-            {
-                processed_mk = processed_mk.replace (Editor.scroll_text, Editor.scroll_text + "<span id='thiefmark'></span>");
-            }
+            //  if (Editor.scroll_text.chomp() != "" && Editor.scroll_text.chomp().char_count () > 5)
+            //  {
+            //      processed_mk = processed_mk.replace (Editor.scroll_text, Editor.scroll_text + "<span id='thiefmark'></span>");
+            //  }
             return (processed_mk.chomp () != "");
         }
 
         private string process () {
-            string text = Widgets.Editor.buffer.text;
+            string text = Widgets.Editor.scroll_text; // buffer.text;
             string processed_mk;
 
             Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
@@ -179,7 +179,6 @@ namespace ThiefMD.Widgets {
                 {
                     result.append ("(");
                     var url = match_info.fetch (1);
-                    debug ("Found: " + url);
                     string file = Path.build_filename (".", url);
 
                     if (url.index_of_char(':') != -1) {
@@ -196,7 +195,6 @@ namespace ThiefMD.Widgets {
                             file = Path.build_filename (sheet_path, url);
                             if (FileUtils.test (file, FileTest.EXISTS)) {
                                 result.append(file);
-                                debug ("Local path: " + file);
                                 break;
                             }
 
@@ -205,7 +203,6 @@ namespace ThiefMD.Widgets {
                                 sheet_path = sheet_path[0:idx];
                             } else {
                                 result.append(url);
-                                debug ("No local path found");
                                 break;
                             }
                         }
@@ -237,10 +234,9 @@ namespace ThiefMD.Widgets {
                 window.scrollTo(0, middle);""";
             } else {
                 script = """const element = document.getElementById('thiefmark');
-                const elementRect = element.getBoundingClientRect();
-                const absoluteElementTop = elementRect.top + window.pageYOffset;
-                const bottom = absoluteElementTop  - window.innerHeight + (elementRect.height * 2);
-                window.scrollTo(0, bottom);""";
+                const textOnTop = element.offsetTop;
+                const middle = textOnTop - (window.innerHeight * %f);
+                window.scrollTo(0, middle);""".printf(Editor.cursor_position);
             }
 
             return script;
