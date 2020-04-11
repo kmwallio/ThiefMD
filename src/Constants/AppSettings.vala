@@ -17,6 +17,10 @@ namespace ThiefMD {
         // Max time for animations in milliseconds
         public const int ANIMATION_TIME = 150;
         public const int ANIMATION_FRAMES = 15;
+
+        // Data Directories
+        public const string DATA_BASE = "ThiefMD";
+        public const string DATA_STYLES = "styles";
     }
 
     public class AppSettings : Granite.Services.Settings {

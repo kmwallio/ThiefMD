@@ -67,6 +67,7 @@ executable(
     'src/Controllers/Dialogs.vala',
     'src/Controllers/SheetManager.vala',
     'src/Controllers/UI.vala',
+    'src/Controllers/UserData.vala',
     asresources,
     c_args: c_args,
     dependencies: [

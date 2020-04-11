@@ -129,8 +129,9 @@ namespace ThiefMD {
                 is_fullscreen = settings.fullscreen;
             });
 
-
             new KeyBindings (main_window);
+
+            UserData.create_data_directories ();
 
             ready = true;
             main_window.show_all ();
