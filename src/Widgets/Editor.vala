@@ -242,7 +242,7 @@ namespace ThiefMD.Widgets {
             if (cursor != null) {
                 Gtk.TextIter cursor_iter;
                 Gtk.TextIter start, end;
-                Widgets.Editor.buffer.get_bounds (out start, out end);
+                buffer.get_bounds (out start, out end);
 
                 buffer.get_iter_at_mark (out cursor_iter, cursor);;
                 //  start = cursor_iter;
