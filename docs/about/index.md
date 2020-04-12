@@ -7,7 +7,7 @@ title: About - ThiefMD
 
 ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app).
 
-While we work on supporting previewing and exporting, we recommend [grip](https://github.com/joeyespo/grip).  For exporting, we recommend [pandoc](https://pandoc.org/).
+It is my primary way of attempting to learn [Vala](https://wiki.gnome.org/Projects/Vala) and filling the gap of applications I miss from [Mac OS X](https://apple.com). 
 
 # Credit
 
@@ -16,13 +16,14 @@ Great software is built on the shoulders of giants.
 * Code <s>stolen</s> *forked* from [Quilter](https://github.com/lainsce/quilter)
 * Font is [iA Writer Duospace](https://github.com/iaolo/iA-Fonts)
 * Inspired by [Ulysses](https://ulyssesapp.com/)
+* Preview CSS is [Splendor](http://markdowncss.github.io/splendor/)
 
 ## Goals
 
 ### Initial
 
 * Basic markdown syntax support
-* Creation and Deleteion of Sheets
+* Creation and Deletion of Sheets
 * Library Management
     * Adding Existing Folders
     * Creating sub folders
@@ -32,7 +33,6 @@ Great software is built on the shoulders of giants.
 
 ### Later on Markdown Support
 
-* Preview pages
 * Compilation and preview of multiple sheets while maintaining order
 * Export sheets or folders
 

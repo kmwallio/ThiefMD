@@ -7,6 +7,24 @@
 			<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 			<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+			<style>
+				.container, .container-fluid {
+					padding-top: 1em;
+				}
+				.container img, .container-fluid img {
+					width: 100%;
+				}
+
+				.pun {
+					font-weight: bold;
+					color: rgb(235, 62, 212);
+				}
+
+				.ny {
+					font-weight: bold;
+					color: rgb(41, 138, 250);
+				}
+			</style>
 		</head>
 		<body>
 			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -21,10 +39,10 @@
 			{{ content }}
 			
 			</div>
-			<footer>
-	    		<ul>
-	        		<li><a href="mailto:mwallio@gmail.com">email</a></li>
-	        		<li><a href="https://github.com/kmwallio">github.com/kmwallio</a></li>
+			<footer class="navbar navbar-expand-lg navbar-dark bg-dark">
+	    		<ul class="navbar-nav">
+	        		<li class="nav-item"><a href="mailto:mwallio@gmail.com" class="nav-link">email</a></li>
+	        		<li class="nav-item"><a href="https://github.com/kmwallio/ThiefMD" class="nav-link">github</a></li>
 				</ul>
 			</footer>
 		</body>

@@ -8,23 +8,23 @@ The included for is [iA Writer Duospace](https://github.com/iaolo/iA-Fonts).  It
 
 ## Screenshots
 
-![](screenshots/work_in_progress.png)
+![](docs/images/work_in_progress.png)
 
 Still a work in progress, but this shows the sheets and editor view.  Sheets render a preview of the first few lines of a file, or shows the file name.
 
-![](screenshots/panel_animation.gif)
+![](docs/images/panel_animation.gif)
 
 Still working on the Library, but showing the different view modes.
 
-![](screenshots/library_remove.gif)
+![](docs/images/library_remove.gif)
 
 Basic library management.
 
-![](screenshots/typewriter_scrolling.gif)
+![](docs/images/typewriter_scrolling.gif)
 
 Live Preview
 
-![](screenshots/preview.png)
+![](docs/images/preview.png)
 
 ## Dependencies
 
