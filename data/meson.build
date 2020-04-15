@@ -27,3 +27,8 @@ install_data(
     join_paths('font', 'iAWriterDuospace-Regular.ttf'),
     install_dir: join_paths(get_option('datadir'), 'fonts', 'truetype', 'thiefmd')
 )
+
+install_data(
+    join_paths('splendor', 'splendor.css'),
+    install_dir: join_paths([ get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'styles' ])
+)
