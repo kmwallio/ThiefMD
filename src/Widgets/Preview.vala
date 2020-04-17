@@ -83,7 +83,7 @@ namespace ThiefMD.Widgets {
                 .markdown-body{padding-top:50%;padding-bottom:50%}
                 </style>""";
             } else {
-                style = style + """</style>
+                style = style + """<style>
                 .markdown-body{padding-bottom:10%}
                 </style>""";
             }
