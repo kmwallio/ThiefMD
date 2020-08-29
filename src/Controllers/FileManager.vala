@@ -350,6 +350,40 @@ namespace ThiefMD.Controllers.FileManager {
         return markdown.str;
     }
 
+    public bool add_ignore_folder (string directory_path)
+    {
+        File ignore_dir = File.new_for_path (directory_path);
+        File parent_dir = ignore_dir.get_parent ();
+        bool file_created = false;
+        string? buffer;
+        if (parent_dir.query_exists ()) {
+            var ignore_file = parent_dir.get_child (".thiefignore");
+            if (!ignore_file.query_exists ()) {
+                // Create new .thiefignore file
+                buffer = ignore_dir.get_basename ();
+                if (buffer == null) {
+                    return false;
+                }
+            } else {
+                buffer = get_file_lines (ignore_file.get_path (), 100, true) + "\n" + ignore_dir.get_basename ();
+                try {
+                    ignore_file.delete ();
+                } catch (Error e) {
+                    warning ("Error: %s\n", e.message);
+                }
+            }
+            try {
+                uint8[] binbuffer = buffer.data;
+                save_file (ignore_file, binbuffer);
+                file_created = true;
+            } catch (Error e) {
+                warning ("Exception found: "+ e.message);
+            }
+        }
+
+        return file_created;
+    }
+
     public string get_file_lines (string file_path, int lines, bool non_empty = true) {
         var lock = new FileLock ();
         string file_contents = "";
