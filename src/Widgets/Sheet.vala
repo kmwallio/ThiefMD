@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2020 kmwallio
+ * 
+ * Modified August 29, 2020
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 using ThiefMD;
 using ThiefMD.Controllers;
 
@@ -63,6 +82,24 @@ namespace ThiefMD.Widgets {
                 _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of("/") + 1) + "</b>";
             }
             _label.set_label (_label_buffer);
+        }
+
+        public override bool button_press_event(Gdk.EventButton event) {
+            base.button_press_event (event);
+
+            if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3) {
+                Gtk.Menu menu = new Gtk.Menu ();
+                Gtk.MenuItem menu_item = new Gtk.MenuItem.with_label ("Remove from Library");
+                menu.attach_to_widget (this, null);
+                menu.add (menu_item);
+                menu_item.activate.connect (() => {
+                    var settings = AppSettings.get_default ();
+                    debug ("Got remove for sheet");
+                });
+                menu.show_all ();
+                menu.popup (null, null, null, event.button, event.time);
+            }
+            return true;
         }
 
         public string file_path () {

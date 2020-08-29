@@ -1,9 +1,3 @@
-using ThiefMD;
-using ThiefMD.Controllers;
-
-namespace ThiefMD.Widgets {
-    public class KeyBindings { 
-        public KeyBindings (Gtk.Window window) {
 /*
 * Copyright (c) 2017 Lains
 *
@@ -24,6 +18,13 @@ namespace ThiefMD.Widgets {
 * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 * Boston, MA 02110-1301 USA
 */
+
+using ThiefMD;
+using ThiefMD.Controllers;
+
+namespace ThiefMD.Widgets {
+    public class KeyBindings { 
+        public KeyBindings (Gtk.Window window) {
             window.key_press_event.connect ((e) => {
                 uint keycode = e.hardware_keycode;
                 var settings = AppSettings.get_default ();
