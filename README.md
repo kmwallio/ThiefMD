@@ -34,7 +34,6 @@ libgranite-dev
 libgtkspell3-3-dev
 libwebkit2gtk-4.0-dev
 libmarkdown2-dev
-libsqlite3-dev
 gtk+-3.0
 gtksourceview-3.0
 meson
