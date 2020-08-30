@@ -1,3 +1,10 @@
+com.github.kmwallio.thiefmd (0.0.3) xenial; urgency=low
+
+  * Library support for new sub-directories
+  * More keyboard shortcuts
+
+ -- kmwallio <mwallio@gmail.com>  Sun, 30 Aug 2020 16:21:58 -0700
+
 com.github.kmwallio.thiefmd (0.0.2) xenial; urgency=low
 
   * Add Library and Sheets management menus
