@@ -89,12 +89,24 @@ namespace ThiefMD.Widgets {
 
             if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3) {
                 Gtk.Menu menu = new Gtk.Menu ();
-                Gtk.MenuItem menu_item = new Gtk.MenuItem.with_label ("Remove from Library");
                 menu.attach_to_widget (this, null);
-                menu.add (menu_item);
-                menu_item.activate.connect (() => {
-                    var settings = AppSettings.get_default ();
-                    debug ("Got remove for sheet");
+
+                Gtk.MenuItem menu_preview_sheet = new Gtk.MenuItem.with_label ((_("Preview")));
+                menu.add (menu_preview_sheet);
+                menu_preview_sheet.activate.connect (() => {
+                    SheetManager.load_sheet (this);
+                    PreviewWindow pvw = new PreviewWindow();
+                    pvw.run(null);
+                });
+
+                menu.add (new Gtk.SeparatorMenuItem ());
+
+                Gtk.MenuItem menu_delete_sheet = new Gtk.MenuItem.with_label ((_("Move to Trash")));
+                menu.add (menu_delete_sheet);
+                menu_delete_sheet.activate.connect (() => {
+                    debug ("Got remove for sheet %s", _sheet_path);
+                    _parent.remove_sheet (this);
+                    FileManager.move_to_trash (_sheet_path);
                 });
                 menu.show_all ();
                 menu.popup (null, null, null, event.button, event.time);

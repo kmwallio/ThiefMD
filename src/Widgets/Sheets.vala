@@ -58,9 +58,17 @@ namespace ThiefMD.Widgets {
             _view.add(_empty);
         }
 
+        public void remove_sheet (Sheet sheet) {
+            if (sheet != null) {
+                debug ("Removing sheet %s", sheet.file_path ());
+                _sheets.remove (sheet);
+                _view.remove (sheet);
+            }
+        }
+
         public void load_sheets () {
             var settings = AppSettings.get_default ();
-            _view.remove(_empty);
+            _view.remove (_empty);
 
             if (_sheets != null) {
                 foreach (Sheet sheet in _sheets) {

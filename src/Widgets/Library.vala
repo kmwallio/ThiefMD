@@ -47,19 +47,6 @@ namespace ThiefMD.Widgets {
             if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3) {
                 Gtk.Menu menu = new Gtk.Menu ();
 
-                Gtk.MenuItem menu_remove_item = new Gtk.MenuItem.with_label ("Remove from Library");
-                menu_remove_item.activate.connect (() => {
-                    var settings = AppSettings.get_default ();
-                    TreeIter remove_node = _selected_node;
-                    if (_selected != null && _all_sheets.find (_selected) != null) {
-                        debug ("Removing %s\n", _selected._path);
-                        _all_sheets.remove (_selected);
-                        settings.remove_from_library (_selected._path);
-                        _lib_store.remove (ref remove_node);
-                        //ThiefApp.get_instance ().refresh_library ();
-                    }
-                });
-
                 Gtk.MenuItem menu_hide_item = new Gtk.MenuItem.with_label ("Hide from Library");
                 menu_hide_item.activate.connect (() => {
                     var settings = AppSettings.get_default ();
@@ -68,6 +55,21 @@ namespace ThiefMD.Widgets {
                         debug ("Hiding %s\n", _selected._path);
                         _all_sheets.remove (_selected);
                         FileManager.add_ignore_folder (_selected._path);
+                        _lib_store.remove (ref remove_node);
+                        //ThiefApp.get_instance ().refresh_library ();
+                    }
+                });
+
+                menu.add (new Gtk.SeparatorMenuItem ());
+
+                Gtk.MenuItem menu_remove_item = new Gtk.MenuItem.with_label ("Remove from Library");
+                menu_remove_item.activate.connect (() => {
+                    var settings = AppSettings.get_default ();
+                    TreeIter remove_node = _selected_node;
+                    if (_selected != null && _all_sheets.find (_selected) != null) {
+                        debug ("Removing %s\n", _selected._path);
+                        _all_sheets.remove (_selected);
+                        settings.remove_from_library (_selected._path);
                         _lib_store.remove (ref remove_node);
                         //ThiefApp.get_instance ().refresh_library ();
                     }

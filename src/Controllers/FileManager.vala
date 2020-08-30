@@ -155,7 +155,7 @@ namespace ThiefMD.Controllers.FileManager {
             } catch (Error e) {
                 warning ("Unexpected error during save: " + e.message);
             }
-            string cache = Path.build_filename (Environment.get_user_cache_dir (), "com.github.lainsce.quilter" + "/temp");
+            string cache = Path.build_filename (Environment.get_user_cache_dir (), "com.github.kmwallio.thiefmd" + "/temp");
             file = File.new_for_path (cache);
             Widgets.Editor.buffer.text = "";
             settings.last_file = file.get_path ();
@@ -208,6 +208,28 @@ namespace ThiefMD.Controllers.FileManager {
         return file_opened;
     }
 
+    public bool move_to_trash (string file_path) {
+        bool moved = false;
+        File to_delete = File.new_for_path (file_path);
+        try {
+            moved = to_delete.trash ();
+        } catch (Error e) {
+            warning ("Error: %s", e.message);
+        }
+
+        if (!moved && to_delete.query_exists ()) {
+            warning ("Attempting manual trashing of file");
+            string? trash_location = UserData.get_trash_folder ();
+            if (trash_location != null) {
+                DateTime now = new DateTime.now_local ();
+                string trash_info = "[Trash Info]\nPath=" + file_path + "\nDeletionDate=" + now.to_string () + "\n";
+                File trash_info_file = File.new_for_path (Path.build_filename (trash_location, "info", to_delete.get_basename () + ".trashinfo"));
+            }
+        }
+
+        return moved;
+    }
+
     public static string get_file_contents (string file_path) {
         // var lock = new FileLock ();
         string file_contents = "";
@@ -220,7 +242,7 @@ namespace ThiefMD.Controllers.FileManager {
                 debug ("Reading %s\n", filename);
                 GLib.FileUtils.get_contents (filename, out file_contents);
             } else {
-                warning ("File does not exist\n");
+                warning ("File %s does not exist\n", file_path);
             }
         } catch (Error e) {
             warning ("Error: %s", e.message);
