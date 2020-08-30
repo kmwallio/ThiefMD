@@ -1,3 +1,9 @@
+com.github.kmwallio.thiefmd (0.0.2) xenial; urgency=low
+
+  * Add Library and Sheets management menus
+
+ -- kmwallio <mwallio@gmail.com>  Sat, 29 Aug 2020 21:19:29 -0700
+
 com.github.kmwallio.thiefmd (0.0.1) xenial; urgency=low
 
   * Initial release.
