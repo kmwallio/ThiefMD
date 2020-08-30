@@ -5,7 +5,7 @@ title: ThiefMD
 
 <img src="images/thief_library.png" style="float: right; width: 40%" />
 
-# ThiefMD, the Markdown Editor you'll have to compile if you want to use it.
+# ThiefMD, the Markdown Editor built on the shoulders of others
 
 Born from Open Source without knowing how Open Source works. ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app), based on open source code from [Quilter](https://github.com/lainsce/quilter) and other projects.
 
@@ -39,7 +39,9 @@ See what your work looks like in real time. Is that your battery draining? Yes, 
 
 # Get ThiefMD!
 
-[Instructions are the GitHub](https://github.com/kmwallio/ThiefMD). It's built with Vala and GTK. There's no plans on porting to Mac or Windows. On Mac, we recommend [Ulysses](https://ulysses.app). Om Windows, we recommend [Typora](https://typora.io).
+[Download the latest release](https://github.com/kmwallio/ThiefMD/releases).
+
+Want to check and build the source? [Instructions are on GitHub](https://github.com/kmwallio/ThiefMD). It's built with Vala and GTK. There's no plans on porting to Mac or Windows. On Mac, we recommend [Ulysses](https://ulysses.app). On Windows, we recommend [Typora](https://typora.io).
 
 <img src="images/brooke-cagle-happy-people.jpg" />
 
