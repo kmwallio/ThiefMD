@@ -211,6 +211,10 @@ namespace ThiefMD.Controllers.FileManager {
     public bool move_to_trash (string file_path) {
         bool moved = false;
         File to_delete = File.new_for_path (file_path);
+        if (!to_delete.query_exists ()) {
+            return true;
+        }
+
         try {
             moved = to_delete.trash ();
         } catch (Error e) {

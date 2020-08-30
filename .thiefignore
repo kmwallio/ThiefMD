@@ -1,7 +1,7 @@
 build
-data
-meson
-src
-vapi
-screenshots
 debian
+vapi
+src
+meson
+data
+screenshots
