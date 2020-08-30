@@ -41,7 +41,7 @@ See what your work looks like in real time. Is that your battery draining? Yes, 
 
 [Download the latest release](https://github.com/kmwallio/ThiefMD/releases).
 
-Want to check and build the source? [Instructions are on GitHub](https://github.com/kmwallio/ThiefMD). It's built with Vala and GTK. There's no plans on porting to Mac or Windows. On Mac, we recommend [Ulysses](https://ulysses.app). On Windows, we recommend [Typora](https://typora.io).
+Want to check out and build the source? [Instructions are on GitHub](https://github.com/kmwallio/ThiefMD). It's built with Vala and GTK. There's no plans on porting to Mac or Windows. On Mac, we recommend [Ulysses](https://ulysses.app). On Windows, we recommend [Typora](https://typora.io).
 
 <img src="images/brooke-cagle-happy-people.jpg" />
 
