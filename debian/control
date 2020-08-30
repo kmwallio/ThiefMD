@@ -12,7 +12,7 @@ Build-Depends: meson,
                libmarkdown2-dev,
                libgtkspell3-3-dev
 Standards-Version: 4.5.0
-Homepage: https://miles.wallio.net/ThiefMD/
+Homepage: https://thiefmd.com
 
 Package: com.github.kmwallio.thiefmd
 Architecture: any
