@@ -21,6 +21,7 @@ using ThiefMD;
 using ThiefMD.Widgets;
 using ThiefMD.Controllers;
 using Gtk;
+using Gdk;
 
 namespace ThiefMD.Widgets {
     /**
@@ -41,6 +42,23 @@ namespace ThiefMD.Widgets {
             get_selection ().changed.connect (on_selection);
         }
 
+        public void new_folder (string folder) {
+            if ((folder.chomp() == "")) {
+                return;
+            }
+
+            if (_selected != null && _all_sheets.find (_selected) != null) {
+                debug ("Creating %s in %s\n", folder, _selected._path);
+                string new_folder_path = Path.build_filename (_selected._path, folder);
+                File newfolder = File.new_for_path (new_folder_path);
+                if (newfolder.query_exists ()) {
+                    return;
+                }
+                newfolder.make_directory ();
+                parse_dir (_selected._path, _selected_node);
+            }
+        }
+
         public override bool button_press_event(Gdk.EventButton event) {
             base.button_press_event (event);
 
@@ -51,7 +69,13 @@ namespace ThiefMD.Widgets {
                 menu_add_item.activate.connect (() => {
                     TreeIter remove_node = _selected_node;
                     if (_selected != null && _all_sheets.find (_selected) != null) {
-                        
+                        NewFolder folder_popup = new NewFolder ();
+                        TreePath? tree_path = _lib_store.get_path (_selected_node);
+                        Rectangle r;
+                        this.get_cell_area (tree_path, null, out r);
+                        folder_popup.set_pointing_to (r);
+                        folder_popup.set_relative_to (this);
+                        folder_popup.popup ();
                         //ThiefApp.get_instance ().refresh_library ();
                     }
                 });
@@ -108,19 +132,23 @@ namespace ThiefMD.Widgets {
         }
 
         private void remove_children (string str_dir) {
-            Dir dir = Dir.open (str_dir, 0);
-            string? file_name = null;
-            while ((file_name = dir.read_name()) != null) {
-                if (!file_name.has_prefix(".")) {
-                    string path = Path.build_filename (str_dir, file_name);
-                    if (FileUtils.test (path, FileTest.IS_DIR)) {
-                        LibPair? kid = get_item (path);
-                        if (kid != null) {
-                            _all_sheets.remove (kid);
-                            remove_children (path);
+            try {
+                Dir dir = Dir.open (str_dir, 0);
+                string? file_name = null;
+                while ((file_name = dir.read_name()) != null) {
+                    if (!file_name.has_prefix(".")) {
+                        string path = Path.build_filename (str_dir, file_name);
+                        if (FileUtils.test (path, FileTest.IS_DIR)) {
+                            LibPair? kid = get_item (path);
+                            if (kid != null) {
+                                _all_sheets.remove (kid);
+                                remove_children (path);
+                            }
                         }
                     }
                 }
+            } catch (Error e) {
+                warning ("Could not remove children from %s cleanly: %s", str_dir, e.message);
             }
         }
 

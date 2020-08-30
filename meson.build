@@ -59,6 +59,7 @@ executable(
     'src/Widgets/Editor.vala',
     'src/Widgets/Library.vala',
     'src/Widgets/NewSheet.vala',
+    'src/Widgets/NewFolder.vala',
     'src/Widgets/Preview.vala',
     'src/Widgets/PreviewWindow.vala',
     'src/Widgets/KeyBindings.vala',
