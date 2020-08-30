@@ -11,7 +11,7 @@ Access quick settings and the preview from the quick menu.
 
 ## Live Preview
 
-![](images/preview.png)
+![](/images/preview.png)
 
 `Ctrl + Shift + P` and see your markdown rendered instantly. Live preview updates as you type.
 
