@@ -32,6 +32,7 @@ namespace ThiefMD.Widgets {
         private TreeStore _lib_store;
         private LibPair _selected;
         private TreeIter _selected_node;
+        NewFolder folder_popup;
 
         public Library () {
             debug ("Setting up library\n");
@@ -40,6 +41,7 @@ namespace ThiefMD.Widgets {
             set_model (_lib_store);
             insert_column_with_attributes (-1, "Library", new CellRendererText (), "text", 0, null);
             get_selection ().changed.connect (on_selection);
+            folder_popup = new NewFolder ();
         }
 
         public void new_folder (string folder) {
@@ -69,7 +71,6 @@ namespace ThiefMD.Widgets {
                 Gtk.MenuItem menu_add_item = new Gtk.MenuItem.with_label (_("Create Sub-Folder"));
                 menu_add_item.activate.connect (() => {
                     if (_selected != null && _all_sheets.find (_selected) != null) {
-                        NewFolder folder_popup = new NewFolder ();
                         TreePath? tree_path = _lib_store.get_path (_selected_node);
                         Rectangle r;
                         this.get_cell_area (tree_path, null, out r);

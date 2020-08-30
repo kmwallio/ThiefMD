@@ -102,7 +102,7 @@ namespace ThiefMD {
                 debug ("Could not set icon: %s\n", e.message);
             }
 
-            toolbar = new Headerbar ();
+            toolbar = Headerbar.get_instance ();
             edit_view_content = new Editor ();
             library = new Library ();
             sheets_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);

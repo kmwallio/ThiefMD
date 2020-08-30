@@ -39,6 +39,10 @@ namespace ThiefMD.Widgets {
             build_ui ();
         }
 
+        public void make_new_sheet () {
+            new_sheet_widget.popup ();
+        }
+
         public static Headerbar get_instance () {
             if (instance == null) {
                 instance = new Widgets.Headerbar ();

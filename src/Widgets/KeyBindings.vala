@@ -37,6 +37,13 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
+                // New Sheet
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.n, keycode)) {
+                        Widgets.Headerbar.get_instance ().make_new_sheet ();
+                    }
+                }
+
                 // Save
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
                     if (match_keycode (Gdk.Key.s, keycode)) {
@@ -45,6 +52,14 @@ namespace ThiefMD.Widgets {
                         } catch (Error e) {
                             warning ("Unexpected error during open: " + e.message);
                         }
+                    }
+                }
+
+                // Preview
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.p, keycode)) {
+                        PreviewWindow pvw = new PreviewWindow();
+                        pvw.run(null);
                     }
                 }
 
@@ -90,6 +105,7 @@ namespace ThiefMD.Widgets {
                 if (match_keycode (Gdk.Key.F11, keycode)) {
                     settings.fullscreen = !settings.fullscreen;
                 }
+
                 if (match_keycode (Gdk.Key.Escape, keycode)) {
                     if (settings.fullscreen) {
                         settings.fullscreen = false;
