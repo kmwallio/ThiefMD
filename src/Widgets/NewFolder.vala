@@ -31,16 +31,16 @@
              _file_name.set_placeholder_text (_("Folder name"));
              _file_name.activate.connect (new_folder);
 
-             _create = new Gtk.Button.with_label (_("Create"));
+             _create = new Gtk.Button.with_label (_("mkdir"));
 
              var menu_grid = new Gtk.Grid ();
              menu_grid.margin = 6;
              menu_grid.row_spacing = 6;
              menu_grid.column_spacing = 12;
-             menu_grid.orientation = Gtk.Orientation.VERTICAL;
+             menu_grid.orientation = Gtk.Orientation.HORIZONTAL;
 
              menu_grid.attach (_file_name, 0, 0, 2, 1);
-             menu_grid.attach (_create, 1, 1, 1, 1);
+             menu_grid.attach (_create, 3, 0, 1, 1);
 
              menu_grid.show_all ();
 

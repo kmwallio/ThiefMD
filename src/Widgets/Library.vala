@@ -63,16 +63,18 @@ namespace ThiefMD.Widgets {
             base.button_press_event (event);
 
             if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3) {
+                var settings = AppSettings.get_default ();
                 Gtk.Menu menu = new Gtk.Menu ();
 
                 Gtk.MenuItem menu_add_item = new Gtk.MenuItem.with_label (_("Create Sub-Folder"));
                 menu_add_item.activate.connect (() => {
-                    TreeIter remove_node = _selected_node;
                     if (_selected != null && _all_sheets.find (_selected) != null) {
                         NewFolder folder_popup = new NewFolder ();
                         TreePath? tree_path = _lib_store.get_path (_selected_node);
                         Rectangle r;
                         this.get_cell_area (tree_path, null, out r);
+                        r.x += settings.view_library_width / 2;
+                        r.y += 20;
                         folder_popup.set_pointing_to (r);
                         folder_popup.set_relative_to (this);
                         folder_popup.popup ();
@@ -81,24 +83,25 @@ namespace ThiefMD.Widgets {
                 });
                 menu.add (menu_add_item);
 
-                Gtk.MenuItem menu_hide_item = new Gtk.MenuItem.with_label (_("Hide from Library"));
-                menu_hide_item.activate.connect (() => {
-                    TreeIter remove_node = _selected_node;
-                    if (_selected != null && _all_sheets.find (_selected) != null) {
-                        debug ("Hiding %s\n", _selected._path);
-                        _all_sheets.remove (_selected);
-                        FileManager.add_ignore_folder (_selected._path);
-                        _lib_store.remove (ref remove_node);
-                        remove_children (_selected._path);
-                        //ThiefApp.get_instance ().refresh_library ();
-                    }
-                });
+                if (_selected != null && !settings.is_in_library (_selected._path)) {
+                    Gtk.MenuItem menu_hide_item = new Gtk.MenuItem.with_label (_("Hide from Library"));
+                    menu_hide_item.activate.connect (() => {
+                        TreeIter hide_node = _selected_node;
+                        if (_selected != null && _all_sheets.find (_selected) != null) {
+                            debug ("Hiding %s\n", _selected._path);
+                            _all_sheets.remove (_selected);
+                            FileManager.add_ignore_folder (_selected._path);
+                            _lib_store.remove (ref hide_node);
+                            remove_children (_selected._path);
+                            //ThiefApp.get_instance ().refresh_library ();
+                        }
+                    });
 
-                menu.add (menu_hide_item);
+                    menu.add (menu_hide_item);
+                }
 
                 Gtk.MenuItem menu_reveal_items = new Gtk.MenuItem.with_label (_("Show Hidden Items"));
                 menu_reveal_items.activate.connect (() => {
-                    TreeIter reveal_node = _selected_node;
                     if (_selected != null && _all_sheets.find (_selected) != null) {
                         FileManager.move_to_trash (Path.build_filename (_selected._path, ".thiefignore"));
                         parse_dir (_selected._path, _selected_node);
@@ -107,22 +110,23 @@ namespace ThiefMD.Widgets {
                 });
                 menu.add (menu_reveal_items);
 
-                menu.add (new Gtk.SeparatorMenuItem ());
+                if (_selected != null && settings.is_in_library (_selected._path)) {
+                    menu.add (new Gtk.SeparatorMenuItem ());
 
-                Gtk.MenuItem menu_remove_item = new Gtk.MenuItem.with_label (_("Remove from Library"));
-                menu_remove_item.activate.connect (() => {
-                    var settings = AppSettings.get_default ();
-                    TreeIter remove_node = _selected_node;
-                    if (_selected != null && _all_sheets.find (_selected) != null) {
-                        debug ("Removing %s\n", _selected._path);
-                        _all_sheets.remove (_selected);
-                        settings.remove_from_library (_selected._path);
-                        _lib_store.remove (ref remove_node);
-                        remove_children (_selected._path);
-                        //ThiefApp.get_instance ().refresh_library ();
-                    }
-                });
-                menu.add (menu_remove_item);
+                    Gtk.MenuItem menu_remove_item = new Gtk.MenuItem.with_label (_("Remove from Library"));
+                    menu_remove_item.activate.connect (() => {
+                        TreeIter remove_node = _selected_node;
+                        if (_selected != null && _all_sheets.find (_selected) != null) {
+                            debug ("Removing %s\n", _selected._path);
+                            _all_sheets.remove (_selected);
+                            settings.remove_from_library (_selected._path);
+                            _lib_store.remove (ref remove_node);
+                            remove_children (_selected._path);
+                            //ThiefApp.get_instance ().refresh_library ();
+                        }
+                    });
+                    menu.add (menu_remove_item);
+                }
 
                 menu.attach_to_widget (this, null);
                 menu.show_all ();

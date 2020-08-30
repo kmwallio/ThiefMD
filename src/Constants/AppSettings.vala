@@ -101,6 +101,19 @@ namespace ThiefMD {
             library_list = new_library;
         }
 
+        public bool is_in_library (string path) {
+            string[] current_library = library();
+            string new_library = "";
+
+            foreach (string item in current_library) {
+                if (item == path) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public bool add_to_library (string folder) {
             string[] current_library = library();
 
