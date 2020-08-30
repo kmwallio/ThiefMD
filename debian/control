@@ -1,0 +1,21 @@
+Source: com.github.kmwallio.thiefmd
+Section: x11
+Priority: extra
+Maintainer: kmwallio <mwallio@gmail.com>
+Build-Depends: meson,
+               debhelper (>= 9),
+               libgtk-3-dev,
+               valac,
+               libgranite-dev,
+               libgtksourceview-3.0-dev,
+               libwebkit2gtk-4.0-dev,
+               libmarkdown2-dev,
+               libgtkspell3-3-dev
+Standards-Version: 4.5.0
+Homepage: https://miles.wallio.net/ThiefMD/
+
+Package: com.github.kmwallio.thiefmd
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: Markdown Library Manager and Editor
+  built on the efforts of other OSS.

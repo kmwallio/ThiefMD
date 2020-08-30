@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2020 kmwallio
+ * 
+ * Modified August 29, 2020
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 using ThiefMD;
 using ThiefMD.Controllers;
 
@@ -63,6 +82,36 @@ namespace ThiefMD.Widgets {
                 _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of("/") + 1) + "</b>";
             }
             _label.set_label (_label_buffer);
+        }
+
+        public override bool button_press_event(Gdk.EventButton event) {
+            base.button_press_event (event);
+
+            if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3) {
+                Gtk.Menu menu = new Gtk.Menu ();
+                menu.attach_to_widget (this, null);
+
+                Gtk.MenuItem menu_preview_sheet = new Gtk.MenuItem.with_label ((_("Preview")));
+                menu.add (menu_preview_sheet);
+                menu_preview_sheet.activate.connect (() => {
+                    SheetManager.load_sheet (this);
+                    PreviewWindow pvw = new PreviewWindow();
+                    pvw.run(null);
+                });
+
+                menu.add (new Gtk.SeparatorMenuItem ());
+
+                Gtk.MenuItem menu_delete_sheet = new Gtk.MenuItem.with_label ((_("Move to Trash")));
+                menu.add (menu_delete_sheet);
+                menu_delete_sheet.activate.connect (() => {
+                    debug ("Got remove for sheet %s", _sheet_path);
+                    _parent.remove_sheet (this);
+                    FileManager.move_to_trash (_sheet_path);
+                });
+                menu.show_all ();
+                menu.popup (null, null, null, event.button, event.time);
+            }
+            return true;
         }
 
         public string file_path () {
