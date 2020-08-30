@@ -1,6 +1,6 @@
 ---
 layout: page
-title: ThiefMD
+title: Thief Markdown Editor
 ---
 
 <img src="images/thief_library.png" style="float: right; width: 40%" />

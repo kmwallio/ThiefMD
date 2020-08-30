@@ -1,0 +1,10 @@
+{% capture category %}{{ post.categories | size }}{% endcapture %}
+<div class="entry-content">
+  <h3><span class="entry-date"><time datetime="{{ post.date | datetime | date_to_xmlschema }}" pubdate>{{ post.date | date: "<span class='month'>%b</span> <span class='day'>%d</span> <span class='year'>%Y</span>"}}</time></span><a href="{{ root_url }}{{ post.url }}">{{post.title}}</a>
+  {% if category != '0' %}
+  <small>posted in {% for category in post.categories %}
+    <a href="/changeblog/categories#{{ category }}">{{ category }}</a>
+  {% endfor %}</small>
+  {% endif %}
+  </h3>
+</div>

@@ -1,4 +1,3 @@
 name: ThiefMD
 markdown: kramdown
-permalink: /blog/:year/:month/:day/:title
-
+permalink: /changeblog/:year/:month/:day/:title

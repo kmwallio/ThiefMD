@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Shortcuts - ThiefMD
+title: Shortcuts
 ---
 
 # Changing the UI

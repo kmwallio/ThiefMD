@@ -1,6 +1,6 @@
 ---
 layout: page
-title: About - ThiefMD
+title: About
 ---
 
 # About

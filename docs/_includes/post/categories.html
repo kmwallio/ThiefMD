@@ -1,0 +1,14 @@
+{% capture category %}{% if post %}{{ post.categories | category_links | size }}{% else %}{{ page.categories | category_links | size }}{% endif %}{% endcapture %}
+{% unless category == '0' %}
+in <span class="categories">
+  {% if post %}
+    {% for category in post.categories %}
+      <a href="/changeblog/categories#{{ category }}">{{ category }}</a>
+    {% endfor %}
+  {% else %}
+    {% for category in page.categories %}
+      <a href="/changeblog/categories#{{ category }}">{{ category }}</a>
+    {% endfor %}
+  {% endif %}
+</span>
+{% endunless %}
