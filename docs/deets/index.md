@@ -3,6 +3,10 @@ layout: page
 title: Details
 ---
 
+## Shortcuts
+
+[Check here](/shortcuts)
+
 ## Quick Menu
 
 ![](/images/quickmenu.png)
