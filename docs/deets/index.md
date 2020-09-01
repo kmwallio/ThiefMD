@@ -15,9 +15,11 @@ Access quick settings and the preview from the quick menu.
 
 ## Live Preview
 
-![](/images/preview.png)
-
 `Ctrl + Shift + P` and see your markdown rendered instantly. Live preview updates as you type.
+
+![](/images/image_finding.png)
+
+Relative paths? Absolute paths? Don't worry, ThiefMD will find the image you're looking for.
 
 A separate window lets allows for better positioning, or multi-monitor support. Focus on your writing, or focus on your reading.
 
