@@ -73,10 +73,8 @@ namespace ThiefMD.Widgets {
                 style += """<link rel="stylesheet" type="text/css" href='""";
                 style += Build.PKGDATADIR + "/styles/splendor.css";
                 style += "' />";
-            
-            warning(style);
-            
-            // If typewriter scrolling is enabled, add padding to match editor
+
+                // If typewriter scrolling is enabled, add padding to match editor
             bool typewriter_active = settings.typewriter_scrolling;
             if (typewriter_active) {
                 style = style + """<style>
@@ -270,7 +268,6 @@ namespace ThiefMD.Widgets {
                 </body>
             </html>""".printf(stylesheet, markdown, script);
             this.load_html (html, "file:///");
-            // debug(html);
         }
     }
 }

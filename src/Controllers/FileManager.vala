@@ -208,7 +208,15 @@ namespace ThiefMD.Controllers.FileManager {
         return file_opened;
     }
 
-    public bool move_to_trash (string file_path) {
+    public bool move_item (string source_file, string destination_folder) throws Error
+    {
+        File to_move = File.new_for_path (source_file);
+        File final_destination = File.new_for_path (destination_folder);
+        return to_move.move (final_destination, FileCopyFlags.NONE);
+    }
+
+    public bool move_to_trash (string file_path)
+    {
         bool moved = false;
         File to_delete = File.new_for_path (file_path);
         if (!to_delete.query_exists ()) {
