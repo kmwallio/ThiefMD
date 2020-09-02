@@ -11,7 +11,7 @@ This article assumes you already have a Git repository setup with your Jekyll in
 
 ## Creating a Post
 
-<img src="images/create_post.png" style="float: left; width: 40%" />
+<img src="/images/create_post.png" style="float: left; width: 40%" />
 
 Creating a post is easy. Select `_posts` in the Library, click on the `New Post` icon, and enter in a filename `YYYY-MM-DD-title`.
 
