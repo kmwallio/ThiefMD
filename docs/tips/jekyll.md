@@ -38,6 +38,12 @@ To insert the current time, right click, Insert Datetime.
 
 Using a time in the future will prevent Jekyll from writing that post to the output until after the time specified.  This makes it useful for drafting or schedule articles.
 
+### Moving Posts
+
+If you're worried about accidentally publishing something, you can create posts in a `_drafts` folder instead.  Once you're ready to publish, simply drag and drop the post from `_drafts` to `_posts`, then commit your changes.
+
+![](/images/drag_n_drop_sheets.gif)
+
 ### Committing
 
 [gitg](https://wiki.gnome.org/Apps/Gitg/) is a useful tool for managing git repositories and committing your posts.

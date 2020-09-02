@@ -15,4 +15,5 @@ This release focuses on blogging. We added some new UI features and better Libra
  ![](/images/datetime_menu.png)
  Update the post timestamp with ease.
 * **Drag and Drop Sheets**
+ ![](/images/drag_n_drop_sheets.gif)
  Move a markdown file into another directory in the library. You could switch a `\_draft` to a `\_post`.
