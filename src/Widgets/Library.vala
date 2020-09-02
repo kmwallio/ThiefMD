@@ -423,6 +423,7 @@ namespace ThiefMD.Widgets {
 
                 try
                 {
+                    print ("Moving %s to %s\n", file_to_move, p._path);
                     FileManager.move_item (file_to_move, p._path);
                 }
                 catch (Error e)

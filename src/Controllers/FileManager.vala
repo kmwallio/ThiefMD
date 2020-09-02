@@ -211,7 +211,7 @@ namespace ThiefMD.Controllers.FileManager {
     public bool move_item (string source_file, string destination_folder) throws Error
     {
         File to_move = File.new_for_path (source_file);
-        File final_destination = File.new_for_path (destination_folder);
+        File final_destination = File.new_for_path (Path.build_filename (destination_folder, to_move.get_basename ()));
         return to_move.move (final_destination, FileCopyFlags.NONE);
     }
 
