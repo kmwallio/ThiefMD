@@ -38,7 +38,7 @@ namespace ThiefMD.Widgets {
             } else {
                 _path = path;
             }
-            debug ("Got path : %s\n", _path);
+            debug ("Got path : %s", _path);
             _title = _path.substring (_path.last_index_of ("/") + 1);
             _sheets = new Sheets(_path);
         }
@@ -59,7 +59,7 @@ namespace ThiefMD.Widgets {
         NewFolder folder_popup;
 
         public Library () {
-            debug ("Setting up library\n");
+            debug ("Setting up library");
             _lib_store = new TreeStore (2, typeof (string), typeof (LibPair));
             parse_library();
             set_model (_lib_store);
@@ -85,7 +85,7 @@ namespace ThiefMD.Widgets {
             }
 
             if (_selected != null && _all_sheets.find (_selected) != null) {
-                debug ("Creating %s in %s\n", folder, _selected._path);
+                debug ("Creating %s in %s", folder, _selected._path);
                 string new_folder_path = Path.build_filename (_selected._path, folder);
                 File newfolder = File.new_for_path (new_folder_path);
                 if (newfolder.query_exists ()) {
@@ -137,16 +137,24 @@ namespace ThiefMD.Widgets {
             return false;
         }
 
+        public void refresh_sheets (string path) {
+            foreach (LibPair pair in _all_sheets) {
+                if (pair._sheets.get_sheets_path () == path) {
+                    pair._sheets.load_sheets ();
+                }
+            }
+        }
+
         public Sheets get_sheets (string path) {
             foreach (LibPair pair in _all_sheets) {
-                debug ("Checking if %s is %s\n", path, pair._sheets.get_sheets_path());
+                debug ("Checking if %s is %s", path, pair._sheets.get_sheets_path());
                 if (pair._sheets.get_sheets_path() == path) {
-                    debug ("Found %s\n", path);
+                    debug ("Found %s", path);
                     return pair._sheets;
                 }
             }
 
-            debug ("Could not find last opened project in library\n");
+            debug ("Could not find last opened project in library");
             return new Sheets(path);
         }
 
@@ -163,7 +171,7 @@ namespace ThiefMD.Widgets {
                 }
                 if (!has_sheets (lib)) {
                     _lib_store.append (out root, null);
-                    debug (lib + "\n");
+                    debug (lib);
                     LibPair pair = new LibPair(lib);
                     _lib_store.set (root, 0, pair._title, 1, pair, -1);
                     _all_sheets.append (pair);
@@ -185,7 +193,7 @@ namespace ThiefMD.Widgets {
                 string? file_name = null;
                 while ((file_name = dir.read_name()) != null) {
                     if (!file_name.has_prefix(".") && !(file_name in excluded)) {
-                        debug ("Found %s \n", file_name);
+                        debug ("Found %s ", file_name);
                         string path = Path.build_filename (str_dir, file_name);
                         if (!has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
                             _lib_store.append (out child, iter);
@@ -200,6 +208,17 @@ namespace ThiefMD.Widgets {
             } catch (Error e) {
                 debug ("Error: %s", e.message);
             }
+        }
+
+        public bool file_in_library (string file_path) {
+            foreach (LibPair p in _all_sheets)
+            {
+                if (file_path.has_prefix (p._path))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         //
@@ -234,7 +253,7 @@ namespace ThiefMD.Widgets {
                     menu_hide_item.activate.connect (() => {
                         TreeIter hide_node = _selected_node;
                         if (_selected != null && _all_sheets.find (_selected) != null) {
-                            debug ("Hiding %s\n", _selected._path);
+                            debug ("Hiding %s", _selected._path);
                             _all_sheets.remove (_selected);
                             FileManager.add_ignore_folder (_selected._path);
                             _lib_store.remove (ref hide_node);
@@ -263,7 +282,7 @@ namespace ThiefMD.Widgets {
                     menu_remove_item.activate.connect (() => {
                         TreeIter remove_node = _selected_node;
                         if (_selected != null && _all_sheets.find (_selected) != null) {
-                            debug ("Removing %s\n", _selected._path);
+                            debug ("Removing %s", _selected._path);
                             _all_sheets.remove (_selected);
                             settings.remove_from_library (_selected._path);
                             _lib_store.remove (ref remove_node);
@@ -288,7 +307,7 @@ namespace ThiefMD.Widgets {
                 LibPair p = convert_selection (model, iter);
                 _selected = p;
                 _selected_node = iter;
-                debug ("Selected: %s\n", p._path);
+                debug ("Selected: %s", p._path);
                 SheetManager.set_sheets(p._sheets);
                 return;
             }
@@ -323,14 +342,14 @@ namespace ThiefMD.Widgets {
                 create_row_drag_icon (path);
                 _lib_store.get_iter (out iter, path);
                 _lib_store.get (iter, 0, out title, 1, out p);
-                print ("Got location %s\n", p._path);
+                debug ("Got location %s", p._path);
             }*/
             return false;
         }
 
 
         private void on_drag_leave (Widget widget, DragContext context, uint time) {
-            debug ("%s: on_drag_leave\n", widget.name);
+            debug ("%s: on_drag_leave", widget.name);
         }
 
         private bool on_drag_drop (
@@ -340,7 +359,7 @@ namespace ThiefMD.Widgets {
             int y,
             uint time)
         {
-            print ("%s: on_drag_drop\n", widget.name);
+            debug ("%s: on_drag_drop", widget.name);
 
             TreePath? path;
             TreeViewDropPosition pos;
@@ -350,6 +369,14 @@ namespace ThiefMD.Widgets {
                  get_dest_row_at_pos (x, y, out path, out pos)) 
             {
                 var target_type = (Atom) context.list_targets().nth_data (Target.STRING);
+
+                debug ("Requested STRING, got: %s", target_type.name());
+
+                if (!target_type.name ().ascii_up ().contains ("STRING"))
+                {
+                    target_type = (Atom) context.list_targets().nth_data (Target.URI);
+                    debug ("Requested URI, got: %s", target_type.name());
+                }
 
                 // Request the data from the source.
                 Gtk.drag_get_data (
@@ -374,20 +401,28 @@ namespace ThiefMD.Widgets {
             uint target_type,
             uint time)
         {
+            debug ("%s: on_drag_data_received", widget.name);
+
             bool dnd_success = false;
             bool delete_selection_data = false;
+            bool item_in_library = false;
             string file_to_move = "";
+            File? file = null;
+            TreePath? path;
+            TreeViewDropPosition pos;
+            LibPair? p = null;
 
-            print ("%s: on_drag_data_received\n", widget.name);
+            if (get_dest_row_at_pos (x, y, out path, out pos)){
+                TreeIter iter;
+                string title;
+                _lib_store.get_iter (out iter, path);
+                _lib_store.get (iter, 0, out title, 1, out p);
+                debug ("Got location %s", p._path);
+            }
 
             // Deal with what we are given from source
             if ((selection_data != null) && (selection_data.get_length() >= 0)) 
             {
-                if (context.get_suggested_action() == DragAction.ASK)
-                {
-                    // Ask the user to move or copy, then set the context action.
-                }
-
                 if (context.get_suggested_action() == DragAction.MOVE)
                 {
                     delete_selection_data = true;
@@ -396,35 +431,134 @@ namespace ThiefMD.Widgets {
                 // Check that we got the format we can use
                 switch (target_type)
                 {
+                    case Target.URI:
+                        file_to_move = (string) selection_data.get_data();
+                    break;
                     case Target.STRING:
                         file_to_move = (string) selection_data.get_data();
-                        dnd_success = true;
                     break;
                     default:
+                        dnd_success = false;
                         warning ("Invalid data type");
                     break;
                 }
+
+                debug ("Got %s", file_to_move);
+
+                if (file_to_move != "")
+                {
+                    if (file_to_move.has_prefix ("file"))
+                    {
+                        debug ("Removing file prefix for %s", file_to_move.chomp ());
+                        file = File.new_for_uri (file_to_move.chomp ());
+                        string? check_path = file.get_path ();
+                        if ((check_path == null) || (check_path.chomp () == ""))
+                        {
+                            debug ("No local path");
+                            item_in_library = true;
+                            delete_selection_data = false;
+                        }
+                        else
+                        {
+                            file_to_move = check_path.chomp ();
+                            debug ("Result path: %s", file_to_move);
+                        }
+                    }
+
+                    file = File.new_for_path (file_to_move);
+                    item_in_library = file_in_library (file_to_move);
+
+                    if (item_in_library && delete_selection_data && !FileUtils.test(file_to_move, FileTest.IS_DIR))
+                    {
+                        dnd_success = true;
+                    }
+                }
             }
 
+            // This isn't in our library, check if it's a folder or file
+            if (!item_in_library)
+            {
+                debug ("Item not in library");
+                delete_selection_data = false;
+                dnd_success = false;
+                if (file.query_exists ())
+                {
+                    debug ("Item found");
+                    if (FileUtils.test(file_to_move, FileTest.IS_DIR))
+                    {
+                        var settings = AppSettings.get_default ();
+                        // Just add to library, no prompt 😅
+                        if (settings.add_to_library (file_to_move))
+                        {
+                            ThiefApp instance = ThiefApp.get_instance ();
+                            instance.refresh_library ();
+                        }
+                    }
+                    else
+                    {
+                        debug ("Prompting for action");
+                        Dialog prompt = new Dialog.with_buttons (
+                            "Move into Library",
+                            ThiefApp.get_instance ().main_window,
+                            DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                            _("Copy"),
+                            Gtk.ResponseType.NO,
+                            _("Move"),
+                            Gtk.ResponseType.YES);
+
+                        prompt.response.connect((response_id) =>
+                        {
+                            prompt.close();
+                            if (response_id == Gtk.ResponseType.NO)
+                            {
+                                try
+                                {
+                                    debug ("Copying %s to %s", file_to_move, p._path);
+                                    FileManager.copy_item (file_to_move, p._path);
+                                }
+                                catch (Error e)
+                                {
+                                    warning ("Hit failure trying to move item in library: %s", e.message);
+                                }
+                            }
+                            else if (response_id == Gtk.ResponseType.YES)
+                            {
+                                try
+                                {
+                                    debug ("Moving %s to %s", file_to_move, p._path);
+                                    FileManager.move_item (file_to_move, p._path);
+                                }
+                                catch (Error e)
+                                {
+                                    warning ("Hit failure trying to move item in library: %s", e.message);
+                                }
+                            }
+                            refresh_sheets (p._path);
+                        });
+
+                        prompt.show_all ();
+                    }
+                }
+                else
+                {
+                    debug ("Item not found");
+                }
+            }
+
+            // Default behavior
             if (dnd_success)
             {
-                TreePath? path;
-                TreeViewDropPosition pos;
-                LibPair? p = null;
-                if (get_dest_row_at_pos (x, y, out path, out pos)){
-                    TreeIter iter;
-                    string title;
-                    set_drag_dest_row (path, pos);
-                    create_row_drag_icon (path);
-                    _lib_store.get_iter (out iter, path);
-                    _lib_store.get (iter, 0, out title, 1, out p);
-                    print ("Got location %s\n", p._path);
-                }
-
                 try
                 {
-                    print ("Moving %s to %s\n", file_to_move, p._path);
+                    debug ("Moving %s to %s", file_to_move, p._path);
                     FileManager.move_item (file_to_move, p._path);
+                    refresh_sheets (p._path);
+                    File? parent = file.get_parent ();
+                    if (parent != null)
+                    {
+                        refresh_sheets (parent.get_path ());
+                    }
+                    UI.set_sheets (SheetManager.get_sheets ());
                 }
                 catch (Error e)
                 {

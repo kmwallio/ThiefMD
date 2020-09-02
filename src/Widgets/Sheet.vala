@@ -151,7 +151,7 @@ namespace ThiefMD.Widgets {
             Gtk.SelectionData selection_data,
             uint target_type, uint time)
         {
-            warning ("%s: on_drag_data_get for %s\n", widget.name, _sheet_path);
+            warning ("%s: on_drag_data_get for %s", widget.name, _sheet_path);
 
             switch (target_type) {
                 case Target.STRING:
@@ -169,11 +169,11 @@ namespace ThiefMD.Widgets {
         }
 
         private void on_drag_data_delete (Gtk.Widget widget, Gdk.DragContext context) {
-            warning ("%s: on_drag_data_delete for %s\n", widget.name, _sheet_path);
+            warning ("%s: on_drag_data_delete for %s", widget.name, _sheet_path);
         }
 
         private void on_drag_end (Gtk.Widget widget, Gdk.DragContext context) {
-            warning ("%s: on_drag_end for %s\n", widget.name, _sheet_path);
+            warning ("%s: on_drag_end for %s", widget.name, _sheet_path);
         }
     }
 }

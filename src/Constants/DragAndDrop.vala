@@ -25,10 +25,12 @@ namespace ThiefMD {
     public const int DWORD_BITS = 32;
 
     public enum Target {
-        STRING
+        STRING,
+        URI
     }
 
     public const TargetEntry[] target_list = {
-        { "STRING" , 0, Target.STRING }
+        { "STRING" , 0, Target.STRING },
+        { "text/uri-list", 0, Target.URI }
     };
 }
