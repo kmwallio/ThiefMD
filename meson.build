@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.kmwallio.thiefmd', ['vala', 'c'],
-    version: '0.0.1'
+    version: '0.0.4'
 )
 
 # Import main lib files
@@ -53,6 +53,7 @@ executable(
     meson.project_name(),
     'src/Application.vala',
     'src/Constants/AppSettings.vala',
+    'src/Constants/DragAndDrop.vala',
     'src/Widgets/HeaderBar.vala',
     'src/Widgets/Sheets.vala',
     'src/Widgets/Sheet.vala',

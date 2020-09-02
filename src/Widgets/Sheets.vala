@@ -103,7 +103,7 @@ namespace ThiefMD.Widgets {
                     }
                 }
             } catch (Error e) {
-                stderr.printf(e.message);
+                warning (e.message);
             }
 
             if (!added) {

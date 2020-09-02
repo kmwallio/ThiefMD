@@ -1,11 +1,19 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="/">ThiefMD</a>
-    <ul class="navbar-nav">
-        <li class="nav-item {% if page.title == "Thief Markdown Editor" %}active{% endif %}"><a href="/" class="nav-link">Home</a></li>
-        <li class="nav-item {% if page.title == "About" %}active{% endif %}"><a href="/about" class="nav-link">About</a></li>
-        <li class="nav-item {% if page.title == "Shortcuts" %}active{% endif %}"><a href="/shortcuts" class="nav-link">Shortcuts</a></li>
-        <li class="nav-item {% if page.title == "Details" %}active{% endif %}"><a href="/deets" class="nav-link">Details</a></li>
-        <li class="nav-item {% if page.title == "Changelog" %}active{% endif %}"><a href="/changeblog" class="nav-link">Updates</a></li>
-        <li class="nav-item"><a href="https://github.com/kmwallio/ThiefMD" class="nav-link">Github</a></li>
-    </ul>
+    <div class="collapse navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item {% if page.title == "Thief Markdown Editor" %}active{% endif %}"><a href="/" class="nav-link">Home</a></li>
+            <li class="nav-item {% if page.title == "About" %}active{% endif %}"><a href="/about" class="nav-link">About</a></li>
+            <li class="nav-item {% if page.title == "Details" %}active{% endif %}"><a href="/deets" class="nav-link">Features</a></li>
+            <li class="nav-item {% if page.title == "Changelog" %}active{% endif %}"><a href="/changeblog" class="nav-link">Updates</a></li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Tips & Tricks
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="/tips/jekyll">Blogging with Jekyll</a>
+                </div>
+            </li>
+        </ul>
+    </div>
 </nav>

@@ -33,6 +33,7 @@ namespace ThiefMD.Widgets {
         private string _label_buffer;
         private Sheets _parent;
 
+        // Change style depending on sheet available in the editor
         public bool active {
             set {
                 var header_context = this.get_style_context ();
@@ -47,23 +48,39 @@ namespace ThiefMD.Widgets {
         public Sheet (string sheet_path, Sheets parent) {
             _sheet_path = sheet_path;
             _parent = parent;
+
+            // Default to filename
             _label_buffer = "<b>" + sheet_path.substring(sheet_path.last_index_of("/") + 1) + "</b>";
             _label = new Gtk.Label(_label_buffer);
             _label.use_markup = true;
             _label.set_ellipsize (Pango.EllipsizeMode.END);
             _label.xalign = 0;
+            add(_label);
 
             var header_context = this.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-list-sheet");
 
-            add(_label);
-
             clicked.connect (() => {
-                debug ("Clicked\n");
+                debug ("Loading %s\n", _sheet_path);
                 SheetManager.load_sheet (this);
             });
 
+            // Add ability to be dragged
+            Gtk.drag_source_set (
+                this,                      // widget will be drag-able
+                Gdk.ModifierType.BUTTON1_MASK, // modifier that will start a drag
+                target_list,               // lists of target to support
+                Gdk.DragAction.MOVE            // what to do with data after dropped
+            );
+
+            // All possible source signals
+            this.drag_begin.connect(on_drag_begin);
+            this.drag_data_get.connect(on_drag_data_get);
+            this.drag_data_delete.connect(on_drag_data_delete);
+            this.drag_end.connect(on_drag_end);
+
+            // Load minimark if file has content
             redraw ();
             show_all ();
             debug ("Creating %s\n", sheet_path);
@@ -71,6 +88,10 @@ namespace ThiefMD.Widgets {
 
         public Sheets get_parent_sheets () {
             return _parent;
+        }
+
+        public string file_path () {
+            return _sheet_path;
         }
 
         public void redraw () {
@@ -83,6 +104,10 @@ namespace ThiefMD.Widgets {
             }
             _label.set_label (_label_buffer);
         }
+
+        //
+        // Click Menu Options
+        //
 
         public override bool button_press_event(Gdk.EventButton event) {
             base.button_press_event (event);
@@ -114,8 +139,41 @@ namespace ThiefMD.Widgets {
             return true;
         }
 
-        public string file_path () {
-            return _sheet_path;
+        //
+        // Drag and Drop Support
+        //
+
+        private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
+            warning ("%s: on_drag_begin", widget.name);
+        }
+
+        private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context,
+            Gtk.SelectionData selection_data,
+            uint target_type, uint time)
+        {
+            warning ("%s: on_drag_data_get for %s", widget.name, _sheet_path);
+
+            switch (target_type) {
+                case Target.STRING:
+                    selection_data.set (
+                        selection_data.get_target(),
+                        BYTE_BITS,
+                        (uchar [])_sheet_path.to_utf8());
+                break;
+                default:
+                    warning ("No known action to take.");
+                break;
+            }
+
+            debug ("Done moving");
+        }
+
+        private void on_drag_data_delete (Gtk.Widget widget, Gdk.DragContext context) {
+            warning ("%s: on_drag_data_delete for %s", widget.name, _sheet_path);
+        }
+
+        private void on_drag_end (Gtk.Widget widget, Gdk.DragContext context) {
+            warning ("%s: on_drag_end for %s", widget.name, _sheet_path);
         }
     }
 }

@@ -29,6 +29,10 @@ namespace ThiefMD.Controllers.SheetManager {
         UI.set_sheets (sheets);
     }
 
+    public Sheets get_sheets () {
+        return _current_sheets;
+    }
+
     public static void refresh_sheet () {
         if (_currentSheet != null) {
             _currentSheet.redraw ();

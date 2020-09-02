@@ -58,7 +58,16 @@ namespace ThiefMD.Widgets {
                 warning ("Error: %s\n", e.message);
             }
 
-            this.populate_popup.connect ((menu) => {
+            this.populate_popup.connect ((source, menu) => {
+                Gtk.MenuItem menu_insert_datetime = new Gtk.MenuItem.with_label (_("Insert Datetime"));
+                menu_insert_datetime.activate.connect (() => {
+                    DateTime now = new DateTime.now_local ();
+                    string new_text = now.format ("%F %H:%M");
+                    insert_at_cursor (new_text);
+                });
+                menu.append (menu_insert_datetime);
+                menu.show_all ();
+
                 menu.selection_done.connect (() => {
                     var selected = get_selected (menu);
 

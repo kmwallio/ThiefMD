@@ -208,7 +208,41 @@ namespace ThiefMD.Controllers.FileManager {
         return file_opened;
     }
 
-    public bool move_to_trash (string file_path) {
+    public bool copy_item (string source_file, string destination_folder) throws Error
+    {
+        File to_move = File.new_for_path (source_file);
+        File final_destination = File.new_for_path (Path.build_filename (destination_folder, to_move.get_basename ()));
+        return to_move.copy (final_destination, FileCopyFlags.NONE);
+    }
+
+    public bool move_item (string source_file, string destination_folder) throws Error
+    {
+        bool moved = false;
+        bool is_active = false;
+        var settings = AppSettings.get_default ();
+
+        if (SheetManager.get_sheet ().file_path () == source_file)
+        {
+            if (settings.last_file != "") {
+                FileManager.save_work_file ();
+            }
+            is_active = true;
+        }
+
+        File to_move = File.new_for_path (source_file);
+        File final_destination = File.new_for_path (Path.build_filename (destination_folder, to_move.get_basename ()));
+        moved = to_move.move (final_destination, FileCopyFlags.NONE);
+
+        if (is_active && moved)
+        {
+            open_file (final_destination.get_path ());
+        }
+
+        return moved;
+    }
+
+    public bool move_to_trash (string file_path)
+    {
         bool moved = false;
         File to_delete = File.new_for_path (file_path);
         if (!to_delete.query_exists ()) {

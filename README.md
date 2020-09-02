@@ -14,17 +14,19 @@ Still a work in progress, but this shows the sheets and editor view.  Sheets ren
 
 ![](docs/images/panel_animation.gif)
 
-Still working on the Library, but showing the different view modes.
+Switching editor view modes.
 
 ![](docs/images/library_remove.gif)
 
 Basic library management.
 
-![](docs/images/typewriter_scrolling.gif)
+![](docs/images/drag_n_drop_sheets.gif)
 
-Live Preview
+Drag and Drop organizing of the library.
 
 ![](docs/images/preview.png)
+
+Live Preview
 
 ## Dependencies
 
@@ -54,16 +56,16 @@ $ sudo ninja install
  * Switch between documents
  * Hide Library and Document Switcher
  * Live Preview
+ * Sheet Management
+ * Shortcut key bindings
 
 ## Planning
 
- * Sheet Management
  * Better library organization
  * Export
  * Theming
- * Shortcut key bindings
 
-## Acknowledgements
+## Acknowledgments
 
 * Code <s>stolen</s> *forked* from [Quilter](https://github.com/lainsce/quilter)
 * Font is [iA Writer Duospace](https://github.com/iaolo/iA-Fonts)
