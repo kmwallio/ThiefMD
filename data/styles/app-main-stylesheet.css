@@ -83,34 +83,6 @@
     -gtk-icon-shadow: 1px 1px transparent;
 }
 
-.color-sepia {
-    background-color: #F0E8DD;
-    border: 1px solid #d0b896;
-    box-shadow:
-        inset 0 0 0 1px alpha (shade (#e0c8a6, 1.4), 0.05),
-        inset 0 1px 0 0 alpha (#e0c8a6, 0.45),
-        inset 0 -1px 0 0 alpha (#8D7768, 0.15);
-    background-image:
-        linear-gradient(
-            to bottom,
-            transparent,
-            transparent 50%,
-            alpha (
-                #807452,
-                0.04
-            )
-        );
-}
-
-.color-sepia:focus {
-    border-color: #52ADF8;
-    box-shadow:
-        inset 0 1px 0 0 alpha (#e0c8a6, 0.45),
-        inset 0 -1px 0 0 alpha (#e0c8a6, 0.15),
-        0 0 0 1px alpha (#d0b896, 0.25);
-    transition: all 100ms ease-out;
-}
-
 .color-sepia image {
     color: #5D4738;
     -gtk-icon-shadow: 1px 1px transparent;

@@ -4,4 +4,8 @@
         <file alias="app-main-stylesheet.css" compressed="true">styles/app-main-stylesheet.css</file>
         <file alias="app-stylesheet.css" compressed="true">styles/app-stylesheet.css</file>
     </gresource>
+    <gresource prefix="/com/github/kmwallio/thiefmd/icons">
+        <file alias="thiefmd-symbolic.svg" compressed="false" preprocess="">icons/symbolic/com.github.kmwallio.thiefmd.svg</file>
+        <file alias="thiefmd.svg" compressed="false" preprocess="">icons/128/com.github.kmwallio.thiefmd.svg</file>
+    </gresource>
 </gresources>

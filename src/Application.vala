@@ -97,7 +97,7 @@ namespace ThiefMD {
             // Attempt to set taskbar icon
             try {
                 debug ("Settings the icon");
-                main_window.icon = Gtk.IconTheme.get_default ().load_icon ("accessories-text-editor", Gtk.IconSize.DIALOG, 0);
+                main_window.icon = Gtk.IconTheme.get_default ().load_icon ("com.github.kmwallio.thiefmd", Gtk.IconSize.DIALOG, 0);
             } catch (Error e) {
                 debug ("Could not set icon: %s\n", e.message);
             }

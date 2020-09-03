@@ -54,6 +54,7 @@ executable(
     'src/Application.vala',
     'src/Constants/AppSettings.vala',
     'src/Constants/DragAndDrop.vala',
+    'src/Widgets/About.vala',
     'src/Widgets/HeaderBar.vala',
     'src/Widgets/Sheets.vala',
     'src/Widgets/Sheet.vala',

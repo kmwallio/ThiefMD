@@ -71,14 +71,14 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             var style = "";
                 style += """<link rel="stylesheet" type="text/css" href='""";
-                style += Build.PKGDATADIR + "/styles/splendor.css";
+                style += Build.PKGDATADIR + "/styles/preview.css";
                 style += "' />";
 
                 // If typewriter scrolling is enabled, add padding to match editor
             bool typewriter_active = settings.typewriter_scrolling;
             if (typewriter_active) {
                 style = style + """<style>
-                .markdown-body{padding-top:50%;padding-bottom:50%}
+                .markdown-body{padding-top:40%;padding-bottom:40%}
                 </style>""";
             } else {
                 style = style + """<style>
