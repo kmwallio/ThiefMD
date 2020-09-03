@@ -9,4 +9,5 @@ Adding some additional "markdown" functionality to the preview, like Syntax High
 
 <!-- more -->
 
-* Syntax Highlighting by [highlight.js](https://highlightjs.org/)
+* Syntax Highlighting by [highlight.js](https://highlightjs.org)
+* Math Rendering by [KaTeX](https://katex.org)

@@ -34,3 +34,15 @@ Stay centered and stay focused. Type writer scrolling keeps your active line fix
 ![](/images/jekyll-minimark.png)
 
 Use [Jekyll](https://jekyllrb.com)? ThiefMD will surface the [front matter](https://jekyllrb.com/docs/front-matter/) in the Sheets View using minimark.
+
+## KaTeX Support
+
+![](/images/katex_preview.png)
+
+Use [KaTeX](https://katex.org) to render Math Equations in Previews. *Currently requires libmarkdown 2.2.0 or greater*.
+
+## Syntax Highlighting
+
+![](/images/syntax_preview.png)
+
+Sharing code? [highlight.js](https://highlightjs.org) will render it with meaning.
