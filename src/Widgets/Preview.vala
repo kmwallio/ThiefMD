@@ -148,7 +148,9 @@ namespace ThiefMD.Widgets {
         private string find_file (string url) {
             string result = "";
             string file = Path.build_filename (".", url);
-            if (url.index_of_char(':') != -1) {
+            if (url.index_of_char (':') != -1) {
+                result = url;
+            } else if (url.index_of_char ('.') == -1) {
                 result = url;
             } else if (FileUtils.test (url, FileTest.EXISTS)) {
                 result = url;
@@ -174,7 +176,12 @@ namespace ThiefMD.Widgets {
                     }
                 }
             }
-            return result;
+
+            if (result != "") {
+                return result;
+            } else {
+                return url;
+            }
         }
 
         private string process () {
