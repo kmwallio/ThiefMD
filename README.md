@@ -1,5 +1,7 @@
 # ThiefMD
 
+<div style="float: left; width: 64px"><img src="docs/images/thiefmd_64.png" width="48" /></div>
+
 ThiefMD is a [Markdown](https://en.wikipedia.org/wiki/Markdown) editor that helps with organization and management.  It is heavily inspired by [Ulysses](https://ulysses.app).  Initial code was based on work from [Quilter](https://github.com/lainsce/quilter).
 
 ## Font
