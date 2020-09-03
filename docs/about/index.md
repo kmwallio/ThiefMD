@@ -18,6 +18,8 @@ Great software is built on the shoulders of giants.
 * Inspired by [Ulysses](https://ulyssesapp.com/)
 * Preview CSS is [Splendor](http://markdowncss.github.io/splendor/)
 * Markdown Rendering by [Discount](http://www.pell.portland.or.us/~orc/Code/discount/)
+* Syntax Highlighting by [highlight.js](https://highlightjs.org/)
+* Math Rendering by [Katex](https://katex.org/)
 
 ## Goals
 

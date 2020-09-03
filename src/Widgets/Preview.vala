@@ -72,7 +72,13 @@ namespace ThiefMD.Widgets {
             var style = "";
                 style += """<link rel="stylesheet" type="text/css" href='""";
                 style += Build.PKGDATADIR + "/styles/preview.css";
-                style += "' />";
+                style += "' />\n";
+                style += """<link rel="stylesheet" type="text/css" href='""";
+                style += Build.PKGDATADIR + "/styles/highlight.css";
+                style += "' />\n";
+                style += """<link rel="stylesheet" type="text/css" href='""";
+                style += Build.PKGDATADIR + "/styles/katex.min.css";
+                style += "' />\n";
 
                 // If typewriter scrolling is enabled, add padding to match editor
             bool typewriter_active = settings.typewriter_scrolling;
@@ -142,7 +148,9 @@ namespace ThiefMD.Widgets {
         private string find_file (string url) {
             string result = "";
             string file = Path.build_filename (".", url);
-            if (url.index_of_char(':') != -1) {
+            if (url.index_of_char (':') != -1) {
+                result = url;
+            } else if (url.index_of_char ('.') == -1) {
                 result = url;
             } else if (FileUtils.test (url, FileTest.EXISTS)) {
                 result = url;
@@ -168,7 +176,12 @@ namespace ThiefMD.Widgets {
                     }
                 }
             }
-            return result;
+
+            if (result != "") {
+                return result;
+            } else {
+                return url;
+            }
         }
 
         private string process () {
@@ -239,10 +252,41 @@ namespace ThiefMD.Widgets {
             bool typewriter_active = settings.typewriter_scrolling;
 
             // Find our ThiefMark and move it to the same position of the cursor
-            script = """const element = document.getElementById('thiefmark');
+            script = """<script>
+            const element = document.getElementById('thiefmark');
             const textOnTop = element.offsetTop;
             const middle = textOnTop - (window.innerHeight * %f);
-            window.scrollTo(0, middle);""".printf((typewriter_active) ? Constants.TYPEWRITER_POSITION : Editor.cursor_position);
+            window.scrollTo(0, middle);
+            </script>
+            <script>
+            renderMathInElement(document.body,
+                {
+                    delimeters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "$", right: "$", display: false},
+                        {left: "\\(", right: "\\)", display: false},
+                        {left: "\\[", right: "\\]", display: true}
+                    ]
+                });
+            </script>
+            <script>hljs.initHighlightingOnLoad();</script>""".printf((typewriter_active) ? Constants.TYPEWRITER_POSITION : Editor.cursor_position);
+
+            return script;
+        }
+
+        private string get_javascript_header () {
+            string script;
+
+               // Find our ThiefMark and move it to the same position of the cursor
+            script = "<script src='";
+            script += Build.PKGDATADIR + "/scripts/highlight.js";
+            script += "'></script>\n";
+            script += """<script src='""";
+            script += Build.PKGDATADIR + "/scripts/katex.min.js";
+            script += "'></script>";
+            script += "<script src='";
+            script += Build.PKGDATADIR + "/scripts/auto-render.min.js";
+            script += "'></script>";
 
             return script;
         }
@@ -251,22 +295,23 @@ namespace ThiefMD.Widgets {
             string stylesheet = set_stylesheet ();
             string markdown = process ();
             string script = get_javascript ();
+            string headerscript = get_javascript_header ();
             html = """
             <!doctype html>
             <html>
                 <head>
                     <meta charset=utf-8>
                     %s
+                    %s
                 </head>
                 <body>
                     <div class=markdown-body>
                         %s
                     </div>
-                    <script>
-                        %s
-                    </script>
+                    %s
                 </body>
-            </html>""".printf(stylesheet, markdown, script);
+            </html>""".printf(stylesheet, headerscript, markdown, script);
+            // warning ("%s\n", html);
             this.load_html (html, "file:///");
         }
     }

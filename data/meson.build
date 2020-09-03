@@ -41,3 +41,33 @@ install_data(
     join_paths('preview', 'preview.css'),
     install_dir: join_paths([ get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'styles' ])
 )
+
+install_data(
+    join_paths('highlight', 'highlight.css'),
+    install_dir: join_paths([ get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'styles' ])
+)
+
+install_data(
+    join_paths('highlight', 'highlight.js'),
+    install_dir: join_paths([ get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'scripts' ])
+)
+
+install_data(
+    join_paths('katex', 'katex.min.css'),
+    install_dir: join_paths([ get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'styles' ])
+)
+
+install_subdir(
+    join_paths('katex', 'fonts'),
+    install_dir: join_paths([ get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'styles' ])
+)
+
+install_data(
+    join_paths('katex', 'katex.min.js'),
+    install_dir: join_paths([ get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'scripts' ])
+)
+
+install_data(
+    join_paths('katex', 'auto-render.min.js'),
+    install_dir: join_paths([ get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'scripts' ])
+)

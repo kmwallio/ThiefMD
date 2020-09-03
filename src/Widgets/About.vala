@@ -37,12 +37,16 @@ namespace ThiefMD.Widgets {
         }
 
         private void build_ui () {
+            this.set_border_width (20);
             title = _("About ThiefMD");
             window_position = WindowPosition.CENTER;
+            set_size_request (450, 350);
 
             stack = new Stack ();
             stack.add_titled (about_grid (), "about", _("About"));
-            stack.add_titled (credits_grid (), "credits", _("Credits"));
+            var credits_view = new Gtk.ScrolledWindow (null, null);
+            credits_view.add (credits_grid ());
+            stack.add_titled (credits_view, "credits", _("Credits"));
 
             StackSwitcher switcher = new StackSwitcher ();
             switcher.set_stack (stack);
@@ -109,10 +113,18 @@ namespace ThiefMD.Widgets {
             var markdown_credits = new Label (_("<b>Markdown Parsing:</b>\n<a href='http://www.pell.portland.or.us/~orc/Code/discount/'>libmarkdown2</a>.\nCopyright © 2007 David Loren Parsons.\n<a href='http://www.pell.portland.or.us/~orc/Code/discount/COPYRIGHT.html'>BSD-style License</a>.\n"));
             markdown_credits.use_markup = true;
 
+            var highlight_credits = new Label (_("<b>Syntax Highlighting:</b>\n<a href='https://highlightjs.org/'>highlight.js</a>.\nCopyright © 2006 Ivan Sagalaev.\n<a href='https://github.com/highlightjs/highlight.js/blob/master/LICENSE'>BSD-3-Clause License</a>.\n"));
+            highlight_credits.use_markup = true;
+
+            var katex_credits = new Label (_("<b>KaTeX:</b>\n<a href='https://katex.org/)'>KaTeX</a>.\n2013-2020 Khan Academy and other contributors.\n<a href='https://github.com/KaTeX/KaTeX/blob/master/LICENSE'>MIT License</a>.\n"));
+            katex_credits.use_markup = true;
+
             grid.add (quilter_credits);
             grid.add (font_credits);
             grid.add (css_credits);
             grid.add (markdown_credits);
+            grid.add (highlight_credits);
+            grid.add (katex_credits);
             grid.show_all ();
 
             return grid;

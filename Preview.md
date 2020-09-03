@@ -59,3 +59,7 @@ It will be used for sanity checking the stylesheet used.
 Here's a sentence with a footnote. [^1]  I'm basically ~~stealing~~ copying and pasting examples from [https://www.markdownguide.org/cheat-sheet/](https://www.markdownguide.org/cheat-sheet/).
 
 [^1]: This is the footnote.
+
+### Math (required libmarkdown 2.2.0 or greater)
+
+$$\int_{a}^{b} x^2 dx$$
