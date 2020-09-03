@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.kmwallio.thiefmd', ['vala', 'c'],
-    version: '0.0.4'
+    version: '0.0.5'
 )
 
 # Import main lib files

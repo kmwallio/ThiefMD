@@ -1,3 +1,10 @@
+com.github.kmwallio.thiefmd (0.0.5) xenial; urgency=low
+
+  * Fix bug with () rendering
+  * Add Syntax Highlighting and KaTeX
+
+ -- kmwallio <mwallio@gmail.com>  Thu, 03 Sep 2020 00:21:57 -0700
+
 com.github.kmwallio.thiefmd (0.0.4) xenial; urgency=low
 
   * Drag and Drop Support for moving sheets in library
