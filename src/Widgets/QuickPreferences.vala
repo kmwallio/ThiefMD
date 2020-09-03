@@ -71,12 +71,31 @@ namespace ThiefMD.Widgets {
 
             var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
 
-            var preview_button = new Gtk.Button.with_label ((_("Preview")));
+            var preview_button = new Gtk.ModelButton ();
+            preview_button.text = (_("Preview"));
             preview_button.has_tooltip = true;
             preview_button.tooltip_text = _("Launch Preview");
             preview_button.clicked.connect (() => {
                 PreviewWindow pvw = new PreviewWindow();
                 pvw.run(null);
+            });
+
+            /*var preferences_button = new Gtk.ModelButton ();
+            preferences_button.text = (_("Preferences"));
+            preferences_button.has_tooltip = true;
+            preferences_button.tooltip_text = _("Edit Preferences");
+            preferences_button.clicked.connect (() => {
+                PreviewWindow pvw = new PreviewWindow();
+                pvw.run(null);
+            });*/
+
+            var about_button = new Gtk.ModelButton ();
+            about_button.text = (_("About"));
+            about_button.has_tooltip = true;
+            about_button.tooltip_text = _("About ThiefMD");
+            about_button.clicked.connect (() => {
+                About abt = new About();
+                abt.run();
             });
 
             var menu_grid = new Gtk.Grid ();
@@ -85,10 +104,12 @@ namespace ThiefMD.Widgets {
             menu_grid.column_spacing = 12;
             menu_grid.orientation = Gtk.Orientation.VERTICAL;
             menu_grid.add (typewriter_button);
-            menu_grid.add (separator);
+            // menu_grid.add (separator);
             menu_grid.add (spellcheck_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
+            // menu_grid.add (preferences_button);
+            menu_grid.add (about_button);
             menu_grid.show_all ();
 
             add (menu_grid);

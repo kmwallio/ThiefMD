@@ -1,6 +1,8 @@
 # This is a Preview File
 
-<div style="float: left; width: 25%;"><img src="data/icons/128/com.github.kmwallio.thiefmd.svg" /></div> It will be used for sanity checking the stylesheet used.
+<div style="float: left; width: 25%;"><img src="data/icons/128/com.github.kmwallio.thiefmd.svg" /></div>
+
+It will be used for sanity checking the stylesheet used.
 
 *Emphasized* text.
 
@@ -39,8 +41,14 @@
     }
 ```
 
+### Markdown Rendered Image
+
 ![](docs/images/matt-hoffman-wheat.jpg)
 
+### HTML Rendered Image
+
+<div><img src="docs/images/matt-hoffman-wheat.jpg" /></div>
+ 
 ### Tables
 
 | Syntax | Description |
@@ -51,4 +59,3 @@
 Here's a sentence with a footnote. [^1]  I'm basically ~~stealing~~ copying and pasting examples from [https://www.markdownguide.org/cheat-sheet/](https://www.markdownguide.org/cheat-sheet/).
 
 [^1]: This is the footnote.
-
