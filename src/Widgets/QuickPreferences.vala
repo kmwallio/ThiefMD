@@ -80,14 +80,14 @@ namespace ThiefMD.Widgets {
                 pvw.run(null);
             });
 
-            /*var preferences_button = new Gtk.ModelButton ();
+            var preferences_button = new Gtk.ModelButton ();
             preferences_button.text = (_("Preferences"));
             preferences_button.has_tooltip = true;
             preferences_button.tooltip_text = _("Edit Preferences");
             preferences_button.clicked.connect (() => {
-                PreviewWindow pvw = new PreviewWindow();
-                pvw.run(null);
-            });*/
+                Preferences prf = new Preferences();
+                prf.run();
+            });
 
             var about_button = new Gtk.ModelButton ();
             about_button.text = (_("About"));
