@@ -33,38 +33,20 @@ namespace ThiefMD.Widgets {
             typewriter_button.set_image (new Gtk.Image.from_icon_name ("preferences-desktop-keyboard", Gtk.IconSize.SMALL_TOOLBAR));
             typewriter_button.set_always_show_image (true);
             typewriter_button.tooltip_text = _("Toggle Typewriter Scrolling");
-
-            if (settings.typewriter_scrolling == false) {
-                typewriter_button.set_active (false);
-            } else {
-                typewriter_button.set_active (settings.typewriter_scrolling);
-            }
+            typewriter_button.set_active (settings.typewriter_scrolling);
 
             typewriter_button.toggled.connect (() => {
-                if (typewriter_button.active) {
-                    settings.typewriter_scrolling = true;
-                } else {
-                    settings.typewriter_scrolling = false;
-                }
+                settings.typewriter_scrolling = typewriter_button.active;
             });
 
             var spellcheck_button = new Gtk.ToggleButton.with_label ((_("Check Spelling")));
             spellcheck_button.set_image (new Gtk.Image.from_icon_name ("tools-check-spelling", Gtk.IconSize.SMALL_TOOLBAR));
             spellcheck_button.set_always_show_image (true);
             spellcheck_button.tooltip_text = _("Toggle Spellcheck");
-
-            if (settings.spellcheck == false) {
-                spellcheck_button.set_active (false);
-            } else {
-                spellcheck_button.set_active (settings.spellcheck);
-            }
+            spellcheck_button.set_active (settings.spellcheck);
 
             spellcheck_button.toggled.connect (() => {
-                if (spellcheck_button.active) {
-                    settings.spellcheck = true;
-                } else {
-                    settings.spellcheck = false;
-                }
+                settings.spellcheck = spellcheck_button.active;
             });
 
             var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
@@ -85,7 +67,7 @@ namespace ThiefMD.Widgets {
             preferences_button.has_tooltip = true;
             preferences_button.tooltip_text = _("Edit Preferences");
             preferences_button.clicked.connect (() => {
-                Preferences prf = new Preferences();
+                Preferences prf = new Preferences(spellcheck_button, typewriter_button);
                 prf.run();
             });
 
@@ -108,7 +90,7 @@ namespace ThiefMD.Widgets {
             menu_grid.add (spellcheck_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
-            // menu_grid.add (preferences_button);
+            menu_grid.add (preferences_button);
             menu_grid.add (about_button);
             menu_grid.show_all ();
 
