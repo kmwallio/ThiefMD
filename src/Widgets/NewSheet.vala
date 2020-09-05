@@ -63,6 +63,7 @@ namespace ThiefMD.Widgets {
             }
 
             SheetManager.new_sheet(file_name);
+            this.hide ();
         }
     }
 }
