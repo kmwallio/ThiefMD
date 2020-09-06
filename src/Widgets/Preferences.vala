@@ -71,7 +71,11 @@ namespace ThiefMD.Widgets {
         private Grid editor_grid () {
             var settings = AppSettings.get_default ();
             Grid grid = new Grid ();
+            grid.margin = 12;
+            grid.row_spacing = 12;
+            grid.column_spacing = 12;
             grid.orientation = Orientation.VERTICAL;
+            grid.hexpand = true;
 
             var spellcheck_switch = new Switch ();
             spellcheck_switch.set_active (settings.spellcheck);
@@ -81,6 +85,7 @@ namespace ThiefMD.Widgets {
             });
             spellcheck_switch.tooltip_text = _("Toggle Spellcheck");
             var spellcheck_label = new Label(_("Check Spelling"));
+            spellcheck_label.xalign = 0;
 
             var typewriter_switch = new Switch ();
             typewriter_switch.set_active (settings.typewriter_scrolling);
