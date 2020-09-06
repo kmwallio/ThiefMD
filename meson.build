@@ -3,6 +3,13 @@ project('com.github.kmwallio.thiefmd', ['vala', 'c'],
     version: '0.0.5'
 )
 
+# Application ID
+if get_option('profile') == 'development'
+  thief_app_id = 'com.github.kmwallio.thiefmd.dev'
+else
+  thief_app_id = 'com.github.kmwallio.thiefmd'
+endif
+
 # Import main lib files
 gnome = import('gnome')
 i18n = import('i18n')
@@ -24,9 +31,10 @@ pkgdatadir = join_paths([ get_option('prefix'),
 
 conf.set_quoted('PKGDATADIR', pkgdatadir)
 
-# Other configs
+# Generate config.h
 conf.set_quoted('GETTEXT_PACKAGE', meson.project_name())
-conf
+conf.set_quoted('RELEASE_NAME', thief_app_id)
+conf.set_quoted('VERSION', meson.project_version())
 add_global_arguments('-DDATADIR="' + get_option('datadir') + '"', language: 'c')
 configure_file(output: 'config.h', configuration: conf)
 config_h_dir = include_directories('.')
@@ -54,6 +62,7 @@ executable(
     'src/Application.vala',
     'src/Constants/AppSettings.vala',
     'src/Constants/DragAndDrop.vala',
+    'src/Constants/ThiefProperties.vala',
     'src/Widgets/About.vala',
     'src/Widgets/HeaderBar.vala',
     'src/Widgets/Sheets.vala',

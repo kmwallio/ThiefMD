@@ -77,7 +77,7 @@ namespace ThiefMD.Widgets {
             about_button.tooltip_text = _("About ThiefMD");
             about_button.clicked.connect (() => {
                 About abt = new About();
-                abt.run();
+                abt.present ();
             });
 
             var menu_grid = new Gtk.Grid ();
