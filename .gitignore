@@ -2,3 +2,5 @@ build/
 .vscode
 docs/_site
 .buildconfig
+subprojects/gxml/*
+subprojects/ultheme/*
