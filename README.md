@@ -10,6 +10,10 @@ The included for is [iA Writer Duospace](https://github.com/iaolo/iA-Fonts).  It
 
 ## Screenshots
 
+![](docs/images/thief_styles.png)
+
+[Ulysses Themes](https://styles.ulysses.app/themes) support. Showing [Tomorrow Dark](https://styles.ulysses.app/themes/tomorrow-qyp), Default ThiefMD Theme, [Dracula](https://styles.ulysses.app/themes/dracula-ZwJ), and [WWDC16](https://styles.ulysses.app/themes/wwdc16-04B).
+
 ![](docs/images/work_in_progress.png)
 
 Still a work in progress, but this shows the sheets and editor view.  Sheets render a preview of the first few lines of a file, or shows the file name.

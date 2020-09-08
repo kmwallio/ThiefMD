@@ -34,5 +34,10 @@ namespace ThiefMD {
             "Math Rendering:\n<a href='https://katex.org/'>KaTeX</a>\nCopyright © 2013-2020 Khan Academy and other contributors.\n<a href='https://github.com/KaTeX/KaTeX/blob/master/LICENSE'>MIT License</a>\n",
             "XML Parsing:\n<a href='https://gitlab.gnome.org/GNOME/gxml/'>GXml</a>\n<a href='https://gitlab.gnome.org/GNOME/gxml/-/blob/master/COPYING'>GNU Lesser General Public License v2.1</a>\n",
         };
+        public const string PREVIEW_TEXT = """# %s
+The `markdown` editor worth stealing. *Focus* more on **writing**.
+> It's the best thing since sliced bread
+[ThiefMD](https://thiefmd.com)
+""";
     }
 }

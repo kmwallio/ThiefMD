@@ -15,11 +15,11 @@ Great software is built on the shoulders of giants.
 
 * Code <s>stolen</s> *forked* from [Quilter](https://github.com/lainsce/quilter)
 * Font is [iA Writer Duospace](https://github.com/iaolo/iA-Fonts)
-* Inspired by [Ulysses](https://ulyssesapp.com/)
-* Preview CSS is [Splendor](http://markdowncss.github.io/splendor/)
-* Markdown Rendering by [Discount](http://www.pell.portland.or.us/~orc/Code/discount/)
-* Syntax Highlighting by [highlight.js](https://highlightjs.org/)
-* Math Rendering by [Katex](https://katex.org/)
+* Inspired by [Ulysses](https://ulyssesapp.com)
+* Preview CSS is [Splendor](http://markdowncss.github.io/splendor)
+* Markdown Rendering by [Discount](http://www.pell.portland.or.us/~orc/Code/discount)
+* Syntax Highlighting by [highlight.js](https://highlightjs.org)
+* Math Rendering by [Katex](https://katex.org)
 
 ## Goals
 
@@ -33,6 +33,7 @@ Great software is built on the shoulders of giants.
     * Removing folders
     * Moving sheets between folders
     * Ordering of sheets
+* Light/Dark/User Themes
 
 ### Later on Markdown Support
 
@@ -43,5 +44,4 @@ Great software is built on the shoulders of giants.
 
 * Timed sessions with typing statistics
 * Some sort of focus mode
-* Light/Dark/User Themes
 * Git-Backed Projects

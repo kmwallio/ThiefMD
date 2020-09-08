@@ -40,7 +40,7 @@ namespace ThiefMD.Widgets {
             buffer.highlight_syntax = true;
             view.editable = false;
             view.set_buffer (buffer);
-            view.set_wrap_mode (Gtk.WrapMode.NONE);
+            view.set_wrap_mode (Gtk.WrapMode.WORD);
             buffer.text = ThiefProperties.PREVIEW_TEXT.printf(theme.get_theme_name ());
             add (view);
 
