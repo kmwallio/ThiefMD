@@ -34,9 +34,26 @@ namespace ThiefMD.Controllers.FileManager {
             written += output.write (buffer[written:buffer.length]);
     }
 
+    public bool is_file_open () {
+        var settings = AppSettings.get_default ();
+        var file = File.new_for_path (settings.last_file);
+        bool file_opened = true;
+
+        if (file.get_path () == null || file.get_path () == "" || !file.query_exists ()) {
+            file_opened = false;
+        }
+
+        return file_opened;
+    }
+
     private void save_work_file () {
         var lock = new FileLock ();
         var settings = AppSettings.get_default ();
+
+        if (settings.last_file == "" || settings.last_file == null) {
+            return;
+        }
+
         var file = File.new_for_path (settings.last_file);
 
         if (file.query_exists ()) {
@@ -511,8 +528,12 @@ namespace ThiefMD.Controllers.FileManager {
     public void save () throws Error {
         debug ("Save button pressed.");
         var settings = AppSettings.get_default ();
+
+        if (settings.last_file == "" || settings.last_file == null) {
+            return;
+        }
+
         var file = File.new_for_path (settings.last_file);
-        
 
         if (file.query_exists ()) {
             try {

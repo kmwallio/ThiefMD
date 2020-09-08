@@ -47,12 +47,17 @@ namespace ThiefMD.Widgets {
                 string text;
                 var file = File.new_for_path (settings.last_file);
 
-                if (file.query_exists ()) {
+                if ((settings.last_file != null) &&
+                    (settings.last_file != "") &&
+                    file.query_exists ())
+                {
                     string filename = file.get_path ();
                     GLib.FileUtils.get_contents (filename, out text);
                     set_text (text, true);
+                    editable = true;
                 } else {
-                    set_text ("", true);
+                    set_text (Constants.FIRST_USE, true);
+                    editable = false;
                 }
             } catch (Error e) {
                 warning ("Error: %s\n", e.message);
@@ -222,6 +227,10 @@ namespace ThiefMD.Widgets {
         }
 
         public void on_text_modified () {
+            if (FileManager.is_file_open ()) {
+                editable = true;
+            }
+
             should_scroll = true;
 
             // Mark as we should save the file
