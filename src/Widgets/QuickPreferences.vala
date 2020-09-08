@@ -25,28 +25,30 @@ namespace ThiefMD.Widgets {
         public Gtk.Label _label;
         public Gtk.Entry _file_name;
         public Gtk.Button _create;
+        public Gtk.ToggleButton _spellcheck_button;
+        public Gtk.ToggleButton _typewriter_button;
 
         public QuickPreferences () {
             var settings = AppSettings.get_default ();
 
-            var typewriter_button = new Gtk.ToggleButton.with_label ((_("Typewriter Scrolling")));
-            typewriter_button.set_image (new Gtk.Image.from_icon_name ("preferences-desktop-keyboard", Gtk.IconSize.SMALL_TOOLBAR));
-            typewriter_button.set_always_show_image (true);
-            typewriter_button.tooltip_text = _("Toggle Typewriter Scrolling");
-            typewriter_button.set_active (settings.typewriter_scrolling);
+            _typewriter_button = new Gtk.ToggleButton.with_label ((_("Typewriter Scrolling")));
+            _typewriter_button.set_image (new Gtk.Image.from_icon_name ("preferences-desktop-keyboard", Gtk.IconSize.SMALL_TOOLBAR));
+            _typewriter_button.set_always_show_image (true);
+            _typewriter_button.tooltip_text = _("Toggle Typewriter Scrolling");
+            _typewriter_button.set_active (settings.typewriter_scrolling);
 
-            typewriter_button.toggled.connect (() => {
-                settings.typewriter_scrolling = typewriter_button.active;
+            _typewriter_button.toggled.connect (() => {
+                settings.typewriter_scrolling = _typewriter_button.active;
             });
 
-            var spellcheck_button = new Gtk.ToggleButton.with_label ((_("Check Spelling")));
-            spellcheck_button.set_image (new Gtk.Image.from_icon_name ("tools-check-spelling", Gtk.IconSize.SMALL_TOOLBAR));
-            spellcheck_button.set_always_show_image (true);
-            spellcheck_button.tooltip_text = _("Toggle Spellcheck");
-            spellcheck_button.set_active (settings.spellcheck);
+            _spellcheck_button = new Gtk.ToggleButton.with_label ((_("Check Spelling")));
+            _spellcheck_button.set_image (new Gtk.Image.from_icon_name ("tools-check-spelling", Gtk.IconSize.SMALL_TOOLBAR));
+            _spellcheck_button.set_always_show_image (true);
+            _spellcheck_button.tooltip_text = _("Toggle Spellcheck");
+            _spellcheck_button.set_active (settings.spellcheck);
 
-            spellcheck_button.toggled.connect (() => {
-                settings.spellcheck = spellcheck_button.active;
+            _spellcheck_button.toggled.connect (() => {
+                settings.spellcheck = _spellcheck_button.active;
             });
 
             var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
@@ -67,7 +69,7 @@ namespace ThiefMD.Widgets {
             preferences_button.has_tooltip = true;
             preferences_button.tooltip_text = _("Edit Preferences");
             preferences_button.clicked.connect (() => {
-                Preferences prf = new Preferences(spellcheck_button, typewriter_button);
+                Preferences prf = new Preferences();
                 prf.run();
             });
 
@@ -85,16 +87,24 @@ namespace ThiefMD.Widgets {
             menu_grid.row_spacing = 6;
             menu_grid.column_spacing = 12;
             menu_grid.orientation = Gtk.Orientation.VERTICAL;
-            menu_grid.add (typewriter_button);
+            menu_grid.add (_typewriter_button);
             // menu_grid.add (separator);
-            menu_grid.add (spellcheck_button);
+            menu_grid.add (_spellcheck_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
             menu_grid.add (preferences_button);
             menu_grid.add (about_button);
             menu_grid.show_all ();
 
+            settings.changed.connect (update_ui);
+
             add (menu_grid);
+        }
+
+        public void update_ui () {
+            var settings = AppSettings.get_default ();
+            _typewriter_button.set_active (settings.typewriter_scrolling);
+            _spellcheck_button.set_active (settings.spellcheck);
         }
     }
 }

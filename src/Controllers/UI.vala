@@ -23,6 +23,7 @@ using ThiefMD.Widgets;
 namespace ThiefMD.Controllers.UI {
     private bool _init = false;
     private bool _show_filename = false;
+    public static Gtk.SourceStyleSchemeManager thief_schemes;
 
     // Returns the old sheets, but puts in the new one
     public Sheets set_sheets (Sheets sheet) {

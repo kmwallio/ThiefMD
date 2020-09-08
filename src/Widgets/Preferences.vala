@@ -25,18 +25,14 @@ using Gdk;
 namespace ThiefMD.Widgets {
     public class Preferences : Dialog {
         private Stack stack;
-        private ToggleButton _spellcheck_btn;
-        private ToggleButton _typewriter_btn;
 
-        public Preferences (ToggleButton splchk, ToggleButton typewtr) {
+        public Preferences () {
             set_transient_for (ThiefApp.get_instance ().main_window);
             parent = ThiefApp.get_instance ().main_window;
             set_destroy_with_parent (true);
             resizable = false;
             deletable = false;
             modal = true;
-            _spellcheck_btn = splchk;
-            _typewriter_btn = typewtr;
             build_ui ();
         }
 
@@ -68,6 +64,21 @@ namespace ThiefMD.Widgets {
             show_all ();
         }
 
+        private Grid display_grid () {
+            Grid grid = new Grid ();
+            grid.margin = 12;
+            grid.row_spacing = 12;
+            grid.column_spacing = 12;
+            grid.orientation = Orientation.VERTICAL;
+            grid.hexpand = true;
+
+            ThemeSelector theme_selector = new ThemeSelector ();
+            grid.add (theme_selector);
+            grid.show_all ();
+
+            return grid;
+        }
+
         private Grid editor_grid () {
             var settings = AppSettings.get_default ();
             Grid grid = new Grid ();
@@ -81,7 +92,6 @@ namespace ThiefMD.Widgets {
             spellcheck_switch.set_active (settings.spellcheck);
             spellcheck_switch.notify["active"].connect (() => {
                 settings.spellcheck = spellcheck_switch.get_active ();
-                _spellcheck_btn.set_active (settings.spellcheck);
             });
             spellcheck_switch.tooltip_text = _("Toggle Spellcheck");
             var spellcheck_label = new Label(_("Check Spelling"));
@@ -91,7 +101,6 @@ namespace ThiefMD.Widgets {
             typewriter_switch.set_active (settings.typewriter_scrolling);
             typewriter_switch.notify["active"].connect (() => {
                 settings.typewriter_scrolling = typewriter_switch.get_active ();
-                _typewriter_btn.set_active (settings.typewriter_scrolling);
             });
             typewriter_switch.tooltip_text = _("Toggle Spellcheck");
             var typewriter_label = new Label(_("Use TypeWriter Scrolling"));
@@ -100,14 +109,6 @@ namespace ThiefMD.Widgets {
             grid.attach (spellcheck_label, 2, 0, 2, 1);
             grid.attach (typewriter_switch, 1, 1, 1, 1);
             grid.attach (typewriter_label, 2, 1, 2, 1);
-            grid.show_all ();
-
-            return grid;
-        }
-
-        private Grid display_grid () {
-            Grid grid = new Grid ();
-
             grid.show_all ();
 
             return grid;

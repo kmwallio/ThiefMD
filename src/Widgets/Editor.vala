@@ -131,6 +131,7 @@ namespace ThiefMD.Widgets {
             this.has_focus = true;
             this.set_tab_width (4);
             this.set_insert_spaces_instead_of_tabs (true);
+            set_scheme (settings.get_valid_theme_id ());
             spell = new GtkSpell.Checker ();
 
             if (settings.spellcheck) {
@@ -148,6 +149,7 @@ namespace ThiefMD.Widgets {
             }
             last_width = settings.window_width;
             last_height = settings.window_height;
+            show_all ();
         }
 
         public signal void changed ();
@@ -383,7 +385,7 @@ namespace ThiefMD.Widgets {
                 move_typewriter_scolling ();
             }
 
-            set_scheme (get_default_scheme ());
+            set_scheme (settings.get_valid_theme_id ());
 
             spellcheck_enable();
         }
@@ -394,9 +396,17 @@ namespace ThiefMD.Widgets {
         }
 
         public void set_scheme (string id) {
-            var style_manager = Gtk.SourceStyleSchemeManager.get_default ();
-            var style = style_manager.get_scheme (id);
-            buffer.set_style_scheme (style);
+            if (id == "thiefmd") {
+                // Reset application CSS to coded
+                get_default_scheme ();
+                var style_manager = Gtk.SourceStyleSchemeManager.get_default ();
+                var style = style_manager.get_scheme (id);
+                buffer.set_style_scheme (style);
+            } else {
+                UI.thief_schemes.force_rescan ();
+                var style = UI.thief_schemes.get_scheme (id);
+                buffer.set_style_scheme (style);
+            }
         }
 
         private string get_default_scheme () {

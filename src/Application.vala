@@ -152,6 +152,7 @@ namespace ThiefMD {
 
             UserData.create_data_directories ();
 
+            edit_view_content.set_scheme (settings.get_valid_theme_id ());
             ready = true;
             main_window.show_all ();
             // Restore preview view

@@ -23,6 +23,7 @@ using ThiefMD.Widgets;
 namespace ThiefMD.Controllers.UserData {
     public string data_path;
     public string style_path;
+    public string scheme_path;
 
     public void create_data_directories () {
         data_path = Path.build_path (
@@ -34,11 +35,28 @@ namespace ThiefMD.Controllers.UserData {
                         Path.DIR_SEPARATOR_S,
                         data_path,
                         Constants.DATA_STYLES);
-        
+
+        scheme_path = Path.build_path (
+            Path.DIR_SEPARATOR_S,
+            data_path,
+            Constants.DATA_SCHEMES);
+
+        UI.thief_schemes = new Gtk.SourceStyleSchemeManager ();
+        UI.thief_schemes.append_search_path (scheme_path);
+
         try {
             File style_file = File.new_for_path (style_path);
             if (!style_file.query_exists ()) {
                 style_file.make_directory_with_parents ();
+            }
+        } catch (Error e) {
+            warning ("Error: %s\n", e.message);
+        }
+
+        try {
+            File scheme_file = File.new_for_path (scheme_path);
+            if (!scheme_file.query_exists ()) {
+                scheme_file.make_directory_with_parents ();
             }
         } catch (Error e) {
             warning ("Error: %s\n", e.message);
