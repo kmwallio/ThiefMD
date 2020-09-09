@@ -1,3 +1,11 @@
+com.github.kmwallio.thiefmd (0.0.6) xenial; urgency=low
+
+  * Adding theme support
+  * Improve UI for About and Preferences
+  * Fix a bug in Editor only view
+
+ -- kmwallio <kmwallio@DigiEmperor>  Tue, 08 Sep 2020 23:24:43 -0700
+
 com.github.kmwallio.thiefmd (0.0.5) xenial; urgency=low
 
   * Fix bug with () rendering
