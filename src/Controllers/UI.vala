@@ -166,7 +166,6 @@ namespace ThiefMD.Controllers.UI {
     }
 
     public void hide_sheets () {
-        var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
 
         debug ("Hiding sheets (%d)\n", instance.sheets_pane.get_position ());

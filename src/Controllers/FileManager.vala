@@ -272,16 +272,6 @@ namespace ThiefMD.Controllers.FileManager {
             warning ("Error: %s", e.message);
         }
 
-        if (!moved && to_delete.query_exists ()) {
-            warning ("Attempting manual trashing of file");
-            string? trash_location = UserData.get_trash_folder ();
-            if (trash_location != null) {
-                DateTime now = new DateTime.now_local ();
-                string trash_info = "[Trash Info]\nPath=" + file_path + "\nDeletionDate=" + now.to_string () + "\n";
-                File trash_info_file = File.new_for_path (Path.build_filename (trash_location, "info", to_delete.get_basename () + ".trashinfo"));
-            }
-        }
-
         return moved;
     }
 
@@ -316,8 +306,6 @@ namespace ThiefMD.Controllers.FileManager {
             int last_newline = 3;
             int next_newline;
             bool valid_frontmatter = true;
-            string key = "";
-            string val = "";
             string line = "";
 
             while (valid_frontmatter) {
