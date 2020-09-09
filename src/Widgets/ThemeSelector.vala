@@ -50,9 +50,12 @@ namespace ThiefMD.Widgets {
             preview_box.add (preview_items);
 
             drop_box = new PreviewDrop ();
-            drop_box.show_all ();
+            drop_box.xalign = 0;
 
-            app_box.attach (drop_box, 0, 0, 1, 1);
+            var border = new Gtk.Frame("Drop Style.ultheme:");
+            border.add (drop_box);
+
+            app_box.attach (border, 0, 0, 1, 1);
             app_box.attach (preview_box, 0, 1, 1, 3);
             app_box.hexpand = true;
 
@@ -91,7 +94,10 @@ namespace ThiefMD.Widgets {
             }
 
             public void build_ui () {
-                label = "  Drop Style.ultheme here to add to library\n\n";
+                label = "\n\n\n\n<small>Stored in <a href='file://" + UserData.style_path + "'>" + UserData.style_path + "</a>.</small>";
+                use_markup = true;
+                set_justify (Justification.LEFT);
+                xalign = 0;
 
                 // Drag and Drop Support
                 Gtk.drag_dest_set (

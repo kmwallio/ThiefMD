@@ -158,6 +158,13 @@ namespace ThiefMD {
             // Restore preview view
             UI.show_view ();
             UI.set_sheets (start_sheet);
+
+            // Save on close
+            shutdown.connect (() => {
+                if (Widgets.Editor.buffer.text.chomp () != "") {
+                    FileManager.save_work_file ();
+                }
+            });
         }
 
         public static ThiefApp get_instance () {

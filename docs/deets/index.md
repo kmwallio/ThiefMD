@@ -49,12 +49,12 @@ Sharing code? [highlight.js](https://highlightjs.org) will render it with meanin
 
 ## Theme Support
 
-![](/images/thief_styles.png)
+<img src="/images/theme_preferences.png" style="float: left; width: 40%" />
 
-[Ulysses Themes](https://styles.ulysses.app/themes) support. Showing [Tomorrow Dark](https://styles.ulysses.app/themes/tomorrow-qyp), Default ThiefMD Theme, [Dracula](https://styles.ulysses.app/themes/dracula-ZwJ), and [WWDC16](https://styles.ulysses.app/themes/wwdc16-04B).
+Import your favorite [Ulysses Themes](https://styles.ulysses.app/themes).[^ulysses-the-best] Showing [Tomorrow Dark](https://styles.ulysses.app/themes/tomorrow-qyp), Default ThiefMD Theme, [Dracula](https://styles.ulysses.app/themes/dracula-ZwJ), and [WWDC16](https://styles.ulysses.app/themes/wwdc16-04B).
 
-<img src="/images/theme_preferences.png" style="float: left; width: 30%" />
+[^ulysses-the-best]: [Ulysses](https://ulysses.app) is our writing tool of choice on [macOS](https://www.apple.com/macos).
 
 In the Preferences Window (`Ctrl + ,`), you can now drag [Ulysses Themes](https://styles.ulysses.app/themes) into the app and use them for the editor.
 
-<div class="clear: both;"></div>
+<div style="clear: both;"></div>
