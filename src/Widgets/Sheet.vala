@@ -134,7 +134,7 @@ namespace ThiefMD.Widgets {
                     FileManager.move_to_trash (_sheet_path);
                 });
                 menu.show_all ();
-                menu.popup (null, null, null, event.button, event.time);
+                menu.popup_at_pointer (event);
             }
             return true;
         }

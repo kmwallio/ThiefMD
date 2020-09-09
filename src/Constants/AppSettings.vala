@@ -73,8 +73,8 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public string theme_id { get; set; }
 
         public string get_valid_theme_id () {
-            UI.thief_schemes.force_rescan ();
-            foreach (var id in UI.thief_schemes.scheme_ids) {
+            UI.UserSchemes ().force_rescan ();
+            foreach (var id in UI.UserSchemes ().scheme_ids) {
                 if (id == theme_id) {
                     return theme_id;
                 }

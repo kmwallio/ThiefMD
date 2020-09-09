@@ -91,7 +91,11 @@ namespace ThiefMD.Widgets {
                 if (newfolder.query_exists ()) {
                     return;
                 }
-                newfolder.make_directory ();
+                try {
+                    newfolder.make_directory ();
+                } catch (Error e) {
+                    warning ("Could not make new directory: %s", e.message);
+                }
                 parse_dir (_selected._path, _selected_node);
             }
         }
@@ -295,7 +299,7 @@ namespace ThiefMD.Widgets {
 
                 menu.attach_to_widget (this, null);
                 menu.show_all ();
-                menu.popup (null, null, null, event.button, event.time);
+                menu.popup_at_pointer (event);
             }
             return true;
         }

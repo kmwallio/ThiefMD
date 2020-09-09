@@ -265,6 +265,10 @@ namespace ThiefMD.Widgets {
                 buffer.get_bounds (out start, out end);
 
                 buffer.get_iter_at_mark (out cursor_iter, cursor);
+                buffer.get_iter_at_mark (out cursor_iter, cursor);;
+                //  scroll_text = buffer.get_text (start, cursor_iter, true);
+                //  scroll_text += "<span id='thiefmark'></span>";
+                //  scroll_text += buffer.get_text (cursor_iter, end, true);
                 string before = buffer.get_text (start, cursor_iter, true);
                 string last_line = before.substring (before.last_index_of ("\n") + 1);
                 string after = buffer.get_text (cursor_iter, end, true);
@@ -274,26 +278,27 @@ namespace ThiefMD.Widgets {
                     first_line = after.substring (0, nl_loc);
                 }
                 int adjustment = get_scrollmark_adjustment (last_line, first_line);
+                adjustment = skip_special_chars (after, adjustment);
                 scroll_text = before;
                 scroll_text += after.substring (0, adjustment);
-                scroll_text += ThiefProperties.THIEF_MARK;
-                scroll_text += after.substring (adjustment + 1);
+                scroll_text += ThiefProperties.THIEF_MARK_CONST;
+                scroll_text += after.substring (adjustment);
 
-                // Calc cursor percentage
-                Rectangle strong;
-                Rectangle weak;
-                this.get_cursor_locations (cursor_iter, out strong, out weak);
-                int win_x, win_y;
-                this.buffer_to_window_coords (Gtk.TextWindowType.WIDGET, strong.x, strong.y, out win_x, out win_y);
-                cursor_position = win_y / (double) last_height;
-                cursor_position = (cursor_position < 0 || cursor_position > 1) ? Constants.TYPEWRITER_POSITION : cursor_position;
-                debug ("Cursor at %d, window %d, %f", win_y, last_height, cursor_position);
                 Preview.update_view ();
             }
 
             should_update_preview = false;
-
             return false;
+        }
+
+        private int skip_special_chars (string haystack, int index = 0) {
+            const string special_chars = "#>*`-+ ";
+
+            while (haystack.length != 0 && special_chars.contains (haystack.substring (index, 1)) && index < haystack.length - 2) {
+                index++;
+            }
+
+            return index;
         }
 
         private int get_scrollmark_adjustment (string before, string after) {
@@ -442,8 +447,8 @@ namespace ThiefMD.Widgets {
                 var style = style_manager.get_scheme (id);
                 buffer.set_style_scheme (style);
             } else {
-                UI.thief_schemes.force_rescan ();
-                var style = UI.thief_schemes.get_scheme (id);
+                UI.UserSchemes ().force_rescan ();
+                var style = UI.UserSchemes ().get_scheme (id);
                 buffer.set_style_scheme (style);
             }
         }

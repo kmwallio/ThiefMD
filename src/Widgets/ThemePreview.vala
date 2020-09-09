@@ -91,8 +91,8 @@ namespace ThiefMD.Widgets {
         }
 
         public void set_scheme (string scheme) {
-            UI.thief_schemes.force_rescan ();
-            var style = UI.thief_schemes.get_scheme (scheme);
+            UI.UserSchemes ().force_rescan ();
+            var style = UI.UserSchemes ().get_scheme (scheme);
             buffer.set_style_scheme (style);
         }
     }

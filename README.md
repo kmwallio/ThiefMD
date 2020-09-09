@@ -36,7 +36,8 @@ Live Preview
 
 ## Dependencies
 
-**Ubuntu**
+### Ubuntu
+
 ```
 meson
 ninja-build
@@ -53,7 +54,8 @@ libgtk-3-dev
 libgtksourceview-3.0-dev
 ```
 
-**Fedora**
+### Fedora
+
 ```
 vala
 meson
@@ -86,12 +88,12 @@ $ sudo ninja install
  * Live Preview
  * Sheet Management
  * Shortcut key bindings
+ * Themes
 
 ## Planning
 
  * Better library organization
  * Export
- * Theming
 
 ## Acknowledgments
 

@@ -23,6 +23,7 @@ namespace ThiefMD {
         public const string URL = "https://thiefmd.com";
         public const string COPYRIGHT = "Copyright © 2020 kmwallio";
         public const string TAGLINE = "The Markdown editor worth stealing";
+        public const string THIEF_MARK_CONST = "THIEFMDa63471e6ec1b4f35b7ca635f3ca39a85";
         public const string THIEF_MARK = "<span id='thiefmark'></span>";
         public const string VERSION = Build.VERSION;
         public const Gtk.License LICENSE_TYPE = Gtk.License.GPL_3_0;

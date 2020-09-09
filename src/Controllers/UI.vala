@@ -23,7 +23,15 @@ using ThiefMD.Widgets;
 namespace ThiefMD.Controllers.UI {
     private bool _init = false;
     private bool _show_filename = false;
-    public static Gtk.SourceStyleSchemeManager thief_schemes;
+    private static Gtk.SourceStyleSchemeManager thief_schemes;
+
+    public Gtk.SourceStyleSchemeManager UserSchemes () {
+        if (thief_schemes == null) {
+            thief_schemes = new Gtk.SourceStyleSchemeManager ();
+        }
+
+        return thief_schemes;
+    }
 
     // Returns the old sheets, but puts in the new one
     public Sheets set_sheets (Sheets sheet) {
@@ -33,7 +41,9 @@ namespace ThiefMD.Controllers.UI {
         ThiefApp instance = ThiefApp.get_instance ();
         var old = instance.library_pane.get_child2 ();
         int cur_pos = instance.library_pane.get_position ();
-        instance.library_pane.remove (old);
+        if (old != null) {
+            instance.library_pane.remove (old);
+        }
         instance.library_pane.add2 (sheet);
         instance.library_pane.set_position (cur_pos);
         instance.library_pane.show_all ();

@@ -41,8 +41,7 @@ namespace ThiefMD.Controllers.UserData {
             data_path,
             Constants.DATA_SCHEMES);
 
-        UI.thief_schemes = new Gtk.SourceStyleSchemeManager ();
-        UI.thief_schemes.append_search_path (scheme_path);
+        UI.UserSchemes ().append_search_path (scheme_path);
 
         try {
             File style_file = File.new_for_path (style_path);

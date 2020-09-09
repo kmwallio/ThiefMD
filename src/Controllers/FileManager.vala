@@ -296,8 +296,6 @@ namespace ThiefMD.Controllers.FileManager {
                 string filename = file.get_path ();
                 debug ("Reading %s\n", filename);
                 GLib.FileUtils.get_contents (filename, out file_contents);
-            } else {
-                warning ("File %s does not exist\n", file_path);
             }
         } catch (Error e) {
             warning ("Error: %s", e.message);
