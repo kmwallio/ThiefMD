@@ -7,11 +7,15 @@ title: Details
 
 [Check here](/shortcuts)
 
-## Quick Menu
+## Quick Preferences
 
-![](/images/quickmenu.png)
+<img src="/images/quickmenu.png" style="float: right; width: 250px;" />
 
-Access quick settings and the preview from the quick menu.
+Quickly access settings, customization, and the preview from the quick quick preferences.
+
+Prefer to use the keyboard, access your preferences with `Ctrl + ,`
+
+<div style="clear: both"></div>
 
 ## Live Preview
 
