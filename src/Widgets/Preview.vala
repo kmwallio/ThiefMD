@@ -311,7 +311,6 @@ namespace ThiefMD.Widgets {
                     %s
                 </body>
             </html>""".printf(stylesheet, headerscript, markdown, script);
-            // warning ("%s\n", html);
             this.load_html (html, "file:///");
         }
     }

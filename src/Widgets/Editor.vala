@@ -26,9 +26,9 @@ namespace ThiefMD.Widgets {
         public static string scroll_text = "";
         public static double cursor_position = 0;
         public bool is_modified { get; set; default = false; }
-        public bool should_scroll { get; set; default = false; }
-        public bool should_save { get; set; default = false; }
-        public bool should_update_preview { get; set; default = false; }
+        private bool should_scroll { get; set; default = false; }
+        private bool should_save { get; set; default = false; }
+        private bool should_update_preview { get; set; default = false; }
         public File file;
         public GtkSpell.Checker spell = null;
         public Gtk.TextTag warning_tag;
@@ -264,10 +264,20 @@ namespace ThiefMD.Widgets {
                 Gtk.TextIter start, end;
                 buffer.get_bounds (out start, out end);
 
-                buffer.get_iter_at_mark (out cursor_iter, cursor);;
-                scroll_text = buffer.get_text (start, cursor_iter, true);
-                scroll_text += "<span id='thiefmark'></span>";
-                scroll_text += buffer.get_text (cursor_iter, end, true);
+                buffer.get_iter_at_mark (out cursor_iter, cursor);
+                string before = buffer.get_text (start, cursor_iter, true);
+                string last_line = before.substring (before.last_index_of ("\n") + 1);
+                string after = buffer.get_text (cursor_iter, end, true);
+                int nl_loc = after.index_of ("\n");
+                string first_line = after;
+                if (nl_loc != -1) {
+                    first_line = after.substring (0, nl_loc);
+                }
+                int adjustment = get_scrollmark_adjustment (last_line, first_line);
+                scroll_text = before;
+                scroll_text += after.substring (0, adjustment);
+                scroll_text += ThiefProperties.THIEF_MARK;
+                scroll_text += after.substring (adjustment + 1);
 
                 // Calc cursor percentage
                 Rectangle strong;
@@ -284,6 +294,35 @@ namespace ThiefMD.Widgets {
             should_update_preview = false;
 
             return false;
+        }
+
+        private int get_scrollmark_adjustment (string before, string after) {
+            int open_p = before.last_index_of ("(");
+            int open_t = before.last_index_of ("<");
+            int close_p = before.last_index_of (")");
+            int close_t = before.last_index_of (">");
+
+            if (open_p == -1 && open_t == -1) {
+                return 0;
+            }
+
+            if (open_p > close_p && open_t > close_t) {
+                close_p = after.index_of (")");
+                close_t = after.index_of (">");
+                return int.max(close_p, close_t) + 1;
+            }
+
+            if (open_p > close_p) {
+                close_p = after.index_of (")");
+                return close_p + 1;
+            }
+
+            if (open_t > close_t) {
+                close_t = after.index_of (")");
+                return close_t + 1;
+            }
+
+            return 0;
         }
 
         public void set_text (string text, bool opening = true) {

@@ -56,7 +56,9 @@ It will be used for sanity checking the stylesheet used.
 | Header | Title |
 | Paragraph | Text | 
 
-Here's a sentence with a footnote. [^1]  I'm basically ~~stealing~~ copying and pasting examples from [https://www.markdownguide.org/cheat-sheet/](https://www.markdownguide.org/cheat-sheet/).
+Here's a sentence with a footnote. [^1]
+
+I'm basically ~~stealing~~ copying and pasting examples from [https://www.markdownguide.org/cheat-sheet/](https://www.markdownguide.org/cheat-sheet/).
 
 [^1]: This is the footnote.
 

@@ -36,15 +36,37 @@ Live Preview
 
 ## Dependencies
 
+**Ubuntu**
 ```
+meson
+ninja-build
 valac
+cmake
 libgranite-dev
 libgtkspell3-3-dev
 libwebkit2gtk-4.0-dev
 libmarkdown2-dev
-gtk+-3.0
-gtksourceview-3.0
+libxml2-dev
+libclutter-1.0-dev
+libarchive-dev
+libgtk-3-dev
+libgtksourceview-3.0-dev
+```
+
+**Fedora**
+```
+vala
 meson
+ninja-build
+cmake
+libmarkdown-devel
+clutter-gtk-devel
+webkit2gtk3-devel
+gtk3-devel
+gtksourceview3-devel
+granite-devel
+gtkspell3-devel
+libarchive-devel
 ```
 
 ## Building
