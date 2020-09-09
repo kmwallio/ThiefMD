@@ -17,6 +17,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using ThiefMD.Controllers;
+
 namespace ThiefMD {
     public class Constants {
         // Margin Constants
@@ -40,6 +42,12 @@ namespace ThiefMD {
         // Data Directories
         public const string DATA_BASE = "ThiefMD";
         public const string DATA_STYLES = "styles";
+        public const string DATA_SCHEMES = "schemes";
+
+        // Arbitrary strings
+        public const string FIRST_USE = """# Click on a sheet to get started
+
+First time here?  Drag a folder into the library, or click on the Folder icon to select a folder to add.""";
     }
 
     public class AppSettings : Granite.Services.Settings {
@@ -62,6 +70,18 @@ namespace ThiefMD {
         public string last_file { get; set; }
         public string spellcheck_language { get; set; }
         public string library_list { get; set; }
+        public string theme_id { get; set; }
+
+        public string get_valid_theme_id () {
+            UI.UserSchemes ().force_rescan ();
+            foreach (var id in UI.UserSchemes ().scheme_ids) {
+                if (id == theme_id) {
+                    return theme_id;
+                }
+            }
+
+            return "thiefmd";
+        }
 
         public string[] library () {
             return library_list.split(";");

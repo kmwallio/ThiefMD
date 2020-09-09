@@ -5,6 +5,8 @@ title: Shortcuts
 
 # Changing the UI
 
+* `Ctrl + ,` - Access preferences window
+
 ## Full Screen
 
 * `F11` - Toggle Full Screen

@@ -1,0 +1,4 @@
+[wrap-git]
+directory=ultheme
+url=https://github.com/TwiRp/ultheme-vala.git
+revision=master

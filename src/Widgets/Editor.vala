@@ -26,9 +26,9 @@ namespace ThiefMD.Widgets {
         public static string scroll_text = "";
         public static double cursor_position = 0;
         public bool is_modified { get; set; default = false; }
-        public bool should_scroll { get; set; default = false; }
-        public bool should_save { get; set; default = false; }
-        public bool should_update_preview { get; set; default = false; }
+        private bool should_scroll { get; set; default = false; }
+        private bool should_save { get; set; default = false; }
+        private bool should_update_preview { get; set; default = false; }
         public File file;
         public GtkSpell.Checker spell = null;
         public Gtk.TextTag warning_tag;
@@ -47,12 +47,17 @@ namespace ThiefMD.Widgets {
                 string text;
                 var file = File.new_for_path (settings.last_file);
 
-                if (file.query_exists ()) {
+                if ((settings.last_file != null) &&
+                    (settings.last_file != "") &&
+                    file.query_exists ())
+                {
                     string filename = file.get_path ();
                     GLib.FileUtils.get_contents (filename, out text);
                     set_text (text, true);
+                    editable = true;
                 } else {
-                    set_text ("", true);
+                    set_text (Constants.FIRST_USE, true);
+                    editable = false;
                 }
             } catch (Error e) {
                 warning ("Error: %s\n", e.message);
@@ -126,6 +131,7 @@ namespace ThiefMD.Widgets {
             this.has_focus = true;
             this.set_tab_width (4);
             this.set_insert_spaces_instead_of_tabs (true);
+            set_scheme (settings.get_valid_theme_id ());
             spell = new GtkSpell.Checker ();
 
             if (settings.spellcheck) {
@@ -143,6 +149,7 @@ namespace ThiefMD.Widgets {
             }
             last_width = settings.window_width;
             last_height = settings.window_height;
+            show_all ();
         }
 
         public signal void changed ();
@@ -222,6 +229,10 @@ namespace ThiefMD.Widgets {
         }
 
         public void on_text_modified () {
+            if (FileManager.is_file_open ()) {
+                editable = true;
+            }
+
             should_scroll = true;
 
             // Mark as we should save the file
@@ -253,26 +264,70 @@ namespace ThiefMD.Widgets {
                 Gtk.TextIter start, end;
                 buffer.get_bounds (out start, out end);
 
+                buffer.get_iter_at_mark (out cursor_iter, cursor);
                 buffer.get_iter_at_mark (out cursor_iter, cursor);;
-                scroll_text = buffer.get_text (start, cursor_iter, true);
-                scroll_text += "<span id='thiefmark'></span>";
-                scroll_text += buffer.get_text (cursor_iter, end, true);
+                //  scroll_text = buffer.get_text (start, cursor_iter, true);
+                //  scroll_text += "<span id='thiefmark'></span>";
+                //  scroll_text += buffer.get_text (cursor_iter, end, true);
+                string before = buffer.get_text (start, cursor_iter, true);
+                string last_line = before.substring (before.last_index_of ("\n") + 1);
+                string after = buffer.get_text (cursor_iter, end, true);
+                int nl_loc = after.index_of ("\n");
+                string first_line = after;
+                if (nl_loc != -1) {
+                    first_line = after.substring (0, nl_loc);
+                }
+                int adjustment = get_scrollmark_adjustment (last_line, first_line);
+                adjustment = skip_special_chars (after, adjustment);
+                scroll_text = before;
+                scroll_text += after.substring (0, adjustment);
+                scroll_text += ThiefProperties.THIEF_MARK_CONST;
+                scroll_text += after.substring (adjustment);
 
-                // Calc cursor percentage
-                Rectangle strong;
-                Rectangle weak;
-                this.get_cursor_locations (cursor_iter, out strong, out weak);
-                int win_x, win_y;
-                this.buffer_to_window_coords (Gtk.TextWindowType.WIDGET, strong.x, strong.y, out win_x, out win_y);
-                cursor_position = win_y / (double) last_height;
-                cursor_position = (cursor_position < 0 || cursor_position > 1) ? Constants.TYPEWRITER_POSITION : cursor_position;
-                debug ("Cursor at %d, window %d, %f", win_y, last_height, cursor_position);
                 Preview.update_view ();
             }
 
             should_update_preview = false;
-
             return false;
+        }
+
+        private int skip_special_chars (string haystack, int index = 0) {
+            const string special_chars = "#>*`-+ ";
+
+            while (haystack.length != 0 && special_chars.contains (haystack.substring (index, 1)) && index < haystack.length - 2) {
+                index++;
+            }
+
+            return index;
+        }
+
+        private int get_scrollmark_adjustment (string before, string after) {
+            int open_p = before.last_index_of ("(");
+            int open_t = before.last_index_of ("<");
+            int close_p = before.last_index_of (")");
+            int close_t = before.last_index_of (">");
+
+            if (open_p == -1 && open_t == -1) {
+                return 0;
+            }
+
+            if (open_p > close_p && open_t > close_t) {
+                close_p = after.index_of (")");
+                close_t = after.index_of (">");
+                return int.max(close_p, close_t) + 1;
+            }
+
+            if (open_p > close_p) {
+                close_p = after.index_of (")");
+                return close_p + 1;
+            }
+
+            if (open_t > close_t) {
+                close_t = after.index_of (")");
+                return close_t + 1;
+            }
+
+            return 0;
         }
 
         public void set_text (string text, bool opening = true) {
@@ -374,7 +429,7 @@ namespace ThiefMD.Widgets {
                 move_typewriter_scolling ();
             }
 
-            set_scheme (get_default_scheme ());
+            set_scheme (settings.get_valid_theme_id ());
 
             spellcheck_enable();
         }
@@ -385,9 +440,17 @@ namespace ThiefMD.Widgets {
         }
 
         public void set_scheme (string id) {
-            var style_manager = Gtk.SourceStyleSchemeManager.get_default ();
-            var style = style_manager.get_scheme (id);
-            buffer.set_style_scheme (style);
+            if (id == "thiefmd") {
+                // Reset application CSS to coded
+                get_default_scheme ();
+                var style_manager = Gtk.SourceStyleSchemeManager.get_default ();
+                var style = style_manager.get_scheme (id);
+                buffer.set_style_scheme (style);
+            } else {
+                UI.UserSchemes ().force_rescan ();
+                var style = UI.UserSchemes ().get_scheme (id);
+                buffer.set_style_scheme (style);
+            }
         }
 
         private string get_default_scheme () {

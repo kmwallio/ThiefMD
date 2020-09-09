@@ -34,9 +34,26 @@ namespace ThiefMD.Controllers.FileManager {
             written += output.write (buffer[written:buffer.length]);
     }
 
+    public bool is_file_open () {
+        var settings = AppSettings.get_default ();
+        var file = File.new_for_path (settings.last_file);
+        bool file_opened = true;
+
+        if (file.get_path () == null || file.get_path () == "" || !file.query_exists ()) {
+            file_opened = false;
+        }
+
+        return file_opened;
+    }
+
     private void save_work_file () {
         var lock = new FileLock ();
         var settings = AppSettings.get_default ();
+
+        if (settings.last_file == "" || settings.last_file == null) {
+            return;
+        }
+
         var file = File.new_for_path (settings.last_file);
 
         if (file.query_exists ()) {
@@ -255,16 +272,6 @@ namespace ThiefMD.Controllers.FileManager {
             warning ("Error: %s", e.message);
         }
 
-        if (!moved && to_delete.query_exists ()) {
-            warning ("Attempting manual trashing of file");
-            string? trash_location = UserData.get_trash_folder ();
-            if (trash_location != null) {
-                DateTime now = new DateTime.now_local ();
-                string trash_info = "[Trash Info]\nPath=" + file_path + "\nDeletionDate=" + now.to_string () + "\n";
-                File trash_info_file = File.new_for_path (Path.build_filename (trash_location, "info", to_delete.get_basename () + ".trashinfo"));
-            }
-        }
-
         return moved;
     }
 
@@ -279,8 +286,6 @@ namespace ThiefMD.Controllers.FileManager {
                 string filename = file.get_path ();
                 debug ("Reading %s\n", filename);
                 GLib.FileUtils.get_contents (filename, out file_contents);
-            } else {
-                warning ("File %s does not exist\n", file_path);
             }
         } catch (Error e) {
             warning ("Error: %s", e.message);
@@ -301,8 +306,6 @@ namespace ThiefMD.Controllers.FileManager {
             int last_newline = 3;
             int next_newline;
             bool valid_frontmatter = true;
-            string key = "";
-            string val = "";
             string line = "";
 
             while (valid_frontmatter) {
@@ -511,8 +514,12 @@ namespace ThiefMD.Controllers.FileManager {
     public void save () throws Error {
         debug ("Save button pressed.");
         var settings = AppSettings.get_default ();
+
+        if (settings.last_file == "" || settings.last_file == null) {
+            return;
+        }
+
         var file = File.new_for_path (settings.last_file);
-        
 
         if (file.query_exists ()) {
             try {

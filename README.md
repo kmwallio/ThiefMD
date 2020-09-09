@@ -2,21 +2,28 @@
 
 <div style="float: left; width: 64px"><img src="docs/images/thiefmd_64.png" width="48" /></div>
 
-ThiefMD is a [Markdown](https://en.wikipedia.org/wiki/Markdown) editor that helps with organization and management.  It is heavily inspired by [Ulysses](https://ulysses.app).  Initial code was based on work from [Quilter](https://github.com/lainsce/quilter).
+ThiefMD is a [Markdown](https://en.wikipedia.org/wiki/Markdown) editor that helps with organization and management. It is heavily inspired by [Ulysses](https://ulysses.app). Initial code was based on work from [Quilter](https://github.com/lainsce/quilter).
 
-## Font
+## Features
 
-The included for is [iA Writer Duospace](https://github.com/iaolo/iA-Fonts).  It is licensed under the [SIL Open Font License](data/font/LICENSE.md).
+ * Basic library at the moment
+ * Switch between documents
+ * Hide Library and Document Switcher
+ * Live Preview
+ * Sheet Management
+ * Shortcut key bindings
+ * Themes
+
+## Planning
+
+ * Better library organization
+ * Export
 
 ## Screenshots
 
-![](docs/images/work_in_progress.png)
+![](docs/images/thief_styles.png)
 
-Still a work in progress, but this shows the sheets and editor view.  Sheets render a preview of the first few lines of a file, or shows the file name.
-
-![](docs/images/panel_animation.gif)
-
-Switching editor view modes.
+[Ulysses Themes](https://styles.ulysses.app/themes) can be imported into the library. Displayed are [Tomorrow Dark](https://styles.ulysses.app/themes/tomorrow-qyp), Default ThiefMD Theme, [Dracula](https://styles.ulysses.app/themes/dracula-ZwJ), and [WWDC16](https://styles.ulysses.app/themes/wwdc16-04B).
 
 ![](docs/images/library_remove.gif)
 
@@ -32,15 +39,41 @@ Live Preview
 
 ## Dependencies
 
+As part of the build, [gxml](https://gitlab.gnome.org/GNOME/gxml) and the [Ulysses Theme Parser](https://github.com/TwiRp/ultheme-vala) will be cloned and built.
+
+### Ubuntu
+
 ```
+meson
+ninja-build
 valac
+cmake
 libgranite-dev
 libgtkspell3-3-dev
 libwebkit2gtk-4.0-dev
 libmarkdown2-dev
-gtk+-3.0
-gtksourceview-3.0
+libxml2-dev
+libclutter-1.0-dev
+libarchive-dev
+libgtk-3-dev
+libgtksourceview-3.0-dev
+```
+
+### Fedora
+
+```
+vala
 meson
+ninja-build
+cmake
+libmarkdown-devel
+clutter-gtk-devel
+webkit2gtk3-devel
+gtk3-devel
+gtksourceview3-devel
+granite-devel
+gtkspell3-devel
+libarchive-devel
 ```
 
 ## Building
@@ -52,20 +85,7 @@ $ ninja
 $ sudo ninja install
 ```
 
-## Features
-
- * Basic library at the moment
- * Switch between documents
- * Hide Library and Document Switcher
- * Live Preview
- * Sheet Management
- * Shortcut key bindings
-
-## Planning
-
- * Better library organization
- * Export
- * Theming
+[Prebuilt packages](https://github.com/kmwallio/ThiefMD/releases) are available for .deb and .rpm.
 
 ## Acknowledgments
 

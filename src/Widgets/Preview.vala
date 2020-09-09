@@ -195,7 +195,7 @@ namespace ThiefMD.Widgets {
             get_preview_markdown (text, out processed_mk);
             processed_mk = url_search.replace_eval (
                 processed_mk,
-                (ssize_t) processed_mk.size(),
+                (ssize_t) processed_mk.length,
                 0,
                 RegexMatchFlags.NOTEMPTY,
                 (match_info, result) =>
@@ -209,7 +209,7 @@ namespace ThiefMD.Widgets {
 
             processed_mk = css_url_search.replace_eval (
                 processed_mk,
-                (ssize_t) processed_mk.size(),
+                (ssize_t) processed_mk.length,
                 0,
                 RegexMatchFlags.NOTEMPTY,
                 (match_info, result) =>
@@ -223,7 +223,7 @@ namespace ThiefMD.Widgets {
 
             processed_mk = src_search.replace_eval (
                     processed_mk,
-                    (ssize_t) processed_mk.size(),
+                    (ssize_t) processed_mk.length,
                     0,
                     RegexMatchFlags.NOTEMPTY,
                     (match_info, result) =>
@@ -311,8 +311,12 @@ namespace ThiefMD.Widgets {
                     %s
                 </body>
             </html>""".printf(stylesheet, headerscript, markdown, script);
-            // warning ("%s\n", html);
+            adjust_thief_mark ();
             this.load_html (html, "file:///");
+        }
+
+        private void adjust_thief_mark () {
+            html = html.replace (ThiefProperties.THIEF_MARK_CONST, ThiefProperties.THIEF_MARK);
         }
     }
 }

@@ -7,11 +7,15 @@ title: Details
 
 [Check here](/shortcuts)
 
-## Quick Menu
+## Quick Preferences
 
-![](/images/quickmenu.png)
+<img src="/images/quickmenu.png" style="float: right; width: 250px;" />
 
-Access quick settings and the preview from the quick menu.
+Quickly access settings, customization, and the preview from the quick quick preferences.
+
+Prefer to use the keyboard, access your preferences with `Ctrl + ,`
+
+<div style="clear: both"></div>
 
 ## Live Preview
 
@@ -33,7 +37,7 @@ Stay centered and stay focused. Type writer scrolling keeps your active line fix
 
 ![](/images/jekyll-minimark.png)
 
-Use [Jekyll](https://jekyllrb.com)? ThiefMD will surface the [front matter](https://jekyllrb.com/docs/front-matter/) in the Sheets View using minimark.
+Use [Jekyll](https://jekyllrb.com)? ThiefMD will surface the [front matter](https://jekyllrb.com/docs/front-matter) in the Sheets View using minimark.
 
 ## KaTeX Support
 
@@ -46,3 +50,15 @@ Use [KaTeX](https://katex.org) to render Math Equations in Previews. *Currently 
 ![](/images/syntax_preview.png)
 
 Sharing code? [highlight.js](https://highlightjs.org) will render it with meaning.
+
+## Theme Support
+
+<img src="/images/theme_preferences.png" style="float: left; width: 40%" />
+
+Import your favorite [Ulysses Themes](https://styles.ulysses.app/themes).[^ulysses-the-best] Showing [Tomorrow Dark](https://styles.ulysses.app/themes/tomorrow-qyp), Default ThiefMD Theme, [Dracula](https://styles.ulysses.app/themes/dracula-ZwJ), and [WWDC16](https://styles.ulysses.app/themes/wwdc16-04B).
+
+[^ulysses-the-best]: [Ulysses](https://ulysses.app) is our writing tool of choice on [macOS](https://www.apple.com/macos).
+
+In the Preferences Window (`Ctrl + ,`), you can now drag [Ulysses Themes](https://styles.ulysses.app/themes) into the app and use them for the editor.
+
+<div style="clear: both;"></div>

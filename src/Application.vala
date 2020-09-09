@@ -102,6 +102,20 @@ namespace ThiefMD {
                 debug ("Could not set icon: %s\n", e.message);
             }
 
+            // Reset UI if it seems "unusable"?
+            if (settings.view_library_width < 10) {
+                settings.view_library_width = 200;
+            }
+            if (settings.view_sheets_width < 10) {
+                settings.view_sheets_width = 200;
+            }
+            if (settings.window_height < 600) {
+                settings.window_height = 600;
+            }
+            if (settings.window_width < 800) {
+                settings.window_width = 800;
+            }
+
             toolbar = Headerbar.get_instance ();
             edit_view_content = new Editor ();
             library = new Library ();
@@ -131,12 +145,6 @@ namespace ThiefMD {
 
             main_window.set_titlebar (toolbar);
             debug ("Window (%d, %d)\n", settings.window_width, settings.window_height);
-            if (settings.window_height < 600) {
-                settings.window_height = 600;
-            }
-            if (settings.window_width < 800) {
-                settings.window_width = 800;
-            }
 
             main_window.set_default_size (settings.window_width, settings.window_height);
             main_window.title = "ThiefMD";
@@ -152,11 +160,19 @@ namespace ThiefMD {
 
             UserData.create_data_directories ();
 
+            edit_view_content.set_scheme (settings.get_valid_theme_id ());
             ready = true;
             main_window.show_all ();
             // Restore preview view
             UI.show_view ();
             UI.set_sheets (start_sheet);
+
+            // Save on close
+            shutdown.connect (() => {
+                if (Widgets.Editor.buffer.text.chomp () != "") {
+                    FileManager.save_work_file ();
+                }
+            });
         }
 
         public static ThiefApp get_instance () {

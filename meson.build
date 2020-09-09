@@ -3,6 +3,13 @@ project('com.github.kmwallio.thiefmd', ['vala', 'c'],
     version: '0.0.5'
 )
 
+# Application ID
+if get_option('profile') == 'development'
+  thief_app_id = 'com.github.kmwallio.thiefmd.dev'
+else
+  thief_app_id = 'com.github.kmwallio.thiefmd'
+endif
+
 # Import main lib files
 gnome = import('gnome')
 i18n = import('i18n')
@@ -24,9 +31,10 @@ pkgdatadir = join_paths([ get_option('prefix'),
 
 conf.set_quoted('PKGDATADIR', pkgdatadir)
 
-# Other configs
+# Generate config.h
 conf.set_quoted('GETTEXT_PACKAGE', meson.project_name())
-conf
+conf.set_quoted('RELEASE_NAME', thief_app_id)
+conf.set_quoted('VERSION', meson.project_version())
 add_global_arguments('-DDATADIR="' + get_option('datadir') + '"', language: 'c')
 configure_file(output: 'config.h', configuration: conf)
 config_h_dir = include_directories('.')
@@ -48,24 +56,31 @@ endif
 
 # Let's define our executable
 add_project_arguments(['--vapidir', join_paths(meson.current_source_dir(), 'vapi')], language: 'vala')
+gxml_dep = dependency('gxml-0.18', fallback : [ 'gxml', 'libgxml_dep' ])
+ultheme_dep = dependency('ultheme-0.1', fallback : [ 'ultheme', 'libultheme_dep' ])
 
 executable(
     meson.project_name(),
     'src/Application.vala',
     'src/Constants/AppSettings.vala',
     'src/Constants/DragAndDrop.vala',
+    'src/Constants/ThiefProperties.vala',
     'src/Widgets/About.vala',
     'src/Widgets/HeaderBar.vala',
     'src/Widgets/Sheets.vala',
     'src/Widgets/Sheet.vala',
     'src/Widgets/Editor.vala',
     'src/Widgets/Library.vala',
-    'src/Widgets/NewSheet.vala',
     'src/Widgets/NewFolder.vala',
+    'src/Widgets/NewSheet.vala',
+    'src/Widgets/Preferences.vala',
     'src/Widgets/Preview.vala',
     'src/Widgets/PreviewWindow.vala',
     'src/Widgets/KeyBindings.vala',
     'src/Widgets/QuickPreferences.vala',
+    'src/Widgets/ThemeSelector.vala',
+    'src/Widgets/DefaultTheme.vala',
+    'src/Widgets/ThemePreview.vala',
     'src/Controllers/FileManager.vala',
     'src/Controllers/Dialogs.vala',
     'src/Controllers/SheetManager.vala',
@@ -80,6 +95,9 @@ executable(
         dependency('gtk+-3.0'),
         dependency('gtkspell3-3.0'),
         dependency('webkit2gtk-4.0'),
+        dependency('clutter-1.0'),
+        gxml_dep,
+        ultheme_dep,
         libmarkdown
     ],
     vala_args: [

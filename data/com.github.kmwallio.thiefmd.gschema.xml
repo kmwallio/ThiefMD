@@ -55,6 +55,11 @@
             <summary>List of Directories</summary>
             <description>Semi-color separated List of Directories to include in the Library</description>
         </key>
+        <key name="theme-id" type="s">
+            <default>'thiefmd'</default>
+            <summary>ID of Syntax Theme to Use</summary>
+            <description>ID of theme to use for display</description>
+        </key>
         <key name="spellcheck" type="b">
             <default>true</default>
             <summary>Enable spellcheck</summary>

@@ -63,6 +63,14 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
+                // Preferences
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.comma, keycode)) {
+                        Preferences prf = new Preferences();
+                        prf.run();
+                    }
+                }
+
                 // Undo
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
                     if (match_keycode (Gdk.Key.z, keycode)) {

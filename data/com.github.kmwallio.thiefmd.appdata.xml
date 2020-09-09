@@ -4,8 +4,8 @@
   <id>com.github.kmwallio.thiefmd.desktop</id>
   <metadata_license>GPL3</metadata_license>
   <name>ThiefMD</name>
-  <summary>A plain yet rich markdown editor</summary>
+  <summary>The markdown editor worth stealing.</summary>
   <description>
-    <p>A markdown editor that aims to provide similar functionality to Ulysses.</p>
+    <p>A markdown editor that aims to provide basic library management with an above average user experience.</p>
   </description>
 </component>

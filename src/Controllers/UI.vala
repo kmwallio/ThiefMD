@@ -23,6 +23,15 @@ using ThiefMD.Widgets;
 namespace ThiefMD.Controllers.UI {
     private bool _init = false;
     private bool _show_filename = false;
+    private static Gtk.SourceStyleSchemeManager thief_schemes;
+
+    public Gtk.SourceStyleSchemeManager UserSchemes () {
+        if (thief_schemes == null) {
+            thief_schemes = new Gtk.SourceStyleSchemeManager ();
+        }
+
+        return thief_schemes;
+    }
 
     // Returns the old sheets, but puts in the new one
     public Sheets set_sheets (Sheets sheet) {
@@ -32,7 +41,9 @@ namespace ThiefMD.Controllers.UI {
         ThiefApp instance = ThiefApp.get_instance ();
         var old = instance.library_pane.get_child2 ();
         int cur_pos = instance.library_pane.get_position ();
-        instance.library_pane.remove (old);
+        if (old != null) {
+            instance.library_pane.remove (old);
+        }
         instance.library_pane.add2 (sheet);
         instance.library_pane.set_position (cur_pos);
         instance.library_pane.show_all ();
@@ -48,7 +59,7 @@ namespace ThiefMD.Controllers.UI {
             _show_filename = settings.show_filename;
         }
 
-        if (_moving) {
+        if (moving ()) {
             return;
         }
 
@@ -73,7 +84,7 @@ namespace ThiefMD.Controllers.UI {
             _show_filename = settings.show_filename;
         }
 
-        if (_moving) {
+        if (moving ()) {
             return;
         }
 
@@ -106,13 +117,22 @@ namespace ThiefMD.Controllers.UI {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
 
+        instance.library_pane.show_all ();
+        instance.library_pane.get_child1 ().hide ();
+        instance.library_pane.get_child2 ().show_all ();
+
         debug ("Showing sheets (%d)\n", instance.sheets_pane.get_position ());
         move_panes(0, settings.view_sheets_width);
     }
 
     public void show_sheets_and_library () {
         var settings = AppSettings.get_default ();
-        
+        ThiefApp instance = ThiefApp.get_instance ();
+
+        instance.library_pane.show_all ();
+        instance.library_pane.get_child1 ().show_all ();
+        instance.library_pane.get_child2 ().show_all ();
+
         move_panes (settings.view_library_width, settings.view_sheets_width + settings.view_library_width);
     }
 
@@ -122,7 +142,7 @@ namespace ThiefMD.Controllers.UI {
 
         debug ("Hiding library (%d)\n", instance.library_pane.get_position ());
         if (instance.library_pane.get_position () > 0 || instance.sheets_pane.get_position () <= 0) {
-            _moving = false;
+            _moving.moving = false;
             int target_sheets = 0;
             if (instance.library_pane.get_position () > 0) {
                 target_sheets = instance.sheets_pane.get_position () - instance.library_pane.get_position ();
@@ -133,15 +153,30 @@ namespace ThiefMD.Controllers.UI {
                     target_sheets = settings.view_sheets_width;
                 }
             }
+
+            _moving.connect (() => {
+                // Second instance because instance above goes out of scope
+                // leading to segfault?
+                ThiefApp instance2 = ThiefApp.get_instance ();
+                instance2.library_pane.get_child1 ().hide ();
+            });
+
             move_panes (0, target_sheets);
         }
     }
 
     public void hide_sheets () {
-        var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
 
         debug ("Hiding sheets (%d)\n", instance.sheets_pane.get_position ());
+
+        _moving.connect (() => {
+            // Second instance because instance above goes out of scope
+            // leading to segfault?
+            ThiefApp instance2 = ThiefApp.get_instance ();
+            instance2.library_pane.get_child2 ().hide ();
+            instance2.library_pane.hide ();
+        });
         move_panes(0, 0);
     }
 
@@ -149,15 +184,14 @@ namespace ThiefMD.Controllers.UI {
     // steal the code from yet
     private int _hop_sheets = 0;
     private int _hop_library = 0;
-    private bool _moving = false;
     private void move_panes (int library_pane, int sheet_pane) {
         ThiefApp instance = ThiefApp.get_instance ();
 
-        if (_moving) {
+        if (moving ()) {
             return;
         }
 
-        _moving = true;
+        _moving.moving = true;
 
         _hop_sheets = (int)((sheet_pane - instance.sheets_pane.get_position ()) / Constants.ANIMATION_FRAMES);
         _hop_library = (int)((library_pane - instance.library_pane.get_position ()) / Constants.ANIMATION_FRAMES);
@@ -172,9 +206,9 @@ namespace ThiefMD.Controllers.UI {
             bool sheet_done = false;
             bool lib_done = false;
 
-            if (!_moving) {
+            if (!_moving.moving) {
                 // debug ("No longer moving\n");
-                _moving = false;
+                _moving.moving = false;
                 return false;
             }
 
@@ -204,12 +238,45 @@ namespace ThiefMD.Controllers.UI {
 
             // debug ("Sheets done: %s, Library done: %s\n", sheet_done ? "yes" : "no", lib_done ? "yes" : "no");
 
-            _moving = !lib_done || !sheet_done;
-            return _moving;
+            _moving.moving = !lib_done || !sheet_done;
+            if (!moving ()) {
+                _moving.movement_done ();
+            }
+            return _moving.moving;
         });
     }
 
-    public bool moving () {
-        return _moving;
+    private delegate void MovementCallback ();
+    private class Movement {
+        public bool moving;
+        private MovementCallback handler;
+        public signal void movement_done ();
+
+        public Movement () {
+            moving = false;
+            handler = do_nothing;
+
+            movement_done.connect (() => {
+                handler ();
+                handler = do_nothing;
+            });
+        }
+
+        public void do_nothing () {
+            // avoid segfault?
+        }
+
+        public void connect (MovementCallback callback) {
+            handler = callback;
+        }
     }
+
+    public bool moving () {
+        if (_moving == null) {
+            _moving = new Movement ();
+        }
+
+        return _moving.moving;
+    }
+    private static Movement _moving;
 }
