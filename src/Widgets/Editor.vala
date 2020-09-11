@@ -201,7 +201,7 @@ namespace ThiefMD.Widgets {
             });
 
             this.set_buffer (buffer);
-            this.set_wrap_mode (Gtk.WrapMode.WORD);
+            this.set_wrap_mode (Gtk.WrapMode.WORD_CHAR);
             this.top_margin = Constants.TOP_MARGIN;
             this.bottom_margin = Constants.BOTTOM_MARGIN;
             this.expand = true;

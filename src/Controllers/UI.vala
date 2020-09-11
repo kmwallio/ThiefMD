@@ -217,7 +217,7 @@ namespace ThiefMD.Controllers.UI {
         }
         instance.library_pane.add2 (sheet);
         instance.library_pane.set_position (cur_pos);
-        instance.library_pane.show_all ();
+        instance.library_pane.show ();
         return (Sheets) old;
     }
 
@@ -288,9 +288,9 @@ namespace ThiefMD.Controllers.UI {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
 
-        instance.library_pane.show_all ();
+        instance.library_pane.show ();
         instance.library_pane.get_child1 ().hide ();
-        instance.library_pane.get_child2 ().show_all ();
+        instance.library_pane.get_child2 ().show ();
 
         debug ("Showing sheets (%d)\n", instance.sheets_pane.get_position ());
         move_panes(0, settings.view_sheets_width);
@@ -300,9 +300,9 @@ namespace ThiefMD.Controllers.UI {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
 
-        instance.library_pane.show_all ();
-        instance.library_pane.get_child1 ().show_all ();
-        instance.library_pane.get_child2 ().show_all ();
+        instance.library_pane.show ();
+        instance.library_pane.get_child1 ().show ();
+        instance.library_pane.get_child2 ().show ();
 
         move_panes (settings.view_library_width, settings.view_sheets_width + settings.view_library_width);
     }
