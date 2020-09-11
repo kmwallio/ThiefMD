@@ -75,7 +75,7 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         }
         
         .thief-list-sheet-active {
-            background: @colorPrimaryActive;
+            background: lighter(@colorPrimary);
             color: @textColorPrimary;
         }
         
@@ -84,7 +84,8 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         }
         
         treeview {
-            background: @colorPrimaryActive;
+            background: lighter(@colorPrimaryActive);
+            color: @textColorGlobal;
         }
         
         treeview.view header button {
