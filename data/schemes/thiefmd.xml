@@ -9,17 +9,29 @@
   <style name="selection"       foreground="#EAEAEA" background="#11BCED"/>
 
   <!-- Bold -->
-  <style name="def:statement" bold="true"/>
+  <style name="def:statement" bold="true" foreground="#E811BA"/>
+  <style name="def:strong-emphasis" bold="true" foreground="#E811BA"/>
 
   <!-- Italic -->
-  <style name="def:doc-comment-element" italic="true"/>
+  <style name="def:doc-comment-element" italic="true" foreground="#0C8DB1"/>
+  <style name="def:emphasis" italic="true" foreground="#0C8DB1"/>
+
+  <!-- Strikethrough -->
+  <style name="def:deletion" strikethrough="true" foreground="#89DEF6" italic="true"/>
 
   <!-- Links -->
-  <style name="def:comment" foreground="#11BCED"/>
-  <style name="def:underlined" foreground="#11BCED"/>
+  <style name="def:comment" foreground="#0C8DB1"/>
+  <style name="def:underlined" foreground="#0C8DB1"/>
+  <style name="def:link-destination" foreground="#0C8DB1"/>
+  <style name="def:link-text" foreground="#0C8DB1"/>
 
   <!-- Code -->
-  <style name="def:identifier" background="#F0F0F0" foreground="#191919"/>
+  <style name="def:identifier" background="#E2F7FD" foreground="#064658"/>
+  <style name="def:preformatted-section" background="#E2F7FD" foreground="#064658"/>
+  <style name="def:inline-code" background="#E2F7FD" foreground="#064658"/>
+
+  <!-- Lists -->
+  <style name="def:list-marker" foreground="#0C8DB1"/>
 
   <!-- Line-break -->
   <style name="def:note" foreground="#191919"/>
@@ -27,13 +39,22 @@
   <!-- Label -->
   <style name="def:preprocessor" foreground="#191919"/>
 
+  <!-- Blockquote -->
+  <style name="markdown:blockquote" foreground="#064658"/>
+
   <!-- Image marking in Links -->
-  <style name="def:shebang" foreground="#11BCED"/>
-  <style name="def:constant" foreground="#11BCED"/>
+  <style name="def:shebang" foreground="#0C8DB1"/>
+  <style name="def:constant" foreground="#0C8DB1"/>
 
   <!-- Backslash Escaping -->
   <style name="def:special-char" foreground="#B7B6B7"/>
+  <style name="def:link-symbol" foreground="#B7B6B7"/>
 
   <!-- Headers -->
-  <style name="def:type" foreground="#11BCED" bold="true" scale="large"/>
+  <style name="def:heading" foreground="#0C8DB1" bold="true" scale="large"/>
+  <style name="def:type" foreground="#0C8DB1" bold="true" scale="large"/>
+  <style name="def:thematic-break" foreground="#11BCED" bold="true" scale="large"/>
+
+  <!-- Noramalization -->
+  <style name="xml:attribute-name" foreground="#064658" bold="false" italic="false" underlined="false" strikethrough="false"/>
 </style-scheme>

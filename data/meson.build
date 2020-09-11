@@ -27,6 +27,12 @@ install_data(
     install_dir: join_paths(get_option('datadir'), 'gtksourceview-3.0', 'styles')
 )
 
+install_subdir(
+    join_paths('language-specs'),
+    install_dir: join_paths(get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'gtksourceview-3.0')
+)
+
+
 install_data(
     join_paths('font', 'iAWriterDuospace-Regular.ttf'),
     install_dir: join_paths(get_option('datadir'), 'fonts', 'truetype', 'thiefmd')

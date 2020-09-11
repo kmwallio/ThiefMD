@@ -2,7 +2,7 @@
 
 <div style="float: left; width: 25%;"><img src="data/icons/128/com.github.kmwallio.thiefmd.svg" /></div>
 
-It will be used for sanity checking the stylesheet used.
+It will be used for sanity checking the style-sheet used.
 
 *Emphasized* text.
 

@@ -24,6 +24,7 @@ namespace ThiefMD.Controllers.UI {
     private bool _init = false;
     private bool _show_filename = false;
     private static Gtk.SourceStyleSchemeManager thief_schemes;
+    private static Gtk.SourceLanguageManager thief_languages;
 
     public Gtk.SourceStyleSchemeManager UserSchemes () {
         if (thief_schemes == null) {
@@ -31,6 +32,40 @@ namespace ThiefMD.Controllers.UI {
         }
 
         return thief_schemes;
+    }
+
+    public Gtk.SourceLanguageManager get_language_manager () {
+        if (thief_languages == null) {
+            thief_languages = new Gtk.SourceLanguageManager ();
+            string custom_languages = Path.build_path (
+                Path.DIR_SEPARATOR_S,
+                Build.PKGDATADIR,
+                "gtksourceview-3.0",
+                "language-specs");
+            string[] language_paths = {
+                custom_languages
+            };
+            thief_languages.set_search_path (language_paths);
+
+            var markdown = thief_languages.get_language ("markdown");
+            if (markdown == null) {
+                warning ("Could not load custom languages");
+                thief_languages = Gtk.SourceLanguageManager.get_default ();
+            }
+        }
+
+        return thief_languages;
+    }
+
+    public Gtk.SourceLanguage get_source_language () {
+        var languages = get_language_manager ();
+
+        var markdown_syntax = languages.get_language ("markdown");
+        if (markdown_syntax == null) {
+            markdown_syntax = languages.guess_language (null, "text/markdown");
+        }
+
+        return markdown_syntax;
     }
 
     // Returns the old sheets, but puts in the new one

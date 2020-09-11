@@ -167,9 +167,8 @@ namespace ThiefMD.Widgets {
 
         construct {
             var settings = AppSettings.get_default ();
-            var manager = Gtk.SourceLanguageManager.get_default ();
-            var language = manager.guess_language (null, "text/markdown");
-            buffer = new Gtk.SourceBuffer.with_language (language);
+
+            buffer = new Gtk.SourceBuffer.with_language (UI.get_source_language ());
             buffer.highlight_syntax = true;
             buffer.set_max_undo_levels (20);
             buffer.changed.connect (() => {

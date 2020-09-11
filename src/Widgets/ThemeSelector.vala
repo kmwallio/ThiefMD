@@ -60,7 +60,14 @@ namespace ThiefMD.Widgets {
             app_box.hexpand = true;
 
             preview_items.add (new DefaultTheme ());
+            add (app_box);
 
+           GLib.Idle.add (load_themes);
+
+            show_all ();
+        }
+
+        public bool load_themes () {
             // Load previous added themes
             try {
                 Dir theme_dir = Dir.open (UserData.style_path, 0);
@@ -75,8 +82,10 @@ namespace ThiefMD.Widgets {
                             ThemePreview dark_preview = new ThemePreview (new_styles, true);
                             ThemePreview light_preview = new ThemePreview (new_styles, false);
 
-                            preview_items.add (dark_preview);
-                            preview_items.add (light_preview);
+                            if (ThemeSelector.instance != null) {
+                                ThemeSelector.instance.preview_items.add (dark_preview);
+                                ThemeSelector.instance.preview_items.add (light_preview);
+                            }
                         }
                     }
                 }
@@ -84,8 +93,7 @@ namespace ThiefMD.Widgets {
                 warning ("Could not load themes: %s", e.message);
             }
 
-            add (app_box);
-            show_all ();
+            return false;
         }
 
         private class PreviewDrop : Gtk.Label {

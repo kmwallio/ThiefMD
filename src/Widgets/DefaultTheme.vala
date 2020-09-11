@@ -26,12 +26,10 @@ namespace ThiefMD.Widgets {
         private Gtk.SourceBuffer buffer;
 
         public DefaultTheme () {
-            var manager = Gtk.SourceLanguageManager.get_default ();
-            var language = manager.guess_language (null, "text/markdown");
             margin = 0;
             view = new Gtk.SourceView ();
             view.margin = 0;
-            buffer = new Gtk.SourceBuffer.with_language (language);
+            buffer = new Gtk.SourceBuffer.with_language (UI.get_source_language ());
             buffer.highlight_syntax = true;
             view.editable = false;
             view.set_buffer (buffer);

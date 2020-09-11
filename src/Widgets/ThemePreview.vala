@@ -31,12 +31,11 @@ namespace ThiefMD.Widgets {
         public ThemePreview (Ultheme.Parser parser, bool is_dark) {
             theme = parser;
             am_dark = is_dark;
-            var manager = Gtk.SourceLanguageManager.get_default ();
-            var language = manager.guess_language (null, "text/markdown");
+
             margin = 0;
             view = new Gtk.SourceView ();
             view.margin = 0;
-            buffer = new Gtk.SourceBuffer.with_language (language);
+            buffer = new Gtk.SourceBuffer.with_language (UI.get_source_language ());
             buffer.highlight_syntax = true;
             view.editable = false;
             view.set_buffer (buffer);
@@ -47,23 +46,25 @@ namespace ThiefMD.Widgets {
             if (am_dark) {
                 string dark_path = Path.build_filename (UserData.scheme_path, theme.get_dark_theme_id () + ".xml");
                 File dark_file = File.new_for_path (dark_path);
-                if (!dark_file.query_exists ()) {
-                    try {
-                        FileManager.save_file (dark_file, theme.get_dark_theme ().data);
-                    } catch (Error e) {
-                        warning ("Could not save local scheme: %s", e.message);
+                try {
+                    if (dark_file.query_exists ()) {
+                        dark_file.delete ();
                     }
+                    FileManager.save_file (dark_file, theme.get_dark_theme ().data);
+                } catch (Error e) {
+                    warning ("Could not save local scheme: %s", e.message);
                 }
                 set_scheme (theme.get_dark_theme_id ());
             } else {
                 string light_path = Path.build_filename (UserData.scheme_path, theme.get_light_theme_id () + ".xml");
                 File light_file = File.new_for_path (light_path);
-                if (!light_file.query_exists ()) {
-                    try {
-                        FileManager.save_file (light_file, theme.get_light_theme ().data);
-                    } catch (Error e) {
-                        warning ("Could not save local scheme: %s", e.message);
+                try {
+                    if (light_file.query_exists ()) {
+                        light_file.delete ();
                     }
+                    FileManager.save_file (light_file, theme.get_light_theme ().data);
+                } catch (Error e) {
+                    warning ("Could not save local scheme: %s", e.message);
                 }
                 set_scheme (theme.get_light_theme_id ());
             }
