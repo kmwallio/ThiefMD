@@ -9,8 +9,8 @@
   <style name="selection"       foreground="#EAEAEA" background="#11BCED"/>
 
   <!-- Bold -->
-  <style name="def:statement" bold="true" foreground="#E811BA"/>
-  <style name="def:strong-emphasis" bold="true" foreground="#E811BA"/>
+  <style name="def:statement" bold="true" foreground="#064658"/>
+  <style name="def:strong-emphasis" bold="true" foreground="#064658"/>
 
   <!-- Italic -->
   <style name="def:doc-comment-element" italic="true" foreground="#0C8DB1"/>

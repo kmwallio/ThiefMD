@@ -532,6 +532,10 @@ namespace ThiefMD.Widgets {
 
         private string get_default_scheme () {
             var provider = new Gtk.CssProvider ();
+            provider.load_from_data ("* { all: unset; } ");
+            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+            // var provider = new Gtk.CssProvider ();
             provider.load_from_resource ("/com/github/kmwallio/thiefmd/app-stylesheet.css");
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
             Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;

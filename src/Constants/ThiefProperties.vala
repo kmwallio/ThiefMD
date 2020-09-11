@@ -41,5 +41,60 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
 > It's the best thing since sliced bread
 [ThiefMD](https://thiefmd.com)
 """;
+        public const string DYNAMIC_CSS = """@define-color colorPrimary %s;
+        @define-color colorPrimaryActive %s;
+        @define-color textColorPrimary %s;
+        @define-color textColorActive %s;
+        @define-color textColorGlobal %s;
+        
+        .thiefmd-toolbar {
+            border-bottom-color: transparent;
+            border-bottom-width: 1px;
+            background: @colorPrimary;
+            color: @textColorGlobal;
+            box-shadow: 0 1px transparent inset;
+        }
+
+        .thief-sheets {
+            border-right: 1px solid alpha(@textColorGlobal, 0.2);
+        }
+        
+        actionbar,
+        .action-bar {
+            border-top-color: transparent;
+            background: @colorPrimary;
+            color: @textColorPrimary;
+            box-shadow: 0 1px transparent inset;
+        }
+        
+        .thief-list-sheet {
+            background: @colorPrimary;
+            border-bottom: 1px solid @textColorGlobal;
+            color: @textColorGlobal;
+            border-radius: 0;
+        }
+        
+        .thief-list-sheet-active {
+            background: @colorPrimaryActive;
+            color: @textColorPrimary;
+        }
+        
+        window {
+            background: @colorPrimary;
+        }
+        
+        treeview {
+            background: @colorPrimaryActive;
+        }
+        
+        treeview.view header button {
+            background: @colorPrimary;
+            color: @textColorGlobal;
+        }
+        
+        treeview.view:selected {
+            background: @colorPrimary;
+            color: @textColorGlobal;
+        }""";
     }
 }

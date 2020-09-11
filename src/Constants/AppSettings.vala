@@ -43,6 +43,7 @@ namespace ThiefMD {
         public const string DATA_BASE = "ThiefMD";
         public const string DATA_STYLES = "styles";
         public const string DATA_SCHEMES = "schemes";
+        public const string DATA_CSS = "css";
 
         // Arbitrary strings
         public const string FIRST_USE = """# Click on a sheet to get started
@@ -71,6 +72,9 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public string spellcheck_language { get; set; }
         public string library_list { get; set; }
         public string theme_id { get; set; }
+        public string custom_theme { get; set; }
+        public bool dark_mode { get; set; }
+        public bool ui_editor_theme { get; set; }
 
         public string get_valid_theme_id () {
             UI.UserSchemes ().force_rescan ();

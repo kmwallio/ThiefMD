@@ -45,6 +45,9 @@ namespace ThiefMD.Widgets {
             } else {
                 load_sheets ();
             }
+
+            var header_context = this.get_style_context ();
+            header_context.add_class ("thief-sheets");
         }
 
         public string get_sheets_path () {

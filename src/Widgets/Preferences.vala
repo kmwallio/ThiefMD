@@ -105,10 +105,23 @@ namespace ThiefMD.Widgets {
             typewriter_switch.tooltip_text = _("Toggle Spellcheck");
             var typewriter_label = new Label(_("Use TypeWriter Scrolling"));
 
+            var ui_colorscheme_switch = new Switch ();
+            ui_colorscheme_switch.set_active (settings.ui_editor_theme);
+            ui_colorscheme_switch.notify["active"].connect (() => {
+                settings.ui_editor_theme = ui_colorscheme_switch.get_active ();
+                if (!settings.ui_editor_theme) {
+                    UI.reset_css ();
+                }
+            });
+            ui_colorscheme_switch.tooltip_text = _("Toggle UI Matching");
+            var ui_colorscheme_label = new Label(_("Match UI to Editor Theme"));
+
             grid.attach (spellcheck_switch, 1, 0, 1, 1);
             grid.attach (spellcheck_label, 2, 0, 2, 1);
             grid.attach (typewriter_switch, 1, 1, 1, 1);
             grid.attach (typewriter_label, 2, 1, 2, 1);
+            grid.attach (ui_colorscheme_switch, 1, 2, 1, 1);
+            grid.attach (ui_colorscheme_label, 2, 2, 2, 1);
             grid.show_all ();
 
             return grid;

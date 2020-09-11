@@ -62,35 +62,24 @@ namespace ThiefMD.Widgets {
             preview_items.add (new DefaultTheme ());
             add (app_box);
 
-           GLib.Idle.add (load_themes);
+            GLib.Idle.add (load_themes);
+            // load_themes ();
 
             show_all ();
         }
 
         public bool load_themes () {
             // Load previous added themes
-            try {
-                Dir theme_dir = Dir.open (UserData.style_path, 0);
-                string? file_name = null;
-                while ((file_name = theme_dir.read_name()) != null) {
-                    if (!file_name.has_prefix(".")) {
-                        if (file_name.down ().has_suffix ("ultheme")) {
-                            string style_path = Path.build_filename (UserData.style_path, file_name);
-                            File style_file = File.new_for_path (style_path);
-                            var new_styles = new Ultheme.Parser (style_file);
+            if (UI.user_themes == null) {
+                return false;
+            }
 
-                            ThemePreview dark_preview = new ThemePreview (new_styles, true);
-                            ThemePreview light_preview = new ThemePreview (new_styles, false);
+            foreach (var new_styles in UI.user_themes) {
+                ThemePreview dark_preview = new ThemePreview (new_styles, true);
+                ThemePreview light_preview = new ThemePreview (new_styles, false);
 
-                            if (ThemeSelector.instance != null) {
-                                ThemeSelector.instance.preview_items.add (dark_preview);
-                                ThemeSelector.instance.preview_items.add (light_preview);
-                            }
-                        }
-                    }
-                }
-            } catch (Error e) {
-                warning ("Could not load themes: %s", e.message);
+                ThemeSelector.instance.preview_items.add (dark_preview);
+                ThemeSelector.instance.preview_items.add (light_preview);
             }
 
             return false;
@@ -196,6 +185,7 @@ namespace ThiefMD.Widgets {
 
                     file.copy (destination, FileCopyFlags.OVERWRITE);
                     var new_styles = new Ultheme.Parser (destination);
+                    UI.add_user_theme (new_styles);
 
                     ThemePreview dark_preview = new ThemePreview (new_styles, true);
                     ThemePreview light_preview = new ThemePreview (new_styles, false);

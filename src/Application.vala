@@ -168,6 +168,7 @@ namespace ThiefMD {
             UI.show_view ();
             UI.set_sheets (start_sheet);
             library.set_active ();
+            UI.load_user_themes ();
 
             // Save on close
             shutdown.connect (() => {

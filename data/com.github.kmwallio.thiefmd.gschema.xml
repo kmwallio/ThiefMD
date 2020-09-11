@@ -60,6 +60,21 @@
             <summary>ID of Syntax Theme to Use</summary>
             <description>ID of theme to use for display</description>
         </key>
+        <key name="custom-theme" type="s">
+            <default>''</default>
+            <summary>Filename of Custom Theme to Use</summary>
+            <description>Filename of Custom Theme to Use</description>
+        </key>
+        <key name="dark-mode" type="b">
+            <default>true</default>
+            <summary>Enable darkmode</summary>
+            <description>When using a custom theme, use the dark color palette</description>
+        </key>
+        <key name="ui-editor-theme" type="b">
+            <default>true</default>
+            <summary>UI to match Editor</summary>
+            <description>When using a custom theme, change the UI to match the color palette</description>
+        </key>
         <key name="spellcheck" type="b">
             <default>true</default>
             <summary>Enable spellcheck</summary>

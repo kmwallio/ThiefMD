@@ -46,25 +46,23 @@ namespace ThiefMD.Widgets {
             if (am_dark) {
                 string dark_path = Path.build_filename (UserData.scheme_path, theme.get_dark_theme_id () + ".xml");
                 File dark_file = File.new_for_path (dark_path);
-                try {
-                    if (dark_file.query_exists ()) {
-                        dark_file.delete ();
+                if (!dark_file.query_exists ()) {
+                    try {
+                        FileManager.save_file (dark_file, theme.get_dark_theme ().data);
+                    } catch (Error e) {
+                        warning ("Could not save local scheme: %s", e.message);
                     }
-                    FileManager.save_file (dark_file, theme.get_dark_theme ().data);
-                } catch (Error e) {
-                    warning ("Could not save local scheme: %s", e.message);
                 }
                 set_scheme (theme.get_dark_theme_id ());
             } else {
                 string light_path = Path.build_filename (UserData.scheme_path, theme.get_light_theme_id () + ".xml");
                 File light_file = File.new_for_path (light_path);
-                try {
-                    if (light_file.query_exists ()) {
-                        light_file.delete ();
+                if (!light_file.query_exists ()) {
+                    try {
+                        FileManager.save_file (light_file, theme.get_light_theme ().data);
+                    } catch (Error e) {
+                        warning ("Could not save local scheme: %s", e.message);
                     }
-                    FileManager.save_file (light_file, theme.get_light_theme ().data);
-                } catch (Error e) {
-                    warning ("Could not save local scheme: %s", e.message);
                 }
                 set_scheme (theme.get_light_theme_id ());
             }
@@ -81,10 +79,15 @@ namespace ThiefMD.Widgets {
             if (am_dark) {
                 ThiefApp.get_instance ().edit_view_content.set_scheme (theme.get_dark_theme_id ());
                 settings.theme_id = theme.get_dark_theme_id ();
+                theme.get_dark_theme_palette (out palette);
             } else {
                 ThiefApp.get_instance ().edit_view_content.set_scheme (theme.get_light_theme_id ());
                 settings.theme_id = theme.get_light_theme_id ();
+                theme.get_light_theme_palette (out palette);
             }
+            settings.dark_mode = am_dark;
+            settings.custom_theme = theme.base_file_name ();
+            UI.set_css_scheme (palette);
         }
 
         public void set_text (string text) {
