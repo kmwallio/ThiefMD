@@ -70,7 +70,85 @@ namespace ThiefMD.Widgets {
                     string new_text = now.format ("%F %H:%M");
                     insert_at_cursor (new_text);
                 });
+
+                Gtk.MenuItem menu_insert_frontmatter = new Gtk.MenuItem.with_label (_("Insert YAML Frontmatter"));
+                menu_insert_frontmatter.activate.connect (() => {
+                    if (!buffer.text.has_prefix ("---")) {
+                        var settings_menu = AppSettings.get_default ();
+                        int new_cursor_location = 0;
+                        File current_file = File.new_for_path (settings_menu.last_file);
+                        Regex date = new Regex ("([0-9]{4}-[0-9]{1,2}-[0-9]{1,2}-?)?(.*?)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+
+                        DateTime now = new DateTime.now_local ();
+                        string current_time = now.format ("%F %H:%M");
+
+                        string parent_folder = current_file.get_parent ().get_basename ().down ();
+                        string page_type = (parent_folder.contains ("post") || parent_folder.contains ("draft")) ? "post" : "page";
+                        string current_title = current_file.get_basename ();
+                        current_title = current_title.substring (0, current_title.last_index_of ("."));
+
+                        // Attempt to convert the file name into a title for the post
+                        try {
+                            current_title = date.replace_eval (
+                                current_title,
+                                (ssize_t) current_title.length,
+                                0,
+                                RegexMatchFlags.NOTEMPTY,
+                                (match_info, result) =>
+                                {
+                                    result.append (match_info.fetch (match_info.get_match_count () - 1));
+                                    return false;
+                                }
+                            );
+                        } catch (Error e) {
+                            warning ("Could not generate title");
+                        }
+
+                        current_title = current_title.replace ("_", " ");
+                        current_title = current_title.replace ("-", " ");
+                        string [] parts = current_title.split (" ");
+                        if (parts != null && parts.length != 0) {
+                            current_title = "";
+                            foreach (var part in parts) {
+                                part = part.substring (0, 1).up () + part.substring (1).down ();
+                                current_title += part + " ";
+                            }
+                            current_title = current_title.chomp ();
+                        }
+
+                        // Build the front matter
+                        string frontmatter = "---\n";
+                        frontmatter += "layout: " + page_type + "\n";
+                        frontmatter += "title: ";
+                        new_cursor_location = frontmatter.length;
+                        frontmatter += current_title + "\n";
+                        // Only insert datetime if we think it's a post
+                        if (page_type == "post") {
+                            frontmatter += "date: " + current_time + "\n";
+                        }
+                        frontmatter += "---\n";
+
+                        // Place the text
+                        buffer.text = frontmatter + buffer.text;
+
+                        // Move the cursor to select the title
+                        Gtk.TextIter start, end;
+                        buffer.get_bounds(out start, out end);
+                        start.forward_chars (new_cursor_location);
+                        end = start;
+                        end.forward_line ();
+                        end.backward_char ();
+                        buffer.place_cursor (start);
+                        buffer.select_range (start, end);
+
+                        // Move the frontmatter onscreen
+                        should_scroll = true;
+                        move_typewriter_scolling ();
+                    }
+                });
+
                 menu.append (menu_insert_datetime);
+                menu.append (menu_insert_frontmatter);
                 menu.show_all ();
 
                 menu.selection_done.connect (() => {
