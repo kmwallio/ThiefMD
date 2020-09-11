@@ -21,18 +21,13 @@ This will create a new markdown file for you to write in.
 
 ### YAML Frontmatter
 
-```yaml
----
-layout: post
-title: Clever Post Title
-date: 2020-08-31 19:58
-categories: [category1, category2]
----
-```
+![](/docs/images/thief_frontmatter.png)
 
-Each post begins with some YAML markup telling Jekyll the title, publish time, categories, and layout.  You can read more in [Jekyll's Documentation](https://jekyllrb.com/docs/front-matter/)
+Each post begins with some YAML markup telling Jekyll the title, publish time, categories, and layout. Simply right-click and `Insert YAML Frontmatter`, and ThiefMD will generate the front matter for you based on the current file.  ThiefMD will only provide the minimum needed frontmatter.
 
-To insert the current time, right click, Insert Datetime.
+You can read more in [Jekyll's Documentation](https://jekyllrb.com/docs/front-matter).
+
+To change or insert the current time, right click, Insert Datetime.
 
 ![](/images/datetime_menu.png)
 
