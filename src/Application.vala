@@ -163,9 +163,11 @@ namespace ThiefMD {
             edit_view_content.set_scheme (settings.get_valid_theme_id ());
             ready = true;
             main_window.show_all ();
+
             // Restore preview view
             UI.show_view ();
             UI.set_sheets (start_sheet);
+            library.set_active ();
 
             // Save on close
             shutdown.connect (() => {

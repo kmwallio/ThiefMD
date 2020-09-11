@@ -43,6 +43,11 @@ namespace ThiefMD.Widgets {
                     header_context.remove_class ("thief-list-sheet-active");
                 }
             }
+
+            get {
+                var header_context = this.get_style_context ();
+                return header_context.has_class ("thief-list-sheet-active");
+            }
         }
 
         public Sheet (string sheet_path, Sheets parent) {

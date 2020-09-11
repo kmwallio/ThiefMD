@@ -31,8 +31,9 @@ namespace ThiefMD.Widgets {
         public Sheets _sheets;
         public string _title;
         public string _path;
+        public TreeIter _iter; // @TODO: Should be weak?
 
-        public LibPair (string path) {
+        public LibPair (string path, TreeIter iter) {
             if (path.has_suffix ("/")) {
                 _path = path.substring(0, -1);
             } else {
@@ -41,6 +42,7 @@ namespace ThiefMD.Widgets {
             debug ("Got path : %s", _path);
             _title = _path.substring (_path.last_index_of ("/") + 1);
             _sheets = new Sheets(_path);
+            _iter = iter;
         }
 
         public string to_string () {
@@ -73,6 +75,15 @@ namespace ThiefMD.Widgets {
             this.drag_leave.connect(this.on_drag_leave);
             this.drag_drop.connect(this.on_drag_drop);
             this.drag_data_received.connect(this.on_drag_data_received);
+        }
+
+        public void set_active () {
+            foreach (var pair in _all_sheets) {
+                if (pair._sheets.has_active_sheet ()) {
+                    TreePath? tree_path = _lib_store.get_path (pair._iter);
+                    set_cursor (tree_path, null, false);
+                }
+            }
         }
 
         //
@@ -176,7 +187,7 @@ namespace ThiefMD.Widgets {
                 if (!has_sheets (lib)) {
                     _lib_store.append (out root, null);
                     debug (lib);
-                    LibPair pair = new LibPair(lib);
+                    LibPair pair = new LibPair(lib, root);
                     _lib_store.set (root, 0, pair._title, 1, pair, -1);
                     _all_sheets.append (pair);
                     parse_dir(lib, root);
@@ -201,7 +212,7 @@ namespace ThiefMD.Widgets {
                         string path = Path.build_filename (str_dir, file_name);
                         if (!has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
                             _lib_store.append (out child, iter);
-                            LibPair pair = new LibPair(path);
+                            LibPair pair = new LibPair(path, child);
                             _all_sheets.append (pair);
                             // Append dir to list
                             _lib_store.set (child, 0, pair._title, 1, pair, -1);

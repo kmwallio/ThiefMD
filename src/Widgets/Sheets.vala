@@ -66,6 +66,15 @@ namespace ThiefMD.Widgets {
             }
         }
 
+        public bool has_active_sheet () {
+            foreach (var sheet in _sheets) {
+                if (sheet.active) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public void load_sheets () {
             var settings = AppSettings.get_default ();
             _view.remove (_empty);
