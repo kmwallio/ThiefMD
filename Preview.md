@@ -62,6 +62,6 @@ I'm basically ~~stealing~~ copying and pasting examples from [https://www.markdo
 
 [^1]: This is the footnote.
 
-### Math (required libmarkdown 2.2.0 or greater)
+### Math (requires libmarkdown 2.2.0 or greater)
 
 $$\int_{a}^{b} x^2 dx$$
