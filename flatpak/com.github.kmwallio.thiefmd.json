@@ -7,11 +7,10 @@
   "copy-icon": true,
   "finish-args":[
     "--share=ipc",
+    "--share=network",
     "--filesystem=home",
     "--device=dri",
-    "--socket=x11",
-    "--socket=session-bus",
-    "--own-name=com.github.kmwallio.thiefmd"
+    "--socket=x11"
   ],
   "cleanup":[
     "/cache",

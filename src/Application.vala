@@ -36,7 +36,7 @@ namespace ThiefMD {
 
         public ThiefApp () {
             Object (
-                application_id: "com.github.kmwallio.theifmd",
+                application_id: "com.github.kmwallio.thiefmd",
                 flags: ApplicationFlags.FLAGS_NONE
             );
         }
