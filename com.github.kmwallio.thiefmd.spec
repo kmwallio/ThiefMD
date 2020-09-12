@@ -1,8 +1,9 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.0.6
+Version: 0.0.7
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
+URL: https://thiefmd.com
 
 Source0: com.github.kmwallio.thiefmd-0.0.6.tar.xz
 
@@ -24,6 +25,8 @@ BuildRequires: pkgconfig(gtkspell3-3.0)
 BuildRequires: pkgconfig(webkit2gtk-4.0)
 
 %description
+Keep your Markdown managed. Write epic tales, keep a journal, or finally write that book report.
+ThiefMD is a Markdown Editor providing an easy way to organize your markdown documents.
 
 %package devel
 Summary: Development files for %{name}
@@ -163,5 +166,13 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
-* Wed Sep 09 2020 kmwallio <mwallio@gmail.com> - 
-- Add theme support
+* Wed Sep 09 2020 kmwallio <mwallio@gmail.com> - 0.0.6
+- Adding theme support
+- Improve UI for About and Preferences
+- Fix a bug in Editor only view
+* Thu Sep 03 2020 kmwallio <mwallio@gmail.com> - 0.0.5
+- Fix bug with () rendering
+- Add Syntax Highlighting and KaTeX
+* Wed Sep 02 2020 kmwallio <mwallio@gmail.com> - 0.0.4
+- Drag and Drop Support for moving sheets in library
+- Blogging centric features
