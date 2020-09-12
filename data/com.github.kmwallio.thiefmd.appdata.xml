@@ -2,15 +2,73 @@
 <!-- Copyright 2018 Miles Wallio <mwallio@gmail.com> -->
 <component type="desktop">
   <id>com.github.kmwallio.thiefmd.desktop</id>
-  <metadata_license>GPL3</metadata_license>
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-3.0+</project_license>
   <name>ThiefMD</name>
   <launchable type="desktop-id">com.github.kmwallio.thiefmd.desktop</launchable>
   <summary>The markdown editor worth stealing.</summary>
   <description>
-    <p>A markdown editor that aims to provide basic library management with an above average user experience.</p>
+    <p>Keep your Markdown managed. Write epic tales, keep a journal, or finally write that book report.</p>
+    <p>ThiefMD is a Markdown Editor providing an easy way to organize your markdown documents.</p>
   </description>
   <developer_name>kmwallio</developer_name>
   <url type="homepage">https://thiefmd.com</url>
   <url type="bugtracker">https://github.com/kmwallio/thiefmd/issues</url>
   <url type="help">https://thiefmd.com/deets</url>
+  <categories>
+    <category>Office</category>
+    <category>Utility</category>
+  </categories>
+  <keywords>
+    <keyword>markdown</keyword>
+    <keyword>editor</keyword>
+    <keyword>writing</keyword>
+  </keywords>
+  <screenshots>
+    <screenshot type="default">
+      <caption>ThiefMD, a Markdown Editor, with a file opened with syntax highlighting</caption>
+      <image>https://thiefmd.com/images/thiefmd.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>ThiefMD, a Markdown Editor, showing a Library view with an open file</caption>
+      <image>https://thiefmd.com/images/thief_window.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>ThiefMD, a Markdown Editor, showing Theme selection preferences to change the user interface</caption>
+      <image>https://thiefmd.com/images/theme_preferences.png</image>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="0.0.6" date="2020-09-08" urgency="low">
+      <description>
+        <p>Dark Mode, Light Mode, and anywhere in between. ThiefMD can now import your favorite themes.</p>
+        <ul>
+          <li>Ulysses Theme support.</li>
+          <li>Fixed bug with black bar with in Editor View mode (Ctrl + 1).</li>
+          <li>About Window rendering improvements.</li>
+          <li>Preferences Window rendering improvements.</li>
+          <li>Preferences Window support for dropping in new themes.</li>
+          <li>New Preferences keyboard shortcut Ctrl + ,</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.6-ohsopretty</url>
+    </release>
+    <release version="0.0.5" date="2020-09-03" urgency="low">
+      <description>
+        <p>Last release broke some preview items.</p>
+        <ul>
+          <li>Fix bug in removing characters between parentheses.</li>
+          <li>Add KaTeX support (if built with libmarkdown 2.2.0 or greater).</li>
+          <li>Add highlight.js support.</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.5-previewfixes</url>
+    </release>
+    <release version="0.0.4" date="2020-09-02" urgency="low">
+      <description>
+        <p>This release focuses on blogging. We added some new UI features and better Library management tools.</p>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.4-blogatog</url>
+    </release>
+  </releases>
 </component>
