@@ -4,11 +4,7 @@ project('com.github.kmwallio.thiefmd', ['vala', 'c'],
 )
 
 # Application ID
-if get_option('profile') == 'development'
-  thief_app_id = 'com.github.kmwallio.thiefmd.dev'
-else
-  thief_app_id = 'com.github.kmwallio.thiefmd'
-endif
+thief_app_id = 'com.github.kmwallio.thiefmd'
 
 # Import main lib files
 gnome = import('gnome')
@@ -30,7 +26,6 @@ pkgdatadir = join_paths([ get_option('prefix'),
                           'com.github.kmwallio.thiefmd' ])
 
 conf.set_quoted('PKGDATADIR', pkgdatadir)
-
 # Generate config.h
 conf.set_quoted('GETTEXT_PACKAGE', meson.project_name())
 conf.set_quoted('RELEASE_NAME', thief_app_id)

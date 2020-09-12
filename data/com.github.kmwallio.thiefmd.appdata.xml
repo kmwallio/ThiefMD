@@ -4,8 +4,13 @@
   <id>com.github.kmwallio.thiefmd.desktop</id>
   <metadata_license>GPL3</metadata_license>
   <name>ThiefMD</name>
+  <launchable type="desktop-id">com.github.kmwallio.thiefmd.desktop</launchable>
   <summary>The markdown editor worth stealing.</summary>
   <description>
     <p>A markdown editor that aims to provide basic library management with an above average user experience.</p>
   </description>
+  <developer_name>kmwallio</developer_name>
+  <url type="homepage">https://thiefmd.com</url>
+  <url type="bugtracker">https://github.com/kmwallio/thiefmd/issues</url>
+  <url type="help">https://thiefmd.com/deets</url>
 </component>

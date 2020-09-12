@@ -6,3 +6,4 @@ meson
 data
 screenshots
 subprojects
+flatpak

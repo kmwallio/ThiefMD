@@ -28,8 +28,6 @@ namespace ThiefMD.Widgets {
 
         public Preferences () {
             set_transient_for (ThiefApp.get_instance ().main_window);
-            parent = ThiefApp.get_instance ().main_window;
-            set_destroy_with_parent (true);
             resizable = false;
             deletable = false;
             modal = true;

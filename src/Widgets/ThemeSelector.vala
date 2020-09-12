@@ -63,7 +63,6 @@ namespace ThiefMD.Widgets {
             add (app_box);
 
             GLib.Idle.add (load_themes);
-            // load_themes ();
 
             show_all ();
         }

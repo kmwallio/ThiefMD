@@ -105,7 +105,12 @@ namespace ThiefMD.Widgets {
                 switch (type) {
                     case WebKit.PolicyDecisionType.NEW_WINDOW_ACTION:
                         if (decision is WebKit.ResponsePolicyDecision) {
-                            launch_browser ((decision as WebKit.ResponsePolicyDecision).request.get_uri ());
+                            WebKit.ResponsePolicyDecision response_decision = (decision as WebKit.ResponsePolicyDecision);
+                            if (response_decision != null && 
+                                response_decision.request != null)
+                            {
+                                launch_browser (response_decision.request.get_uri ());
+                            }
                         }
                     break;
                     case WebKit.PolicyDecisionType.RESPONSE:

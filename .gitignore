@@ -4,3 +4,5 @@ docs/_site
 .buildconfig
 subprojects/gxml/*
 subprojects/ultheme/*
+flatpak/.flatpak-builder/*
+flatpak/build*

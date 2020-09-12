@@ -28,8 +28,6 @@ namespace ThiefMD.Widgets {
 
         public About () {
             set_transient_for (ThiefApp.get_instance ().main_window);
-            parent = ThiefApp.get_instance ().main_window;
-            set_destroy_with_parent (true);
             resizable = false;
             deletable = true;
             modal = true;
@@ -46,9 +44,13 @@ namespace ThiefMD.Widgets {
             website = ThiefProperties.URL;
             license_type = ThiefProperties.LICENSE_TYPE;
 
-            IconTheme icon_theme = IconTheme.get_default();
-            var thief_icon = icon_theme.load_icon("com.github.kmwallio.thiefmd", 128, IconLookupFlags.FORCE_SVG);
-            logo = thief_icon;
+            try {
+                IconTheme icon_theme = IconTheme.get_default();
+                var thief_icon = icon_theme.load_icon("com.github.kmwallio.thiefmd", 128, IconLookupFlags.FORCE_SVG);
+                logo = thief_icon;
+            } catch (Error e) {
+                warning ("Could not load logo: %s", e.message);
+            }
 
             add_credit_section ("Credits", ThiefProperties.GIANTS);
         }

@@ -63,7 +63,7 @@ namespace ThiefMD.Widgets {
         public Library () {
             debug ("Setting up library");
             _lib_store = new TreeStore (2, typeof (string), typeof (LibPair));
-            parse_library();
+            GLib.Idle.add (parse_library);
             set_model (_lib_store);
             insert_column_with_attributes (-1, "Library", new CellRendererText (), "text", 0, null);
             get_selection ().changed.connect (on_selection);
@@ -173,7 +173,7 @@ namespace ThiefMD.Widgets {
             return new Sheets(path);
         }
 
-        public void parse_library () {
+        public bool parse_library () {
             var settings = AppSettings.get_default ();
             settings.validate_library ();
             string[] library = settings.library ();
@@ -193,6 +193,8 @@ namespace ThiefMD.Widgets {
                     parse_dir(lib, root);
                 }
             }
+
+            return false;
         }
 
         private void parse_dir (string str_dir, TreeIter iter) {

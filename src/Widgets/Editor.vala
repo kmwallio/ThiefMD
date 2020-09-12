@@ -77,7 +77,12 @@ namespace ThiefMD.Widgets {
                         var settings_menu = AppSettings.get_default ();
                         int new_cursor_location = 0;
                         File current_file = File.new_for_path (settings_menu.last_file);
-                        Regex date = new Regex ("([0-9]{4}-[0-9]{1,2}-[0-9]{1,2}-?)?(.*?)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+                        Regex date = null;
+                        try {
+                            date = new Regex ("([0-9]{4}-[0-9]{1,2}-[0-9]{1,2}-?)?(.*?)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+                        } catch (Error e) {
+                            warning ("Could not compile regex: %s", e.message);
+                        }
 
                         DateTime now = new DateTime.now_local ();
                         string current_time = now.format ("%F %H:%M");
@@ -89,17 +94,19 @@ namespace ThiefMD.Widgets {
 
                         // Attempt to convert the file name into a title for the post
                         try {
-                            current_title = date.replace_eval (
-                                current_title,
-                                (ssize_t) current_title.length,
-                                0,
-                                RegexMatchFlags.NOTEMPTY,
-                                (match_info, result) =>
-                                {
-                                    result.append (match_info.fetch (match_info.get_match_count () - 1));
-                                    return false;
-                                }
-                            );
+                            if (date != null) {
+                                current_title = date.replace_eval (
+                                    current_title,
+                                    (ssize_t) current_title.length,
+                                    0,
+                                    RegexMatchFlags.NOTEMPTY,
+                                    (match_info, result) =>
+                                    {
+                                        result.append (match_info.fetch (match_info.get_match_count () - 1));
+                                        return false;
+                                    }
+                                );
+                            }
                         } catch (Error e) {
                             warning ("Could not generate title");
                         }

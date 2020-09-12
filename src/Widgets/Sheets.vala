@@ -80,7 +80,9 @@ namespace ThiefMD.Widgets {
 
         public void load_sheets () {
             var settings = AppSettings.get_default ();
-            _view.remove (_empty);
+            if (_empty != null) {
+                _view.remove (_empty);
+            }
 
             if (_sheets != null) {
                 foreach (Sheet sheet in _sheets) {

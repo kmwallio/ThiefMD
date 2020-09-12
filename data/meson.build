@@ -72,3 +72,5 @@ install_data(
     join_paths('katex', 'auto-render.min.js'),
     install_dir: join_paths([ get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'scripts' ])
 )
+
+gnome.compile_schemas()

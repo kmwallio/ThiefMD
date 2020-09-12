@@ -2,10 +2,9 @@
 Name=ThiefMD
 GenericName=Thief Markdown Editor
 Comment=A plain yet rich writing environment
-Categories=Office;Accessories;
+Categories=Office
 Exec=com.github.kmwallio.thiefmd
 Icon=com.github.kmwallio.thiefmd
 Terminal=false
 Type=Application
-X-GNOME-Gettext-Domain=thiefmd
 Keywords=markdown;text;editor;

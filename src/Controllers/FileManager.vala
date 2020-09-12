@@ -296,7 +296,13 @@ namespace ThiefMD.Controllers.FileManager {
 
     public string get_yamlless_markdown (string buffer, int lines, bool non_empty = true, bool include_title = true, bool include_date = true)
     {
-        Regex headers = new Regex ("^\\s*(.+)\\s*:\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+        Regex headers = null;
+        try {
+            headers = new Regex ("^\\s*(.+)\\s*:\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+        } catch (Error e) {
+            warning ("Could not compile regex: %s", e.message);
+        }
+
         MatchInfo matches;
         var markdown = new StringBuilder ();
         int mklines = 0;
@@ -321,17 +327,29 @@ namespace ThiefMD.Controllers.FileManager {
                     break;
                 }
 
-                if (headers.match (line, RegexMatchFlags.NOTEMPTY, out matches)) {
-                    if (include_title && matches.fetch (1).ascii_down() == "title") {
-                        markdown.append ("# " + matches.fetch (2).replace ("\"", "") + "\n");
-                        mklines++;
-                    } else if (include_date && matches.fetch (1).ascii_down() == "date") {
-                        markdown.append ("## " + matches.fetch (2) + "\n");
-                        mklines++;
+                if (headers != null) {
+                    if (headers.match (line, RegexMatchFlags.NOTEMPTY, out matches)) {
+                        if (include_title && matches.fetch (1).ascii_down() == "title") {
+                            markdown.append ("# " + matches.fetch (2).replace ("\"", "") + "\n");
+                            mklines++;
+                        } else if (include_date && matches.fetch (1).ascii_down() == "date") {
+                            markdown.append ("## " + matches.fetch (2) + "\n");
+                            mklines++;
+                        }
+                    } else {
+                        // If it's a list or empty line, we're cool
+                        if (!line.chomp ().has_prefix ("-") && line.chomp () != "") {
+                            valid_frontmatter = false;
+                            break;
+                        }
                     }
                 } else {
-                    valid_frontmatter = false;
-                    break;
+                    string quick_parse = line.chomp ();
+                    if (quick_parse.has_prefix ("title")) {
+                        markdown.append ("# " + quick_parse.substring (quick_parse.index_of (":") + 1));
+                    } else if (quick_parse.has_prefix ("date")) {
+                        markdown.append ("## " + quick_parse.substring (quick_parse.index_of (":") + 1));
+                    }
                 }
 
                 i++;
