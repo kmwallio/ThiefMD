@@ -79,6 +79,7 @@ namespace ThiefMD.Widgets {
 
                 ThemeSelector.instance.preview_items.add (dark_preview);
                 ThemeSelector.instance.preview_items.add (light_preview);
+                ThemeSelector.instance.preview_items.show_all ();
             }
 
             return false;
