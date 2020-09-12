@@ -16,6 +16,10 @@ A .desktop file should be created and added to the proper path. If this is a the
 
 ## Installing non-flatpak'd themes
 
-The theme in the screenshot if [Vimix Gtk](https://github.com/vinceliuice/vimix-gtk-themes).
+The theme in the screenshots is [Vimix Gtk](https://github.com/vinceliuice/vimix-gtk-themes).
 
-sudo ./install.sh -a -d /var/lib/flatpak/runtime/org.gnome.Platform/x86_64/3.36/active/files/share/themes
+1. Clone the repo
+  `git clone https://github.com/vinceliuice/vimix-gtk-themes.git`
+2. `cd vimix-gtk-themes`
+3. If using the system install of the gnome runtime
+  `sudo ./install.sh -a -d /var/lib/flatpak/runtime/org.gnome.Platform/x86_64/3.36/active/files/share/themes`

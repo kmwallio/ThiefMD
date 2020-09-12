@@ -2,6 +2,8 @@
 @define-color colorPrimaryActive #DFDFDF;
 @define-color textColorPrimary #0C0C0C;
 @define-color textColorActive #000000;
+@define-color windowColor #2c292d;
+@define-color selectionColor #0C8DB1;
 
 .thiefmd-toolbar {
     border-bottom-color: transparent;
@@ -20,11 +22,32 @@ actionbar,
 }
 
 .thief-list-sheet {
-    border-bottom: 1px solid #0c0c0c;
+    background: @windowColor;
+    border-bottom: 1px solid @textColorPrimary;
     border-radius: 0;
+    color: darker(@colorPrimaryActive);
 }
 
 .thief-list-sheet-active {
     background: @colorPrimaryActive;
     color: @textColorActive;
+}
+
+window {
+    background: @windowColor;
+}
+
+treeview {
+    background: lighter(@windowColor);
+    color: @colorPrimary;
+}
+
+treeview.view header button {
+    background: lighter(@windowColor);
+    color: @colorPrimary;
+}
+
+treeview.view:selected {
+    background: @selectionColor;
+    color: @colorPrimary;
 }
