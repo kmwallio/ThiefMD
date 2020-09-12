@@ -289,7 +289,7 @@ namespace ThiefMD.Controllers.UI {
         ThiefApp instance = ThiefApp.get_instance ();
 
         instance.library_pane.show ();
-        instance.library_pane.get_child1 ().hide ();
+        instance.library_pane.get_child1 ().show ();
         instance.library_pane.get_child2 ().show_all ();
 
         debug ("Showing sheets (%d)\n", instance.sheets_pane.get_position ());
@@ -311,6 +311,10 @@ namespace ThiefMD.Controllers.UI {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
 
+        instance.library_pane.show ();
+        instance.library_pane.get_child1 ().show ();
+        instance.library_pane.get_child2 ().show_all ();
+
         debug ("Hiding library (%d)\n", instance.library_pane.get_position ());
         if (instance.library_pane.get_position () > 0 || instance.sheets_pane.get_position () <= 0) {
             _moving.moving = false;
@@ -325,15 +329,15 @@ namespace ThiefMD.Controllers.UI {
                 }
             }
 
-            _moving.connect (() => {
-                // Second instance because instance above goes out of scope
-                // leading to segfault?
-                ThiefApp instance2 = ThiefApp.get_instance ();
-                instance2.library_pane.get_child1 ().hide ();
-            });
-
             move_panes (0, target_sheets);
         }
+
+        _moving.connect (() => {
+            // Second instance because instance above goes out of scope
+            // leading to segfault?
+            ThiefApp instance2 = ThiefApp.get_instance ();
+            instance2.library_pane.get_child1 ().hide ();
+        });
     }
 
     public void hide_sheets () {
