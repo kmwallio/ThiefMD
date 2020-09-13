@@ -117,12 +117,10 @@ namespace ThiefMD.Widgets {
                 int y,
                 uint time)
             {
-                // set_shadow_type (Gtk.ShadowType.ETCHED_OUT);
                 return false;
             }
 
             private void on_drag_leave (Widget widget, DragContext context, uint time) {
-                // set_shadow_type (Gtk.ShadowType.ETCHED_IN);
             }
 
             private bool on_drag_drop (

@@ -23,20 +23,28 @@ using ThiefMD.Controllers;
 namespace ThiefMD.Widgets {
     public class ThiefSheetsSerializable : Object {
         public string[] sheet_order { get; set; }
+        public string[] hidden_folders { get; set; }
 
         public ThiefSheetsSerializable (ThiefSheets sheets) {
-            sheet_order = new string[(int)sheets.sheet_order.length ()];
-            for(int i = 0; i < (int)(sheets.sheet_order.length ()); i++) {
-                sheet_order[i] = sheets.sheet_order.nth_data (i);
+            sheet_order = new string[sheets.sheet_order.size];
+            for(int i = 0; i < sheets.sheet_order.size; i++) {
+                sheet_order[i] = sheets.sheet_order.get (i);
+            }
+
+            hidden_folders = new string[sheets.hidden_folders.size];
+            for(int i = 0; i < sheets.hidden_folders.size; i++) {
+                hidden_folders[i] = sheets.hidden_folders.get (i);
             }
         }
     }
 
     public class ThiefSheets : Object {
-        public List<string> sheet_order;
+        public Gee.List<string> sheet_order;
+        public Gee.LinkedList<string> hidden_folders;
 
         public ThiefSheets () {
-            sheet_order = new List<string> ();
+            sheet_order = new Gee.ArrayList<string> ();
+            hidden_folders = new Gee.LinkedList<string> ();
         }
 
         public static ThiefSheets new_for_file (string file) {
@@ -48,13 +56,30 @@ namespace ThiefMD.Widgets {
             ThiefSheetsSerializable thief_sheets = Json.gobject_deserialize (typeof (ThiefSheetsSerializable), data) as ThiefSheetsSerializable;
             if (thief_sheets != null) {
                 foreach (var s in thief_sheets.sheet_order) {
-                    t_sheets.sheet_order.append (s);
+                    t_sheets.add_sheet(s);
+                }
+
+                foreach (var s in thief_sheets.hidden_folders) {
+                    t_sheets.add_hidden_folder (s);
                 }
             }
 
             return t_sheets;
         }
+
+        public void add_sheet (string sheet_name) {
+            if (!sheet_order.contains (sheet_name)) {
+                sheet_order.add (sheet_name);
+            }
+        }
+
+        public void add_hidden_folder (string folder) {
+            if (!hidden_folders.contains (folder)) {
+                hidden_folders.add (folder);
+            }
+        }
     }
+
     /**
      * Sheets View
      * 
@@ -85,8 +110,31 @@ namespace ThiefMD.Widgets {
             header_context.add_class ("thief-sheets");
         }
 
+        public void add_hidden_item (string directory_path) {
+            File ignore_dir = File.new_for_path (directory_path);
+            if (ignore_dir.query_exists ()) {
+                metadata.add_hidden_folder (ignore_dir.get_basename ());
+            }
+            save_library_order ();
+        }
+
+        public void remove_hidden_items () {
+            metadata.hidden_folders.clear ();
+            save_library_order ();
+        }
+
         public string get_sheets_path () {
             return _sheets_dir;
+        }
+
+        public string get_parent_sheets_path () {
+            File path = File.new_for_path (_sheets_dir);
+            File? parent = path.get_parent ();
+            if (parent != null) {
+                return parent.get_path ();
+            } else {
+                return "";
+            }
         }
 
         private void show_empty () {
@@ -154,12 +202,11 @@ namespace ThiefMD.Widgets {
                     File file = File.new_for_path (path);
                     if (file.query_exists () && !_sheets.has_key (file_name)) {
                         if ((!FileUtils.test(path, FileTest.IS_DIR)) &&
-                            (path.has_suffix(".md") || path.has_suffix(".markdown"))) {
+                            (path.down ().has_suffix(".md") || path. down().has_suffix(".markdown"))) {
 
                             Sheet sheet = new Sheet (path, this);
                             _sheets.set (file_name, sheet);
                             _view.add (sheet);
-                            metadata.sheet_order.append (file_name);
 
                             if (settings.last_file == path) {
                                 sheet.active = true;
@@ -175,16 +222,11 @@ namespace ThiefMD.Widgets {
             // Load anything new in the folder
             reload_sheets ();
 
-            if (metadata.sheet_order.length () == 0) {
+            if (metadata.sheet_order.size == 0) {
                 show_empty();
             } else if (settings.save_library_order) {
                 save_library_order ();
             }
-
-            // Toggle saving of sheets
-            settings.changed.connect (() => {
-                save_library_order ();
-            });
         }
 
         public void reload_sheets () {
@@ -205,7 +247,7 @@ namespace ThiefMD.Widgets {
                             Sheet sheet = new Sheet (path, this);
                             _sheets.set (file_name, sheet);
                             _view.add (sheet);
-                            metadata.sheet_order.append (file_name);
+                            metadata.add_sheet (file_name);
 
                             if (settings.last_file == path) {
                                 sheet.active = true;
@@ -220,9 +262,14 @@ namespace ThiefMD.Widgets {
         }
 
         public void sort_sheets_by_name (bool asc = true) {
-            metadata.sheet_order.sort (GLib.strcmp);
-            if (!asc) {
-                metadata.sheet_order.reverse ();
+            if (asc) {
+                metadata.sheet_order.sort ((a, b) => {
+                    return GLib.strcmp (a, b);
+                });
+            } else {
+                metadata.sheet_order.sort ((a, b) => {
+                    return -1 * GLib.strcmp (a, b);
+                });
             }
 
             foreach (var s in metadata.sheet_order) {
@@ -231,21 +278,44 @@ namespace ThiefMD.Widgets {
                 _view.add (show);
             }
             _view.show ();
-            save_library_order ();
+            save_metadata_file (true);
         }
 
         private void save_library_order () {
+            save_metadata_file ();
+            //  File metadata_file = File.new_for_path (Path.build_filename (_sheets_dir, ".thiefsheets"));
+            //  if (metadata_file.query_exists ())
+            //  {
+            //      warning ("Deleting: %s", metadata_file.get_path ());
+            //      metadata_file.delete();
+            //  }
+            //  File thief_file = File.new_for_path (Path.build_filename (_sheets_dir, ".thiefignore"));
+            //  if (thief_file.query_exists ())
+            //  {
+            //      warning ("Deleting: %s", thief_file.get_path ());
+            //      thief_file.delete();
+            //  }
+        }
+
+        private void save_metadata_file (bool create = false) {
             var settings = AppSettings.get_default ();
-            if (!settings.save_library_order) {
+            File metadata_file = File.new_for_path (Path.build_filename (_sheets_dir, ".thiefsheets"));
+
+            if (!settings.save_library_order && metadata.hidden_folders.size == 0) {
                 return;
             }
-            File metadata_file = File.new_for_path (Path.build_filename (_sheets_dir, ".thiefsheets"));
-            List<weak string> current_order = metadata.sheet_order.copy ();
-            foreach (var file_check in current_order) {
+
+            if (!metadata_file.query_exists () && metadata.hidden_folders.size == 0 && !create) {
+                return;
+            }
+
+            for (int i = 0; i < metadata.sheet_order.size; i++) {
+                string file_check = metadata.sheet_order.get (i);
                 string path = Path.build_filename(_sheets_dir, file_check);
                 File file = File.new_for_path (path);
                 if (!file.query_exists ()) {
-                    metadata.sheet_order.remove (file_check);
+                    metadata.sheet_order.remove_at (i);
+                    i--;
                 }
             }
 
@@ -258,7 +328,7 @@ namespace ThiefMD.Widgets {
                 if (metadata_file.query_exists ()) {
                     metadata_file.delete ();
                 }
-                debug ("Saving to: %s", metadata_file.get_path ());
+                warning ("Saving to: %s", metadata_file.get_path ());
                 FileManager.save_file (metadata_file, generate.to_data (null).data);
             } catch (Error e) {
                 warning ("Could not serialize data: %s", e.message);

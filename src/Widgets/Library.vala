@@ -108,7 +108,7 @@ namespace ThiefMD.Widgets {
                 } catch (Error e) {
                     warning ("Could not make new directory: %s", e.message);
                 }
-                parse_dir (_selected._path, _selected_node);
+                parse_dir (_selected._sheets, _selected._path, _selected_node);
             }
         }
 
@@ -191,26 +191,32 @@ namespace ThiefMD.Widgets {
                     LibPair pair = new LibPair(lib, root);
                     _lib_store.set (root, 0, pair._title, 1, pair, -1);
                     _all_sheets.append (pair);
-                    parse_dir(lib, root);
+
+                    string hiddens = "";
+                    foreach (var h in pair._sheets.metadata.hidden_folders) {
+                        hiddens += h + ", ";
+                    }
+                    if (hiddens != "") {
+                        warning ("Hidden: %s", string.join (", ", hiddens));
+                    }
+
+                    parse_dir(pair._sheets, lib, root);
                 }
             }
 
             return false;
         }
 
-        private void parse_dir (string str_dir, TreeIter iter) {
+        private void parse_dir (Sheets sheet_dir, string str_dir, TreeIter iter) {
             try {
                 // Create child iter
                 TreeIter child;
-
-                string excludeds = FileManager.get_file_contents (Path.build_filename (str_dir, ".thiefignore"));
-                string[] excluded = excludeds.split("\n");
 
                 // Loop through the directory
                 Dir dir = Dir.open (str_dir, 0);
                 string? file_name = null;
                 while ((file_name = dir.read_name()) != null) {
-                    if (!file_name.has_prefix(".") && !(file_name in excluded)) {
+                    if (!file_name.has_prefix(".") && !sheet_dir.metadata.hidden_folders.contains(file_name)) {
                         debug ("Found %s ", file_name);
                         string path = Path.build_filename (str_dir, file_name);
                         if (!has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
@@ -219,7 +225,16 @@ namespace ThiefMD.Widgets {
                             _all_sheets.append (pair);
                             // Append dir to list
                             _lib_store.set (child, 0, pair._title, 1, pair, -1);
-                            parse_dir (path, child);
+
+                            string hiddens = "";
+                            foreach (var h in pair._sheets.metadata.hidden_folders) {
+                                hiddens += h + ", ";
+                            }
+                            if (hiddens != "") {
+                                warning ("Hidden: %s", string.join (", ", hiddens));
+                            }
+
+                            parse_dir (pair._sheets, path, child);
                         }
                     }
                 }
@@ -272,11 +287,14 @@ namespace ThiefMD.Widgets {
                         TreeIter hide_node = _selected_node;
                         if (_selected != null && _all_sheets.find (_selected) != null) {
                             debug ("Hiding %s", _selected._path);
+                            LibPair? parent = get_item (_selected._sheets.get_parent_sheets_path ());
+                            if (parent != null) {
+                                warning ("Hiding: %s", _selected._path);
+                                parent._sheets.add_hidden_item (_selected._path);
+                            }
                             _all_sheets.remove (_selected);
-                            FileManager.add_ignore_folder (_selected._path);
                             _lib_store.remove (ref hide_node);
                             remove_children (_selected._path);
-                            //ThiefApp.get_instance ().refresh_library ();
                         }
                     });
 
@@ -286,9 +304,8 @@ namespace ThiefMD.Widgets {
                 Gtk.MenuItem menu_reveal_items = new Gtk.MenuItem.with_label (_("Show Hidden Items"));
                 menu_reveal_items.activate.connect (() => {
                     if (_selected != null && _all_sheets.find (_selected) != null) {
-                        FileManager.move_to_trash (Path.build_filename (_selected._path, ".thiefignore"));
-                        parse_dir (_selected._path, _selected_node);
-                        // ThiefApp.get_instance ().refresh_library ();
+                        _selected._sheets.remove_hidden_items ();
+                        parse_dir (_selected._sheets, _selected._path, _selected_node);
                     }
                 });
                 menu.add (menu_reveal_items);
@@ -305,7 +322,6 @@ namespace ThiefMD.Widgets {
                             settings.remove_from_library (_selected._path);
                             _lib_store.remove (ref remove_node);
                             remove_children (_selected._path);
-                            //ThiefApp.get_instance ().refresh_library ();
                         }
                     });
                     menu.add (menu_remove_item);

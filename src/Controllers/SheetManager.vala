@@ -56,8 +56,8 @@ namespace ThiefMD.Controllers.SheetManager {
         }
 
         if (_currentSheet != null) {
-            _currentSheet.redraw ();
             _currentSheet.active = false;
+            _currentSheet.redraw ();
         }
 
         loaded_file = FileManager.open_file (sheet.file_path());

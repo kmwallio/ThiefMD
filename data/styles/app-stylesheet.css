@@ -21,6 +21,14 @@ actionbar,
     box-shadow: 0 1px transparent inset;
 }
 
+.thief-drop-above {
+    margin-bottom: 1.5rem;
+}
+
+.thief-drop-below {
+    margin-top: 1.5rem;
+}
+
 .thief-list-sheet {
     background: @windowColor;
     border-bottom: 1px solid @textColorPrimary;
