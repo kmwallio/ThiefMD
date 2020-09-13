@@ -188,7 +188,7 @@ namespace ThiefMD.Widgets {
             Gtk.SelectionData selection_data,
             uint target_type, uint time)
         {
-            warning ("%s: on_drag_data_get for %s", widget.name, _sheet_path);
+            debug ("%s: on_drag_data_get for %s", widget.name, _sheet_path);
 
             switch (target_type) {
                 case Target.STRING:
@@ -198,7 +198,7 @@ namespace ThiefMD.Widgets {
                         (uchar [])_sheet_path.to_utf8());
                 break;
                 default:
-                    warning ("No known action to take.");
+                    debug ("No known action to take.");
                 break;
             }
 
@@ -206,11 +206,11 @@ namespace ThiefMD.Widgets {
         }
 
         private void on_drag_data_delete (Gtk.Widget widget, Gdk.DragContext context) {
-            warning ("%s: on_drag_data_delete for %s", widget.name, _sheet_path);
+            debug ("%s: on_drag_data_delete for %s", widget.name, _sheet_path);
         }
 
         private void on_drag_end (Gtk.Widget widget, Gdk.DragContext context) {
-            warning ("%s: on_drag_end for %s", widget.name, _sheet_path);
+            debug ("%s: on_drag_end for %s", widget.name, _sheet_path);
         }
 
         //
@@ -225,7 +225,7 @@ namespace ThiefMD.Widgets {
             uint time)
         {
             int mid =  get_allocated_height () / 2;
-            warning ("%s: motion (m: %d, %d)", widget.name, mid, y);
+            // warning ("%s: motion (m: %d, %d)", widget.name, mid, y);
             var header_context = this.get_style_context ();
 
             if (y < mid && !header_context.has_class ("thief-drop-below")) {
@@ -246,7 +246,7 @@ namespace ThiefMD.Widgets {
         }
 
         private void on_drag_leave (Widget widget, DragContext context, uint time) {
-            warning ("%s: on_drag_leave", widget.name);
+            debug ("%s: on_drag_leave", widget.name);
             var header_context = this.get_style_context ();
             if (header_context.has_class ("thief-drop-above")) {
                 header_context.remove_class ("thief-drop-above");
@@ -264,7 +264,7 @@ namespace ThiefMD.Widgets {
             int y,
             uint time)
         {
-            warning ("%s: drop (%d, %d)", widget.name, x, y);
+            debug ("%s: drop (%d, %d)", widget.name, x, y);
             var target_type = (Atom) context.list_targets().nth_data (Target.STRING);
 
             // Request the data from the source.
@@ -290,6 +290,10 @@ namespace ThiefMD.Widgets {
             uint time)
         {
             var header_context = this.get_style_context ();
+
+            int mid =  get_allocated_height () / 2;
+            debug ("%s: data (m: %d, %d)", widget.name, mid, y);
+
             if (header_context.has_class ("thief-drop-above")) {
                 header_context.remove_class ("thief-drop-above");
             }
@@ -298,8 +302,6 @@ namespace ThiefMD.Widgets {
                 header_context.remove_class ("thief-drop-below");
             }
 
-            int mid =  get_allocated_height () / 2;
-            warning ("%s: data (%d, %d)", widget.name, x, y);
             string file_to_parse = "";
             File file = dnd_get_file (selection_data, target_type);
             if (!file.query_exists ()) {
@@ -307,6 +309,13 @@ namespace ThiefMD.Widgets {
                 return;
             }
 
+            if (y > mid) {
+                debug ("Move %s after %s", file.get_basename (), file_name ());
+                _parent.move_sheet_after (this.file_name (), file.get_basename ());
+            } else {
+                debug ("Move %s before %s", file.get_basename (), file_name ());
+                _parent.move_sheet_before (this.file_name (), file.get_basename ());
+            }
 
 
             Gtk.drag_finish (context, false, false, time);

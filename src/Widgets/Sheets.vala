@@ -47,7 +47,7 @@ namespace ThiefMD.Widgets {
             hidden_folders = new Gee.LinkedList<string> ();
         }
 
-        public static ThiefSheets new_for_file (string file) {
+        public static ThiefSheets new_for_file (string file) throws Error {
             ThiefSheets t_sheets = new ThiefSheets ();
 
             Json.Parser parser = new Json.Parser ();
@@ -90,6 +90,7 @@ namespace ThiefMD.Widgets {
         private string _sheets_dir;
         private Gee.HashMap<string, Sheet> _sheets;
         private Gtk.Box _view;
+        private bool _reorderable;
         Gtk.Label _empty;
 
         public Sheets (string path) {
@@ -108,6 +109,7 @@ namespace ThiefMD.Widgets {
 
             var header_context = this.get_style_context ();
             header_context.add_class ("thief-sheets");
+            _reorderable = true;
         }
 
         public void add_hidden_item (string directory_path) {
@@ -272,13 +274,57 @@ namespace ThiefMD.Widgets {
                 });
             }
 
+            redraw_sheets ();
+            save_metadata_file (true);
+        }
+
+        private bool clear_order () {
+            _reorderable = true;
+            return false;
+        }
+
+        public void move_sheet_after (string destination, string moved) {
+            if (!_reorderable) {
+                return;
+            }
+            _reorderable = false;
+
+            metadata.sheet_order.remove (moved);
+            int index = metadata.sheet_order.index_of (destination);
+            
+            if (index + 1 < metadata.sheet_order.size) {
+                metadata.sheet_order.insert (index + 1, moved);
+            } else {
+                metadata.sheet_order.add (moved);
+            }
+
+            redraw_sheets ();
+            save_metadata_file (true);
+        }
+
+        public void move_sheet_before (string destination, string moved) {
+            if (!_reorderable) {
+                return;
+            }
+            _reorderable = false;
+
+            metadata.sheet_order.remove (moved);
+            int index = metadata.sheet_order.index_of (destination);
+
+            metadata.sheet_order.insert (index, moved);
+
+            redraw_sheets ();
+            save_metadata_file (true);
+        }
+
+        public void redraw_sheets () {
             foreach (var s in metadata.sheet_order) {
                 Sheet show = _sheets.get (s);
                 _view.remove (show);
                 _view.add (show);
             }
             _view.show ();
-            save_metadata_file (true);
+            Timeout.add (300, clear_order);
         }
 
         private void save_library_order () {
@@ -328,7 +374,7 @@ namespace ThiefMD.Widgets {
                 if (metadata_file.query_exists ()) {
                     metadata_file.delete ();
                 }
-                warning ("Saving to: %s", metadata_file.get_path ());
+                debug ("Saving to: %s", metadata_file.get_path ());
                 FileManager.save_file (metadata_file, generate.to_data (null).data);
             } catch (Error e) {
                 warning ("Could not serialize data: %s", e.message);

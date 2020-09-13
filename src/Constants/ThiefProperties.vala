@@ -55,6 +55,15 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             box-shadow: 0 1px transparent inset;
         }
 
+
+        .thief-drop-above {
+            margin-bottom: 1.5rem;
+        }
+
+        .thief-drop-below {
+            margin-top: 1.5rem;
+        }
+
         .thief-sheets {
             border-right: 1px solid alpha(@textColorGlobal, 0.2);
         }
