@@ -24,11 +24,17 @@ namespace ThiefMD.Widgets {
     public class ThiefSheetsSerializable : Object {
         public string[] sheet_order { get; set; }
         public string[] hidden_folders { get; set; }
+        public string[] folder_order { get; set; }
 
         public ThiefSheetsSerializable (ThiefSheets sheets) {
             sheet_order = new string[sheets.sheet_order.size];
             for(int i = 0; i < sheets.sheet_order.size; i++) {
                 sheet_order[i] = sheets.sheet_order.get (i);
+            }
+
+            folder_order = new string[sheets.folder_order.size];
+            for(int i = 0; i < sheets.folder_order.size; i++) {
+                folder_order[i] = sheets.folder_order.get (i);
             }
 
             hidden_folders = new string[sheets.hidden_folders.size];
@@ -40,10 +46,12 @@ namespace ThiefMD.Widgets {
 
     public class ThiefSheets : Object {
         public Gee.List<string> sheet_order;
+        public Gee.List<string> folder_order;
         public Gee.LinkedList<string> hidden_folders;
 
         public ThiefSheets () {
             sheet_order = new Gee.ArrayList<string> ();
+            folder_order = new Gee.ArrayList<string> ();
             hidden_folders = new Gee.LinkedList<string> ();
         }
 
@@ -59,6 +67,10 @@ namespace ThiefMD.Widgets {
                     t_sheets.add_sheet(s);
                 }
 
+                foreach (var s in thief_sheets.folder_order) {
+                    t_sheets.add_folder (s);
+                }
+
                 foreach (var s in thief_sheets.hidden_folders) {
                     t_sheets.add_hidden_folder (s);
                 }
@@ -70,6 +82,12 @@ namespace ThiefMD.Widgets {
         public void add_sheet (string sheet_name) {
             if (!sheet_order.contains (sheet_name)) {
                 sheet_order.add (sheet_name);
+            }
+        }
+
+        public void add_folder (string folder) {
+            if (!folder_order.contains (folder)) {
+                folder_order.add (folder);
             }
         }
 
@@ -165,6 +183,22 @@ namespace ThiefMD.Widgets {
             return false;
         }
 
+        public void refresh () {
+            var keys = _sheets.keys;
+            foreach (var file_check in metadata.sheet_order) {
+                string path = Path.build_filename(_sheets_dir, file_check);
+                File file = File.new_for_path (path);
+                if (!file.query_exists ()) {
+                    Sheet bad_sheet = null;
+                    _sheets.unset (file_check, out bad_sheet);
+                    if (bad_sheet != null) {
+                        _view.remove (bad_sheet);
+                    }
+                }
+            }
+            reload_sheets ();
+        }
+
         public void load_sheets () {
             var settings = AppSettings.get_default ();
             if (_empty != null) {
@@ -175,7 +209,10 @@ namespace ThiefMD.Widgets {
                 foreach (var sheet in _sheets) {
                     _view.remove (sheet.value);
                 }
-                _sheets.unset_all (_sheets);
+                foreach (var file_check in metadata.sheet_order) {
+                    Sheet rem_sheet;
+                    _sheets.unset (file_check, out rem_sheet);
+                }
                 _sheets = null;
             }
 
@@ -281,6 +318,39 @@ namespace ThiefMD.Widgets {
         private bool clear_order () {
             _reorderable = true;
             return false;
+        }
+
+        public void move_folder_after (string destination, string moved) {
+            if (!_reorderable) {
+                return;
+            }
+            _reorderable = false;
+
+            metadata.folder_order.remove (moved);
+            int index = metadata.folder_order.index_of (destination);
+
+            if (index + 1 < metadata.folder_order.size) {
+                metadata.folder_order.insert (index + 1, moved);
+            } else {
+                metadata.folder_order.add (moved);
+            }
+
+            redraw_sheets ();
+            save_metadata_file (true);
+        }
+
+        public void move_folder_before (string destination, string moved) {
+            if (!_reorderable) {
+                return;
+            }
+            _reorderable = false;
+
+            metadata.folder_order.remove (moved);
+            int index = metadata.folder_order.index_of (destination);
+            metadata.folder_order.insert (index, moved);
+
+            redraw_sheets ();
+            save_metadata_file (true);
         }
 
         public void move_sheet_after (string destination, string moved) {

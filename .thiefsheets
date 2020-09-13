@@ -14,5 +14,7 @@
     "flatpak",
     "src",
     "meson"
+  ],
+  "folder-order" : [
   ]
 }

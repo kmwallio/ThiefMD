@@ -9,5 +9,7 @@
     "_layouts",
     "changeblog",
     "images"
+  ],
+  "folder-order" : [
   ]
 }

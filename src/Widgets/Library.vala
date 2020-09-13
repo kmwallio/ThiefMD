@@ -70,12 +70,15 @@ namespace ThiefMD.Widgets {
             get_selection ().changed.connect (on_selection);
             folder_popup = new NewFolder ();
 
-            // Drag and Drop Support
+            // Drop Support
             enable_model_drag_dest (target_list, DragAction.MOVE);
             this.drag_motion.connect(this.on_drag_motion);
             this.drag_leave.connect(this.on_drag_leave);
             this.drag_drop.connect(this.on_drag_drop);
             this.drag_data_received.connect(this.on_drag_data_received);
+            
+            // Drap support
+            enable_model_drag_source (ModifierType.BUTTON1_MASK, target_list, DragAction.MOVE);
         }
 
         public void set_active () {
@@ -156,7 +159,7 @@ namespace ThiefMD.Widgets {
         public void refresh_sheets (string path) {
             foreach (LibPair pair in _all_sheets) {
                 if (pair._sheets.get_sheets_path () == path) {
-                    pair._sheets.load_sheets ();
+                    pair._sheets.refresh ();
                 }
             }
         }
@@ -273,7 +276,6 @@ namespace ThiefMD.Widgets {
                             debug ("Hiding %s", _selected._path);
                             LibPair? parent = get_item (_selected._sheets.get_parent_sheets_path ());
                             if (parent != null) {
-                                warning ("Hiding: %s", _selected._path);
                                 parent._sheets.add_hidden_item (_selected._path);
                             }
                             _all_sheets.remove (_selected);
@@ -365,7 +367,7 @@ namespace ThiefMD.Widgets {
             int y,
             uint time)
         {
-            debug ("%s: on_drag_drop", widget.name);
+            warning ("%s: on_drag_drop", widget.name);
 
             TreePath? path;
             TreeViewDropPosition pos;
@@ -376,12 +378,12 @@ namespace ThiefMD.Widgets {
             {
                 var target_type = (Atom) context.list_targets().nth_data (Target.STRING);
 
-                debug ("Requested STRING, got: %s", target_type.name());
+                warning ("Requested STRING, got: %s", target_type.name());
 
                 if (!target_type.name ().ascii_up ().contains ("STRING"))
                 {
                     target_type = (Atom) context.list_targets().nth_data (Target.URI);
-                    debug ("Requested URI, got: %s", target_type.name());
+                    warning ("Requested URI, got: %s", target_type.name());
                 }
 
                 // Request the data from the source.
@@ -398,6 +400,35 @@ namespace ThiefMD.Widgets {
             return is_valid_drop_site;
         }
 
+        private void move_folder (LibPair source, LibPair dest, TreeViewDropPosition pos) {
+            if (source == null || dest == null) {
+                warning ("Could not determine drag source or destination");
+                return;
+            }
+
+            File p1 = File.new_for_path (source._path);
+            File p2 = File.new_for_path (dest._path);
+
+            if (p1.get_parent ().get_path () != p2.get_parent ().get_path ()) {
+                warning ("Can only reorder library items for items at the same level");
+                return;
+            }
+
+            LibPair parent = get_item (p1.get_parent ().get_path ());
+            if (parent == null) {
+                warning ("Could not find parent metadata file");
+                return;
+            }
+
+            if (pos == TreeViewDropPosition.AFTER || pos == TreeViewDropPosition.INTO_OR_AFTER) {
+                warning ("Moving %s after %s", source._path, dest._path);
+                // parent._sheets.move_folder_after (p2.get_basename (), p1.get_basename ());
+            } else {
+                warning ("Moving %s before %s", source._path, dest._path);
+                // parent._sheets.move_folder_before (p2.get_basename (), p1.get_basename ());
+            }
+        }
+
         private void on_drag_data_received (
             Widget widget,
             DragContext context,
@@ -407,7 +438,7 @@ namespace ThiefMD.Widgets {
             uint target_type,
             uint time)
         {
-            debug ("%s: on_drag_data_received", widget.name);
+            warning ("%s: on_drag_data_received", widget.name);
 
             bool dnd_success = false;
             bool delete_selection_data = false;
@@ -416,14 +447,19 @@ namespace ThiefMD.Widgets {
             File? file = null;
             TreePath? path;
             TreeViewDropPosition pos;
+            TreeIter iter;
             LibPair? p = null;
 
             if (get_dest_row_at_pos (x, y, out path, out pos)){
-                TreeIter iter;
                 string title;
                 _lib_store.get_iter (out iter, path);
                 _lib_store.get (iter, 0, out title, 1, out p);
-                debug ("Got location %s", p._path);
+                warning ("Got location %s", p._path);
+                if (selection_data == null || selection_data.get_length () < 0) {
+                    move_folder (_selected, p, pos);
+                    Gtk.drag_finish (context, false, false, time);
+                    return;
+                }
             }
 
             // Deal with what we are given from source
@@ -434,50 +470,13 @@ namespace ThiefMD.Widgets {
                     delete_selection_data = true;
                 }
 
-                // Check that we got the format we can use
-                switch (target_type)
+                file = dnd_get_file (selection_data, target_type);
+                file_to_move = file.get_path ();
+                item_in_library = file_in_library (file_to_move);
+
+                if (item_in_library && delete_selection_data && !FileUtils.test(file_to_move, FileTest.IS_DIR))
                 {
-                    case Target.URI:
-                        file_to_move = (string) selection_data.get_data();
-                    break;
-                    case Target.STRING:
-                        file_to_move = (string) selection_data.get_data();
-                    break;
-                    default:
-                        dnd_success = false;
-                        warning ("Invalid data type");
-                    break;
-                }
-
-                debug ("Got %s", file_to_move);
-
-                if (file_to_move != "")
-                {
-                    if (file_to_move.has_prefix ("file"))
-                    {
-                        debug ("Removing file prefix for %s", file_to_move.chomp ());
-                        file = File.new_for_uri (file_to_move.chomp ());
-                        string? check_path = file.get_path ();
-                        if ((check_path == null) || (check_path.chomp () == ""))
-                        {
-                            debug ("No local path");
-                            item_in_library = true;
-                            delete_selection_data = false;
-                        }
-                        else
-                        {
-                            file_to_move = check_path.chomp ();
-                            debug ("Result path: %s", file_to_move);
-                        }
-                    }
-
-                    file = File.new_for_path (file_to_move);
-                    item_in_library = file_in_library (file_to_move);
-
-                    if (item_in_library && delete_selection_data && !FileUtils.test(file_to_move, FileTest.IS_DIR))
-                    {
-                        dnd_success = true;
-                    }
+                    dnd_success = true;
                 }
             }
 
@@ -556,7 +555,7 @@ namespace ThiefMD.Widgets {
             {
                 try
                 {
-                    debug ("Moving %s to %s", file_to_move, p._path);
+                    warning ("Moving %s to %s", file_to_move, p._path);
                     FileManager.move_item (file_to_move, p._path);
                     refresh_sheets (p._path);
                     File? parent = file.get_parent ();
