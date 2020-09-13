@@ -192,14 +192,6 @@ namespace ThiefMD.Widgets {
                     _lib_store.set (root, 0, pair._title, 1, pair, -1);
                     _all_sheets.append (pair);
 
-                    string hiddens = "";
-                    foreach (var h in pair._sheets.metadata.hidden_folders) {
-                        hiddens += h + ", ";
-                    }
-                    if (hiddens != "") {
-                        warning ("Hidden: %s", string.join (", ", hiddens));
-                    }
-
                     parse_dir(pair._sheets, lib, root);
                 }
             }
@@ -225,14 +217,6 @@ namespace ThiefMD.Widgets {
                             _all_sheets.append (pair);
                             // Append dir to list
                             _lib_store.set (child, 0, pair._title, 1, pair, -1);
-
-                            string hiddens = "";
-                            foreach (var h in pair._sheets.metadata.hidden_folders) {
-                                hiddens += h + ", ";
-                            }
-                            if (hiddens != "") {
-                                warning ("Hidden: %s", string.join (", ", hiddens));
-                            }
 
                             parse_dir (pair._sheets, path, child);
                         }
