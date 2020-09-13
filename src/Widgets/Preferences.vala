@@ -114,12 +114,22 @@ namespace ThiefMD.Widgets {
             ui_colorscheme_switch.tooltip_text = _("Toggle UI Matching");
             var ui_colorscheme_label = new Label(_("Match UI to Editor Theme"));
 
+            var perserve_library_switch = new Switch ();
+            perserve_library_switch.set_active (settings.save_library_order);
+            perserve_library_switch.notify["active"].connect (() => {
+                settings.save_library_order = perserve_library_switch.get_active ();
+            });
+            perserve_library_switch.tooltip_text = _("Toggle Save Library Order");
+            var perserve_library_label = new Label(_("Preserve Library Order"));
+
             grid.attach (spellcheck_switch, 1, 0, 1, 1);
             grid.attach (spellcheck_label, 2, 0, 2, 1);
             grid.attach (typewriter_switch, 1, 1, 1, 1);
             grid.attach (typewriter_label, 2, 1, 2, 1);
             grid.attach (ui_colorscheme_switch, 1, 2, 1, 1);
             grid.attach (ui_colorscheme_label, 2, 2, 2, 1);
+            grid.attach (perserve_library_switch, 1, 3, 1, 1);
+            grid.attach (perserve_library_label, 2, 3, 2, 1);
             grid.show_all ();
 
             return grid;

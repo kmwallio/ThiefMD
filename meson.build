@@ -91,6 +91,7 @@ executable(
         dependency('gtkspell3-3.0'),
         dependency('webkit2gtk-4.0'),
         dependency('clutter-1.0'),
+        dependency('json-glib-1.0'),
         gxml_dep,
         ultheme_dep,
         libmarkdown

@@ -350,18 +350,6 @@ namespace ThiefMD.Widgets {
             int y,
             uint time)
         {
-            /*TreePath? path;
-            TreeViewDropPosition pos;
-            if (get_dest_row_at_pos (x, y, out path, out pos)){
-                TreeIter iter;
-                string title;
-                LibPair p;
-                set_drag_dest_row (path, pos);
-                create_row_drag_icon (path);
-                _lib_store.get_iter (out iter, path);
-                _lib_store.get (iter, 0, out title, 1, out p);
-                debug ("Got location %s", p._path);
-            }*/
             return false;
         }
 

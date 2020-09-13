@@ -100,6 +100,10 @@
             <default>false</default>
             <summary>Whether ThiefMD should be fullscreen or not</summary>
         </key>
+        <key name="save-library-order" type="b">
+            <default>false</default>
+            <summary> Persist Library Order between launches</summary>
+        </key>
         <key name="spacing" type="i">
             <default>4</default>
             <summary>The spacing on the Editor View's lines</summary>

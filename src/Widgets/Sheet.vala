@@ -99,6 +99,10 @@ namespace ThiefMD.Widgets {
             return _sheet_path;
         }
 
+        public string file_name () {
+            return _sheet_path.substring (_sheet_path.last_index_of (Path.DIR_SEPARATOR_S) + 1);
+        }
+
         public void redraw () {
             Preview.update_view ();
             string file_contents = FileManager.get_file_lines_yaml (_sheet_path, Constants.SHEET_PREVIEW_LINES);
@@ -120,6 +124,20 @@ namespace ThiefMD.Widgets {
             if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3) {
                 Gtk.Menu menu = new Gtk.Menu ();
                 menu.attach_to_widget (this, null);
+
+                Gtk.MenuItem sort_sheets_by_name = new Gtk.MenuItem.with_label ((_("Sort Sheets by Filename Ascending")));
+                menu.add (sort_sheets_by_name);
+                sort_sheets_by_name.activate.connect (() => {
+                    _parent.sort_sheets_by_name ();
+                });
+
+                Gtk.MenuItem sort_sheets_by_name_desc = new Gtk.MenuItem.with_label ((_("Sort Sheets by Filename Descending")));
+                menu.add (sort_sheets_by_name_desc);
+                sort_sheets_by_name_desc.activate.connect (() => {
+                    _parent.sort_sheets_by_name (false);
+                });
+
+                menu.add (new Gtk.SeparatorMenuItem ());
 
                 Gtk.MenuItem menu_preview_sheet = new Gtk.MenuItem.with_label ((_("Preview")));
                 menu.add (menu_preview_sheet);
