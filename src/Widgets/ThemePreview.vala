@@ -21,7 +21,7 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class ThemePreview : Gtk.Button {
+    public class ThemePreview : Gtk.ToggleButton {
         private Ultheme.Parser theme;
         private Gtk.SourceView view;
         private Gtk.SourceBuffer buffer;
@@ -29,6 +29,7 @@ namespace ThiefMD.Widgets {
         private Ultheme.HexColorPalette palette;
 
         public ThemePreview (Ultheme.Parser parser, bool is_dark) {
+            var settings = AppSettings.get_default ();
             theme = parser;
             am_dark = is_dark;
 
@@ -71,7 +72,23 @@ namespace ThiefMD.Widgets {
                 switch_to_this_scheme ();
             });
 
+            settings.changed.connect (() => {
+                set_preview_state ();
+            });
+
+            set_preview_state ();
             show_all ();
+        }
+
+        private void set_preview_state () {
+            var settings = AppSettings.get_default ();
+            if (settings.theme_id == theme.get_dark_theme_id () && am_dark) {
+                active = true;
+            } else if (settings.theme_id == theme.get_light_theme_id () && !am_dark) {
+                active = true;
+            } else {
+                active = false;
+            }
         }
 
         private void switch_to_this_scheme () {
