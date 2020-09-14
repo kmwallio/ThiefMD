@@ -95,6 +95,7 @@ namespace ThiefMD.Widgets {
             pagebreak_folder_switch.tooltip_text = _("Page Break between Folders");
             var pagebreak_folder_label = new Label(_("Insert a Page Break after each folder"));
             pagebreak_folder_label.xalign = 0;
+            pagebreak_folder_label.hexpand = true;
 
             var pagebreak_sheet_switch = new Switch ();
             pagebreak_sheet_switch.set_active (settings.export_break_sheets);
@@ -103,6 +104,8 @@ namespace ThiefMD.Widgets {
             });
             pagebreak_sheet_switch.tooltip_text = _("Page Break between Sheets");
             var pagebreak_sheet_label = new Label(_("Insert a Page Break after each sheet"));
+            pagebreak_sheet_label.xalign = 0;
+            pagebreak_sheet_label.hexpand = true;
 
             var pdf_include_urls_switch = new Switch ();
             pdf_include_urls_switch.set_active (settings.export_include_urls);
@@ -111,6 +114,8 @@ namespace ThiefMD.Widgets {
             });
             pdf_include_urls_switch.tooltip_text = _("Include URLs in PDF");
             var pdf_include_urls_label = new Label(_("Insert URLs into resulting PDF"));
+            pdf_include_urls_label.xalign = 0;
+            pdf_include_urls_label.hexpand = true;
 
             var page_setup_label = new Gtk.Label (_("<b>Page Setup</b>"));
             page_setup_label.hexpand = true;
@@ -128,6 +133,8 @@ namespace ThiefMD.Widgets {
                 }
             });
             var side_margin_label = new Label(_("Side margins in PDF in inches"));
+            side_margin_label.xalign = 0;
+            side_margin_label.hexpand = true;
 
             var top_bottom_margin_entry = new Gtk.SpinButton.with_range (0.0, 3.5, 0.05);
             top_bottom_margin_entry.set_value (settings.export_top_bottom_margins);
@@ -140,6 +147,8 @@ namespace ThiefMD.Widgets {
                 }
             });
             var top_bottom_margin_label = new Label(_("Top & Bottom margins in PDF in inches"));
+            top_bottom_margin_label.xalign = 0;
+            top_bottom_margin_label.hexpand = true;
 
             grid.attach (pagebreak_folder_switch, 1, 0, 1, 1);
             grid.attach (pagebreak_folder_label, 2, 0, 2, 1);
