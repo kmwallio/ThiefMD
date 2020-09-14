@@ -42,6 +42,17 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.0.7" date="2020-09-13" urgency="low">
+      <description>
+        <p>Organize your writing and maybe share that great novel you've been working on.</p>
+        <ul>
+          <li>Sheets can now be reordered.</li>
+          <li>Items in the Library can now be Reordered.</li>
+          <li>You can now right-click on a folder in the Library and export it.</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.7-orderlyfashion</url>
+    </release>
     <release version="0.0.6" date="2020-09-08" urgency="low">
       <description>
         <p>Dark Mode, Light Mode, and anywhere in between. ThiefMD can now import your favorite themes.</p>

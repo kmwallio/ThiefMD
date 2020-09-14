@@ -166,6 +166,10 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sun Sep 13 2020 kmwallio <mwallio@gmail.com> - 0.0.7
+- Library Reordering
+- Sheets Reordering
+- Library Export
 * Wed Sep 09 2020 kmwallio <mwallio@gmail.com> - 0.0.6
 - Adding theme support
 - Improve UI for About and Preferences
