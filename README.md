@@ -25,10 +25,6 @@ ThiefMD is a [Markdown](https://en.wikipedia.org/wiki/Markdown) editor that help
 
 [Ulysses Themes](https://styles.ulysses.app/themes) can be imported into the library. Displayed are [Tomorrow Dark](https://styles.ulysses.app/themes/tomorrow-qyp), Default ThiefMD Theme, [Dracula](https://styles.ulysses.app/themes/dracula-ZwJ), and [WWDC16](https://styles.ulysses.app/themes/wwdc16-04B).
 
-![](docs/images/library_remove.gif)
-
-Basic library management.
-
 ![](docs/images/drag_n_drop_sheets.gif)
 
 Drag and Drop organizing of the library.
@@ -36,6 +32,10 @@ Drag and Drop organizing of the library.
 ![](docs/images/preview.png)
 
 Live Preview
+
+![](docs/images/typewriter_scrolling.gif)
+
+Typewriter Scrolling.
 
 ## Dependencies
 

@@ -11,4 +11,4 @@ title: Tips and Tricks
 ## [Jekyll](https://jekyllrb.com/)
 
 * [Blogging with Jekyll](/tips/jekyll)
-
+* [ThiefMD for Novel Writing](/tips/novel-writing)

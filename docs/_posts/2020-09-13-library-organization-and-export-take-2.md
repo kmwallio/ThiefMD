@@ -2,6 +2,7 @@
 layout: post
 title: Library Organization and Export Take 2
 date: 2020-09-13 18:37
+categories: [release, new features]
 ---
 
 Library Organization and Export. More blogging improvements, and more.

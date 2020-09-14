@@ -23,3 +23,10 @@ The theme in the screenshots is [Vimix Gtk](https://github.com/vinceliuice/vimix
 2. `cd vimix-gtk-themes`
 3. If using the system install of the gnome runtime
   `sudo ./install.sh -a -d /var/lib/flatpak/runtime/org.gnome.Platform/x86_64/3.36/active/files/share/themes`
+
+## Submitting a Release
+
+1. Determine the release file hash using `sha256sum com.github.kmwallio.thiefmd-X.Y.Z.tar.xz`
+2. Make sure the tar.xz is uploaded as part of the GitHub release
+3. ???
+4. Profit

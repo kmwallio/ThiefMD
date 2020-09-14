@@ -21,7 +21,7 @@ This will create a new markdown file for you to write in.
 
 ### YAML Frontmatter
 
-![](/docs/images/thief_frontmatter.png)
+![](/images/thief_frontmatter.png)
 
 Each post begins with some YAML markup telling Jekyll the title, publish time, categories, and layout. Simply right-click and `Insert YAML Frontmatter`, and ThiefMD will generate the front matter for you based on the current file.  ThiefMD will only provide the minimum needed frontmatter.
 
@@ -38,6 +38,16 @@ Using a time in the future will prevent Jekyll from writing that post to the out
 If you're worried about accidentally publishing something, you can create posts in a `_drafts` folder instead.  Once you're ready to publish, simply drag and drop the post from `_drafts` to `_posts`, then commit your changes.
 
 ![](/images/drag_n_drop_sheets.gif)
+
+## Too Many ***_posts***?
+
+<img src="/images/thief_sort.png" style="width: 50%; float: left" /> Sort your sheets by Filename.
+
+By default, sheets are created at the bottom of the Sheets view.  Sorting by Filename ascending will have your **newer** posts at the bottom of the screen.
+
+Sorting by descending will have newer posts at the top, but any new post will be located at the bottom.  Just re-run the sort, and your post will be right where you want it.
+
+<div style="clear: both;"></div>
 
 ### Committing
 
