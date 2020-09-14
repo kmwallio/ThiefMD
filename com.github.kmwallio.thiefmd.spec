@@ -5,7 +5,8 @@ Summary: The markdown editor worth stealing.
 License: GPL-3.0+
 URL: https://thiefmd.com
 
-Source0: com.github.kmwallio.thiefmd-0.0.6.tar.xz
+Source0: com.github.kmwallio.thiefmd-0.0.7.tar.xz
+Source1: data/%{name}.appdata.xml
 
 BuildRequires: meson
 BuildRequires: vala
@@ -158,6 +159,31 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 /usr/share/vala/vapi/gxml-0.20.deps
 /usr/share/vala/vapi/gxml-0.20.vapi
 /usr/share/vala/vapi/ultheme.vapi
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/css.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/def.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/dtd.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/dtl.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/html.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/javascript-expressions.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/javascript-functions-classes.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/javascript-literals.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/javascript-modules.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/javascript-statements.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/javascript-values.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/javascript.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/jsdoc.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/json.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/language-specs.its
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/language-specs.pot
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/language.dtd
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/language.rng
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/language2.rng
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/latex.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/markdown.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/rst.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/xml.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/xslt.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/yaml.lang
 
 %files devel
 %{_libdir}/libgxml-0.20.so
