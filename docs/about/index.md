@@ -20,6 +20,7 @@ Great software is built on the shoulders of giants.
 * Markdown Rendering by [Discount](http://www.pell.portland.or.us/~orc/Code/discount)
 * Syntax Highlighting by [highlight.js](https://highlightjs.org)
 * Math Rendering by [Katex](https://katex.org)
+* Screenshots use [Vimix GTK Themes](https://github.com/vinceliuice/vimix-gtk-themes) and [Vimix Icon Theme](https://github.com/vinceliuice/vimix-icon-theme)
 
 ## Goals
 
@@ -34,11 +35,14 @@ Great software is built on the shoulders of giants.
     * Moving sheets between folders
     * Ordering of sheets
 * Light/Dark/User Themes
+* Export sheets or folders
+* Compilation and preview of multiple sheets while maintaining order
 
 ### Later on Markdown Support
 
-* Compilation and preview of multiple sheets while maintaining order
-* Export sheets or folders
+* Load multiple sheets into Editor View
+* Keep undo history tied to sheets
+* Additional export and preview themes
 
 ### I don't really want it but...
 
