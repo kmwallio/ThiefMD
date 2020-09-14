@@ -1,9 +1,9 @@
 {
   "sheet-order" : [
-    "flatpak-packaging.md",
     "README.md",
+    "DEB-Packaging.md",
     "RPM-Packaging.md",
-    "DEB-Packaging.md"
+    "flatpak-packaging.md"
   ],
   "hidden-folders" : [
     "subprojects",
@@ -16,5 +16,6 @@
     "meson"
   ],
   "folder-order" : [
+    "docs"
   ]
 }
