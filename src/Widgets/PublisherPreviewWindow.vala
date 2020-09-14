@@ -65,6 +65,10 @@ namespace ThiefMD.Widgets {
                         var page_setup = new Gtk.PageSetup();
                         print_settings[Gtk.PRINT_SETTINGS_OUTPUT_URI] = new_novel.get_uri ();
                         page_setup.set_paper_size_and_default_margins(page_size);
+                        page_setup.set_left_margin (settings.export_side_margins, Gtk.Unit.INCH);
+                        page_setup.set_right_margin (settings.export_side_margins, Gtk.Unit.INCH);
+                        page_setup.set_top_margin (settings.export_top_bottom_margins, Gtk.Unit.INCH);
+                        page_setup.set_bottom_margin (settings.export_top_bottom_margins, Gtk.Unit.INCH);
                         print_operation.set_print_settings (print_settings);
                         print_operation.set_page_setup (page_setup);
                         print_operation.print ();

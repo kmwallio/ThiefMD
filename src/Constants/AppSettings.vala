@@ -79,6 +79,8 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public bool export_break_folders { get; set; }
         public bool export_break_sheets { get; set; }
         public bool export_include_urls { get; set; }
+        public double export_side_margins { get; set; }
+        public double export_top_bottom_margins { get; set; }
 
         public string get_valid_theme_id () {
             UI.UserSchemes ().force_rescan ();
