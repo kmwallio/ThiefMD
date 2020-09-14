@@ -1,0 +1,15 @@
+{
+  "sheet-order" : [
+    "Preview.md",
+    "index.md"
+  ],
+  "hidden-folders" : [
+    "_site",
+    "_includes",
+    "_layouts",
+    "changeblog",
+    "images"
+  ],
+  "folder-order" : [
+  ]
+}

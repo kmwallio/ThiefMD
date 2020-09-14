@@ -58,6 +58,7 @@ namespace ThiefMD.Widgets {
         private TreeStore _lib_store;
         private LibPair _selected;
         private TreeIter _selected_node;
+        private PreventDelayedDrop _droppable;
         NewFolder folder_popup;
 
         public Library () {
@@ -69,13 +70,17 @@ namespace ThiefMD.Widgets {
             insert_column_with_attributes (-1, "Library", new CellRendererText (), "text", 0, null);
             get_selection ().changed.connect (on_selection);
             folder_popup = new NewFolder ();
+            _droppable = new PreventDelayedDrop ();
 
-            // Drag and Drop Support
+            // Drop Support
             enable_model_drag_dest (target_list, DragAction.MOVE);
             this.drag_motion.connect(this.on_drag_motion);
             this.drag_leave.connect(this.on_drag_leave);
             this.drag_drop.connect(this.on_drag_drop);
             this.drag_data_received.connect(this.on_drag_data_received);
+            
+            // Drap support
+            enable_model_drag_source (ModifierType.BUTTON1_MASK, target_list, DragAction.MOVE);
         }
 
         public void set_active () {
@@ -108,7 +113,7 @@ namespace ThiefMD.Widgets {
                 } catch (Error e) {
                     warning ("Could not make new directory: %s", e.message);
                 }
-                parse_dir (_selected._path, _selected_node);
+                parse_dir (_selected._sheets, _selected._path, _selected_node);
             }
         }
 
@@ -156,7 +161,7 @@ namespace ThiefMD.Widgets {
         public void refresh_sheets (string path) {
             foreach (LibPair pair in _all_sheets) {
                 if (pair._sheets.get_sheets_path () == path) {
-                    pair._sheets.load_sheets ();
+                    pair._sheets.refresh ();
                 }
             }
         }
@@ -191,26 +196,41 @@ namespace ThiefMD.Widgets {
                     LibPair pair = new LibPair(lib, root);
                     _lib_store.set (root, 0, pair._title, 1, pair, -1);
                     _all_sheets.append (pair);
-                    parse_dir(lib, root);
+
+                    parse_dir(pair._sheets, lib, root);
                 }
             }
 
             return false;
         }
 
-        private void parse_dir (string str_dir, TreeIter iter) {
+        private void parse_dir (Sheets sheet_dir, string str_dir, TreeIter iter) {
             try {
                 // Create child iter
                 TreeIter child;
 
-                string excludeds = FileManager.get_file_contents (Path.build_filename (str_dir, ".thiefignore"));
-                string[] excluded = excludeds.split("\n");
+                // Load ordered folders
+                foreach (var file_name in sheet_dir.metadata.folder_order) {
+                    if (!file_name.has_prefix(".") && !sheet_dir.metadata.hidden_folders.contains(file_name)) {
+                        debug ("Loading from thiefsheets %s ", file_name);
+                        string path = Path.build_filename (str_dir, file_name);
+                        if (!has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
+                            _lib_store.append (out child, iter);
+                            LibPair pair = new LibPair(path, child);
+                            _all_sheets.append (pair);
+                            // Append dir to list
+                            _lib_store.set (child, 0, pair._title, 1, pair, -1);
+
+                            parse_dir (pair._sheets, path, child);
+                        }
+                    }
+                }
 
                 // Loop through the directory
                 Dir dir = Dir.open (str_dir, 0);
                 string? file_name = null;
                 while ((file_name = dir.read_name()) != null) {
-                    if (!file_name.has_prefix(".") && !(file_name in excluded)) {
+                    if (!file_name.has_prefix(".") && !sheet_dir.metadata.hidden_folders.contains(file_name)) {
                         debug ("Found %s ", file_name);
                         string path = Path.build_filename (str_dir, file_name);
                         if (!has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
@@ -219,7 +239,9 @@ namespace ThiefMD.Widgets {
                             _all_sheets.append (pair);
                             // Append dir to list
                             _lib_store.set (child, 0, pair._title, 1, pair, -1);
-                            parse_dir (path, child);
+                            sheet_dir.metadata.add_folder (file_name);
+
+                            parse_dir (pair._sheets, path, child);
                         }
                     }
                 }
@@ -239,6 +261,42 @@ namespace ThiefMD.Widgets {
             return false;
         }
 
+        private string build_novel (LibPair p) {
+            StringBuilder markdown = new StringBuilder ();
+            var settings = AppSettings.get_default ();
+
+            foreach (var file in p._sheets.metadata.sheet_order) {
+                string sheet_markdown = FileManager.get_file_contents (Path.build_filename (p._path, file));
+                sheet_markdown = FileManager.get_yamlless_markdown(sheet_markdown, 0, true, true, false);
+                markdown.append (sheet_markdown);
+
+                if (settings.export_break_sheets) {
+                    markdown.append ("\n<div style='page-break-before: always'></div>\n");
+                } else {
+                    markdown.append ("\n\n");
+                }
+            }
+
+            foreach (var folder in p._sheets.metadata.folder_order) {
+                if (!p._sheets.metadata.hidden_folders.contains (folder)) {
+                    if (markdown.len != 0) {
+                        if (settings.export_break_folders) {
+                            markdown.append ("\n<div style='page-break-before: always'></div>\n");
+                        } else {
+                            markdown.append ("\n\n");
+                        }
+                    }
+                    string path = Path.build_filename (p._path, folder);
+                    if (FileUtils.test (path, FileTest.IS_DIR) && !FileUtils.test (path, FileTest.IS_SYMLINK)) {
+                        LibPair? child = get_item (path);
+                        markdown.append (build_novel (child));
+                    }
+                }
+            }
+
+            return markdown.str;
+        }
+
         //
         // Mouse Click Actions
         //
@@ -249,6 +307,18 @@ namespace ThiefMD.Widgets {
             if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3) {
                 var settings = AppSettings.get_default ();
                 Gtk.Menu menu = new Gtk.Menu ();
+
+                Gtk.MenuItem menu_preview_item = new Gtk.MenuItem.with_label (_("Export Preview"));
+                menu_preview_item.activate.connect (() => {
+                    if (_selected != null && _all_sheets.find (_selected) != null) {
+                        string preview_markdown = build_novel (_selected);
+                        PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown);
+                        ppw.show_all ();
+                    }
+                });
+                menu.add (menu_preview_item);
+
+                menu.add (new Gtk.SeparatorMenuItem ());
 
                 Gtk.MenuItem menu_add_item = new Gtk.MenuItem.with_label (_("Create Sub-Folder"));
                 menu_add_item.activate.connect (() => {
@@ -272,11 +342,13 @@ namespace ThiefMD.Widgets {
                         TreeIter hide_node = _selected_node;
                         if (_selected != null && _all_sheets.find (_selected) != null) {
                             debug ("Hiding %s", _selected._path);
+                            LibPair? parent = get_item (_selected._sheets.get_parent_sheets_path ());
+                            if (parent != null) {
+                                parent._sheets.add_hidden_item (_selected._path);
+                            }
                             _all_sheets.remove (_selected);
-                            FileManager.add_ignore_folder (_selected._path);
                             _lib_store.remove (ref hide_node);
                             remove_children (_selected._path);
-                            //ThiefApp.get_instance ().refresh_library ();
                         }
                     });
 
@@ -286,9 +358,8 @@ namespace ThiefMD.Widgets {
                 Gtk.MenuItem menu_reveal_items = new Gtk.MenuItem.with_label (_("Show Hidden Items"));
                 menu_reveal_items.activate.connect (() => {
                     if (_selected != null && _all_sheets.find (_selected) != null) {
-                        FileManager.move_to_trash (Path.build_filename (_selected._path, ".thiefignore"));
-                        parse_dir (_selected._path, _selected_node);
-                        // ThiefApp.get_instance ().refresh_library ();
+                        _selected._sheets.remove_hidden_items ();
+                        parse_dir (_selected._sheets, _selected._path, _selected_node);
                     }
                 });
                 menu.add (menu_reveal_items);
@@ -305,7 +376,6 @@ namespace ThiefMD.Widgets {
                             settings.remove_from_library (_selected._path);
                             _lib_store.remove (ref remove_node);
                             remove_children (_selected._path);
-                            //ThiefApp.get_instance ().refresh_library ();
                         }
                     });
                     menu.add (menu_remove_item);
@@ -350,18 +420,6 @@ namespace ThiefMD.Widgets {
             int y,
             uint time)
         {
-            /*TreePath? path;
-            TreeViewDropPosition pos;
-            if (get_dest_row_at_pos (x, y, out path, out pos)){
-                TreeIter iter;
-                string title;
-                LibPair p;
-                set_drag_dest_row (path, pos);
-                create_row_drag_icon (path);
-                _lib_store.get_iter (out iter, path);
-                _lib_store.get (iter, 0, out title, 1, out p);
-                debug ("Got location %s", p._path);
-            }*/
             return false;
         }
 
@@ -410,6 +468,43 @@ namespace ThiefMD.Widgets {
             return is_valid_drop_site;
         }
 
+        private void move_folder (
+            ref TreeIter source_iter,
+            ref TreeIter dest_iter,
+            LibPair source,
+            LibPair dest,
+            TreeViewDropPosition pos)
+        {
+            if (source == null || dest == null) {
+                warning ("Could not determine drag source or destination");
+                return;
+            }
+
+            File p1 = File.new_for_path (source._path);
+            File p2 = File.new_for_path (dest._path);
+
+            if (p1.get_parent ().get_path () != p2.get_parent ().get_path ()) {
+                warning ("Can only reorder library items for items at the same level");
+                return;
+            }
+
+            LibPair parent = get_item (p1.get_parent ().get_path ());
+            if (parent == null) {
+                warning ("Could not find parent metadata file");
+                return;
+            }
+
+            if (pos == TreeViewDropPosition.AFTER || pos == TreeViewDropPosition.INTO_OR_AFTER) {
+                debug ("Moving %s after %s", source._path, dest._path);
+                parent._sheets.move_folder_after (p2.get_basename (), p1.get_basename ());
+                _lib_store.move_after (ref source_iter, dest_iter);
+            } else {
+                debug ("Moving %s before %s", source._path, dest._path);
+                parent._sheets.move_folder_before (p2.get_basename (), p1.get_basename ());
+                _lib_store.move_before (ref source_iter, dest_iter);
+            }
+        }
+
         private void on_drag_data_received (
             Widget widget,
             DragContext context,
@@ -420,6 +515,10 @@ namespace ThiefMD.Widgets {
             uint time)
         {
             debug ("%s: on_drag_data_received", widget.name);
+            if (!_droppable.can_get_drop ()) {
+                Gtk.drag_finish (context, false, false, time);
+                return;
+            }
 
             bool dnd_success = false;
             bool delete_selection_data = false;
@@ -428,14 +527,19 @@ namespace ThiefMD.Widgets {
             File? file = null;
             TreePath? path;
             TreeViewDropPosition pos;
+            TreeIter dest_iter;
             LibPair? p = null;
 
             if (get_dest_row_at_pos (x, y, out path, out pos)){
-                TreeIter iter;
                 string title;
-                _lib_store.get_iter (out iter, path);
-                _lib_store.get (iter, 0, out title, 1, out p);
+                _lib_store.get_iter (out dest_iter, path);
+                _lib_store.get (dest_iter, 0, out title, 1, out p);
                 debug ("Got location %s", p._path);
+                if (selection_data == null || selection_data.get_length () < 0) {
+                    move_folder (ref _selected_node, ref dest_iter, _selected, p, pos);
+                    Gtk.drag_finish (context, false, false, time);
+                    return;
+                }
             }
 
             // Deal with what we are given from source
@@ -446,50 +550,13 @@ namespace ThiefMD.Widgets {
                     delete_selection_data = true;
                 }
 
-                // Check that we got the format we can use
-                switch (target_type)
+                file = dnd_get_file (selection_data, target_type);
+                file_to_move = file.get_path ();
+                item_in_library = file_in_library (file_to_move);
+
+                if (item_in_library && delete_selection_data && !FileUtils.test(file_to_move, FileTest.IS_DIR))
                 {
-                    case Target.URI:
-                        file_to_move = (string) selection_data.get_data();
-                    break;
-                    case Target.STRING:
-                        file_to_move = (string) selection_data.get_data();
-                    break;
-                    default:
-                        dnd_success = false;
-                        warning ("Invalid data type");
-                    break;
-                }
-
-                debug ("Got %s", file_to_move);
-
-                if (file_to_move != "")
-                {
-                    if (file_to_move.has_prefix ("file"))
-                    {
-                        debug ("Removing file prefix for %s", file_to_move.chomp ());
-                        file = File.new_for_uri (file_to_move.chomp ());
-                        string? check_path = file.get_path ();
-                        if ((check_path == null) || (check_path.chomp () == ""))
-                        {
-                            debug ("No local path");
-                            item_in_library = true;
-                            delete_selection_data = false;
-                        }
-                        else
-                        {
-                            file_to_move = check_path.chomp ();
-                            debug ("Result path: %s", file_to_move);
-                        }
-                    }
-
-                    file = File.new_for_path (file_to_move);
-                    item_in_library = file_in_library (file_to_move);
-
-                    if (item_in_library && delete_selection_data && !FileUtils.test(file_to_move, FileTest.IS_DIR))
-                    {
-                        dnd_success = true;
-                    }
+                    dnd_success = true;
                 }
             }
 

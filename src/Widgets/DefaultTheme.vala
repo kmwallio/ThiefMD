@@ -21,11 +21,12 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class DefaultTheme : Gtk.Button {
+    public class DefaultTheme : Gtk.ToggleButton {
         private Gtk.SourceView view;
         private Gtk.SourceBuffer buffer;
 
         public DefaultTheme () {
+            var settings = AppSettings.get_default ();
             margin = 0;
             view = new Gtk.SourceView ();
             view.margin = 0;
@@ -42,12 +43,27 @@ namespace ThiefMD.Widgets {
             buffer.set_style_scheme (style);
 
             clicked.connect (() => {
-                var settings = AppSettings.get_default ();
+                var settings2 = AppSettings.get_default ();
                 ThiefApp.get_instance ().edit_view_content.set_scheme ("thiefmd");
                 settings.theme_id = "thiefmd";
             });
 
+            settings.changed.connect (() => {
+                set_preview_state ();
+            });
+
+            set_preview_state ();
+
             show_all ();
+        }
+
+        private void set_preview_state () {
+            var settings = AppSettings.get_default ();
+            if (settings.theme_id == "thiefmd") {
+                active = true;
+            } else {
+                active = false;
+            }
         }
     }
 }

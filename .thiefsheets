@@ -1,0 +1,20 @@
+{
+  "sheet-order" : [
+    "flatpak-packaging.md",
+    "README.md",
+    "RPM-Packaging.md",
+    "DEB-Packaging.md"
+  ],
+  "hidden-folders" : [
+    "subprojects",
+    "data",
+    "debian",
+    "build",
+    "vapi",
+    "flatpak",
+    "src",
+    "meson"
+  ],
+  "folder-order" : [
+  ]
+}

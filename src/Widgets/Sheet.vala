@@ -19,6 +19,8 @@
 
 using ThiefMD;
 using ThiefMD.Controllers;
+using Gtk;
+using Gdk;
 
 namespace ThiefMD.Widgets {
     /**
@@ -85,6 +87,18 @@ namespace ThiefMD.Widgets {
             this.drag_data_delete.connect(on_drag_data_delete);
             this.drag_end.connect(on_drag_end);
 
+            // Add ability to be dropped on
+            Gtk.drag_dest_set (
+                this,                          // widget will be drag-able
+                DestDefaults.ALL,              // modifier that will start a drag
+                target_list,                   // lists of target to support
+                Gdk.DragAction.MOVE            // what to do with data after dropped
+            );
+            this.drag_motion.connect(this.on_drag_motion);
+            this.drag_leave.connect(this.on_drag_leave);
+            this.drag_drop.connect(this.on_drag_drop);
+            this.drag_data_received.connect(this.on_drag_data_received);
+
             // Load minimark if file has content
             redraw ();
             show_all ();
@@ -97,6 +111,10 @@ namespace ThiefMD.Widgets {
 
         public string file_path () {
             return _sheet_path;
+        }
+
+        public string file_name () {
+            return _sheet_path.substring (_sheet_path.last_index_of (Path.DIR_SEPARATOR_S) + 1);
         }
 
         public void redraw () {
@@ -121,12 +139,26 @@ namespace ThiefMD.Widgets {
                 Gtk.Menu menu = new Gtk.Menu ();
                 menu.attach_to_widget (this, null);
 
+                Gtk.MenuItem sort_sheets_by_name = new Gtk.MenuItem.with_label ((_("Sort Sheets by Filename Ascending")));
+                menu.add (sort_sheets_by_name);
+                sort_sheets_by_name.activate.connect (() => {
+                    _parent.sort_sheets_by_name ();
+                });
+
+                Gtk.MenuItem sort_sheets_by_name_desc = new Gtk.MenuItem.with_label ((_("Sort Sheets by Filename Descending")));
+                menu.add (sort_sheets_by_name_desc);
+                sort_sheets_by_name_desc.activate.connect (() => {
+                    _parent.sort_sheets_by_name (false);
+                });
+
+                menu.add (new Gtk.SeparatorMenuItem ());
+
                 Gtk.MenuItem menu_preview_sheet = new Gtk.MenuItem.with_label ((_("Preview")));
                 menu.add (menu_preview_sheet);
                 menu_preview_sheet.activate.connect (() => {
                     SheetManager.load_sheet (this);
-                    PreviewWindow pvw = new PreviewWindow();
-                    pvw.run(null);
+                    PreviewWindow pvw = PreviewWindow.get_instance ();
+                    pvw.show_all ();
                 });
 
                 menu.add (new Gtk.SeparatorMenuItem ());
@@ -145,18 +177,18 @@ namespace ThiefMD.Widgets {
         }
 
         //
-        // Drag and Drop Support
+        // Drag Support
         //
 
         private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
-            warning ("%s: on_drag_begin", widget.name);
+            debug ("%s: on_drag_begin", widget.name);
         }
 
         private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context,
             Gtk.SelectionData selection_data,
             uint target_type, uint time)
         {
-            warning ("%s: on_drag_data_get for %s", widget.name, _sheet_path);
+            debug ("%s: on_drag_data_get for %s", widget.name, _sheet_path);
 
             switch (target_type) {
                 case Target.STRING:
@@ -166,7 +198,7 @@ namespace ThiefMD.Widgets {
                         (uchar [])_sheet_path.to_utf8());
                 break;
                 default:
-                    warning ("No known action to take.");
+                    debug ("No known action to take.");
                 break;
             }
 
@@ -174,11 +206,118 @@ namespace ThiefMD.Widgets {
         }
 
         private void on_drag_data_delete (Gtk.Widget widget, Gdk.DragContext context) {
-            warning ("%s: on_drag_data_delete for %s", widget.name, _sheet_path);
+            debug ("%s: on_drag_data_delete for %s", widget.name, _sheet_path);
         }
 
         private void on_drag_end (Gtk.Widget widget, Gdk.DragContext context) {
-            warning ("%s: on_drag_end for %s", widget.name, _sheet_path);
+            debug ("%s: on_drag_end for %s", widget.name, _sheet_path);
+        }
+
+        //
+        // Drop support
+        //
+
+        private bool on_drag_motion (
+            Widget widget,
+            DragContext context,
+            int x,
+            int y,
+            uint time)
+        {
+            int mid =  get_allocated_height () / 2;
+            // warning ("%s: motion (m: %d, %d)", widget.name, mid, y);
+            var header_context = this.get_style_context ();
+
+            if (y < mid && !header_context.has_class ("thief-drop-below")) {
+                if (header_context.has_class ("thief-drop-above")) {
+                    header_context.remove_class ("thief-drop-above");
+                }
+                header_context.add_class ("thief-drop-below");
+            }
+
+            if (y > mid && !header_context.has_class ("thief-drop-above")) {
+                if (header_context.has_class ("thief-drop-below")) {
+                    header_context.remove_class ("thief-drop-below");
+                }
+                header_context.add_class ("thief-drop-above");
+            }
+
+            return false;
+        }
+
+        private void on_drag_leave (Widget widget, DragContext context, uint time) {
+            debug ("%s: on_drag_leave", widget.name);
+            var header_context = this.get_style_context ();
+            if (header_context.has_class ("thief-drop-above")) {
+                header_context.remove_class ("thief-drop-above");
+            }
+
+            if (header_context.has_class ("thief-drop-below")) {
+                header_context.remove_class ("thief-drop-below");
+            }
+        }
+
+        private bool on_drag_drop (
+            Widget widget,
+            DragContext context,
+            int x,
+            int y,
+            uint time)
+        {
+            debug ("%s: drop (%d, %d)", widget.name, x, y);
+            var target_type = (Atom) context.list_targets().nth_data (Target.STRING);
+
+            // Request the data from the source.
+            Gtk.drag_get_data (
+                widget,         // will receive 'drag_data_received' signal
+                context,        // represents the current state of the DnD
+                target_type,    // the target type we want
+                time            // time stamp
+                );
+
+            bool is_valid_drop_site = target_type.name ().ascii_up ().contains ("STRING");
+
+            return is_valid_drop_site;
+        }
+
+        private void on_drag_data_received (
+            Widget widget,
+            DragContext context,
+            int x,
+            int y,
+            SelectionData selection_data,
+            uint target_type,
+            uint time)
+        {
+            var header_context = this.get_style_context ();
+
+            int mid =  get_allocated_height () / 2;
+            debug ("%s: data (m: %d, %d)", widget.name, mid, y);
+
+            if (header_context.has_class ("thief-drop-above")) {
+                header_context.remove_class ("thief-drop-above");
+            }
+
+            if (header_context.has_class ("thief-drop-below")) {
+                header_context.remove_class ("thief-drop-below");
+            }
+
+            string file_to_parse = "";
+            File file = dnd_get_file (selection_data, target_type);
+            if (!file.query_exists ()) {
+                Gtk.drag_finish (context, false, false, time);
+                return;
+            }
+
+            if (y > mid) {
+                _parent.move_sheet_after (this.file_name (), file.get_basename ());
+            } else {
+                _parent.move_sheet_before (this.file_name (), file.get_basename ());
+            }
+
+
+            Gtk.drag_finish (context, false, false, time);
+            return;
         }
     }
 }

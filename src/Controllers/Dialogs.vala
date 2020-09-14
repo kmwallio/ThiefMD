@@ -32,8 +32,37 @@ namespace ThiefMD.Controllers.Dialogs {
             chooser.add_button ("_Add to Library", Gtk.ResponseType.ACCEPT);
         }
 
+        chooser.action = action;
 
-        if (action != Gtk.FileChooserAction.SELECT_FOLDER) {
+        if (action == Gtk.FileChooserAction.SAVE) {
+            var pdf = new Gtk.FileFilter ();
+            pdf.set_filter_name (_("PDF file"));
+            pdf.add_mime_type ("application/pdf");
+            pdf.add_pattern ("*.pdf");
+            chooser.add_filter (pdf);
+
+            var markdown_filter = new Gtk.FileFilter ();
+            markdown_filter.set_filter_name (_("Markdown files"));
+            markdown_filter.add_mime_type ("text/markdown");
+            markdown_filter.add_pattern ("*.md");
+            markdown_filter.add_pattern ("*.markdown");
+            chooser.add_filter (markdown_filter);
+
+            var html_filter = new Gtk.FileFilter ();
+            html_filter.set_filter_name (_("HTML files"));
+            html_filter.add_mime_type ("text/html");
+            html_filter.add_pattern ("*.html");
+            html_filter.add_pattern ("*.htm");
+            chooser.add_filter (html_filter);
+
+            var mhtml_filter = new Gtk.FileFilter ();
+            mhtml_filter.set_filter_name (_("MHTML files"));
+            mhtml_filter.add_mime_type ("application/x-mimearchive");
+            mhtml_filter.add_pattern ("*.mhtml");
+            mhtml_filter.add_pattern ("*.mht");
+            chooser.add_filter (mhtml_filter);
+
+        } else if (action != Gtk.FileChooserAction.SELECT_FOLDER) {
             var filter1 = new Gtk.FileFilter ();
             filter1.set_filter_name (_("Markdown files"));
             filter1.add_pattern ("*.md");

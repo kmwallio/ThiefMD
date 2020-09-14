@@ -71,6 +71,7 @@ executable(
     'src/Widgets/Preferences.vala',
     'src/Widgets/Preview.vala',
     'src/Widgets/PreviewWindow.vala',
+    'src/Widgets/PublisherPreviewWindow.vala',
     'src/Widgets/KeyBindings.vala',
     'src/Widgets/QuickPreferences.vala',
     'src/Widgets/ThemeSelector.vala',
@@ -91,6 +92,7 @@ executable(
         dependency('gtkspell3-3.0'),
         dependency('webkit2gtk-4.0'),
         dependency('clutter-1.0'),
+        dependency('json-glib-1.0'),
         gxml_dep,
         ultheme_dep,
         libmarkdown

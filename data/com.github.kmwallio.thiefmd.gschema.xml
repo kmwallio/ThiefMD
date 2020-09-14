@@ -100,6 +100,10 @@
             <default>false</default>
             <summary>Whether ThiefMD should be fullscreen or not</summary>
         </key>
+        <key name="save-library-order" type="b">
+            <default>false</default>
+            <summary>Persist Library Order between launches</summary>
+        </key>
         <key name="spacing" type="i">
             <default>4</default>
             <summary>The spacing on the Editor View's lines</summary>
@@ -107,6 +111,18 @@
         <key name="margins" type="i">
             <default>20</default>
             <summary>The margins for the Editor View</summary>
+        </key>
+        <key name="export-break-folders" type="b">
+            <default>false</default>
+            <summary>Insert Page Breaks in PDF Between Folders</summary>
+        </key>
+        <key name="export-break-sheets" type="b">
+            <default>false</default>
+            <summary>Insert Page Breaks in PDF Between every Sheet</summary>
+        </key>
+        <key name="export-include-urls" type="b">
+            <default>false</default>
+            <summary>Insert URLs next to Links in PDFs</summary>
         </key>
     </schema>
 </schemalist>

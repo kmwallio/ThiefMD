@@ -22,10 +22,13 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class PreviewWindow : Gtk.Application {
+    public class PreviewWindow : Gtk.Window {
         private static PreviewWindow? instance = null;
         Preview preview;
-        public Gtk.ApplicationWindow window;
+
+        public PreviewWindow () {
+            build_ui ();
+        }
 
         public static void update_preview_title ()
         {
@@ -34,46 +37,46 @@ namespace ThiefMD.Widgets {
             {
                 if (settings.show_filename && settings.last_file != "") {
                     string file_name = settings.last_file.substring(settings.last_file.last_index_of("/") + 1);
-                    instance.window.title = "Preview: " + file_name;
+                    instance.title = "Preview: " + file_name;
                 } else {
-                    instance.window.title = "Preview";
+                    instance.title = "Preview";
                 }
             }
         }
 
         public static PreviewWindow get_instance () {
+            if (instance == null) {
+                instance = new PreviewWindow ();
+            }
             return instance;
         }
 
-        protected override void activate () {
-            window = new Gtk.ApplicationWindow (this);
+        protected void build_ui () {
             var settings = AppSettings.get_default ();
             int w, h, m, p;
 
             if (settings.show_filename && settings.last_file != "") {
                 string file_name = settings.last_file.substring(settings.last_file.last_index_of("/") + 1);
-                window.title = "Preview: " + file_name;
+                title = "Preview: " + file_name;
             } else {
-                window.title = "Preview";
+                title = "Preview";
             }
 
-
+            transient_for = ThiefApp.get_instance ().main_window;
+            destroy_with_parent = true;
             ThiefApp.get_instance ().main_window.get_size (out w, out h);
-
             w = w - ThiefApp.get_instance ().pane_position;
+            set_default_size(w, h - 150);
 
-            window.set_default_size(w, h - 150);
+            add (Preview.get_instance ());
 
-            window.add (Preview.get_instance ());
-            window.show_all ();
-
-            window.delete_event.connect (this.on_delete_event);
+            delete_event.connect (this.on_delete_event);
             instance = this;
         }
 
         public bool on_delete_event () {
-            window.remove (Preview.get_instance ());
-            window.show_all ();
+            remove (Preview.get_instance ());
+            show_all ();
             instance = null;
 
             return false;

@@ -55,6 +55,15 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             box-shadow: 0 1px transparent inset;
         }
 
+
+        .thief-drop-above {
+            margin-bottom: 1.5rem;
+        }
+
+        .thief-drop-below {
+            margin-top: 1.5rem;
+        }
+
         .thief-sheets {
             border-right: 1px solid alpha(@textColorGlobal, 0.2);
         }
@@ -78,12 +87,18 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             background: lighter(@colorPrimary);
             color: @textColorPrimary;
         }
-        
-        window {
-            background: @colorPrimary;
+
+        filechooser {
+            background: @windowColor;
+            color: @textColorGlobal;
         }
         
-        treeview {
+        filechooser actionbar, filechooser, filechooser stack, placessidebar, window {
+            background: darker(@colorPrimary);
+            color: @textColorPrimary;
+        }
+        
+        placessidebar, treeview {
             background: lighter(@colorPrimaryActive);
             color: @textColorGlobal;
         }
@@ -93,9 +108,69 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             color: @textColorGlobal;
         }
         
-        treeview.view:selected {
+        placessidebar *:selected, treeview.view:selected {
             background: @colorPrimary;
             color: @textColorGlobal;
         }""";
+
+        public const string PRINT_CSS = """@media print {
+            *,
+            *:before,
+            *:after {
+              background: transparent !important;
+              color: #000 !important;
+              box-shadow: none !important;
+              text-shadow: none !important;
+            }
+          
+            a,
+            a:visited {
+              text-decoration: underline;
+            }
+          
+            a[href]:after {
+              %s
+            }
+          
+            abbr[title]:after {
+              content: " (" attr(title) ")";
+            }
+          
+            a[href^="#"]:after,
+            a[href^="javascript:"]:after {
+              content: "";
+            }
+          
+            pre,
+            blockquote {
+              border: 1px solid #999;
+              page-break-inside: avoid;
+            }
+          
+            thead {
+              display: table-header-group;
+            }
+          
+            tr,
+            img {
+              page-break-inside: avoid;
+            }
+          
+            img {
+              max-width: 100% !important;
+            }
+          
+            p,
+            h2,
+            h3 {
+              orphans: 3;
+              widows: 3;
+            }
+          
+            h2,
+            h3 {
+              page-break-after: avoid;
+            }
+          }""";
     }
 }
