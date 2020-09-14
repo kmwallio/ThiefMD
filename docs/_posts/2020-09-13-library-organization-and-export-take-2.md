@@ -16,5 +16,6 @@ This release packs a lot into it.
 * Themes can now style the entire application. Get immersed in your writing and lose track of the editor.
 * Re-order your sheets and library items. Sort by file name, or drag and drop. It's up to you.
 * Export from the Library. Right-click on an Item, to view the combined document, then export. You want to write the next great novel? We want to help you get there.
+  ![](/images/export.png)
 * Export settings in the Preferences. It's just a `Ctrl + ,` away.
 * Improved theme parsing. There's still a few quirks, but most themes now look better.
