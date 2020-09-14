@@ -60,8 +60,8 @@ namespace ThiefMD.Widgets {
             preview_button.has_tooltip = true;
             preview_button.tooltip_text = _("Launch Preview");
             preview_button.clicked.connect (() => {
-                PreviewWindow pvw = new PreviewWindow();
-                pvw.run(null);
+                PreviewWindow pvw = PreviewWindow.get_instance ();
+                pvw.show_all ();
             });
 
             var preferences_button = new Gtk.ModelButton ();

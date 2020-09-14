@@ -58,8 +58,8 @@ namespace ThiefMD.Widgets {
                 // Preview
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
                     if (match_keycode (Gdk.Key.p, keycode)) {
-                        PreviewWindow pvw = new PreviewWindow();
-                        pvw.run(null);
+                        PreviewWindow pvw = PreviewWindow.get_instance ();
+                        pvw.show_all ();
                     }
                 }
 

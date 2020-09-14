@@ -108,7 +108,7 @@ namespace ThiefMD.Widgets {
         private string _sheets_dir;
         private Gee.HashMap<string, Sheet> _sheets;
         private Gtk.Box _view;
-        private bool _reorderable;
+        private PreventDelayedDrop _reorderable;
         Gtk.Label _empty;
 
         public Sheets (string path) {
@@ -127,7 +127,7 @@ namespace ThiefMD.Widgets {
 
             var header_context = this.get_style_context ();
             header_context.add_class ("thief-sheets");
-            _reorderable = true;
+            _reorderable = new PreventDelayedDrop ();
         }
 
         public void add_hidden_item (string directory_path) {
@@ -315,16 +315,10 @@ namespace ThiefMD.Widgets {
             save_metadata_file (true);
         }
 
-        private bool clear_order () {
-            _reorderable = true;
-            return false;
-        }
-
         public void move_folder_after (string destination, string moved) {
-            if (!_reorderable) {
+            if (!_reorderable.can_get_drop ()) {
                 return;
             }
-            _reorderable = false;
 
             metadata.folder_order.remove (moved);
             int index = metadata.folder_order.index_of (destination);
@@ -335,29 +329,27 @@ namespace ThiefMD.Widgets {
                 metadata.folder_order.add (moved);
             }
 
-            redraw_sheets ();
             save_metadata_file (true);
         }
 
         public void move_folder_before (string destination, string moved) {
-            if (!_reorderable) {
+            if (!_reorderable.can_get_drop ()) {
                 return;
             }
-            _reorderable = false;
 
             metadata.folder_order.remove (moved);
             int index = metadata.folder_order.index_of (destination);
             metadata.folder_order.insert (index, moved);
 
-            redraw_sheets ();
             save_metadata_file (true);
         }
 
         public void move_sheet_after (string destination, string moved) {
-            if (!_reorderable) {
+            if (!_reorderable.can_get_drop ()) {
                 return;
             }
-            _reorderable = false;
+
+            debug ("Moving %s after %s", moved, destination);
 
             metadata.sheet_order.remove (moved);
             int index = metadata.sheet_order.index_of (destination);
@@ -373,10 +365,11 @@ namespace ThiefMD.Widgets {
         }
 
         public void move_sheet_before (string destination, string moved) {
-            if (!_reorderable) {
+            if (!_reorderable.can_get_drop ()) {
                 return;
             }
-            _reorderable = false;
+
+            debug ("Moving %s before %s", moved, destination);
 
             metadata.sheet_order.remove (moved);
             int index = metadata.sheet_order.index_of (destination);
@@ -394,7 +387,6 @@ namespace ThiefMD.Widgets {
                 _view.add (show);
             }
             _view.show ();
-            Timeout.add (300, clear_order);
         }
 
         private void save_library_order () {

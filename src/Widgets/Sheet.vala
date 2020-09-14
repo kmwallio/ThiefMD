@@ -157,8 +157,8 @@ namespace ThiefMD.Widgets {
                 menu.add (menu_preview_sheet);
                 menu_preview_sheet.activate.connect (() => {
                     SheetManager.load_sheet (this);
-                    PreviewWindow pvw = new PreviewWindow();
-                    pvw.run(null);
+                    PreviewWindow pvw = PreviewWindow.get_instance ();
+                    pvw.show_all ();
                 });
 
                 menu.add (new Gtk.SeparatorMenuItem ());
@@ -310,10 +310,8 @@ namespace ThiefMD.Widgets {
             }
 
             if (y > mid) {
-                debug ("Move %s after %s", file.get_basename (), file_name ());
                 _parent.move_sheet_after (this.file_name (), file.get_basename ());
             } else {
-                debug ("Move %s before %s", file.get_basename (), file_name ());
                 _parent.move_sheet_before (this.file_name (), file.get_basename ());
             }
 

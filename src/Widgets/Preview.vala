@@ -42,7 +42,11 @@ namespace ThiefMD.Widgets {
 
             update_html_view ();
             var settings = AppSettings.get_default ();
-            settings.changed.connect (update_html_view);
+            settings.changed.connect (() => {
+                if (this == instance) {
+                    update_html_view ();
+                }
+            });
             connect_signals ();
         }
 
@@ -80,17 +84,21 @@ namespace ThiefMD.Widgets {
                 style += Build.PKGDATADIR + "/styles/katex.min.css";
                 style += "' />\n";
 
-                // If typewriter scrolling is enabled, add padding to match editor
-            bool typewriter_active = settings.typewriter_scrolling;
-            if (typewriter_active) {
-                style = style + """<style>
-                .markdown-body{padding-top:40%;padding-bottom:40%}
-                </style>""";
+            // If typewriter scrolling is enabled, add padding to match editor
+
+            style += "<style>\n";
+            if (settings.typewriter_scrolling) {
+                style = style + ".markdown-body{padding-top:40%;padding-bottom:40%}\n";
             } else {
-                style = style + """<style>
-                .markdown-body{padding-bottom:10%}
-                </style>""";
+                style = style + ".markdown-body{padding-bottom:10%}\n";
             }
+
+            if (!settings.export_include_urls) {
+                style = style + ThiefProperties.PRINT_CSS.printf ("""content: "";""");
+            } else {
+                style = style + ThiefProperties.PRINT_CSS.printf ("""content: " (" attr(href) ")";""");
+            }
+            style += "\n</style>\n";
 
             return style;
         }
@@ -189,8 +197,13 @@ namespace ThiefMD.Widgets {
             }
         }
 
-        private string process () {
-            string text = Widgets.Editor.scroll_text; // buffer.text;
+        private string process (string markdown = "") {
+            string text;
+            if (markdown == "") {
+                text = Widgets.Editor.scroll_text; // buffer.text;
+            } else {
+                text = markdown;
+            }
             string processed_mk;
 
             Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
@@ -249,21 +262,25 @@ namespace ThiefMD.Widgets {
             return result;
         }
 
-        private string get_javascript () {
+        private string get_javascript (bool use_thief_mark) {
             var settings = AppSettings.get_default ();
-            string script;
+            string script = "";
 
             // If typewriter scrolling is enabled, add padding to match editor
             bool typewriter_active = settings.typewriter_scrolling;
 
             // Find our ThiefMark and move it to the same position of the cursor
-            script = """<script>
-            const element = document.getElementById('thiefmark');
-            const textOnTop = element.offsetTop;
-            const middle = textOnTop - (window.innerHeight * %f);
-            window.scrollTo(0, middle);
-            </script>
-            <script>
+            if (use_thief_mark) {
+                script = """<script>
+                const element = document.getElementById('thiefmark');
+                const textOnTop = element.offsetTop;
+                const middle = textOnTop - (window.innerHeight * %f);
+                window.scrollTo(0, middle);
+                </script>""".printf((typewriter_active) ? Constants.TYPEWRITER_POSITION : Editor.cursor_position);
+            }
+
+            // Default preview javascript
+            script += """<script>
             renderMathInElement(document.body,
                 {
                     delimeters: [
@@ -274,7 +291,7 @@ namespace ThiefMD.Widgets {
                     ]
                 });
             </script>
-            <script>hljs.initHighlightingOnLoad();</script>""".printf((typewriter_active) ? Constants.TYPEWRITER_POSITION : Editor.cursor_position);
+            <script>hljs.initHighlightingOnLoad();</script>""";
 
             return script;
         }
@@ -296,10 +313,10 @@ namespace ThiefMD.Widgets {
             return script;
         }
 
-        public void update_html_view () {
+        public void update_html_view (bool use_thief_mark = true, string markdown = "") {
             string stylesheet = set_stylesheet ();
-            string markdown = process ();
-            string script = get_javascript ();
+            string markdown_res = process (markdown);
+            string script = get_javascript (use_thief_mark);
             string headerscript = get_javascript_header ();
             html = """
             <!doctype html>
@@ -315,13 +332,17 @@ namespace ThiefMD.Widgets {
                     </div>
                     %s
                 </body>
-            </html>""".printf(stylesheet, headerscript, markdown, script);
-            adjust_thief_mark ();
+            </html>""".printf(stylesheet, headerscript, markdown_res, script);
+            adjust_thief_mark (use_thief_mark);
             this.load_html (html, "file:///");
         }
 
-        private void adjust_thief_mark () {
-            html = html.replace (ThiefProperties.THIEF_MARK_CONST, ThiefProperties.THIEF_MARK);
+        private void adjust_thief_mark (bool use_thief_mark) {
+            if (use_thief_mark) {
+                html = html.replace (ThiefProperties.THIEF_MARK_CONST, ThiefProperties.THIEF_MARK);
+            } else {
+                html = html.replace (ThiefProperties.THIEF_MARK_CONST, "");
+            }
         }
     }
 }

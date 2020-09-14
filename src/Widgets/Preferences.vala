@@ -41,6 +41,7 @@ namespace ThiefMD.Widgets {
 
             stack = new Stack ();
             stack.add_titled (editor_grid (), "Editor Preferences", _("Editor"));
+            stack.add_titled (export_grid (), "Export Preferences", _("Export"));
             stack.add_titled (display_grid (), "Display Preferences", _("Display"));
 
             StackSwitcher switcher = new StackSwitcher ();
@@ -72,6 +73,51 @@ namespace ThiefMD.Widgets {
 
             ThemeSelector theme_selector = new ThemeSelector ();
             grid.add (theme_selector);
+            grid.show_all ();
+
+            return grid;
+        }
+
+        private Grid export_grid () {
+            var settings = AppSettings.get_default ();
+            Grid grid = new Grid ();
+            grid.margin = 12;
+            grid.row_spacing = 12;
+            grid.column_spacing = 12;
+            grid.orientation = Orientation.VERTICAL;
+            grid.hexpand = true;
+
+            var pagebreak_folder_switch = new Switch ();
+            pagebreak_folder_switch.set_active (settings.export_break_folders);
+            pagebreak_folder_switch.notify["active"].connect (() => {
+                settings.export_break_folders = pagebreak_folder_switch.get_active ();
+            });
+            pagebreak_folder_switch.tooltip_text = _("Page Break between Folders");
+            var pagebreak_folder_label = new Label(_("Insert a Page Break after each folder"));
+            pagebreak_folder_label.xalign = 0;
+
+            var pagebreak_sheet_switch = new Switch ();
+            pagebreak_sheet_switch.set_active (settings.export_break_sheets);
+            pagebreak_sheet_switch.notify["active"].connect (() => {
+                settings.export_break_sheets = pagebreak_sheet_switch.get_active ();
+            });
+            pagebreak_sheet_switch.tooltip_text = _("Page Break between Sheets");
+            var pagebreak_sheet_label = new Label(_("Insert a Page Break after each sheet"));
+
+            var pdf_include_urls_switch = new Switch ();
+            pdf_include_urls_switch.set_active (settings.export_include_urls);
+            pdf_include_urls_switch.notify["active"].connect (() => {
+                settings.export_include_urls = pdf_include_urls_switch.get_active ();
+            });
+            pdf_include_urls_switch.tooltip_text = _("Include URLs in PDF");
+            var pdf_include_urls_label = new Label(_("Insert URLs into resulting PDF"));
+
+            grid.attach (pagebreak_folder_switch, 1, 0, 1, 1);
+            grid.attach (pagebreak_folder_label, 2, 0, 2, 1);
+            grid.attach (pagebreak_sheet_switch, 1, 1, 1, 1);
+            grid.attach (pagebreak_sheet_label, 2, 1, 2, 1);
+            grid.attach (pdf_include_urls_switch, 1, 2, 1, 1);
+            grid.attach (pdf_include_urls_label, 2, 2, 2, 1);
             grid.show_all ();
 
             return grid;

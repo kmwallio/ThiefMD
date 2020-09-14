@@ -71,6 +71,7 @@ executable(
     'src/Widgets/Preferences.vala',
     'src/Widgets/Preview.vala',
     'src/Widgets/PreviewWindow.vala',
+    'src/Widgets/PublisherPreviewWindow.vala',
     'src/Widgets/KeyBindings.vala',
     'src/Widgets/QuickPreferences.vala',
     'src/Widgets/ThemeSelector.vala',

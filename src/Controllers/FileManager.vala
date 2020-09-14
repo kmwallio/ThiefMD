@@ -338,7 +338,8 @@ namespace ThiefMD.Controllers.FileManager {
                         }
                     } else {
                         // If it's a list or empty line, we're cool
-                        if (!line.chomp ().has_prefix ("-") && line.chomp () != "") {
+                        line = line.down ();
+                        if (!line.chomp ().has_prefix ("-") && line.chomp () != "" && line.chomp ().has_prefix ("categories")) {
                             valid_frontmatter = false;
                             break;
                         }
@@ -640,7 +641,7 @@ namespace ThiefMD.Controllers.FileManager {
         }
 
         if (tries == 15) {
-            debug ("*** Broke out ***\n");
+            warning ("*** Broke out ***\n");
         }
 
         debug ("*** Lock acq\n");

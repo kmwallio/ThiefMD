@@ -76,6 +76,9 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public bool dark_mode { get; set; }
         public bool ui_editor_theme { get; set; }
         public bool save_library_order { get; set; }
+        public bool export_break_folders { get; set; }
+        public bool export_break_sheets { get; set; }
+        public bool export_include_urls { get; set; }
 
         public string get_valid_theme_id () {
             UI.UserSchemes ().force_rescan ();

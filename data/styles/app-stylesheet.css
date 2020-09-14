@@ -13,6 +13,11 @@
     box-shadow: 0 1px transparent inset;
 }
 
+filechooser {
+    background: @windowColor;
+    color: @colorPrimary;
+}
+
 actionbar,
 .action-bar {
     border-top-color: transparent;
@@ -41,11 +46,12 @@ actionbar,
     color: @textColorActive;
 }
 
-window {
+filechooser actionbar, filechooser, filechooser stack, placessidebar, window {
     background: @windowColor;
+    color: @colorPrimary;
 }
 
-treeview {
+placessidebar, treeview {
     background: lighter(@windowColor);
     color: @colorPrimary;
 }
@@ -55,7 +61,7 @@ treeview.view header button {
     color: @colorPrimary;
 }
 
-treeview.view:selected {
+placessidebar *:selected, treeview.view:selected {
     background: @selectionColor;
     color: @colorPrimary;
 }
