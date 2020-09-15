@@ -141,6 +141,7 @@ namespace ThiefMD.Widgets {
         public bool am_active {
             set {
                 if (value){
+                    preview_markdown = buffer.text;
                     active = true;
                     var settings = AppSettings.get_default ();
 
@@ -165,6 +166,7 @@ namespace ThiefMD.Widgets {
                     dynamic_margins ();
                 } else {
                     if (active != value) {
+                        preview_markdown = "";
                         try {
                             save ();
                         } catch (Error e) {
@@ -177,6 +179,14 @@ namespace ThiefMD.Widgets {
                     active = false;
                 }
             }
+        }
+
+        public string active_markdown () {
+            if (preview_markdown == "") {
+                return buffer.text;
+            }
+
+            return preview_markdown;
         }
 
         public bool spellcheck {
@@ -292,7 +302,7 @@ namespace ThiefMD.Widgets {
 
             // Move the preview if present
             if (!should_update_preview) {
-                UI.update_preview ();
+                update_preview ();
                 should_update_preview = true;
             }
         }
@@ -323,7 +333,7 @@ namespace ThiefMD.Widgets {
                 preview_markdown += ThiefProperties.THIEF_MARK_CONST;
                 preview_markdown += after.substring (adjustment);
 
-                Preview.update_view ();
+                UI.update_preview ();
             }
 
             should_update_preview = false;
@@ -639,6 +649,15 @@ namespace ThiefMD.Widgets {
                     }
                 });
             });
+        }
+
+        public void clean () {
+            preview_markdown = "";
+            buffer.text = "";
+            editable = false;
+            spell.dispose ();
+            buffer.dispose ();
+            file = null;
         }
     }
 }

@@ -28,6 +28,7 @@ namespace ThiefMD.Controllers.SheetManager {
     private Gtk.ScrolledWindow _view;
     private Gtk.InfoBar _bar;
     private Widgets.Editor _welcome_screen;
+    private bool show_welcome = false;
 
     public void init () {
         if (_editors == null) {
@@ -39,6 +40,7 @@ namespace ThiefMD.Controllers.SheetManager {
         }
 
         if (_view == null) {
+            _welcome_screen = new Widgets.Editor ("");
             _view = new Gtk.ScrolledWindow (null, null);
             _bar = new Gtk.InfoBar ();
             _bar.revealed = false;
@@ -68,19 +70,16 @@ namespace ThiefMD.Controllers.SheetManager {
 
     private void update_view () {
         // Clear the view
-        if (_welcome_screen != null) {
+        if (show_welcome) {
             _view.remove (_welcome_screen);
-            _welcome_screen = null;
         }
 
         // Load the view
         if (_active_editors.size == 0) {
-            _welcome_screen = new Widgets.Editor ("");
-            _welcome_screen.hexpand = true;
+            show_welcome = true;
             _view.add (_welcome_screen);
         } else {
             foreach (var editor in _active_editors) {
-                editor.editor.hexpand = true;
                 _view.add (editor.editor);
             }
         }
@@ -92,13 +91,14 @@ namespace ThiefMD.Controllers.SheetManager {
         StringBuilder builder = new StringBuilder ();
         for (int i = 0; i < _active_editors.size; i++) {
             SheetPair sp = _active_editors.get (i);
-            string text = (sp == _currentSheet) ? sp.editor.preview_markdown : sp.editor.buffer.text;
+            string text = (sp == _currentSheet) ? sp.editor.active_markdown () : sp.editor.buffer.text;
             if (i > 0) {
                 builder.append (FileManager.get_yamlless_markdown (text, 0, true, true, false));
             } else {
                 builder.append (text);
             }
         }
+
         return builder.str;
     }
 
@@ -229,6 +229,7 @@ namespace ThiefMD.Controllers.SheetManager {
             try {
                 editor.editor.save ();
                 editor.sheet.redraw ();
+                UI.update_preview ();
             } catch (Error e) {
                 warning ("Could not save file %s: %s", editor.sheet.file_path (), e.message);
             }
@@ -267,6 +268,7 @@ namespace ThiefMD.Controllers.SheetManager {
             _active_editors.remove (remove_this);
             _editors.remove (remove_this);
             _view.remove (remove_this.editor);
+            remove_this.editor.clean ();
             remove_this.editor = null;
             remove_this.sheet = null;
             clear_view ();
@@ -298,6 +300,7 @@ namespace ThiefMD.Controllers.SheetManager {
         while (_editors.size > Constants.KEEP_X_SHEETS_IN_MEMORY) {
             SheetPair clean = _editors.poll ();
             clean.editor.am_active = false;
+            clean.editor.clean ();
             clean.editor = null;
             clean.sheet.active = false;
             clean.sheet = null;

@@ -60,6 +60,7 @@ namespace ThiefMD.Widgets {
             } else {
                 title = "Preview";
             }
+            UI.update_preview ();
 
             transient_for = ThiefApp.get_instance ().main_window;
             destroy_with_parent = true;
