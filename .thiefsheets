@@ -3,7 +3,8 @@
     "README.md",
     "DEB-Packaging.md",
     "RPM-Packaging.md",
-    "flatpak-packaging.md"
+    "flatpak-packaging.md",
+    "VISION.md"
   ],
   "hidden-folders" : [
     "subprojects",
