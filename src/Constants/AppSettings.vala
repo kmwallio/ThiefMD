@@ -33,7 +33,7 @@ namespace ThiefMD {
         public const int AUTOSAVE_TIMEOUT = 3000;
 
         // Default number of sheets to keep history of
-        public const int KEEP_X_SHEETS_IN_MEMORY = 3;
+        public const int KEEP_X_SHEETS_IN_MEMORY = 5;
         public const int TYPEWRITER_UPDATE_TIME = 500;
 
         // Typewriter Position

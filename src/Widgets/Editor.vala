@@ -140,14 +140,15 @@ namespace ThiefMD.Widgets {
 
         public bool am_active {
             set {
+                var settings = AppSettings.get_default ();
                 if (value){
                     preview_markdown = buffer.text;
                     active = true;
-                    var settings = AppSettings.get_default ();
 
                     set_scheme (settings.get_valid_theme_id ());
 
                     buffer.changed.connect (on_change_notification);
+                    settings.changed.connect (update_settings);
 
                     typewriter_active = settings.typewriter_scrolling;
                     if (typewriter_active) {
@@ -166,6 +167,10 @@ namespace ThiefMD.Widgets {
                     dynamic_margins ();
                 } else {
                     if (active != value) {
+                        if (settings.spellcheck) {
+                            spell.detach ();
+                        }
+
                         preview_markdown = "";
                         try {
                             save ();
@@ -175,6 +180,7 @@ namespace ThiefMD.Widgets {
                         }
                         buffer.changed.disconnect (on_change_notification);
                         size_allocate.disconnect (dynamic_margins);
+                        settings.changed.disconnect (update_settings);
                     }
                     active = false;
                 }
@@ -655,6 +661,7 @@ namespace ThiefMD.Widgets {
             preview_markdown = "";
             buffer.text = "";
             editable = false;
+            spell.detach ();
             spell.dispose ();
             buffer.dispose ();
             file = null;

@@ -22,7 +22,7 @@ using ThiefMD.Widgets;
 
 namespace ThiefMD.Controllers.SheetManager {
     private SheetPair _currentSheet;
-    private Sheets _current_sheets;
+    private weak Sheets _current_sheets;
     private Gee.Queue<SheetPair> _editors;
     private Gee.LinkedList<SheetPair> _active_editors;
     private Gtk.ScrolledWindow _view;
@@ -149,7 +149,7 @@ namespace ThiefMD.Controllers.SheetManager {
         if (_currentSheet == null) {
             _currentSheet = new SheetPair ();
             _currentSheet.sheet = sheet;
-            _currentSheet.editor = FileManager.open_file (sheet.file_path());
+            FileManager.open_file (sheet.file_path (), out _currentSheet.editor);
         } else {
             _editors.remove (_currentSheet);
         }
@@ -321,7 +321,7 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     private class SheetPair {
-        public Sheet sheet;
+        public weak Sheet sheet;
         public Widgets.Editor editor;
     }
 }

@@ -34,11 +34,10 @@ namespace ThiefMD.Controllers.FileManager {
             written += output.write (buffer[written:buffer.length]);
     }
 
-    public Widgets.Editor open_file (string file_path) {
+    public void open_file (string file_path, out Widgets.Editor editor) {
         bool file_opened = false;
         var lock = new FileLock ();
         var settings = AppSettings.get_default ();
-        Widgets.Editor editor = null;
 
         try {
             string text;
@@ -56,8 +55,6 @@ namespace ThiefMD.Controllers.FileManager {
         } catch (Error e) {
             warning ("Error: %s", e.message);
         }
-
-        return editor;
     }
 
     public bool copy_item (string source_file, string destination_folder) throws Error
@@ -357,7 +354,6 @@ namespace ThiefMD.Controllers.FileManager {
 
                 try {
                     save_file (new_file, binbuffer);
-                    open_file (new_file.get_path ());
                     file_created = true;
                 } catch (Error e) {
                     warning ("Exception found: "+ e.message);
