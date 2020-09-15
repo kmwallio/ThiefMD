@@ -94,17 +94,16 @@ namespace ThiefMD.Widgets {
         private void switch_to_this_scheme () {
             var settings = AppSettings.get_default ();
             if (am_dark) {
-                ThiefApp.get_instance ().edit_view_content.set_scheme (theme.get_dark_theme_id ());
                 settings.theme_id = theme.get_dark_theme_id ();
                 theme.get_dark_theme_palette (out palette);
             } else {
-                ThiefApp.get_instance ().edit_view_content.set_scheme (theme.get_light_theme_id ());
                 settings.theme_id = theme.get_light_theme_id ();
                 theme.get_light_theme_palette (out palette);
             }
             settings.dark_mode = am_dark;
             settings.custom_theme = theme.base_file_name ();
             UI.set_css_scheme (palette);
+            SheetManager.refresh_scheme ();
         }
 
         public void set_text (string text) {

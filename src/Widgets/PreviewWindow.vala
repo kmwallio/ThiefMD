@@ -24,7 +24,6 @@ using ThiefMD.Controllers;
 namespace ThiefMD.Widgets {
     public class PreviewWindow : Gtk.Window {
         private static PreviewWindow? instance = null;
-        Preview preview;
 
         public PreviewWindow () {
             build_ui ();

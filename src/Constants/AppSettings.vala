@@ -29,6 +29,13 @@ namespace ThiefMD {
         public const int BOTTOM_MARGIN = 20;
         public const int TOP_MARGIN = 20;
 
+        // Timing Constants
+        public const int AUTOSAVE_TIMEOUT = 3000;
+
+        // Default number of sheets to keep history of
+        public const int KEEP_X_SHEETS_IN_MEMORY = 3;
+        public const int TYPEWRITER_UPDATE_TIME = 500;
+
         // Typewriter Position
         public const double TYPEWRITER_POSITION = 0.45;
 
@@ -131,7 +138,6 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
 
         public bool is_in_library (string path) {
             string[] current_library = library();
-            string new_library = "";
 
             foreach (string item in current_library) {
                 if (item == path) {

@@ -23,8 +23,43 @@ using ThiefMD.Widgets;
 namespace ThiefMD.Controllers.UI {
     private bool _init = false;
     private bool _show_filename = false;
+
+    //
+    // Sheets Management
+    //
+    TimedMutex preview_mutex;
+    public void update_preview () {
+        if (preview_mutex == null) {
+            preview_mutex = new TimedMutex (250);
+        }
+
+        if (preview_mutex.can_do_action ()) {
+            Preview.get_instance ().update_html_view (true, SheetManager.get_markdown ());
+        }
+    }
+
+    // Switches Sheets shown in the Library view with the
+    // provided sheet
+    public Sheets set_sheets (Sheets sheet) {
+        if (sheet == null) {
+            return sheet;
+        }
+        ThiefApp instance = ThiefApp.get_instance ();
+        var old = instance.library_pane.get_child2 ();
+        int cur_pos = instance.library_pane.get_position ();
+        if (old != null) {
+            instance.library_pane.remove (old);
+        }
+        instance.library_pane.add2 (sheet);
+        instance.library_pane.set_position (cur_pos);
+        instance.library_pane.get_child2 ().show_all ();
+        return (Sheets) old;
+    }
+
+    //
+    // Themeing and Styling of the App
+    //
     private Gtk.SourceStyleSchemeManager thief_schemes;
-    private Gtk.SourceLanguageManager thief_languages;
     public List<Ultheme.Parser> user_themes;
     private Thread<bool> theme_worker_thread;
 
@@ -107,40 +142,6 @@ namespace ThiefMD.Controllers.UI {
         return thief_schemes;
     }
 
-    public Gtk.SourceLanguageManager get_language_manager () {
-        if (thief_languages == null) {
-            thief_languages = new Gtk.SourceLanguageManager ();
-            string custom_languages = Path.build_path (
-                Path.DIR_SEPARATOR_S,
-                Build.PKGDATADIR,
-                "gtksourceview-3.0",
-                "language-specs");
-            string[] language_paths = {
-                custom_languages
-            };
-            thief_languages.set_search_path (language_paths);
-
-            var markdown = thief_languages.get_language ("markdown");
-            if (markdown == null) {
-                warning ("Could not load custom languages");
-                thief_languages = Gtk.SourceLanguageManager.get_default ();
-            }
-        }
-
-        return thief_languages;
-    }
-
-    public Gtk.SourceLanguage get_source_language () {
-        var languages = get_language_manager ();
-
-        var markdown_syntax = languages.get_language ("markdown");
-        if (markdown_syntax == null) {
-            markdown_syntax = languages.guess_language (null, "text/markdown");
-        }
-
-        return markdown_syntax;
-    }
-
     public void load_css_scheme () {
         var settings = AppSettings.get_default ();
         Ultheme.HexColorPalette palette;
@@ -175,9 +176,7 @@ namespace ThiefMD.Controllers.UI {
             warning ("Could not set dynamic css: %s", e.message);
         }
 
-        if (ThiefApp.get_instance ().edit_view_content != null && settings.theme_id != "thiefmd") {
-            ThiefApp.get_instance ().edit_view_content.set_scheme (settings.theme_id);
-        }
+        SheetManager.refresh_scheme ();
     }
 
     public void set_css_scheme (Ultheme.HexColorPalette palette) {
@@ -204,23 +203,50 @@ namespace ThiefMD.Controllers.UI {
         }
     }
 
-    // Returns the old sheets, but puts in the new one
-    public Sheets set_sheets (Sheets sheet) {
-        if (sheet == null) {
-            return sheet;
+    //
+    // ThiefMD Custom GtkSourceView Languages
+    //
+    private Gtk.SourceLanguageManager thief_languages;
+
+    public Gtk.SourceLanguageManager get_language_manager () {
+        if (thief_languages == null) {
+            thief_languages = new Gtk.SourceLanguageManager ();
+            string custom_languages = Path.build_path (
+                Path.DIR_SEPARATOR_S,
+                Build.PKGDATADIR,
+                "gtksourceview-3.0",
+                "language-specs");
+            string[] language_paths = {
+                custom_languages
+            };
+            thief_languages.set_search_path (language_paths);
+
+            var markdown = thief_languages.get_language ("markdown");
+            if (markdown == null) {
+                warning ("Could not load custom languages");
+                thief_languages = Gtk.SourceLanguageManager.get_default ();
+            }
         }
-        ThiefApp instance = ThiefApp.get_instance ();
-        var old = instance.library_pane.get_child2 ();
-        int cur_pos = instance.library_pane.get_position ();
-        if (old != null) {
-            instance.library_pane.remove (old);
-        }
-        instance.library_pane.add2 (sheet);
-        instance.library_pane.set_position (cur_pos);
-        instance.library_pane.get_child2 ().show_all ();
-        return (Sheets) old;
+
+        return thief_languages;
     }
 
+    public Gtk.SourceLanguage get_source_language () {
+        var languages = get_language_manager ();
+
+        var markdown_syntax = languages.get_language ("markdown");
+        if (markdown_syntax == null) {
+            markdown_syntax = languages.guess_language (null, "text/markdown");
+        }
+
+        return markdown_syntax;
+    }
+
+    //
+    // Switching Main Window View
+    //
+
+    // Cycle through views
     public void toggle_view () {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
@@ -284,6 +310,7 @@ namespace ThiefMD.Controllers.UI {
         debug ("View mode: %d\n", settings.view_state);
     }
 
+    // Switch to showing Editor + Sheets
     public void show_sheets () {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
@@ -294,17 +321,6 @@ namespace ThiefMD.Controllers.UI {
 
         debug ("Showing sheets (%d)\n", instance.sheets_pane.get_position ());
         move_panes(0, settings.view_sheets_width);
-    }
-
-    public void show_sheets_and_library () {
-        var settings = AppSettings.get_default ();
-        ThiefApp instance = ThiefApp.get_instance ();
-
-        instance.library_pane.show ();
-        instance.library_pane.get_child1 ().show ();
-        instance.library_pane.get_child2 ().show_all ();
-
-        move_panes (settings.view_library_width, settings.view_sheets_width + settings.view_library_width);
     }
 
     public void hide_library () {
@@ -340,6 +356,19 @@ namespace ThiefMD.Controllers.UI {
         });
     }
 
+    // Show all three panels
+    public void show_sheets_and_library () {
+        var settings = AppSettings.get_default ();
+        ThiefApp instance = ThiefApp.get_instance ();
+
+        instance.library_pane.show ();
+        instance.library_pane.get_child1 ().show ();
+        instance.library_pane.get_child2 ().show_all ();
+
+        move_panes (settings.view_library_width, settings.view_sheets_width + settings.view_library_width);
+    }
+
+    // Show just the Editor
     public void hide_sheets () {
         ThiefApp instance = ThiefApp.get_instance ();
 
