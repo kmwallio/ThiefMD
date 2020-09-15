@@ -68,6 +68,8 @@ namespace ThiefMD.Widgets {
                 set_scheme (theme.get_light_theme_id ());
             }
 
+            set_preview_state ();
+
             clicked.connect (() => {
                 switch_to_this_scheme ();
             });
@@ -76,7 +78,6 @@ namespace ThiefMD.Widgets {
                 set_preview_state ();
             });
 
-            set_preview_state ();
             show_all ();
         }
 
@@ -102,6 +103,14 @@ namespace ThiefMD.Widgets {
             }
             settings.dark_mode = am_dark;
             settings.custom_theme = theme.base_file_name ();
+
+            // Temporary hack for persisting settings
+            Timeout.add (150, () => {
+                settings.dark_mode = am_dark;
+                settings.custom_theme = theme.base_file_name ();
+                return false;
+            });
+
             UI.set_css_scheme (palette);
             SheetManager.refresh_scheme ();
         }

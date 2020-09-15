@@ -113,7 +113,10 @@ namespace ThiefMD.Widgets {
             this.has_focus = true;
             this.set_tab_width (4);
             this.set_insert_spaces_instead_of_tabs (true);
-            set_scheme (settings.get_valid_theme_id ());
+            Timeout.add (250, () => {
+                set_scheme (settings.get_valid_theme_id ());
+                return false;
+            });
             dynamic_margins ();
             spell = new GtkSpell.Checker ();
 
@@ -142,6 +145,19 @@ namespace ThiefMD.Widgets {
             set {
                 var settings = AppSettings.get_default ();
                 if (value){
+                    // Update the file if it was changed from disk
+                    if (file.query_exists ())
+                    {
+                        string text;
+                        try {
+                            string filename = file.get_path ();
+                            GLib.FileUtils.get_contents (filename, out text);
+                            set_text (text, true);
+                        } catch (Error e) {
+                            warning ("Could not load file from disk: %s", e.message);
+                        }
+                    }
+
                     preview_markdown = buffer.text;
                     active = true;
 

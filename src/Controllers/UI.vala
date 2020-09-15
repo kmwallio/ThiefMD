@@ -76,14 +76,14 @@ namespace ThiefMD.Controllers.UI {
             return;
         }
 
+        user_themes = new List<Ultheme.Parser> ();
         if (!Thread.supported ()) {
             warning ("No threads available for work");
+            GLib.Idle.add (load_themes);
         } else {
             theme_worker_thread = new Thread<bool>("theme_worker_thread", load_themes);
         }
         load_css_scheme ();
-
-        user_themes = new List<Ultheme.Parser> ();
     }
 
     private bool load_themes () {
@@ -145,6 +145,7 @@ namespace ThiefMD.Controllers.UI {
     public void load_css_scheme () {
         var settings = AppSettings.get_default ();
         Ultheme.HexColorPalette palette;
+        warning ("Using %s", settings.custom_theme);
         if (settings.ui_editor_theme && settings.theme_id != "thiefmd") {
             string style_path = Path.build_filename (UserData.style_path, settings.custom_theme);
             File style = File.new_for_path (style_path);

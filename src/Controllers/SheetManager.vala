@@ -23,7 +23,7 @@ using ThiefMD.Widgets;
 namespace ThiefMD.Controllers.SheetManager {
     private SheetPair _currentSheet;
     private weak Sheets _current_sheets;
-    private Gee.Queue<SheetPair> _editors;
+    private Gee.LinkedList<SheetPair> _editors;
     private Gee.LinkedList<SheetPair> _active_editors;
     private Gtk.ScrolledWindow _view;
     private Gtk.InfoBar _bar;
@@ -106,9 +106,32 @@ namespace ThiefMD.Controllers.SheetManager {
         return 0.1;
     }
 
+    private Thread<bool> sheet_worker_thread;
+    TimedMutex load_sheets;
+    Mutex loading_sheets;
     public void set_sheets (Sheets sheets) {
         _current_sheets = sheets;
         UI.set_sheets (sheets);
+    }
+
+    private bool preload_sheets () {
+        warning ("Thread start");
+        if (_current_sheets == null) {
+            return false;
+        }
+
+        if (loading_sheets.trylock ()) {
+            GLib.List<Sheet> sheets_to_cache = _current_sheets.get_sheets ();
+            foreach (var sheet in sheets_to_cache) {
+                warning ("Loaded: %s", sheet.file_path ());
+                silent_load_sheet (sheet);
+            }
+
+            check_queue ();
+            loading_sheets.unlock ();
+        }
+
+        return false;
     }
 
     public Sheets get_sheets () {
@@ -163,6 +186,35 @@ namespace ThiefMD.Controllers.SheetManager {
 
         update_view ();
         return loaded_file != null;
+    }
+
+    public static void silent_load_sheet (Sheet sheet) {
+        if (sheet == null) {
+            return;
+        }
+
+        foreach (var editor in _editors) {
+            if (editor.sheet == sheet) {
+                return;
+            }
+        }
+
+        foreach (var editor in _active_editors) {
+            if (editor.sheet == sheet) {
+                return;
+            }
+        }
+
+
+        SheetPair cached_sheet = new SheetPair ();
+        cached_sheet.sheet = sheet;
+        FileManager.open_file (sheet.file_path (), out cached_sheet.editor);
+
+        if (cached_sheet.editor != null) {
+            _editors.insert (0, cached_sheet);
+        }
+
+        debug ("Tried to load %s (%s)\n", sheet.file_path (), (cached_sheet.editor != null) ? "success" : "failed");
     }
 
     public static void new_sheet (string file_name) {
