@@ -445,6 +445,7 @@ namespace ThiefMD.Controllers.UI {
             _moving.moving = !lib_done || !sheet_done;
             if (!moving ()) {
                 _moving.movement_done ();
+                SheetManager.redraw ();
             }
             return _moving.moving;
         });

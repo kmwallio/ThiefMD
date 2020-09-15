@@ -49,7 +49,7 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     public Gtk.ScrolledWindow get_view () {
-        update_view ();
+        clear_view ();
 
         return _view;
     }
@@ -275,6 +275,12 @@ namespace ThiefMD.Controllers.SheetManager {
         }
 
         return false;
+    }
+
+    public void redraw () {
+        foreach (var editor in _active_editors) {
+            editor.editor.show ();
+        }
     }
 
     private void clear_view () {

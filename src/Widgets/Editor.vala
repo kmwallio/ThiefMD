@@ -51,7 +51,6 @@ namespace ThiefMD.Widgets {
         public bool is_modified { get; set; default = false; }
         private bool should_scroll { get; set; default = false; }
         private bool should_save { get; set; default = false; }
-        private bool should_update_preview { get; set; default = false; }
 
         public Editor (string open_file) {
             var settings = AppSettings.get_default ();
@@ -129,6 +128,7 @@ namespace ThiefMD.Widgets {
 
             last_width = settings.window_width;
             last_height = settings.window_height;
+            preview_mutex = new TimedMutex ();
         }
 
         public signal void changed ();
@@ -307,13 +307,15 @@ namespace ThiefMD.Widgets {
             }
 
             // Move the preview if present
-            if (!should_update_preview) {
-                update_preview ();
-                should_update_preview = true;
-            }
+            update_preview ();
         }
 
-        public bool update_preview () {
+        private TimedMutex preview_mutex;
+        public void update_preview () {
+            if (!preview_mutex.can_do_action ()) {
+                return;
+            }
+
             var cursor = buffer.get_insert ();
             if (cursor != null) {
                 Gtk.TextIter cursor_iter;
@@ -338,12 +340,9 @@ namespace ThiefMD.Widgets {
                 preview_markdown += after.substring (0, adjustment);
                 preview_markdown += ThiefProperties.THIEF_MARK_CONST;
                 preview_markdown += after.substring (adjustment);
-
+                warning ("Updating preview");
                 UI.update_preview ();
             }
-
-            should_update_preview = false;
-            return false;
         }
 
         private int skip_special_chars (string haystack, int index = 0) {
