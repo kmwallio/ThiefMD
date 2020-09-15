@@ -43,7 +43,7 @@ See what your work looks like in real time. Is that your battery draining? Yes, 
 
 [Download the latest release](https://github.com/kmwallio/ThiefMD/releases).
 
-## Flatpack
+## Flatpak
 
 [ThiefMD](https://flathub.org/apps/details/com.github.kmwallio.thiefmd) is now available on Flathub. Make sure you've added [flathub](https://flatpak.org/setup) to your system.
 

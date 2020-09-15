@@ -4,7 +4,7 @@
 
 ThiefMD is a [Markdown](https://en.wikipedia.org/wiki/Markdown) editor that helps with `organization and management`. It is heavily inspired by [Ulysses](https://ulysses.app). Initial code was based on work from [Quilter](https://github.com/lainsce/quilter).
 
-## Installation from Flatpack
+## Installation from Flatpak
 
 [ThiefMD](https://flathub.org/apps/details/com.github.kmwallio.thiefmd) is now available on Flathub. Make sure you've added [flathub](https://flatpak.org/setup) to your system.
 
