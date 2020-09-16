@@ -104,8 +104,6 @@ namespace ThiefMD.Controllers.SheetManager {
             builder.append (FileManager.get_yamlless_markdown (text, 0, true, true, false));
         }
 
-        warning ("Preview markdown\n%s", builder.str);
-
         return builder.str;
     }
 
