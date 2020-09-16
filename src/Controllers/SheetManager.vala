@@ -303,6 +303,24 @@ namespace ThiefMD.Controllers.SheetManager {
         }
     }
 
+    public static void bold () {
+        if (_currentSheet != null) {
+            _currentSheet.editor.bold ();
+        }
+    }
+
+    public static void italic () {
+        if (_currentSheet != null) {
+            _currentSheet.editor.italic ();
+        }
+    }
+
+    public static void strikethrough () {
+        if (_currentSheet != null) {
+            _currentSheet.editor.strikethrough ();
+        }
+    }
+
     private static void refresh_scheme () {
         var settings = AppSettings.get_default ();
         var scheme_id = settings.get_valid_theme_id ();
