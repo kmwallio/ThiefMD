@@ -1,7 +1,7 @@
 {
   "sheet-order" : [
-    "Preview.md",
-    "index.md"
+    "index.md",
+    "Preview.md"
   ],
   "hidden-folders" : [
     "_site",
@@ -11,5 +11,10 @@
     "images"
   ],
   "folder-order" : [
+    "_posts",
+    "tips",
+    "about",
+    "deets",
+    "shortcuts"
   ]
 }

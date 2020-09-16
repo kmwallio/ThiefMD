@@ -95,6 +95,7 @@ namespace ThiefMD.Widgets {
             pagebreak_folder_switch.tooltip_text = _("Page Break between Folders");
             var pagebreak_folder_label = new Label(_("Insert a Page Break after each folder"));
             pagebreak_folder_label.xalign = 0;
+            pagebreak_folder_label.hexpand = true;
 
             var pagebreak_sheet_switch = new Switch ();
             pagebreak_sheet_switch.set_active (settings.export_break_sheets);
@@ -103,6 +104,8 @@ namespace ThiefMD.Widgets {
             });
             pagebreak_sheet_switch.tooltip_text = _("Page Break between Sheets");
             var pagebreak_sheet_label = new Label(_("Insert a Page Break after each sheet"));
+            pagebreak_sheet_label.xalign = 0;
+            pagebreak_sheet_label.hexpand = true;
 
             var pdf_include_urls_switch = new Switch ();
             pdf_include_urls_switch.set_active (settings.export_include_urls);
@@ -111,6 +114,41 @@ namespace ThiefMD.Widgets {
             });
             pdf_include_urls_switch.tooltip_text = _("Include URLs in PDF");
             var pdf_include_urls_label = new Label(_("Insert URLs into resulting PDF"));
+            pdf_include_urls_label.xalign = 0;
+            pdf_include_urls_label.hexpand = true;
+
+            var page_setup_label = new Gtk.Label (_("<b>Page Setup</b>"));
+            page_setup_label.hexpand = true;
+            page_setup_label.xalign = 0;
+            page_setup_label.use_markup = true;
+
+            var side_margin_entry = new Gtk.SpinButton.with_range (0.0, 3.5, 0.05);
+            side_margin_entry.set_value (settings.export_side_margins);
+            side_margin_entry.value_changed.connect (() => {
+                double new_margin = side_margin_entry.get_value ();
+                if (new_margin >= 0.0 && new_margin <= 3.5) {
+                    settings.export_side_margins = new_margin;
+                } else {
+                    side_margin_entry.set_value (settings.export_side_margins);
+                }
+            });
+            var side_margin_label = new Label(_("Side margins in PDF in inches"));
+            side_margin_label.xalign = 0;
+            side_margin_label.hexpand = true;
+
+            var top_bottom_margin_entry = new Gtk.SpinButton.with_range (0.0, 3.5, 0.05);
+            top_bottom_margin_entry.set_value (settings.export_top_bottom_margins);
+            top_bottom_margin_entry.value_changed.connect (() => {
+                double new_margin = top_bottom_margin_entry.get_value ();
+                if (new_margin >= 0.0 && new_margin <= 3.5) {
+                    settings.export_top_bottom_margins = new_margin;
+                } else {
+                    top_bottom_margin_entry.set_value (settings.export_top_bottom_margins);
+                }
+            });
+            var top_bottom_margin_label = new Label(_("Top & Bottom margins in PDF in inches"));
+            top_bottom_margin_label.xalign = 0;
+            top_bottom_margin_label.hexpand = true;
 
             grid.attach (pagebreak_folder_switch, 1, 0, 1, 1);
             grid.attach (pagebreak_folder_label, 2, 0, 2, 1);
@@ -118,6 +156,13 @@ namespace ThiefMD.Widgets {
             grid.attach (pagebreak_sheet_label, 2, 1, 2, 1);
             grid.attach (pdf_include_urls_switch, 1, 2, 1, 1);
             grid.attach (pdf_include_urls_label, 2, 2, 2, 1);
+
+            grid.attach (page_setup_label, 1, 3, 2, 1);
+            grid.attach (side_margin_entry, 1, 4, 1, 1);
+            grid.attach (side_margin_label, 2, 4, 1, 1);
+            grid.attach (top_bottom_margin_entry, 1, 5, 1, 1);
+            grid.attach (top_bottom_margin_label, 2, 5, 1, 1);
+
             grid.show_all ();
 
             return grid;

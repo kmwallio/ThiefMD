@@ -188,6 +188,7 @@ namespace ThiefMD.Widgets {
                     dynamic_margins ();
                     should_scroll = true;
                     update_preview ();
+                    spellcheck_enable();
                 } else {
                     if (active != value) {
                         cursor_location = buffer.cursor_position;
@@ -209,6 +210,7 @@ namespace ThiefMD.Widgets {
                     }
                     editable = false;
                     active = false;
+                    spellcheck = false;
                 }
             }
         }
