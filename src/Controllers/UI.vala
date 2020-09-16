@@ -23,8 +23,43 @@ using ThiefMD.Widgets;
 namespace ThiefMD.Controllers.UI {
     private bool _init = false;
     private bool _show_filename = false;
+
+    //
+    // Sheets Management
+    //
+    TimedMutex preview_mutex;
+    public void update_preview () {
+        if (preview_mutex == null) {
+            preview_mutex = new TimedMutex (250);
+        }
+
+        if (preview_mutex.can_do_action ()) {
+            Preview.get_instance ().update_html_view (true, SheetManager.get_markdown ());
+        }
+    }
+
+    // Switches Sheets shown in the Library view with the
+    // provided sheet
+    public Sheets set_sheets (Sheets sheet) {
+        if (sheet == null) {
+            return sheet;
+        }
+        ThiefApp instance = ThiefApp.get_instance ();
+        var old = instance.library_pane.get_child2 ();
+        int cur_pos = instance.library_pane.get_position ();
+        if (old != null) {
+            instance.library_pane.remove (old);
+        }
+        instance.library_pane.add2 (sheet);
+        instance.library_pane.set_position (cur_pos);
+        instance.library_pane.get_child2 ().show_all ();
+        return (Sheets) old;
+    }
+
+    //
+    // Themeing and Styling of the App
+    //
     private Gtk.SourceStyleSchemeManager thief_schemes;
-    private Gtk.SourceLanguageManager thief_languages;
     public List<Ultheme.Parser> user_themes;
     private Thread<bool> theme_worker_thread;
 
@@ -41,14 +76,27 @@ namespace ThiefMD.Controllers.UI {
             return;
         }
 
+        load_css_scheme ();
+        user_themes = new List<Ultheme.Parser> ();
         if (!Thread.supported ()) {
             warning ("No threads available for work");
+            GLib.Idle.add (load_themes);
         } else {
             theme_worker_thread = new Thread<bool>("theme_worker_thread", load_themes);
         }
-        load_css_scheme ();
+    }
 
-        user_themes = new List<Ultheme.Parser> ();
+    private bool need_to_update_theme (string contents, File file) {
+        string new_theme = Checksum.compute_for_string (ChecksumType.MD5, contents);
+        string old_text;
+        try {
+            GLib.FileUtils.get_contents (file.get_path (), out old_text);
+            string old_theme = Checksum.compute_for_string (ChecksumType.MD5, old_text);
+
+            return new_theme == old_theme;
+        } catch (Error e) {
+            return true;
+        }
     }
 
     private bool load_themes () {
@@ -68,10 +116,11 @@ namespace ThiefMD.Controllers.UI {
                         string dark_path = Path.build_filename (UserData.scheme_path, theme.get_dark_theme_id () + ".xml");
                         File dark_file = File.new_for_path (dark_path);
                         try {
-                            if (dark_file.query_exists ()) {
+                            string dark_theme_data = theme.get_dark_theme ();
+                            if (dark_file.query_exists () && need_to_update_theme(dark_theme_data, dark_file)) {
                                 dark_file.delete ();
+                                FileManager.save_file (dark_file, dark_theme_data.data);
                             }
-                            FileManager.save_file (dark_file, theme.get_dark_theme ().data);
                         } catch (Error e) {
                             warning ("Could not save local scheme: %s", e.message);
                         }
@@ -79,10 +128,11 @@ namespace ThiefMD.Controllers.UI {
                         string light_path = Path.build_filename (UserData.scheme_path, theme.get_light_theme_id () + ".xml");
                         File light_file = File.new_for_path (light_path);
                         try {
-                            if (light_file.query_exists ()) {
+                            string light_theme_data = theme.get_light_theme ();
+                            if (light_file.query_exists () && need_to_update_theme (light_theme_data, light_file)) {
                                 light_file.delete ();
+                                FileManager.save_file (light_file, light_theme_data.data);
                             }
-                            FileManager.save_file (light_file, theme.get_light_theme ().data);
                         } catch (Error e) {
                             warning ("Could not save local scheme: %s", e.message);
                         }
@@ -106,6 +156,73 @@ namespace ThiefMD.Controllers.UI {
 
         return thief_schemes;
     }
+
+    public void load_css_scheme () {
+        var settings = AppSettings.get_default ();
+        Ultheme.HexColorPalette palette;
+        debug ("Using %s", settings.custom_theme);
+        if (settings.ui_editor_theme && settings.theme_id != "thiefmd") {
+            string style_path = Path.build_filename (UserData.style_path, settings.custom_theme);
+            File style = File.new_for_path (style_path);
+            if (style.query_exists ()) {
+                try {
+                    var theme = new Ultheme.Parser (style);
+                    if (settings.dark_mode) {
+                        theme.get_dark_theme_palette (out palette);
+                    } else {
+                        theme.get_light_theme_palette (out palette);
+                    }
+                    set_css_scheme (palette);
+                } catch (Error e) {
+                    warning ("Could not load previous style: %s", e.message);
+                }
+            }
+        }
+    }
+
+    public void reset_css () {
+        var settings = AppSettings.get_default ();
+
+        try {
+            var provider = new Gtk.CssProvider ();
+            provider.load_from_resource ("/com/github/kmwallio/thiefmd/app-stylesheet.css");
+            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
+        } catch (Error e) {
+            warning ("Could not set dynamic css: %s", e.message);
+        }
+
+        SheetManager.refresh_scheme ();
+    }
+
+    public void set_css_scheme (Ultheme.HexColorPalette palette) {
+        var settings = AppSettings.get_default ();
+        if (palette == null || !settings.ui_editor_theme) { 
+            return;
+        }
+
+        string new_css = ThiefProperties.DYNAMIC_CSS.printf (
+            palette.global.background,
+            palette.global_active.background,
+            palette.headers.foreground,
+            palette.global_active.foreground,
+            palette.global.foreground
+        );
+
+        try {
+            var provider = new Gtk.CssProvider ();
+            provider.load_from_data (new_css);
+            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_mode;
+        } catch (Error e) {
+            warning ("Could not set dynamic css: %s", e.message);
+        }
+    }
+
+    //
+    // ThiefMD Custom GtkSourceView Languages
+    //
+    private Gtk.SourceLanguageManager thief_languages;
 
     public Gtk.SourceLanguageManager get_language_manager () {
         if (thief_languages == null) {
@@ -141,86 +258,11 @@ namespace ThiefMD.Controllers.UI {
         return markdown_syntax;
     }
 
-    public void load_css_scheme () {
-        var settings = AppSettings.get_default ();
-        Ultheme.HexColorPalette palette;
-        if (settings.ui_editor_theme && settings.theme_id != "thiefmd") {
-            string style_path = Path.build_filename (UserData.style_path, settings.custom_theme);
-            File style = File.new_for_path (style_path);
-            if (style.query_exists ()) {
-                try {
-                    var theme = new Ultheme.Parser (style);
-                    if (settings.dark_mode) {
-                        theme.get_dark_theme_palette (out palette);
-                    } else {
-                        theme.get_light_theme_palette (out palette);
-                    }
-                    set_css_scheme (palette);
-                } catch (Error e) {
-                    warning ("Could not load previous style: %s", e.message);
-                }
-            }
-        }
-    }
+    //
+    // Switching Main Window View
+    //
 
-    public void reset_css () {
-        var settings = AppSettings.get_default ();
-
-        try {
-            var provider = new Gtk.CssProvider ();
-            provider.load_from_resource ("/com/github/kmwallio/thiefmd/app-stylesheet.css");
-            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
-        } catch (Error e) {
-            warning ("Could not set dynamic css: %s", e.message);
-        }
-
-        if (ThiefApp.get_instance ().edit_view_content != null && settings.theme_id != "thiefmd") {
-            ThiefApp.get_instance ().edit_view_content.set_scheme (settings.theme_id);
-        }
-    }
-
-    public void set_css_scheme (Ultheme.HexColorPalette palette) {
-        var settings = AppSettings.get_default ();
-        if (palette == null || !settings.ui_editor_theme) { 
-            return;
-        }
-
-        string new_css = ThiefProperties.DYNAMIC_CSS.printf (
-            palette.global.background,
-            palette.global_active.background,
-            palette.headers.foreground,
-            palette.global_active.foreground,
-            palette.global.foreground
-        );
-
-        try {
-            var provider = new Gtk.CssProvider ();
-            provider.load_from_data (new_css);
-            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_mode;
-        } catch (Error e) {
-            warning ("Could not set dynamic css: %s", e.message);
-        }
-    }
-
-    // Returns the old sheets, but puts in the new one
-    public Sheets set_sheets (Sheets sheet) {
-        if (sheet == null) {
-            return sheet;
-        }
-        ThiefApp instance = ThiefApp.get_instance ();
-        var old = instance.library_pane.get_child2 ();
-        int cur_pos = instance.library_pane.get_position ();
-        if (old != null) {
-            instance.library_pane.remove (old);
-        }
-        instance.library_pane.add2 (sheet);
-        instance.library_pane.set_position (cur_pos);
-        instance.library_pane.get_child2 ().show_all ();
-        return (Sheets) old;
-    }
-
+    // Cycle through views
     public void toggle_view () {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
@@ -284,6 +326,7 @@ namespace ThiefMD.Controllers.UI {
         debug ("View mode: %d\n", settings.view_state);
     }
 
+    // Switch to showing Editor + Sheets
     public void show_sheets () {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
@@ -294,17 +337,6 @@ namespace ThiefMD.Controllers.UI {
 
         debug ("Showing sheets (%d)\n", instance.sheets_pane.get_position ());
         move_panes(0, settings.view_sheets_width);
-    }
-
-    public void show_sheets_and_library () {
-        var settings = AppSettings.get_default ();
-        ThiefApp instance = ThiefApp.get_instance ();
-
-        instance.library_pane.show ();
-        instance.library_pane.get_child1 ().show ();
-        instance.library_pane.get_child2 ().show_all ();
-
-        move_panes (settings.view_library_width, settings.view_sheets_width + settings.view_library_width);
     }
 
     public void hide_library () {
@@ -340,6 +372,19 @@ namespace ThiefMD.Controllers.UI {
         });
     }
 
+    // Show all three panels
+    public void show_sheets_and_library () {
+        var settings = AppSettings.get_default ();
+        ThiefApp instance = ThiefApp.get_instance ();
+
+        instance.library_pane.show ();
+        instance.library_pane.get_child1 ().show ();
+        instance.library_pane.get_child2 ().show_all ();
+
+        move_panes (settings.view_library_width, settings.view_sheets_width + settings.view_library_width);
+    }
+
+    // Show just the Editor
     public void hide_sheets () {
         ThiefApp instance = ThiefApp.get_instance ();
 
@@ -416,6 +461,7 @@ namespace ThiefMD.Controllers.UI {
             _moving.moving = !lib_done || !sheet_done;
             if (!moving ()) {
                 _moving.movement_done ();
+                SheetManager.redraw ();
             }
             return _moving.moving;
         });

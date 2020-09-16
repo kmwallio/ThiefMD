@@ -68,6 +68,8 @@ namespace ThiefMD.Widgets {
                 set_scheme (theme.get_light_theme_id ());
             }
 
+            set_preview_state ();
+
             clicked.connect (() => {
                 switch_to_this_scheme ();
             });
@@ -76,7 +78,6 @@ namespace ThiefMD.Widgets {
                 set_preview_state ();
             });
 
-            set_preview_state ();
             show_all ();
         }
 
@@ -91,20 +92,55 @@ namespace ThiefMD.Widgets {
             }
         }
 
+        private static string theme_to_switch_to;
+        private static bool switch_to_dark = true;
+        private static bool trying = false;
+        public static Mutex switcher_mutex;
+
+        private bool switch_theme () {
+            var settings = AppSettings.get_default ();
+            // Since switching to GLib.Settings, not seeing the retry
+            // issues anymore.
+            //if (settings.can_update_theme ()) {
+                switcher_mutex.lock ();
+                settings.dark_mode = switch_to_dark;
+                settings.custom_theme = theme_to_switch_to;
+                trying = false;
+                switcher_mutex.unlock ();
+            //}
+
+            //  settings.dark_mode = switch_to_dark;
+            //  settings.custom_theme = theme_to_switch_to;
+
+            return trying;
+        }
+
         private void switch_to_this_scheme () {
             var settings = AppSettings.get_default ();
             if (am_dark) {
-                ThiefApp.get_instance ().edit_view_content.set_scheme (theme.get_dark_theme_id ());
                 settings.theme_id = theme.get_dark_theme_id ();
                 theme.get_dark_theme_palette (out palette);
             } else {
-                ThiefApp.get_instance ().edit_view_content.set_scheme (theme.get_light_theme_id ());
                 settings.theme_id = theme.get_light_theme_id ();
                 theme.get_light_theme_palette (out palette);
             }
+
+            if (!settings.can_update_theme ()) {
+                warning ("Theme cannot be updated, will schedule retry");
+                if (!trying && switcher_mutex.trylock ()) {
+                    theme_to_switch_to = theme.base_file_name ();
+                    switch_to_dark = am_dark;
+                    trying = true;
+                    Timeout.add (250, switch_theme);
+                    switcher_mutex.unlock ();
+                }
+            }
+
             settings.dark_mode = am_dark;
             settings.custom_theme = theme.base_file_name ();
+
             UI.set_css_scheme (palette);
+            SheetManager.refresh_scheme ();
         }
 
         public void set_text (string text) {

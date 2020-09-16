@@ -53,6 +53,12 @@ namespace ThiefMD.Widgets {
             }
 
             add_credit_section ("Credits", ThiefProperties.GIANTS);
+
+            response.connect ((response_id) => {
+                if (response_id == Gtk.ResponseType.CANCEL || response_id == Gtk.ResponseType.DELETE_EVENT) {
+                    destroy ();
+                }
+            });
         }
     }
 }

@@ -26,8 +26,6 @@ namespace ThiefMD {
         private static ThiefApp _instance;
         public Gtk.ApplicationWindow main_window;
         public Headerbar toolbar;
-        public Gtk.ScrolledWindow edit_view;
-        public Editor edit_view_content;
         public Library library;
         public Gtk.Paned sheets_pane;
         public Gtk.Paned library_pane;
@@ -62,15 +60,9 @@ namespace ThiefMD {
                 if (settings.fullscreen) {
                     main_window.fullscreen ();
                     settings.statusbar = false;
-                    var buffer_context = edit_view_content.get_style_context ();
-                    buffer_context.add_class ("full-text");
-                    buffer_context.remove_class ("small-text");
                 } else {
                     main_window.unfullscreen ();
                     settings.statusbar = true;
-                    var buffer_context = edit_view_content.get_style_context ();
-                    buffer_context.add_class ("small-text");
-                    buffer_context.remove_class ("full-text");
                 }
             }
         }
@@ -89,10 +81,12 @@ namespace ThiefMD {
             }
 
             if (settings.library_list == "") {
-                settings.add_to_library (start_dir);
+                settings.last_file = "";
+                start_dir = "";
             }
 
             main_window = new Gtk.ApplicationWindow (this);
+            SheetManager.init ();
 
             // Attempt to set taskbar icon
             try {
@@ -117,15 +111,11 @@ namespace ThiefMD {
             }
 
             toolbar = Headerbar.get_instance ();
-            edit_view_content = new Editor ();
             library = new Library ();
             sheets_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             library_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             library_view = new Gtk.ScrolledWindow (null, null);
             library_view.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
-
-            edit_view = new Gtk.ScrolledWindow (null, null);
-            edit_view.add (edit_view_content);
 
             library_view.add (library);
             library_pane.add1 (library_view);
@@ -135,7 +125,7 @@ namespace ThiefMD {
             library_pane.set_position (settings.view_library_width);
             
             sheets_pane.add1 (library_pane);
-            sheets_pane.add2 (edit_view);
+            sheets_pane.add2 (SheetManager.get_view ());
             sheets_pane.set_position (settings.view_library_width + settings.view_sheets_width);
 
 
@@ -160,7 +150,6 @@ namespace ThiefMD {
 
             UserData.create_data_directories ();
 
-            edit_view_content.set_scheme (settings.get_valid_theme_id ());
             ready = true;
             main_window.show_all ();
 
@@ -172,9 +161,7 @@ namespace ThiefMD {
 
             // Save on close
             shutdown.connect (() => {
-                if (Widgets.Editor.buffer.text.chomp () != "") {
-                    FileManager.save_work_file ();
-                }
+                SheetManager.save_active ();
             });
         }
 

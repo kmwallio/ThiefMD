@@ -24,7 +24,6 @@ using ThiefMD.Controllers;
 namespace ThiefMD.Widgets {
     public class PreviewWindow : Gtk.Window {
         private static PreviewWindow? instance = null;
-        Preview preview;
 
         public PreviewWindow () {
             build_ui ();
@@ -61,6 +60,7 @@ namespace ThiefMD.Widgets {
             } else {
                 title = "Preview";
             }
+            UI.update_preview ();
 
             transient_for = ThiefApp.get_instance ().main_window;
             destroy_with_parent = true;

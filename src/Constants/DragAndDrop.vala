@@ -74,34 +74,13 @@ namespace ThiefMD {
         return file;
     }
 
-    public class PreventDelayedDrop {
-        private bool droppable;
-        private Mutex droptex;
+    public class PreventDelayedDrop : TimedMutex {
         public PreventDelayedDrop () {
-            droppable = true;
-            droptex = Mutex ();
+            base (300);
         }
 
         public bool can_get_drop () {
-            bool res = droppable;
-            debug ("%s get drop", res ? "CAN" : "CANNOT");
-
-            if (droppable) {
-                debug ("Acquiring lock");
-                droptex.lock ();
-                debug ("Lock acquired");
-                droppable = false;
-                Timeout.add (300, clear_drop);
-                droptex.unlock ();
-            }
-            return res;
-        }
-
-        private bool clear_drop () {
-            droptex.lock ();
-            droppable = true;
-            droptex.unlock ();
-            return false;
+            return can_do_action ();
         }
     }
 }

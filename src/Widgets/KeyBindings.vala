@@ -48,7 +48,7 @@ namespace ThiefMD.Widgets {
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
                     if (match_keycode (Gdk.Key.s, keycode)) {
                         try {
-                            FileManager.save_work_file ();
+                            SheetManager.save_active ();
                         } catch (Error e) {
                             warning ("Unexpected error during open: " + e.message);
                         }
@@ -74,14 +74,14 @@ namespace ThiefMD.Widgets {
                 // Undo
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
                     if (match_keycode (Gdk.Key.z, keycode)) {
-                        Widgets.Editor.buffer.undo ();
+                        SheetManager.undo ();
                     }
                 }
 
                 // Redo
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK + Gdk.ModifierType.SHIFT_MASK) != 0) {
                     if (match_keycode (Gdk.Key.z, keycode)) {
-                        Widgets.Editor.buffer.redo ();
+                        SheetManager.redo ();
                     }
                 }
 
@@ -129,10 +129,11 @@ namespace ThiefMD.Widgets {
             Gdk.Keymap keymap = Gdk.Keymap.get_for_display (Gdk.Display.get_default ());
             if (keymap.get_entries_for_keyval (keyval, out keys)) {
                 foreach (var key in keys) {
-                    if (code == key.keycode)
+                    if (code == key.keycode) {
                         return true;
                     }
                 }
+            }
 
             return false;
         }

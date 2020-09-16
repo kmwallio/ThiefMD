@@ -44,7 +44,7 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             settings.changed.connect (() => {
                 if (this == instance) {
-                    update_html_view ();
+                    update_html_view (true, SheetManager.get_markdown ());
                 }
             });
             connect_signals ();
@@ -198,61 +198,59 @@ namespace ThiefMD.Widgets {
         }
 
         private string process (string markdown = "") {
-            string text;
-            if (markdown == "") {
-                text = Widgets.Editor.scroll_text; // buffer.text;
-            } else {
-                text = markdown;
-            }
-            string processed_mk;
+            string text = markdown;
+            string processed_mk = "";
 
-            Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex css_url_search = new Regex ("url\\(['\"]?(.+?)['\"]?\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            try {
+                Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+                Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+                Regex css_url_search = new Regex ("url\\(['\"]?(.+?)['\"]?\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
 
-            get_preview_markdown (text, out processed_mk);
-            processed_mk = url_search.replace_eval (
-                processed_mk,
-                (ssize_t) processed_mk.length,
-                0,
-                RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
-                {
-                    result.append ("(");
-                    var url = match_info.fetch (1);
-                    result.append (find_file (url));
-                    result.append (")");
-                    return false;
-                });
-
-            processed_mk = css_url_search.replace_eval (
-                processed_mk,
-                (ssize_t) processed_mk.length,
-                0,
-                RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
-                {
-                    result.append ("url(");
-                    var url = match_info.fetch (1);
-                    result.append (find_file (url));
-                    result.append (")");
-                    return false;
-                });
-
-            processed_mk = src_search.replace_eval (
+                get_preview_markdown (text, out processed_mk);
+                processed_mk = url_search.replace_eval (
                     processed_mk,
                     (ssize_t) processed_mk.length,
                     0,
                     RegexMatchFlags.NOTEMPTY,
                     (match_info, result) =>
                     {
-                        result.append ("src=\"");
+                        result.append ("(");
                         var url = match_info.fetch (1);
                         result.append (find_file (url));
-                        result.append ("\"");
+                        result.append (")");
                         return false;
                     });
 
+                processed_mk = css_url_search.replace_eval (
+                    processed_mk,
+                    (ssize_t) processed_mk.length,
+                    0,
+                    RegexMatchFlags.NOTEMPTY,
+                    (match_info, result) =>
+                    {
+                        result.append ("url(");
+                        var url = match_info.fetch (1);
+                        result.append (find_file (url));
+                        result.append (")");
+                        return false;
+                    });
+
+                processed_mk = src_search.replace_eval (
+                        processed_mk,
+                        (ssize_t) processed_mk.length,
+                        0,
+                        RegexMatchFlags.NOTEMPTY,
+                        (match_info, result) =>
+                        {
+                            result.append ("src=\"");
+                            var url = match_info.fetch (1);
+                            result.append (find_file (url));
+                            result.append ("\"");
+                            return false;
+                        });
+            } catch (Error e) {
+                warning ("Error generating preview: %s", e.message);
+            }
             var mkd = new Markdown.Document.from_gfm_string (processed_mk.data, 0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x04000000 + 0x00400000 + 0x10000000 + 0x40000000);
             mkd.compile (0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x00400000 + 0x04000000 + 0x40000000 + 0x10000000);
 
@@ -276,7 +274,7 @@ namespace ThiefMD.Widgets {
                 const textOnTop = element.offsetTop;
                 const middle = textOnTop - (window.innerHeight * %f);
                 window.scrollTo(0, middle);
-                </script>""".printf((typewriter_active) ? Constants.TYPEWRITER_POSITION : Editor.cursor_position);
+                </script>""".printf((typewriter_active) ? Constants.TYPEWRITER_POSITION : SheetManager.get_cursor_position ());
             }
 
             // Default preview javascript
