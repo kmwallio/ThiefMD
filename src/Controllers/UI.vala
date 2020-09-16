@@ -76,6 +76,7 @@ namespace ThiefMD.Controllers.UI {
             return;
         }
 
+        load_css_scheme ();
         user_themes = new List<Ultheme.Parser> ();
         if (!Thread.supported ()) {
             warning ("No threads available for work");
@@ -83,7 +84,19 @@ namespace ThiefMD.Controllers.UI {
         } else {
             theme_worker_thread = new Thread<bool>("theme_worker_thread", load_themes);
         }
-        load_css_scheme ();
+    }
+
+    private bool need_to_update_theme (string contents, File file) {
+        string new_theme = Checksum.compute_for_string (ChecksumType.MD5, contents);
+        string old_text;
+        try {
+            GLib.FileUtils.get_contents (file.get_path (), out old_text);
+            string old_theme = Checksum.compute_for_string (ChecksumType.MD5, old_text);
+
+            return new_theme == old_theme;
+        } catch (Error e) {
+            return true;
+        }
     }
 
     private bool load_themes () {
@@ -103,10 +116,11 @@ namespace ThiefMD.Controllers.UI {
                         string dark_path = Path.build_filename (UserData.scheme_path, theme.get_dark_theme_id () + ".xml");
                         File dark_file = File.new_for_path (dark_path);
                         try {
-                            if (dark_file.query_exists ()) {
+                            string dark_theme_data = theme.get_dark_theme ();
+                            if (dark_file.query_exists () && need_to_update_theme(dark_theme_data, dark_file)) {
                                 dark_file.delete ();
+                                FileManager.save_file (dark_file, dark_theme_data.data);
                             }
-                            FileManager.save_file (dark_file, theme.get_dark_theme ().data);
                         } catch (Error e) {
                             warning ("Could not save local scheme: %s", e.message);
                         }
@@ -114,10 +128,11 @@ namespace ThiefMD.Controllers.UI {
                         string light_path = Path.build_filename (UserData.scheme_path, theme.get_light_theme_id () + ".xml");
                         File light_file = File.new_for_path (light_path);
                         try {
-                            if (light_file.query_exists ()) {
+                            string light_theme_data = theme.get_light_theme ();
+                            if (light_file.query_exists () && need_to_update_theme (light_theme_data, light_file)) {
                                 light_file.delete ();
+                                FileManager.save_file (light_file, light_theme_data.data);
                             }
-                            FileManager.save_file (light_file, theme.get_light_theme ().data);
                         } catch (Error e) {
                             warning ("Could not save local scheme: %s", e.message);
                         }
@@ -145,7 +160,7 @@ namespace ThiefMD.Controllers.UI {
     public void load_css_scheme () {
         var settings = AppSettings.get_default ();
         Ultheme.HexColorPalette palette;
-        warning ("Using %s", settings.custom_theme);
+        debug ("Using %s", settings.custom_theme);
         if (settings.ui_editor_theme && settings.theme_id != "thiefmd") {
             string style_path = Path.build_filename (UserData.style_path, settings.custom_theme);
             File style = File.new_for_path (style_path);
