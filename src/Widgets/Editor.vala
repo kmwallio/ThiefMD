@@ -27,8 +27,9 @@ namespace ThiefMD.Widgets {
         // Things related to the file of this instance
         //
 
-        public File file;
+        private File file;
         public new Gtk.SourceBuffer buffer;
+        private string opened_filename;
         public string preview_markdown = "";
         private bool active = true;
 
@@ -128,7 +129,7 @@ namespace ThiefMD.Widgets {
                 if (value){
                     bool move_screen = false;
                     // Update the file if it was changed from disk
-                    if (file.query_exists ())
+                    if (opened_filename != "" && file.query_exists ())
                     {
                         string text;
                         try {
@@ -186,6 +187,7 @@ namespace ThiefMD.Widgets {
                     size_allocate.connect (dynamic_margins);
                     dynamic_margins ();
                     should_scroll = true;
+                    update_preview ();
                 } else {
                     if (active != value) {
                         cursor_location = buffer.cursor_position;
@@ -256,7 +258,7 @@ namespace ThiefMD.Widgets {
         }
 
         public bool save () throws Error {
-            if (file.query_exists () && !FileUtils.test (file.get_path (), FileTest.IS_DIR)) {
+            if (opened_filename != "" && file.query_exists () && !FileUtils.test (file.get_path (), FileTest.IS_DIR)) {
                 FileManager.save_file (file, buffer.text.data);
                 return true;
             }
@@ -312,7 +314,7 @@ namespace ThiefMD.Widgets {
 
         public void on_text_modified () {
             SheetManager.last_modified (this);
-            if (file != null && file.query_exists ()) {
+            if (file != null && opened_filename != "" && file.query_exists ()) {
                 editable = true;
             }
 
@@ -412,6 +414,7 @@ namespace ThiefMD.Widgets {
         }
 
         public bool open_file (string file_name) {
+            opened_filename = file_name;
             file = File.new_for_path (file_name);
 
             // We do this after creating the file in case

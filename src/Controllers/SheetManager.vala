@@ -99,15 +99,12 @@ namespace ThiefMD.Controllers.SheetManager {
 
     public string get_markdown () {
         StringBuilder builder = new StringBuilder ();
-        for (int i = 0; i < _active_editors.size; i++) {
-            SheetPair sp = _active_editors.get (i);
+        foreach (var sp in _active_editors) {
             string text = (sp == _currentSheet) ? sp.editor.active_markdown () : sp.editor.buffer.text;
-            if (i > 0) {
-                builder.append (FileManager.get_yamlless_markdown (text, 0, true, true, false));
-            } else {
-                builder.append (text);
-            }
+            builder.append (FileManager.get_yamlless_markdown (text, 0, true, true, false));
         }
+
+        warning ("Preview markdown\n%s", builder.str);
 
         return builder.str;
     }
@@ -200,6 +197,7 @@ namespace ThiefMD.Controllers.SheetManager {
         _currentSheet.editor.am_active = true;
         _active_editors.add (_currentSheet);
         loaded_file = _currentSheet.editor;
+        settings.last_file = sheet.file_path ();
 
         debug ("Tried to load %s (%s)\n", sheet.file_path (), (loaded_file != null) ? "success" : "failed");
 

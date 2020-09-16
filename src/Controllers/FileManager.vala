@@ -118,18 +118,23 @@ namespace ThiefMD.Controllers.FileManager {
         return file_contents;
     }
 
-    public string get_yamlless_markdown (string buffer, int lines, bool non_empty = true, bool include_title = true, bool include_date = true)
+    public string get_yamlless_markdown (string markdown, int lines, bool non_empty = true, bool include_title = true, bool include_date = true)
     {
+        string buffer = markdown;
         Regex headers = null;
         try {
-            headers = new Regex ("^\\s*(.+)\\s*:\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            headers = new Regex ("^\\s*(.+)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
         } catch (Error e) {
             warning ("Could not compile regex: %s", e.message);
         }
 
         MatchInfo matches;
-        var markdown = new StringBuilder ();
+        var markout = new StringBuilder ();
         int mklines = 0;
+
+        if (buffer.has_prefix ("---" + ThiefProperties.THIEF_MARK_CONST)) {
+            buffer = buffer.replace (ThiefProperties.THIEF_MARK_CONST, "");
+        }
 
         if (buffer.length > 4 && buffer[0:4] == "---\n") {
             int i = 0;
@@ -145,6 +150,7 @@ namespace ThiefMD.Controllers.FileManager {
                     break;
                 }
                 line = buffer[last_newline+1:next_newline];
+                line = line.replace (ThiefProperties.THIEF_MARK_CONST, "");
                 last_newline = next_newline;
 
                 if (line == "---") {
@@ -152,18 +158,18 @@ namespace ThiefMD.Controllers.FileManager {
                 }
 
                 if (headers != null) {
-                    if (headers.match (line, RegexMatchFlags.NOTEMPTY, out matches)) {
+                    if (headers.match (line, RegexMatchFlags.NOTEMPTY_ATSTART, out matches)) {
                         if (include_title && matches.fetch (1).ascii_down() == "title") {
-                            markdown.append ("# " + matches.fetch (2).replace ("\"", "") + "\n");
+                            markout.append ("# " + matches.fetch (2).replace ("\"", "") + "\n");
                             mklines++;
                         } else if (include_date && matches.fetch (1).ascii_down() == "date") {
-                            markdown.append ("## " + matches.fetch (2) + "\n");
+                            markout.append ("## " + matches.fetch (2) + "\n");
                             mklines++;
                         }
                     } else {
                         // If it's a list or empty line, we're cool
-                        line = line.down ();
-                        if (!line.chomp ().has_prefix ("-") && line.chomp () != "" && line.chomp ().has_prefix ("categories")) {
+                        line = line.down ().chomp ();
+                        if (!line.has_prefix ("-") && line != "") {
                             valid_frontmatter = false;
                             break;
                         }
@@ -171,9 +177,9 @@ namespace ThiefMD.Controllers.FileManager {
                 } else {
                     string quick_parse = line.chomp ();
                     if (quick_parse.has_prefix ("title")) {
-                        markdown.append ("# " + quick_parse.substring (quick_parse.index_of (":") + 1));
+                        markout.append ("# " + quick_parse.substring (quick_parse.index_of (":") + 1));
                     } else if (quick_parse.has_prefix ("date")) {
-                        markdown.append ("## " + quick_parse.substring (quick_parse.index_of (":") + 1));
+                        markout.append ("## " + quick_parse.substring (quick_parse.index_of (":") + 1));
                     }
                 }
 
@@ -181,16 +187,16 @@ namespace ThiefMD.Controllers.FileManager {
             }
 
             if (!valid_frontmatter) {
-                markdown.erase ();
-                markdown.append (buffer);
+                markout.erase ();
+                markout.append (markdown);
             } else {
-                markdown.append (buffer[last_newline:buffer.length]);
+                markout.append (buffer[last_newline:buffer.length]);
             }
         } else {
-            markdown.append (buffer);
+            markout.append (markdown);
         }
 
-        return markdown.str;
+        return markout.str;
     }
 
     public string get_file_lines_yaml (string file_path, int lines, bool non_empty = true) {
