@@ -60,6 +60,7 @@ executable(
     'src/Constants/AppSettings.vala',
     'src/Constants/DragAndDrop.vala',
     'src/Constants/ThiefProperties.vala',
+    'src/Constants/Helpers.vala',
     'src/Widgets/About.vala',
     'src/Widgets/HeaderBar.vala',
     'src/Widgets/Sheets.vala',

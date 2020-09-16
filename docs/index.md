@@ -39,13 +39,24 @@ See what your work looks like in real time. Is that your battery draining? Yes, 
 
 # Get ThiefMD!
 
+## RPM or Deb?
+
 [Download the latest release](https://github.com/kmwallio/ThiefMD/releases).
 
-Want to check out and build the source? [Instructions are on GitHub](https://github.com/kmwallio/ThiefMD). It's built with Vala and GTK. There's no plans on porting to Mac or Windows. On Mac, we recommend [Ulysses](https://ulysses.app). On Windows, we recommend [Typora](https://typora.io).
+## Flatpak
+
+[ThiefMD](https://flathub.org/apps/details/com.github.kmwallio.thiefmd) is now available on Flathub. Make sure you've added [flathub](https://flatpak.org/setup) to your system.
+
+```bash
+flatpak install flathub com.github.kmwallio.thiefmd
+```
+
+## Build from Source
+
+Want to check out and build the source? [Instructions are on GitHub](https://github.com/kmwallio/ThiefMD#dependencies). It's built with Vala and GTK. There's no plans on porting to Mac or Windows. On Mac, we recommend [Ulysses](https://ulysses.app). On Windows, we recommend [Typora](https://typora.io).
 
 <img src="images/brooke-cagle-happy-people.jpg" />
 
-These is a stock photo of **happy** people.  They're not using ThiefMD. The photo of people is by [Brooke Cagle](https://unsplash.com/@brookecagle), Wheat by [Matt Hoffman
-](https://unsplash.com/@__matthoffman__), and more Wheat by [Jonas Zürcher](https://unsplash.com/@tsueri).
+These is a stock photo of **happy** people.  They're not using ThiefMD. The photo of people is by [Brooke Cagle](https://unsplash.com/@brookecagle), Wheat by [Matt Hoffman](https://unsplash.com/@__matthoffman__), and more Wheat by [Jonas Zürcher](https://unsplash.com/@tsueri).
 
 ThiefMD should be gluten and allergy free but was made in a facility that handles wheat, nuts, and shellfish.

@@ -23,183 +23,18 @@ using ThiefMD.Widgets;
 namespace ThiefMD.Controllers.FileManager {
     public static bool disable_save = false;
 
-    public File tmp_file;
-    public File file;
-    public Widgets.Editor view;
-
     public void save_file (File save_file, uint8[] buffer) throws Error {
+        if (save_file.query_exists ()) {
+            save_file.delete ();
+        }
+
         var output = new DataOutputStream (save_file.create(FileCreateFlags.REPLACE_DESTINATION));
         long written = 0;
         while (written < buffer.length)
             written += output.write (buffer[written:buffer.length]);
     }
 
-    public bool is_file_open () {
-        var settings = AppSettings.get_default ();
-        var file = File.new_for_path (settings.last_file);
-        bool file_opened = true;
-
-        if (file.get_path () == null || file.get_path () == "" || !file.query_exists ()) {
-            file_opened = false;
-        }
-
-        return file_opened;
-    }
-
-    private void save_work_file () {
-        var lock = new FileLock ();
-        var settings = AppSettings.get_default ();
-
-        if (settings.last_file == "" || settings.last_file == null) {
-            return;
-        }
-
-        var file = File.new_for_path (settings.last_file);
-
-        if (file.query_exists ()) {
-            try {
-                file.delete ();
-            } catch (Error e) {
-                warning ("Error: %s\n", e.message);
-            }
-
-            Gtk.TextIter start, end;
-            Widgets.Editor.buffer.get_bounds (out start, out end);
-
-            string buffer = Widgets.Editor.buffer.get_text (start, end, true);
-            uint8[] binbuffer = buffer.data;
-
-            try {
-                save_file (file, binbuffer);
-            } catch (Error e) {
-                warning ("Exception found: "+ e.message);
-            }
-        }
-
-        SheetManager.refresh_sheet ();
-    }
-
-    public File setup_tmp_file () {
-        debug ("Setupping cache...");
-        string cache_path = Path.build_filename (Environment.get_user_cache_dir (), "com.github.kmwallio.thiefmd");
-        var cache_folder = File.new_for_path (cache_path);
-        if (!cache_folder.query_exists ()) {
-            try {
-                cache_folder.make_directory_with_parents ();
-            } catch (Error e) {
-                warning ("Error: %s\n", e.message);
-            }
-        }
-
-        tmp_file = cache_folder.get_child ("temp");
-        return tmp_file;
-    }
-
-    private void save_tmp_file () {
-        setup_tmp_file ();
-
-        debug ("Saving cache...");
-        if ( tmp_file.query_exists () ) {
-            try {
-                tmp_file.delete();
-            } catch (Error e) {
-                warning ("Error: %s\n", e.message);
-            }
-
-        }
-
-        Gtk.TextIter start, end;
-        Widgets.Editor.buffer.get_bounds (out start, out end);
-
-        string buffer = Widgets.Editor.buffer.get_text (start, end, true);
-        uint8[] binbuffer = buffer.data;
-
-        try {
-            save_file (tmp_file, binbuffer);
-        } catch (Error e) {
-            warning ("Exception found: "+ e.message);
-        }
-    }
-
-    // File I/O
-    public void new_file () {
-        var lock = new FileLock ();
-        debug ("New button pressed.");
-        debug ("Buffer was modified. Asking user to save first.");
-        var settings = AppSettings.get_default ();
-        var dialog = new Controllers.Dialogs.Dialog.display_save_confirm (ThiefApp.get_instance ().main_window);
-        dialog.response.connect ((response_id) => {
-            switch (response_id) {
-                case Gtk.ResponseType.YES:
-                    debug ("User saves the file.");
-
-                    try {
-                        Controllers.FileManager.save ();
-                        string cache = Path.build_filename (Environment.get_user_cache_dir (), "com.github.kmwallio.thiefmd" + "/temp");
-                        file = File.new_for_path (cache);
-                        Widgets.Editor.buffer.text = "";
-                        settings.last_file = file.get_path ();
-                        
-                    } catch (Error e) {
-                        warning ("Unexpected error during save: " + e.message);
-                    }
-                    break;
-                case Gtk.ResponseType.NO:
-                    debug ("User doesn't care about the file, shoot it to space.");
-
-                    string cache = Path.build_filename (Environment.get_user_cache_dir (), "com.github.kmwallio.thiefmd" + "/temp");
-                    file = File.new_for_path (cache);
-                    Widgets.Editor.buffer.text = "";
-                    settings.last_file = file.get_path ();
-                    
-                    break;
-                case Gtk.ResponseType.CANCEL:
-                    debug ("User cancelled, don't do anything.");
-                    break;
-                case Gtk.ResponseType.DELETE_EVENT:
-                    debug ("User cancelled, don't do anything.");
-                    break;
-            }
-            dialog.destroy();
-        });
-
-        if (view.is_modified) {
-            dialog.show ();
-            view.is_modified = false;
-        } else {
-            try {
-                Controllers.FileManager.save ();
-            } catch (Error e) {
-                warning ("Unexpected error during save: " + e.message);
-            }
-            string cache = Path.build_filename (Environment.get_user_cache_dir (), "com.github.kmwallio.thiefmd" + "/temp");
-            file = File.new_for_path (cache);
-            Widgets.Editor.buffer.text = "";
-            settings.last_file = file.get_path ();
-            
-        }
-    }
-
-    public bool open_from_outside (File[] files, string hint) {
-        var lock = new FileLock ();
-        if (files.length > 0) {
-            var file = files[0];
-            string text;
-            var settings = AppSettings.get_default ();
-            settings.last_file = file.get_path ();
-            
-
-            try {
-                GLib.FileUtils.get_contents (file.get_path (), out text);
-                Widgets.Editor.buffer.text = text;
-            } catch (Error e) {
-                warning ("Error: %s", e.message);
-            }
-        }
-        return true;
-    }
-
-    public bool open_file (string file_path) {
+    public void open_file (string file_path, out Widgets.Editor editor) {
         bool file_opened = false;
         var lock = new FileLock ();
         var settings = AppSettings.get_default ();
@@ -211,8 +46,7 @@ namespace ThiefMD.Controllers.FileManager {
             if (file.query_exists ()) {
                 string filename = file.get_path ();
                 debug ("Reading %s\n", filename);
-                GLib.FileUtils.get_contents (filename, out text);
-                Widgets.Editor.buffer.text = text;
+                editor = new Widgets.Editor (filename);
                 settings.last_file = filename;
                 file_opened = true;
             } else {
@@ -221,8 +55,6 @@ namespace ThiefMD.Controllers.FileManager {
         } catch (Error e) {
             warning ("Error: %s", e.message);
         }
-
-        return file_opened;
     }
 
     public bool copy_item (string source_file, string destination_folder) throws Error
@@ -238,22 +70,14 @@ namespace ThiefMD.Controllers.FileManager {
         bool is_active = false;
         var settings = AppSettings.get_default ();
 
-        if (SheetManager.get_sheet ().file_path () == source_file)
+        if (SheetManager.close_active_file (source_file))
         {
-            if (settings.last_file != "") {
-                FileManager.save_work_file ();
-            }
             is_active = true;
         }
 
         File to_move = File.new_for_path (source_file);
         File final_destination = File.new_for_path (Path.build_filename (destination_folder, to_move.get_basename ()));
         moved = to_move.move (final_destination, FileCopyFlags.NONE);
-
-        if (is_active && moved)
-        {
-            open_file (final_destination.get_path ());
-        }
 
         return moved;
     }
@@ -294,18 +118,23 @@ namespace ThiefMD.Controllers.FileManager {
         return file_contents;
     }
 
-    public string get_yamlless_markdown (string buffer, int lines, bool non_empty = true, bool include_title = true, bool include_date = true)
+    public string get_yamlless_markdown (string markdown, int lines, bool non_empty = true, bool include_title = true, bool include_date = true)
     {
+        string buffer = markdown;
         Regex headers = null;
         try {
-            headers = new Regex ("^\\s*(.+)\\s*:\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            headers = new Regex ("^\\s*(.+)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
         } catch (Error e) {
             warning ("Could not compile regex: %s", e.message);
         }
 
         MatchInfo matches;
-        var markdown = new StringBuilder ();
+        var markout = new StringBuilder ();
         int mklines = 0;
+
+        if (buffer.has_prefix ("---" + ThiefProperties.THIEF_MARK_CONST)) {
+            buffer = buffer.replace (ThiefProperties.THIEF_MARK_CONST, "");
+        }
 
         if (buffer.length > 4 && buffer[0:4] == "---\n") {
             int i = 0;
@@ -321,6 +150,7 @@ namespace ThiefMD.Controllers.FileManager {
                     break;
                 }
                 line = buffer[last_newline+1:next_newline];
+                line = line.replace (ThiefProperties.THIEF_MARK_CONST, "");
                 last_newline = next_newline;
 
                 if (line == "---") {
@@ -328,18 +158,18 @@ namespace ThiefMD.Controllers.FileManager {
                 }
 
                 if (headers != null) {
-                    if (headers.match (line, RegexMatchFlags.NOTEMPTY, out matches)) {
+                    if (headers.match (line, RegexMatchFlags.NOTEMPTY_ATSTART, out matches)) {
                         if (include_title && matches.fetch (1).ascii_down() == "title") {
-                            markdown.append ("# " + matches.fetch (2).replace ("\"", "") + "\n");
+                            markout.append ("# " + matches.fetch (2).replace ("\"", "") + "\n");
                             mklines++;
                         } else if (include_date && matches.fetch (1).ascii_down() == "date") {
-                            markdown.append ("## " + matches.fetch (2) + "\n");
+                            markout.append ("## " + matches.fetch (2) + "\n");
                             mklines++;
                         }
                     } else {
                         // If it's a list or empty line, we're cool
-                        line = line.down ();
-                        if (!line.chomp ().has_prefix ("-") && line.chomp () != "" && line.chomp ().has_prefix ("categories")) {
+                        line = line.down ().chomp ();
+                        if (!line.has_prefix ("-") && line != "") {
                             valid_frontmatter = false;
                             break;
                         }
@@ -347,9 +177,9 @@ namespace ThiefMD.Controllers.FileManager {
                 } else {
                     string quick_parse = line.chomp ();
                     if (quick_parse.has_prefix ("title")) {
-                        markdown.append ("# " + quick_parse.substring (quick_parse.index_of (":") + 1));
+                        markout.append ("# " + quick_parse.substring (quick_parse.index_of (":") + 1));
                     } else if (quick_parse.has_prefix ("date")) {
-                        markdown.append ("## " + quick_parse.substring (quick_parse.index_of (":") + 1));
+                        markout.append ("## " + quick_parse.substring (quick_parse.index_of (":") + 1));
                     }
                 }
 
@@ -357,16 +187,16 @@ namespace ThiefMD.Controllers.FileManager {
             }
 
             if (!valid_frontmatter) {
-                markdown.erase ();
-                markdown.append (buffer);
+                markout.erase ();
+                markout.append (markdown);
             } else {
-                markdown.append (buffer[last_newline:buffer.length]);
+                markout.append (buffer[last_newline:buffer.length]);
             }
         } else {
-            markdown.append (buffer);
+            markout.append (markdown);
         }
 
-        return markdown.str;
+        return markout.str;
     }
 
     public string get_file_lines_yaml (string file_path, int lines, bool non_empty = true) {
@@ -506,91 +336,14 @@ namespace ThiefMD.Controllers.FileManager {
         return file_contents;
     }
 
-    public void open () throws Error {
-        var lock = new FileLock ();
-        debug ("Open button pressed.");
-        var settings = AppSettings.get_default ();
-        var file = Controllers.Dialogs.display_open_dialog ();
-
-        try {
-            debug ("Opening file...");
-            if (file == null) {
-                debug ("User cancelled operation. Aborting.");
-            } else {
-                string text;
-                GLib.FileUtils.get_contents (file.get_path (), out text);
-                Widgets.Editor.buffer.text = text;
-                settings.last_file = file.get_path ();
-            }
-        } catch (Error e) {
-            warning ("Unexpected error during open: " + e.message);
-        }
-
-        view.is_modified = false;
-        file = null;
-    }
-
     public void save () throws Error {
         debug ("Save button pressed.");
-        var settings = AppSettings.get_default ();
-
-        if (settings.last_file == "" || settings.last_file == null) {
-            return;
-        }
-
-        var file = File.new_for_path (settings.last_file);
-
-        if (file.query_exists ()) {
-            try {
-                file.delete ();
-            } catch (Error e) {
-                warning ("Error: " + e.message);
-            }
-        }
-
-        Gtk.TextIter start, end;
-        Widgets.Editor.buffer.get_bounds (out start, out end);
-        string buffer = Widgets.Editor.buffer.get_text (start, end, true);
-        uint8[] binbuffer = buffer.data;
 
         try {
-            save_file (file, binbuffer);
+            SheetManager.save_active ();
         } catch (Error e) {
             warning ("Unexpected error during save: " + e.message);
         }
-
-        file = null;
-        view.is_modified = false;
-    }
-
-    public void save_as () throws Error {
-        var lock = new FileLock ();
-        debug ("Save as button pressed.");
-        var settings = AppSettings.get_default ();
-        var file = Controllers.Dialogs.display_save_dialog ();
-        settings.last_file = file.get_path ();
-
-        try {
-            debug ("Saving file...");
-            if (file == null) {
-                debug ("User cancelled operation. Aborting.");
-            } else {
-                if (file.query_exists ()) {
-                    file.delete ();
-                }
-
-                Gtk.TextIter start, end;
-                Widgets.Editor.buffer.get_bounds (out start, out end);
-                string buffer = Widgets.Editor.buffer.get_text (start, end, true);
-                uint8[] binbuffer = buffer.data;
-                save_file (file, binbuffer);
-            }
-        } catch (Error e) {
-            warning ("Unexpected error during save: " + e.message);
-        }
-
-        file = null;
-        view.is_modified = false;
     }
 
     public static bool create_sheet (string parent_folder, string file_name) {
@@ -607,7 +360,6 @@ namespace ThiefMD.Controllers.FileManager {
 
                 try {
                     save_file (new_file, binbuffer);
-                    open_file (new_file.get_path ());
                     file_created = true;
                 } catch (Error e) {
                     warning ("Exception found: "+ e.message);

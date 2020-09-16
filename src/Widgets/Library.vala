@@ -64,7 +64,6 @@ namespace ThiefMD.Widgets {
         public Library () {
             debug ("Setting up library");
             _lib_store = new TreeStore (2, typeof (string), typeof (LibPair));
-            // GLib.Idle.add (parse_library); // Breaks highlighting files on open
             parse_library ();
             set_model (_lib_store);
             insert_column_with_attributes (-1, "Library", new CellRendererText (), "text", 0, null);

@@ -199,6 +199,16 @@ namespace ThiefMD.Widgets {
             reload_sheets ();
         }
 
+        public List<Sheet> get_sheets () {
+            List<Sheet> list = new List<Sheet> ();
+            foreach (var sheet in metadata.sheet_order) {
+                if (_sheets.has_key (sheet)) {
+                    list.append (_sheets.get (sheet));
+                }
+            }
+            return list;
+        }
+
         public void load_sheets () {
             var settings = AppSettings.get_default ();
             if (_empty != null) {

@@ -22,14 +22,21 @@ using Gdk;
 
 namespace ThiefMD.Widgets {
     public class Editor : Gtk.SourceView {
-        public static new Gtk.SourceBuffer buffer;
-        public static string scroll_text = "";
-        public static double cursor_position = 0;
-        public bool is_modified { get; set; default = false; }
-        private bool should_scroll { get; set; default = false; }
-        private bool should_save { get; set; default = false; }
-        private bool should_update_preview { get; set; default = false; }
-        public File file;
+
+        //
+        // Things related to the file of this instance
+        //
+
+        private File file;
+        public new Gtk.SourceBuffer buffer;
+        private string opened_filename;
+        public string preview_markdown = "";
+        private bool active = true;
+
+        //
+        // UI Items
+        //
+
         public GtkSpell.Checker spell = null;
         public Gtk.TextTag warning_tag;
         public Gtk.TextTag error_tag;
@@ -38,138 +45,26 @@ namespace ThiefMD.Widgets {
         private bool spellcheck_active;
         private bool typewriter_active;
 
-        public Editor () {
-            update_settings ();
+        //
+        // Maintaining state
+        //
+
+        public bool is_modified { get; set; default = false; }
+        private bool should_scroll { get; set; default = false; }
+        private bool should_save { get; set; default = false; }
+
+        public Editor (string file_path) {
             var settings = AppSettings.get_default ();
             settings.changed.connect (update_settings);
 
-            try {
-                string text;
-                var file = File.new_for_path (settings.last_file);
-
-                if ((settings.last_file != null) &&
-                    (settings.last_file != "") &&
-                    file.query_exists ())
-                {
-                    string filename = file.get_path ();
-                    GLib.FileUtils.get_contents (filename, out text);
-                    set_text (text, true);
-                    editable = true;
-                } else {
-                    set_text (Constants.FIRST_USE, true);
-                    editable = false;
-                }
-            } catch (Error e) {
-                warning ("Error: %s\n", e.message);
+            if (!open_file (file_path)) {
+                set_text (Constants.FIRST_USE, true);
+                editable = false;
             }
 
-            this.populate_popup.connect ((source, menu) => {
-                Gtk.MenuItem menu_insert_datetime = new Gtk.MenuItem.with_label (_("Insert Datetime"));
-                menu_insert_datetime.activate.connect (() => {
-                    DateTime now = new DateTime.now_local ();
-                    string new_text = now.format ("%F %H:%M");
-                    insert_at_cursor (new_text);
-                });
-
-                Gtk.MenuItem menu_insert_frontmatter = new Gtk.MenuItem.with_label (_("Insert YAML Frontmatter"));
-                menu_insert_frontmatter.activate.connect (() => {
-                    if (!buffer.text.has_prefix ("---")) {
-                        var settings_menu = AppSettings.get_default ();
-                        int new_cursor_location = 0;
-                        File current_file = File.new_for_path (settings_menu.last_file);
-                        Regex date = null;
-                        try {
-                            date = new Regex ("([0-9]{4}-[0-9]{1,2}-[0-9]{1,2}-?)?(.*?)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-                        } catch (Error e) {
-                            warning ("Could not compile regex: %s", e.message);
-                        }
-
-                        DateTime now = new DateTime.now_local ();
-                        string current_time = now.format ("%F %H:%M");
-
-                        string parent_folder = current_file.get_parent ().get_basename ().down ();
-                        string page_type = (parent_folder.contains ("post") || parent_folder.contains ("draft")) ? "post" : "page";
-                        string current_title = current_file.get_basename ();
-                        current_title = current_title.substring (0, current_title.last_index_of ("."));
-
-                        // Attempt to convert the file name into a title for the post
-                        try {
-                            if (date != null) {
-                                current_title = date.replace_eval (
-                                    current_title,
-                                    (ssize_t) current_title.length,
-                                    0,
-                                    RegexMatchFlags.NOTEMPTY,
-                                    (match_info, result) =>
-                                    {
-                                        result.append (match_info.fetch (match_info.get_match_count () - 1));
-                                        return false;
-                                    }
-                                );
-                            }
-                        } catch (Error e) {
-                            warning ("Could not generate title");
-                        }
-
-                        current_title = current_title.replace ("_", " ");
-                        current_title = current_title.replace ("-", " ");
-                        string [] parts = current_title.split (" ");
-                        if (parts != null && parts.length != 0) {
-                            current_title = "";
-                            foreach (var part in parts) {
-                                part = part.substring (0, 1).up () + part.substring (1).down ();
-                                current_title += part + " ";
-                            }
-                            current_title = current_title.chomp ();
-                        }
-
-                        // Build the front matter
-                        string frontmatter = "---\n";
-                        frontmatter += "layout: " + page_type + "\n";
-                        frontmatter += "title: ";
-                        new_cursor_location = frontmatter.length;
-                        frontmatter += current_title + "\n";
-                        // Only insert datetime if we think it's a post
-                        if (page_type == "post") {
-                            frontmatter += "date: " + current_time + "\n";
-                        }
-                        frontmatter += "---\n";
-
-                        // Place the text
-                        buffer.text = frontmatter + buffer.text;
-
-                        // Move the cursor to select the title
-                        Gtk.TextIter start, end;
-                        buffer.get_bounds(out start, out end);
-                        start.forward_chars (new_cursor_location);
-                        end = start;
-                        end.forward_line ();
-                        end.backward_char ();
-                        buffer.place_cursor (start);
-                        buffer.select_range (start, end);
-
-                        // Move the frontmatter onscreen
-                        should_scroll = true;
-                        move_typewriter_scolling ();
-                    }
-                });
-
-                menu.append (menu_insert_datetime);
-                menu.append (menu_insert_frontmatter);
-                menu.show_all ();
-
-                menu.selection_done.connect (() => {
-                    var selected = get_selected (menu);
-
-                    if (selected != null) {
-                        try {
-                            spell.set_language (selected.label);
-                            settings.spellcheck_language = selected.label;
-                        } catch (Error e) {
-                        }
-                    }
-                });
-            });
+            build_menu ();
+            update_settings ();
+            dynamic_margins ();
         }
 
         construct {
@@ -177,11 +72,7 @@ namespace ThiefMD.Widgets {
 
             buffer = new Gtk.SourceBuffer.with_language (UI.get_source_language ());
             buffer.highlight_syntax = true;
-            buffer.set_max_undo_levels (20);
-            buffer.changed.connect (() => {
-                is_modified = true;
-                on_text_modified ();
-            });
+            buffer.set_max_undo_levels (Constants.MAX_UNDO_LEVELS);
 
             warning_tag = new Gtk.TextTag ("warning_bg");
             warning_tag.underline = Pango.Underline.ERROR;
@@ -195,18 +86,6 @@ namespace ThiefMD.Widgets {
 
             is_modified = false;
 
-            if (settings.autosave == true) {
-                Timeout.add (10000, autosave);
-            }
-
-            //
-            // Register for redrawing of window for handling margins and other
-            // redrawing
-            //
-            size_allocate.connect (() => {
-                dynamic_margins();
-            });
-
             this.set_buffer (buffer);
             this.set_wrap_mode (Gtk.WrapMode.WORD_CHAR);
             this.top_margin = Constants.TOP_MARGIN;
@@ -215,28 +94,132 @@ namespace ThiefMD.Widgets {
             this.has_focus = true;
             this.set_tab_width (4);
             this.set_insert_spaces_instead_of_tabs (true);
-            set_scheme (settings.get_valid_theme_id ());
+            Timeout.add (250, () => {
+                set_scheme (settings.get_valid_theme_id ());
+                return false;
+            });
+            dynamic_margins ();
             spell = new GtkSpell.Checker ();
 
             if (settings.spellcheck) {
-                debug ("Activate spellcheck\n");
+                debug ("Spellcheck active");
                 spell.attach (this);
                 spellcheck_active = true;
             } else {
-                debug ("Disable spellcheck\n");
+                debug ("Spellcheck inactive");
                 spellcheck_active = false;
             }
 
-            typewriter_active = settings.typewriter_scrolling;
-            if (typewriter_active) {
-                Timeout.add(500, move_typewriter_scolling);
-            }
             last_width = settings.window_width;
             last_height = settings.window_height;
-            show_all ();
+            preview_mutex = new TimedMutex ();
         }
 
         public signal void changed ();
+
+        public void on_change_notification () {
+            is_modified = true;
+            on_text_modified ();
+        }
+
+        private int cursor_location;
+        public bool am_active {
+            set {
+                var settings = AppSettings.get_default ();
+                if (value){
+                    bool move_screen = false;
+                    // Update the file if it was changed from disk
+                    if (opened_filename != "" && file.query_exists ())
+                    {
+                        string text;
+                        try {
+                            string checksum_on_close = Checksum.compute_for_string (ChecksumType.MD5, buffer.text);
+                            string filename = file.get_path ();
+                            GLib.FileUtils.get_contents (filename, out text);
+                            string checksum_on_open = Checksum.compute_for_string (ChecksumType.MD5, text);
+                            if (checksum_on_close != checksum_on_open) {
+                                warning ("File changed on disk (%s != %s), rereading", checksum_on_open, checksum_on_close);
+                                set_text (text, true);
+                                move_screen = true;
+                            }
+                            if (cursor_location > text.length) {
+                                cursor_location = text.length - 1;
+                            }
+                        } catch (Error e) {
+                            warning ("Could not load file from disk: %s", e.message);
+                        }
+
+                        editable = true;
+                    }
+
+                    preview_markdown = buffer.text;
+                    active = true;
+
+                    set_scheme (settings.get_valid_theme_id ());
+
+                    if (move_screen) {
+                        debug ("Cursor found at: %d", cursor_location);
+                        // Move the cursor
+                        set_cursor_visible (true);
+                        Gtk.TextIter new_cursor_location;
+                        buffer.get_start_iter (out new_cursor_location);
+                        new_cursor_location.forward_chars (cursor_location);
+                        buffer.place_cursor (new_cursor_location);
+                        scroll_to_iter (new_cursor_location, 0.0, true, 0.0, Constants.TYPEWRITER_POSITION);
+                    }
+
+                    buffer.changed.connect (on_change_notification);
+                    settings.changed.connect (update_settings);
+
+                    typewriter_active = settings.typewriter_scrolling;
+                    if (typewriter_active) {
+                        Timeout.add(Constants.TYPEWRITER_UPDATE_TIME, move_typewriter_scolling);
+                    }
+
+                    if (settings.autosave) {
+                        Timeout.add (Constants.AUTOSAVE_TIMEOUT, autosave);
+                    }
+
+                    //
+                    // Register for redrawing of window for handling margins and other
+                    // redrawing
+                    //
+                    size_allocate.connect (dynamic_margins);
+                    dynamic_margins ();
+                    should_scroll = true;
+                    update_preview ();
+                } else {
+                    if (active != value) {
+                        cursor_location = buffer.cursor_position;
+                        debug ("Cursor saved at: %d", cursor_location);
+                        if (settings.spellcheck) {
+                            spell.detach ();
+                        }
+
+                        preview_markdown = "";
+                        try {
+                            save ();
+                        } catch (Error e) {
+                            warning ("Unable to save file " + file.get_basename () + ": " + e.message);
+                            SheetManager.show_error ("Unable to save file " + file.get_basename () + ": " + e.message);
+                        }
+                        buffer.changed.disconnect (on_change_notification);
+                        size_allocate.disconnect (dynamic_margins);
+                        settings.changed.disconnect (update_settings);
+                    }
+                    editable = false;
+                    active = false;
+                }
+            }
+        }
+
+        public string active_markdown () {
+            if (preview_markdown == "") {
+                return buffer.text;
+            }
+
+            return preview_markdown;
+        }
 
         public bool spellcheck {
             set {
@@ -274,14 +257,31 @@ namespace ThiefMD.Widgets {
             }
         }
 
+        public bool save () throws Error {
+            if (opened_filename != "" && file.query_exists () && !FileUtils.test (file.get_path (), FileTest.IS_DIR)) {
+                FileManager.save_file (file, buffer.text.data);
+                return true;
+            }
+            return false;
+        }
+
         private bool autosave () {
+            if (!active) {
+                return false;
+            }
+
             var settings = AppSettings.get_default ();
 
             //
             // Make sure we're not swapping files
             //
             if (should_save) {
-                FileManager.save_work_file ();
+                try {
+                    save ();
+                } catch (Error e) {
+                    warning ("Unable to save file " + file.get_basename () + ": " + e.message);
+                    SheetManager.show_error ("Unable to save file " + file.get_basename () + ": " + e.message);
+                }
                 should_save = false;
             }
 
@@ -313,7 +313,8 @@ namespace ThiefMD.Widgets {
         }
 
         public void on_text_modified () {
-            if (FileManager.is_file_open ()) {
+            SheetManager.last_modified (this);
+            if (file != null && opened_filename != "" && file.query_exists ()) {
                 editable = true;
             }
 
@@ -324,7 +325,7 @@ namespace ThiefMD.Widgets {
             if (!should_save) {
                 var settings = AppSettings.get_default ();
                 if (!settings.autosave) {
-                    Timeout.add (3000, autosave);
+                    Timeout.add (Constants.AUTOSAVE_TIMEOUT, autosave);
                 }
                 should_save = true;
             }
@@ -335,13 +336,15 @@ namespace ThiefMD.Widgets {
             }
 
             // Move the preview if present
-            if (!should_update_preview) {
-                Timeout.add (500, update_preview);
-                should_update_preview = true;
-            }
+            update_preview ();
         }
 
-        public bool update_preview () {
+        private TimedMutex preview_mutex;
+        public void update_preview () {
+            if (!preview_mutex.can_do_action ()) {
+                return;
+            }
+
             var cursor = buffer.get_insert ();
             if (cursor != null) {
                 Gtk.TextIter cursor_iter;
@@ -350,9 +353,7 @@ namespace ThiefMD.Widgets {
 
                 buffer.get_iter_at_mark (out cursor_iter, cursor);
                 buffer.get_iter_at_mark (out cursor_iter, cursor);;
-                //  scroll_text = buffer.get_text (start, cursor_iter, true);
-                //  scroll_text += "<span id='thiefmark'></span>";
-                //  scroll_text += buffer.get_text (cursor_iter, end, true);
+
                 string before = buffer.get_text (start, cursor_iter, true);
                 string last_line = before.substring (before.last_index_of ("\n") + 1);
                 string after = buffer.get_text (cursor_iter, end, true);
@@ -363,16 +364,14 @@ namespace ThiefMD.Widgets {
                 }
                 int adjustment = get_scrollmark_adjustment (last_line, first_line);
                 adjustment = skip_special_chars (after, adjustment);
-                scroll_text = before;
-                scroll_text += after.substring (0, adjustment);
-                scroll_text += ThiefProperties.THIEF_MARK_CONST;
-                scroll_text += after.substring (adjustment);
 
-                Preview.update_view ();
+                preview_markdown = before;
+                preview_markdown += after.substring (0, adjustment);
+                preview_markdown += ThiefProperties.THIEF_MARK_CONST;
+                preview_markdown += after.substring (adjustment);
+
+                UI.update_preview ();
             }
-
-            should_update_preview = false;
-            return false;
         }
 
         private int skip_special_chars (string haystack, int index = 0) {
@@ -414,8 +413,43 @@ namespace ThiefMD.Widgets {
             return 0;
         }
 
+        public bool open_file (string file_name) {
+            opened_filename = file_name;
+            file = File.new_for_path (file_name);
+
+            // We do this after creating the file in case
+            // we switched files or are caching this editor.
+            // We don't want this to become active again and
+            // corrupt a file.
+            if (file_name == "") {
+                return false;
+            }
+
+            if (file.query_exists ()) {
+                try {
+                    string text;
+                    file = File.new_for_path (file_name);
+
+                    if (file.query_exists ())
+                    {
+                        string filename = file.get_path ();
+                        GLib.FileUtils.get_contents (filename, out text);
+                        set_text (text, true);
+                        editable = true;
+                        return true;
+                    }
+                } catch (Error e) {
+                    warning ("Error: %s", e.message);
+                    SheetManager.show_error ("Unexpected Error: " + e.message);
+                }
+            }
+
+            return false;
+        }
+
         public void set_text (string text, bool opening = true) {
             if (opening) {
+                buffer.set_max_undo_levels (0);
                 buffer.begin_not_undoable_action ();
                 buffer.changed.disconnect (on_text_modified);
             }
@@ -423,6 +457,7 @@ namespace ThiefMD.Widgets {
             buffer.text = text;
 
             if (opening) {
+                buffer.set_max_undo_levels (Constants.MAX_UNDO_LEVELS);
                 buffer.end_not_undoable_action ();
                 buffer.changed.connect (on_text_modified);
             }
@@ -502,7 +537,7 @@ namespace ThiefMD.Widgets {
             typewriter_scrolling ();
             if (!typewriter_active && settings.typewriter_scrolling) {
                 typewriter_active = true;
-                Timeout.add(500, move_typewriter_scolling);
+                Timeout.add(Constants.TYPEWRITER_UPDATE_TIME, move_typewriter_scolling);
                 queue_draw ();
                 should_scroll = true;
                 move_typewriter_scolling ();
@@ -511,6 +546,15 @@ namespace ThiefMD.Widgets {
                 queue_draw ();
                 should_scroll = true;
                 move_typewriter_scolling ();
+            }
+
+            var buffer_context = this.get_style_context ();
+            if (settings.fullscreen) {
+                buffer_context.add_class ("full-text");
+                buffer_context.remove_class ("small-text");
+            } else {
+                buffer_context.add_class ("small-text");
+                buffer_context.remove_class ("full-text");
             }
 
             set_scheme (settings.get_valid_theme_id ());
@@ -539,15 +583,19 @@ namespace ThiefMD.Widgets {
 
         private string get_default_scheme () {
             var provider = new Gtk.CssProvider ();
+
             provider.load_from_resource ("/com/github/kmwallio/thiefmd/app-stylesheet.css");
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
             Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
-            Gtk.TextIter start, end;
-            buffer.get_bounds (out start, out end);
+
             return "thiefmd";
         }
 
         public bool move_typewriter_scolling () {
+            if (!active) {
+                return false;
+            }
+
             var settings = AppSettings.get_default ();
             var cursor = buffer.get_insert ();
 
@@ -557,6 +605,130 @@ namespace ThiefMD.Widgets {
             }
 
             return settings.typewriter_scrolling;
+        }
+
+        private void build_menu () {
+            if (file == null) {
+                return;
+            }
+
+            var settings = AppSettings.get_default ();
+            this.populate_popup.connect ((source, menu) => {
+                Gtk.MenuItem menu_insert_datetime = new Gtk.MenuItem.with_label (_("Insert Datetime"));
+                menu_insert_datetime.activate.connect (() => {
+                    DateTime now = new DateTime.now_local ();
+                    string new_text = now.format ("%F %H:%M");
+                    insert_at_cursor (new_text);
+                });
+
+                Gtk.MenuItem menu_insert_frontmatter = new Gtk.MenuItem.with_label (_("Insert YAML Frontmatter"));
+                menu_insert_frontmatter.activate.connect (() => {
+                    if (!buffer.text.has_prefix ("---")) {
+                        var settings_menu = AppSettings.get_default ();
+                        int new_cursor_location = 0;
+                        Regex date = null;
+                        try {
+                            date = new Regex ("([0-9]{4}-[0-9]{1,2}-[0-9]{1,2}-?)?(.*?)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+                        } catch (Error e) {
+                            warning ("Could not compile regex: %s", e.message);
+                        }
+
+                        DateTime now = new DateTime.now_local ();
+                        string current_time = now.format ("%F %H:%M");
+
+                        string parent_folder = file.get_parent ().get_basename ().down ();
+                        string page_type = (parent_folder.contains ("post") || parent_folder.contains ("draft")) ? "post" : "page";
+                        string current_title = file.get_basename ();
+                        current_title = current_title.substring (0, current_title.last_index_of ("."));
+
+                        // Attempt to convert the file name into a title for the post
+                        try {
+                            if (date != null) {
+                                current_title = date.replace_eval (
+                                    current_title,
+                                    (ssize_t) current_title.length,
+                                    0,
+                                    RegexMatchFlags.NOTEMPTY,
+                                    (match_info, result) =>
+                                    {
+                                        result.append (match_info.fetch (match_info.get_match_count () - 1));
+                                        return false;
+                                    }
+                                );
+                            }
+                        } catch (Error e) {
+                            warning ("Could not generate title");
+                        }
+
+                        current_title = current_title.replace ("_", " ");
+                        current_title = current_title.replace ("-", " ");
+                        string [] parts = current_title.split (" ");
+                        if (parts != null && parts.length != 0) {
+                            current_title = "";
+                            foreach (var part in parts) {
+                                part = part.substring (0, 1).up () + part.substring (1).down ();
+                                current_title += part + " ";
+                            }
+                            current_title = current_title.chomp ();
+                        }
+
+                        // Build the front matter
+                        string frontmatter = "---\n";
+                        frontmatter += "layout: " + page_type + "\n";
+                        frontmatter += "title: ";
+                        new_cursor_location = frontmatter.length;
+                        frontmatter += current_title + "\n";
+                        // Only insert datetime if we think it's a post
+                        if (page_type == "post") {
+                            frontmatter += "date: " + current_time + "\n";
+                        }
+                        frontmatter += "---\n";
+
+                        // Place the text
+                        buffer.text = frontmatter + buffer.text;
+
+                        // Move the cursor to select the title
+                        Gtk.TextIter start, end;
+                        buffer.get_bounds (out start, out end);
+                        start.forward_chars (new_cursor_location);
+                        end = start;
+                        end.forward_line ();
+                        end.backward_char ();
+                        buffer.place_cursor (start);
+                        buffer.select_range (start, end);
+
+                        // Move the frontmatter onscreen
+                        should_scroll = true;
+                        move_typewriter_scolling ();
+                    }
+                });
+
+                menu.append (menu_insert_datetime);
+                menu.append (menu_insert_frontmatter);
+                menu.show_all ();
+
+                menu.selection_done.connect (() => {
+                    var selected = get_selected (menu);
+
+                    if (selected != null) {
+                        try {
+                            spell.set_language (selected.label);
+                            settings.spellcheck_language = selected.label;
+                        } catch (Error e) {
+                        }
+                    }
+                });
+            });
+        }
+
+        public void clean () {
+            preview_markdown = "";
+            buffer.text = "";
+            editable = false;
+            spell.detach ();
+            spell.dispose ();
+            buffer.dispose ();
+            file = null;
         }
     }
 }
