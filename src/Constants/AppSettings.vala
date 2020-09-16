@@ -189,7 +189,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         }
 
         public bool can_update_theme () {
-            return app_settings.is_writable ("dark-mode") && app_settings.is_writable ("custome-theme");
+            return app_settings.is_writable ("dark-mode") && app_settings.is_writable ("custom-theme");
         }
 
         public signal void changed ();
