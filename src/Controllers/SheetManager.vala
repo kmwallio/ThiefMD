@@ -23,6 +23,7 @@ using ThiefMD.Widgets;
 namespace ThiefMD.Controllers.SheetManager {
     private SheetPair _currentSheet;
     private weak Sheets _current_sheets;
+    private Gee.LinkedList<Widgets.Editor> _editor_pool;
     private Gee.LinkedList<SheetPair> _editors;
     private Gee.LinkedList<SheetPair> _active_editors;
     private Gtk.ScrolledWindow _view;
@@ -33,6 +34,15 @@ namespace ThiefMD.Controllers.SheetManager {
     public void init () {
         if (_editors == null) {
             _editors = new Gee.LinkedList<SheetPair> ();
+        }
+
+        if (_editor_pool == null) {
+            _editor_pool = new Gee.LinkedList<Widgets.Editor> ();
+            for (int i = 0; i < Constants.EDITOR_POOL_SIZE; i++) {
+                Widgets.Editor new_editor = new Widgets.Editor ("");
+                new_editor.am_active = false;
+                _editor_pool.add (new_editor);
+            }
         }
 
         if (_active_editors == null) {
@@ -148,6 +158,15 @@ namespace ThiefMD.Controllers.SheetManager {
         return _currentSheet.sheet;
     }
 
+    private void open_file (string file_path, out Widgets.Editor editor) {
+        if (_editor_pool.size > 0) {
+            editor = _editor_pool.poll ();
+            editor.open_file (file_path);
+        } else {
+            FileManager.open_file (file_path, out editor);
+        }
+    }
+
     public static bool load_sheet (Sheet sheet) {
         if (_currentSheet != null && sheet == _currentSheet.sheet && _active_editors.size == 1) {
             return true;
@@ -172,7 +191,7 @@ namespace ThiefMD.Controllers.SheetManager {
         if (_currentSheet == null) {
             _currentSheet = new SheetPair ();
             _currentSheet.sheet = sheet;
-            FileManager.open_file (sheet.file_path (), out _currentSheet.editor);
+            open_file (sheet.file_path (), out _currentSheet.editor);
         } else {
             _editors.remove (_currentSheet);
         }
@@ -208,7 +227,7 @@ namespace ThiefMD.Controllers.SheetManager {
 
         SheetPair cached_sheet = new SheetPair ();
         cached_sheet.sheet = sheet;
-        FileManager.open_file (sheet.file_path (), out cached_sheet.editor);
+        open_file (sheet.file_path (), out cached_sheet.editor);
 
         if (cached_sheet.editor != null) {
             _editors.insert (0, cached_sheet);
@@ -358,11 +377,16 @@ namespace ThiefMD.Controllers.SheetManager {
         while (_editors.size > Constants.KEEP_X_SHEETS_IN_MEMORY) {
             SheetPair clean = _editors.poll ();
             clean.editor.am_active = false;
-            clean.editor.clean ();
-            clean.editor = null;
-            clean.sheet.active = false;
-            clean.sheet = null;
-            clean = null;
+            if (_editor_pool.size < Constants.EDITOR_POOL_SIZE) {
+                clean.editor.open_file ("");
+                _editor_pool.add (clean.editor);
+            } else {
+                clean.editor.clean ();
+                clean.editor = null;
+                clean.sheet.active = false;
+                clean.sheet = null;
+                clean = null;
+            }
         }
     }
 

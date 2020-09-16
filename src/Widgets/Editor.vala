@@ -52,31 +52,11 @@ namespace ThiefMD.Widgets {
         private bool should_scroll { get; set; default = false; }
         private bool should_save { get; set; default = false; }
 
-        public Editor (string open_file) {
+        public Editor (string file_path) {
             var settings = AppSettings.get_default ();
             settings.changed.connect (update_settings);
-            bool loaded = false;
 
-            if (open_file != "") {
-                try {
-                    string text;
-                    file = File.new_for_path (open_file);
-
-                    if (file.query_exists ())
-                    {
-                        string filename = file.get_path ();
-                        GLib.FileUtils.get_contents (filename, out text);
-                        set_text (text, true);
-                        editable = true;
-                        loaded = true;
-                    }
-                } catch (Error e) {
-                    warning ("Error: %s", e.message);
-                    SheetManager.show_error ("Unexpected Error: " + e.message);
-                }
-            }
-
-            if (!loaded) {
+            if (!open_file (file_path)) {
                 set_text (Constants.FIRST_USE, true);
                 editable = false;
             }
@@ -91,7 +71,7 @@ namespace ThiefMD.Widgets {
 
             buffer = new Gtk.SourceBuffer.with_language (UI.get_source_language ());
             buffer.highlight_syntax = true;
-            buffer.set_max_undo_levels (20);
+            buffer.set_max_undo_levels (Constants.MAX_UNDO_LEVELS);
 
             warning_tag = new Gtk.TextTag ("warning_bg");
             warning_tag.underline = Pango.Underline.ERROR;
@@ -141,27 +121,51 @@ namespace ThiefMD.Widgets {
             on_text_modified ();
         }
 
+        private int cursor_location;
         public bool am_active {
             set {
                 var settings = AppSettings.get_default ();
                 if (value){
+                    bool move_screen = false;
                     // Update the file if it was changed from disk
                     if (file.query_exists ())
                     {
                         string text;
                         try {
+                            string checksum_on_close = Checksum.compute_for_string (ChecksumType.MD5, buffer.text);
                             string filename = file.get_path ();
                             GLib.FileUtils.get_contents (filename, out text);
-                            set_text (text, true);
+                            string checksum_on_open = Checksum.compute_for_string (ChecksumType.MD5, text);
+                            if (checksum_on_close != checksum_on_open) {
+                                warning ("File changed on disk (%s != %s), rereading", checksum_on_open, checksum_on_close);
+                                set_text (text, true);
+                                move_screen = true;
+                            }
+                            if (cursor_location > text.length) {
+                                cursor_location = text.length - 1;
+                            }
                         } catch (Error e) {
                             warning ("Could not load file from disk: %s", e.message);
                         }
+
+                        editable = true;
                     }
 
                     preview_markdown = buffer.text;
                     active = true;
 
                     set_scheme (settings.get_valid_theme_id ());
+
+                    if (move_screen) {
+                        debug ("Cursor found at: %d", cursor_location);
+                        // Move the cursor
+                        set_cursor_visible (true);
+                        Gtk.TextIter new_cursor_location;
+                        buffer.get_start_iter (out new_cursor_location);
+                        new_cursor_location.forward_chars (cursor_location);
+                        buffer.place_cursor (new_cursor_location);
+                        scroll_to_iter (new_cursor_location, 0.0, true, 0.0, Constants.TYPEWRITER_POSITION);
+                    }
 
                     buffer.changed.connect (on_change_notification);
                     settings.changed.connect (update_settings);
@@ -181,8 +185,11 @@ namespace ThiefMD.Widgets {
                     //
                     size_allocate.connect (dynamic_margins);
                     dynamic_margins ();
+                    should_scroll = true;
                 } else {
                     if (active != value) {
+                        cursor_location = buffer.cursor_position;
+                        debug ("Cursor saved at: %d", cursor_location);
                         if (settings.spellcheck) {
                             spell.detach ();
                         }
@@ -198,6 +205,7 @@ namespace ThiefMD.Widgets {
                         size_allocate.disconnect (dynamic_margins);
                         settings.changed.disconnect (update_settings);
                     }
+                    editable = false;
                     active = false;
                 }
             }
@@ -248,8 +256,11 @@ namespace ThiefMD.Widgets {
         }
 
         public bool save () throws Error {
-            FileManager.save_file (file, buffer.text.data);
-            return true;
+            if (file.query_exists () && !FileUtils.test (file.get_path (), FileTest.IS_DIR)) {
+                FileManager.save_file (file, buffer.text.data);
+                return true;
+            }
+            return false;
         }
 
         private bool autosave () {
@@ -356,7 +367,7 @@ namespace ThiefMD.Widgets {
                 preview_markdown += after.substring (0, adjustment);
                 preview_markdown += ThiefProperties.THIEF_MARK_CONST;
                 preview_markdown += after.substring (adjustment);
-                warning ("Updating preview");
+
                 UI.update_preview ();
             }
         }
@@ -400,8 +411,42 @@ namespace ThiefMD.Widgets {
             return 0;
         }
 
+        public bool open_file (string file_name) {
+            file = File.new_for_path (file_name);
+
+            // We do this after creating the file in case
+            // we switched files or are caching this editor.
+            // We don't want this to become active again and
+            // corrupt a file.
+            if (file_name == "") {
+                return false;
+            }
+
+            if (file.query_exists ()) {
+                try {
+                    string text;
+                    file = File.new_for_path (file_name);
+
+                    if (file.query_exists ())
+                    {
+                        string filename = file.get_path ();
+                        GLib.FileUtils.get_contents (filename, out text);
+                        set_text (text, true);
+                        editable = true;
+                        return true;
+                    }
+                } catch (Error e) {
+                    warning ("Error: %s", e.message);
+                    SheetManager.show_error ("Unexpected Error: " + e.message);
+                }
+            }
+
+            return false;
+        }
+
         public void set_text (string text, bool opening = true) {
             if (opening) {
+                buffer.set_max_undo_levels (0);
                 buffer.begin_not_undoable_action ();
                 buffer.changed.disconnect (on_text_modified);
             }
@@ -409,6 +454,7 @@ namespace ThiefMD.Widgets {
             buffer.text = text;
 
             if (opening) {
+                buffer.set_max_undo_levels (Constants.MAX_UNDO_LEVELS);
                 buffer.end_not_undoable_action ();
                 buffer.changed.connect (on_text_modified);
             }
@@ -640,7 +686,7 @@ namespace ThiefMD.Widgets {
 
                         // Move the cursor to select the title
                         Gtk.TextIter start, end;
-                        buffer.get_bounds(out start, out end);
+                        buffer.get_bounds (out start, out end);
                         start.forward_chars (new_cursor_location);
                         end = start;
                         end.forward_line ();
