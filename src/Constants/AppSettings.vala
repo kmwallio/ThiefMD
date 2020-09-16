@@ -33,7 +33,14 @@ namespace ThiefMD {
         public const int AUTOSAVE_TIMEOUT = 3000;
 
         // Default number of sheets to keep history of
-        public const int KEEP_X_SHEETS_IN_MEMORY = 15;
+        public const int KEEP_X_SHEETS_IN_MEMORY = 10;
+        // Pool allows for faster file opens. If it's greater
+        // than the sheets to keep in memory, there shouldn't be
+        // lag, but we hold more stuff doing nothing. Once
+        // KEEP_X_SHEETS_IN_MEMORY + EDITOR_POOL_SIZE files have
+        // been opened, we should have a responsive editor?
+        public const int EDITOR_POOL_SIZE = 5;
+        public const int MAX_UNDO_LEVELS = 25;
 
         // Typewriter Position
         public const int TYPEWRITER_UPDATE_TIME = 500;
@@ -58,7 +65,8 @@ namespace ThiefMD {
 First time here?  Drag a folder into the library, or click on the Folder icon to select a folder to add.""";
     }
 
-    public class AppSettings : Granite.Services.Settings {
+    public class AppSettings : Object {
+        private GLib.Settings app_settings;
         public bool fullscreen { get; set; }
         public bool show_num_lines { get; set; }
         public bool autosave { get; set; }
@@ -180,8 +188,45 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             return instance;
         }
 
+        public bool can_update_theme () {
+            return app_settings.is_writable ("dark-mode") && app_settings.is_writable ("custome-theme");
+        }
+
+        public signal void changed ();
+
         private AppSettings () {
-            base ("com.github.kmwallio.thiefmd");
+            app_settings = new GLib.Settings ("com.github.kmwallio.thiefmd");
+            app_settings.bind ("fullscreen", this, "fullscreen", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("show-num-lines", this, "show_num_lines", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("autosave", this, "autosave", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("spellcheck", this, "spellcheck", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("statusbar", this, "statusbar", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("show-filename", this, "show_filename", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("typewriter-scrolling", this, "typewriter_scrolling", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("margins", this, "margins", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("spacing", this, "spacing", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("window-height", this, "window_height", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("window-width", this, "window_width", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("window-x", this, "window_x", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("window-y", this, "window_y", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("view-state", this, "view_state", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("view-sheets-width", this, "view_sheets_width", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("view-library-width", this, "view_library_width", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("last-file", this, "last_file", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("spellcheck-language", this, "spellcheck_language", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("library-list", this, "library_list", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("theme-id", this, "theme_id", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("custom-theme", this, "custom_theme", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("dark-mode", this, "dark_mode", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("ui-editor-theme", this, "ui_editor_theme", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("save-library-order", this, "save_library_order", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("export-break-folders", this, "export_break_folders", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("export-break-sheets", this, "export_break_sheets", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("export-include-urls", this, "export_include_urls", SettingsBindFlags.DEFAULT);
+
+            app_settings.changed.connect (() => {
+                changed ();
+            });
         }
     }
 }
