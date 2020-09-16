@@ -259,6 +259,40 @@ namespace ThiefMD.Widgets {
             }
         }
 
+        private void insert_markup_around_cursor (string markup) {
+            if (!buffer.get_has_selection ()) {
+                Gtk.TextIter iter;
+                insert_at_cursor (markup + markup);
+                buffer.get_iter_at_offset (out iter, buffer.cursor_position - markup.length);
+                if (buffer.cursor_position - markup.length > 0) {
+                    buffer.place_cursor (iter);
+                }
+            } else {
+                Gtk.TextIter iter_start, iter_end;
+                if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
+                    buffer.insert (ref iter_start, markup, -1);
+                    if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
+                        buffer.insert (ref iter_end, markup, -1);
+                        buffer.get_selection_bounds (out iter_start, out iter_end);
+                        iter_end.backward_chars (markup.length);
+                        buffer.select_range (iter_start, iter_end);
+                    }
+                }
+            }
+        }
+
+        public void bold () {
+            insert_markup_around_cursor ("**");
+        }
+
+        public void italic () {
+            insert_markup_around_cursor ("*");
+        }
+
+        public void strikethrough () {
+            insert_markup_around_cursor ("~~");
+        }
+
         public bool save () throws Error {
             if (opened_filename != "" && file.query_exists () && !FileUtils.test (file.get_path (), FileTest.IS_DIR)) {
                 FileManager.save_file (file, buffer.text.data);

@@ -44,6 +44,27 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
+                // Bold
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.b, keycode)) {
+                        SheetManager.bold ();
+                    }
+                }
+
+                // Italic
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.i, keycode)) {
+                        SheetManager.italic ();
+                    }
+                }
+
+                // Strikethrough
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.d, keycode)) {
+                        SheetManager.strikethrough ();
+                    }
+                }
+
                 // Save
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
                     if (match_keycode (Gdk.Key.s, keycode)) {
