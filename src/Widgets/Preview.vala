@@ -153,111 +153,16 @@ namespace ThiefMD.Widgets {
         }
 
         private bool get_preview_markdown (string raw_mk, out string processed_mk) {
-            processed_mk = FileManager.get_yamlless_markdown(raw_mk, 0, true, true, false);
+            processed_mk = Pandoc.resolve_paths (raw_mk);
+            processed_mk = FileManager.get_yamlless_markdown(processed_mk, 0, true, true, false);
 
-            return (processed_mk.chomp () != "");
-        }
-
-        private string find_file (string url) {
-            string result = "";
-            string file = Path.build_filename (".", url);
-            if (url.index_of_char (':') != -1) {
-                result = url;
-            } else if (url.index_of_char ('.') == -1) {
-                result = url;
-            } else if (FileUtils.test (url, FileTest.EXISTS)) {
-                result = url;
-            } else if (FileUtils.test (file, FileTest.EXISTS)) {
-                result = file;
-            } else {
-                Sheet search_sheet = SheetManager.get_sheet ();
-                string sheet_path = (search_sheet != null) ? Path.get_dirname (search_sheet.file_path ()) : "";
-                int idx = 0;
-                while (sheet_path != "") {
-                    file = Path.build_filename (sheet_path, url);
-                    if (FileUtils.test (file, FileTest.EXISTS)) {
-                        result = file;
-                        break;
-                    }
-
-                    idx = sheet_path.last_index_of_char ('/');
-                    if (idx != -1) {
-                        sheet_path = sheet_path[0:idx];
-                    } else {
-                        result = url;
-                        break;
-                    }
-                }
-            }
-
-            if (result != "") {
-                return result;
-            } else {
-                return url;
-            }
-        }
-
-        private string process (string markdown = "") {
-            string text = markdown;
-            string processed_mk = "";
-
-            try {
-                Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-                Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-                Regex css_url_search = new Regex ("url\\(['\"]?(.+?)['\"]?\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-
-                get_preview_markdown (text, out processed_mk);
-                processed_mk = url_search.replace_eval (
-                    processed_mk,
-                    (ssize_t) processed_mk.length,
-                    0,
-                    RegexMatchFlags.NOTEMPTY,
-                    (match_info, result) =>
-                    {
-                        result.append ("(");
-                        var url = match_info.fetch (1);
-                        result.append (find_file (url));
-                        result.append (")");
-                        return false;
-                    });
-
-                processed_mk = css_url_search.replace_eval (
-                    processed_mk,
-                    (ssize_t) processed_mk.length,
-                    0,
-                    RegexMatchFlags.NOTEMPTY,
-                    (match_info, result) =>
-                    {
-                        result.append ("url(");
-                        var url = match_info.fetch (1);
-                        result.append (find_file (url));
-                        result.append (")");
-                        return false;
-                    });
-
-                processed_mk = src_search.replace_eval (
-                        processed_mk,
-                        (ssize_t) processed_mk.length,
-                        0,
-                        RegexMatchFlags.NOTEMPTY,
-                        (match_info, result) =>
-                        {
-                            result.append ("src=\"");
-                            var url = match_info.fetch (1);
-                            result.append (find_file (url));
-                            result.append ("\"");
-                            return false;
-                        });
-            } catch (Error e) {
-                warning ("Error generating preview: %s", e.message);
-            }
             var mkd = new Markdown.Document.from_gfm_string (processed_mk.data, 0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x04000000 + 0x00400000 + 0x10000000 + 0x40000000);
             mkd.compile (0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x00400000 + 0x04000000 + 0x40000000 + 0x10000000);
 
             string result;
-            mkd.get_document (out result);
+            mkd.get_document (out processed_mk);
 
-            return result;
+            return (processed_mk.chomp () != "");
         }
 
         private string get_javascript (bool use_thief_mark) {
@@ -313,7 +218,8 @@ namespace ThiefMD.Widgets {
 
         public void update_html_view (bool use_thief_mark = true, string markdown = "") {
             string stylesheet = set_stylesheet ();
-            string markdown_res = process (markdown);
+            string markdown_res = "";
+            get_preview_markdown (markdown, out markdown_res);
             string script = get_javascript (use_thief_mark);
             string headerscript = get_javascript_header ();
             html = """

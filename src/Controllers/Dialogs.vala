@@ -41,6 +41,18 @@ namespace ThiefMD.Controllers.Dialogs {
             pdf.add_pattern ("*.pdf");
             chooser.add_filter (pdf);
 
+            var epub_filter = new Gtk.FileFilter ();
+            epub_filter.set_filter_name (_("ePUB file"));
+            epub_filter.add_mime_type ("application/epub+zip");
+            epub_filter.add_pattern ("*.epub");
+            chooser.add_filter (epub_filter);
+
+            var docx_filter = new Gtk.FileFilter ();
+            docx_filter.set_filter_name (_("docx file"));
+            docx_filter.add_mime_type ("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+            docx_filter.add_pattern ("*.docx");
+            chooser.add_filter (docx_filter);
+
             var markdown_filter = new Gtk.FileFilter ();
             markdown_filter.set_filter_name (_("Markdown files"));
             markdown_filter.add_mime_type ("text/markdown");

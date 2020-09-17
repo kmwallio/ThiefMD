@@ -10,7 +10,8 @@ Build-Depends: meson,
                libgtksourceview-3.0-dev,
                libwebkit2gtk-4.0-dev,
                libmarkdown2-dev,
-               libgtkspell3-3-dev
+               libgtkspell3-3-dev,
+               pandoc
 Standards-Version: 4.5.0
 Homepage: https://thiefmd.com
 

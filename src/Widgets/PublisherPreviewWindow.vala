@@ -84,6 +84,10 @@ namespace ThiefMD.Widgets {
                         FileManager.save_file (new_novel, preview.html.data);
                     } else if (filename.has_suffix (".mhtml")) {
                         preview.save_to_file.begin (new_novel, WebKit.SaveMode.MHTML);
+                    } else if (filename.has_suffix (".epub")) {
+                        Pandoc.make_epub (new_novel.get_path (), _markdown);
+                    } else if (filename.has_suffix (".docx")) {
+                        Pandoc.make_docx (new_novel.get_path (), _markdown);
                     }
                 } catch (Error e) {
                     warning ("Could not save file %s: %s", new_novel.get_basename (), e.message);

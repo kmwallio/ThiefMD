@@ -314,6 +314,7 @@ namespace ThiefMD.Widgets {
             if (should_save) {
                 try {
                     save ();
+                    SheetManager.redraw ();
                 } catch (Error e) {
                     warning ("Unable to save file " + file.get_basename () + ": " + e.message);
                     SheetManager.show_error ("Unable to save file " + file.get_basename () + ": " + e.message);

@@ -260,20 +260,30 @@ namespace ThiefMD.Widgets {
             return false;
         }
 
-        private string build_novel (LibPair p) {
+        private string build_novel (LibPair p, bool metadata = false) {
             StringBuilder markdown = new StringBuilder ();
             var settings = AppSettings.get_default ();
 
             foreach (var file in p._sheets.metadata.sheet_order) {
                 string sheet_markdown = FileManager.get_file_contents (Path.build_filename (p._path, file));
-                sheet_markdown = FileManager.get_yamlless_markdown(sheet_markdown, 0, true, true, false);
-                markdown.append (sheet_markdown);
-
-                if (settings.export_break_sheets) {
-                    markdown.append ("\n<div style='page-break-before: always'></div>\n");
-                } else {
-                    markdown.append ("\n\n");
+                if (settings.export_resolve_paths) {
+                    sheet_markdown = Pandoc.resolve_paths (sheet_markdown, p._path);
                 }
+
+                if (!metadata) {
+                    sheet_markdown = FileManager.get_yamlless_markdown(sheet_markdown, 0, true, true, false);
+                    markdown.append (sheet_markdown);
+                    if (settings.export_break_sheets) {
+                        markdown.append ("\n<div style='page-break-before: always'></div>\n");
+                    } else {
+                        markdown.append ("\n\n");
+                    }
+                } else {
+                    metadata = false;
+                    markdown.append (sheet_markdown);
+                    markdown.append ("\n");
+                }
+                
             }
 
             foreach (var folder in p._sheets.metadata.folder_order) {
@@ -310,7 +320,7 @@ namespace ThiefMD.Widgets {
                 Gtk.MenuItem menu_preview_item = new Gtk.MenuItem.with_label (_("Export Preview"));
                 menu_preview_item.activate.connect (() => {
                     if (_selected != null && _all_sheets.find (_selected) != null) {
-                        string preview_markdown = build_novel (_selected);
+                        string preview_markdown = build_novel (_selected, settings.export_include_metadata_file);
                         PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown);
                         ppw.show_all ();
                     }

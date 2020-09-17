@@ -93,9 +93,11 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public bool save_library_order { get; set; }
         public bool export_break_folders { get; set; }
         public bool export_break_sheets { get; set; }
+        public bool export_resolve_paths { get; set; }
         public bool export_include_urls { get; set; }
         public double export_side_margins { get; set; }
         public double export_top_bottom_margins { get; set; }
+        public bool export_include_metadata_file { get; set; }
 
         public string get_valid_theme_id () {
             UI.UserSchemes ().force_rescan ();
@@ -224,7 +226,11 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("save-library-order", this, "save_library_order", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-break-folders", this, "export_break_folders", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-break-sheets", this, "export_break_sheets", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("export-resolve-paths", this, "export_resolve_paths", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-include-urls", this, "export_include_urls", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("export-side-margins", this, "export_side_margins", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("export-top-bottom-margins", this, "export_top_bottom_margins", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("export-include-metadata-file", this, "export_include_metadata_file", SettingsBindFlags.DEFAULT);
 
             app_settings.changed.connect (() => {
                 changed ();

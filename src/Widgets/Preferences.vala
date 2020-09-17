@@ -87,25 +87,26 @@ namespace ThiefMD.Widgets {
             grid.orientation = Orientation.VERTICAL;
             grid.hexpand = true;
 
-            var pagebreak_folder_switch = new Switch ();
-            pagebreak_folder_switch.set_active (settings.export_break_folders);
-            pagebreak_folder_switch.notify["active"].connect (() => {
-                settings.export_break_folders = pagebreak_folder_switch.get_active ();
+            var epub_metadata_file = new Switch ();
+            epub_metadata_file.set_active (settings.export_include_metadata_file);
+            epub_metadata_file.notify["active"].connect (() => {
+                settings.export_include_metadata_file = epub_metadata_file.get_active ();
             });
-            pagebreak_folder_switch.tooltip_text = _("Page Break between Folders");
-            var pagebreak_folder_label = new Label(_("Insert a Page Break after each folder"));
-            pagebreak_folder_label.xalign = 0;
-            pagebreak_folder_label.hexpand = true;
+            epub_metadata_file.tooltip_text = _("First Markdown File includes Author Metadata");
+            var epub_metadata_file_label = new Label(_("First Markdown file includes <a href='https://thiefmd.com/export/author-metadata'>Author metadata</a>"));
+            epub_metadata_file_label.xalign = 0;
+            epub_metadata_file_label.hexpand = true;
+            epub_metadata_file_label.use_markup = true;
 
-            var pagebreak_sheet_switch = new Switch ();
-            pagebreak_sheet_switch.set_active (settings.export_break_sheets);
-            pagebreak_sheet_switch.notify["active"].connect (() => {
-                settings.export_break_sheets = pagebreak_sheet_switch.get_active ();
+            var export_resolve_paths_switch = new Switch ();
+            export_resolve_paths_switch.set_active (settings.export_resolve_paths);
+            export_resolve_paths_switch.notify["active"].connect (() => {
+                settings.export_resolve_paths = export_resolve_paths_switch.get_active ();
             });
-            pagebreak_sheet_switch.tooltip_text = _("Page Break between Sheets");
-            var pagebreak_sheet_label = new Label(_("Insert a Page Break after each sheet"));
-            pagebreak_sheet_label.xalign = 0;
-            pagebreak_sheet_label.hexpand = true;
+            export_resolve_paths_switch.tooltip_text = _("Resolve full paths to resources");
+            var export_resolve_paths_label = new Label(_("Resolve full paths to resources on export (ePub, docx required)"));
+            export_resolve_paths_label.xalign = 0;
+            export_resolve_paths_label.hexpand = true;
 
             var pdf_include_urls_switch = new Switch ();
             pdf_include_urls_switch.set_active (settings.export_include_urls);
@@ -150,18 +151,62 @@ namespace ThiefMD.Widgets {
             top_bottom_margin_label.xalign = 0;
             top_bottom_margin_label.hexpand = true;
 
-            grid.attach (pagebreak_folder_switch, 1, 0, 1, 1);
-            grid.attach (pagebreak_folder_label, 2, 0, 2, 1);
-            grid.attach (pagebreak_sheet_switch, 1, 1, 1, 1);
-            grid.attach (pagebreak_sheet_label, 2, 1, 2, 1);
-            grid.attach (pdf_include_urls_switch, 1, 2, 1, 1);
-            grid.attach (pdf_include_urls_label, 2, 2, 2, 1);
+            var pagebreak_folder_switch = new Switch ();
+            pagebreak_folder_switch.set_active (settings.export_break_folders);
+            pagebreak_folder_switch.notify["active"].connect (() => {
+                settings.export_break_folders = pagebreak_folder_switch.get_active ();
+            });
+            pagebreak_folder_switch.tooltip_text = _("Page Break between Folders");
+            var pagebreak_folder_label = new Label(_("Insert a Page Break after each folder"));
+            pagebreak_folder_label.xalign = 0;
+            pagebreak_folder_label.hexpand = true;
 
-            grid.attach (page_setup_label, 1, 3, 2, 1);
-            grid.attach (side_margin_entry, 1, 4, 1, 1);
-            grid.attach (side_margin_label, 2, 4, 1, 1);
-            grid.attach (top_bottom_margin_entry, 1, 5, 1, 1);
-            grid.attach (top_bottom_margin_label, 2, 5, 1, 1);
+            var pagebreak_sheet_switch = new Switch ();
+            pagebreak_sheet_switch.set_active (settings.export_break_sheets);
+            pagebreak_sheet_switch.notify["active"].connect (() => {
+                settings.export_break_sheets = pagebreak_sheet_switch.get_active ();
+            });
+            pagebreak_sheet_switch.tooltip_text = _("Page Break between Sheets");
+            var pagebreak_sheet_label = new Label(_("Insert a Page Break after each sheet"));
+            pagebreak_sheet_label.xalign = 0;
+            pagebreak_sheet_label.hexpand = true;
+
+            int g = 1;
+
+            grid.attach (epub_metadata_file, 1, g, 1, 1);
+            grid.attach (epub_metadata_file_label, 2, g, 1, 1);
+            g++;
+
+            grid.attach (export_resolve_paths_switch, 1, g, 1, 1);
+            grid.attach (export_resolve_paths_label, 2, g, 1, 1);
+            g++;
+
+            grid.attach (pdf_include_urls_switch, 1, g, 1, 1);
+            grid.attach (pdf_include_urls_label, 2, g, 2, 1);
+            g++;
+
+            grid.attach (pdf_include_urls_switch, 1, g, 1, 1);
+            grid.attach (pdf_include_urls_label, 2, g, 2, 1);
+            g++;
+
+            grid.attach (pdf_include_urls_switch, 1, g, 1, 1);
+            grid.attach (pdf_include_urls_label, 2, g, 2, 1);
+            g++;
+
+            grid.attach (page_setup_label, 1, g, 2, 1);
+            g++;
+            grid.attach (side_margin_entry, 1, g, 1, 1);
+            grid.attach (side_margin_label, 2, g, 1, 1);
+            g++;
+            grid.attach (top_bottom_margin_entry, 1, g, 1, 1);
+            grid.attach (top_bottom_margin_label, 2, g, 1, 1);
+            g++;
+            grid.attach (pagebreak_folder_switch, 1, g, 1, 1);
+            grid.attach (pagebreak_folder_label, 2, g, 2, 1);
+            g++;
+            grid.attach (pagebreak_sheet_switch, 1, g, 1, 1);
+            grid.attach (pagebreak_sheet_label, 2, g, 2, 1);
+            g++;
 
             grid.show_all ();
 
