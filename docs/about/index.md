@@ -27,21 +27,21 @@ Great software is built on the shoulders of giants.
 ### Initial
 
 * Basic markdown syntax support
-* Creation and Deletion of Sheets
+* Creation and Deletion of Files
 * Library Management
     * Adding Existing Folders
     * Creating sub folders
     * Removing folders
-    * Moving sheets between folders
-    * Ordering of sheets
+    * Moving markdown files between folders
+    * Ordering of markdown files and folders
 * Light/Dark/User Themes
-* Export sheets or folders
-* Compilation and preview of multiple sheets while maintaining order
+* Export a file or folders
+* Compilation and preview of multiple files while maintaining order
 
 ### Later on Markdown Support
 
-* Load multiple sheets into Editor View
-* Keep undo history tied to sheets
+* Load multiple files into Editor View
+* Keep undo history tied to files
 * Additional export and preview themes
 
 ### I don't really want it but...

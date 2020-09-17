@@ -41,9 +41,9 @@ If you're worried about accidentally publishing something, you can create posts 
 
 ## Too Many ***_posts***?
 
-<img src="/images/thief_sort.png" style="width: 50%; float: left" /> Sort your sheets by Filename.
+<img src="/images/thief_sort.png" style="width: 50%; float: left" /> Sort your files by Filename.
 
-By default, sheets are created at the bottom of the Sheets view.  Sorting by Filename ascending will have your **newer** posts at the bottom of the screen.
+By default, files are created at the bottom of the Folder view.  Sorting by Filename ascending will have your **newer** posts at the bottom of the screen.
 
 Sorting by descending will have newer posts at the top, but any new post will be located at the bottom.  Just re-run the sort, and your post will be right where you want it.
 

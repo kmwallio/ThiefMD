@@ -138,13 +138,13 @@ namespace ThiefMD.Widgets {
                 Gtk.Menu menu = new Gtk.Menu ();
                 menu.attach_to_widget (this, null);
 
-                Gtk.MenuItem sort_sheets_by_name = new Gtk.MenuItem.with_label ((_("Sort Sheets by Filename Ascending")));
+                Gtk.MenuItem sort_sheets_by_name = new Gtk.MenuItem.with_label ((_("Sort by Filename Ascending")));
                 menu.add (sort_sheets_by_name);
                 sort_sheets_by_name.activate.connect (() => {
                     _parent.sort_sheets_by_name ();
                 });
 
-                Gtk.MenuItem sort_sheets_by_name_desc = new Gtk.MenuItem.with_label ((_("Sort Sheets by Filename Descending")));
+                Gtk.MenuItem sort_sheets_by_name_desc = new Gtk.MenuItem.with_label ((_("Sort by Filename Descending")));
                 menu.add (sort_sheets_by_name_desc);
                 sort_sheets_by_name_desc.activate.connect (() => {
                     _parent.sort_sheets_by_name (false);
@@ -172,6 +172,7 @@ namespace ThiefMD.Widgets {
                 menu.show_all ();
                 menu.popup_at_pointer (event);
             }
+
             return true;
         }
 
