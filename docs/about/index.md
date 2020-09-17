@@ -20,6 +20,7 @@ Great software is built on the shoulders of giants.
 * Markdown Rendering by [Discount](http://www.pell.portland.or.us/~orc/Code/discount)
 * Syntax Highlighting by [highlight.js](https://highlightjs.org)
 * Math Rendering by [Katex](https://katex.org)
+* Multi Format Export by [Pandoc](https://pandoc.org)
 * Screenshots use [Vimix GTK Themes](https://github.com/vinceliuice/vimix-gtk-themes) and [Vimix Icon Theme](https://github.com/vinceliuice/vimix-icon-theme)
 
 ## Goals
