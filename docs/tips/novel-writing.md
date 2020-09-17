@@ -29,7 +29,7 @@ You can keep writing without having to touch the scroll-bar to keep the cursor i
 
 `Ctrl + 1` will change in Editor Only mode. Eliminate distractions and focus on the current sheet on hand.  Want even less distraction? `F11` will enter full-screen. No title-bar, no desktop background, no distraction. `F11` or `Esc` can help return you back to the world of noise.
 
-`Ctrl + 2` will switch to Editor + Sheets view. Want to keep focused on a single chapter and break the chapter into multiple files? This view is for you. Drag and drop sheets to reorder, and quickly switch between them with just a click.
+`Ctrl + 2` will switch to Editor + Current Folder view. Want to keep focused on a single chapter and break the chapter into multiple files? This view is for you. Drag and drop files to reorder, and quickly switch between them with just a click.
 
 `Ctrl + 3` will take you back to the Library view.
 

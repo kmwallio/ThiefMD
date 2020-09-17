@@ -83,6 +83,24 @@
       }]
     },
     {
+      "name": "pandoc",
+      "only-arches": [
+        "x86_64"
+      ],
+      "buildsystem": "simple",
+      "build-commands": [
+        "cp bin/pandoc /app/bin/pandoc",
+        "cp bin/pandoc-citeproc /app/bin/pandoc-citeproc"
+      ],
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://github.com/jgm/pandoc/releases/download/2.10.1/pandoc-2.10.1-linux-amd64.tar.gz",
+          "sha256": "a3ab481ad53f5568d7ec5263fbdd3478fb320d13b5d61a92fb5cee410186bd86"
+        }
+      ]
+    },
+    {
       "name":"thiefmd",
       "buildsystem":"meson",
       "sources":[

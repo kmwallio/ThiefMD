@@ -314,6 +314,7 @@ namespace ThiefMD.Widgets {
             if (should_save) {
                 try {
                     save ();
+                    SheetManager.redraw ();
                 } catch (Error e) {
                     warning ("Unable to save file " + file.get_basename () + ": " + e.message);
                     SheetManager.show_error ("Unable to save file " + file.get_basename () + ": " + e.message);
@@ -451,6 +452,7 @@ namespace ThiefMD.Widgets {
 
         public bool open_file (string file_name) {
             opened_filename = file_name;
+            debug ("Opening file: %s", file_name);
             file = File.new_for_path (file_name);
 
             // We do this after creating the file in case
@@ -472,6 +474,7 @@ namespace ThiefMD.Widgets {
                         GLib.FileUtils.get_contents (filename, out text);
                         set_text (text, true);
                         editable = true;
+                        debug ("%s opened", file_name);
                         return true;
                     }
                 } catch (Error e) {

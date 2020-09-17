@@ -20,6 +20,7 @@
 namespace ThiefMD.Controllers.Dialogs {
     public Gtk.FileChooserDialog create_file_chooser (string title,
             Gtk.FileChooserAction action) {
+        var settings = AppSettings.get_default ();
         var chooser = new Gtk.FileChooserDialog (title, null, action);
 
         chooser.add_button ("_Cancel", Gtk.ResponseType.CANCEL);
@@ -41,6 +42,18 @@ namespace ThiefMD.Controllers.Dialogs {
             pdf.add_pattern ("*.pdf");
             chooser.add_filter (pdf);
 
+            var epub_filter = new Gtk.FileFilter ();
+            epub_filter.set_filter_name (_("ePUB file"));
+            epub_filter.add_mime_type ("application/epub+zip");
+            epub_filter.add_pattern ("*.epub");
+            chooser.add_filter (epub_filter);
+
+            var docx_filter = new Gtk.FileFilter ();
+            docx_filter.set_filter_name (_("docx file"));
+            docx_filter.add_mime_type ("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+            docx_filter.add_pattern ("*.docx");
+            chooser.add_filter (docx_filter);
+
             var markdown_filter = new Gtk.FileFilter ();
             markdown_filter.set_filter_name (_("Markdown files"));
             markdown_filter.add_mime_type ("text/markdown");
@@ -61,6 +74,14 @@ namespace ThiefMD.Controllers.Dialogs {
             mhtml_filter.add_pattern ("*.mhtml");
             mhtml_filter.add_pattern ("*.mht");
             chooser.add_filter (mhtml_filter);
+
+            if (settings.export_include_metadata_file) {
+                chooser.set_current_name ("my-great-novel.epub");
+                chooser.set_filter (epub_filter);
+            } else {
+                chooser.set_current_name ("my-great-work.pdf");
+                chooser.set_filter (pdf);
+            }
 
         } else if (action != Gtk.FileChooserAction.SELECT_FOLDER) {
             var filter1 = new Gtk.FileFilter ();

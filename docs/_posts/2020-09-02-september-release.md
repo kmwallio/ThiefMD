@@ -14,7 +14,7 @@ Now that we're releasing binary packages, an about dialog has been added linking
 * **Datetime**
  ![](/images/datetime_menu.png)
  Update the post timestamp with ease.
-* **Drag and Drop Sheets**
+* **Drag and Drop Files**
  ![](/images/drag_n_drop_sheets.gif)
  Move a markdown file into another directory in the library. You could switch a `_draft` to a `_post`.
 * About Dialog  

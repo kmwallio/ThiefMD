@@ -120,9 +120,17 @@
             <default>false</default>
             <summary>Insert Page Breaks in PDF Between every Sheet</summary>
         </key>
+        <key name="export-resolve-paths" type="b">
+            <default>true</default>
+            <summary>Convert relative paths to absolute paths</summary>
+        </key>
         <key name="export-include-urls" type="b">
             <default>false</default>
             <summary>Insert URLs next to Links in PDFs</summary>
+        </key>
+        <key name="export-include-metadata-file" type="b">
+            <default>false</default>
+            <summary>First Markdown File includes author metadata</summary>
         </key>
         <key name="export-side-margins" type="d">
             <default>1.0</default>

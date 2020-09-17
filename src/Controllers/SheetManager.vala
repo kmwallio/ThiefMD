@@ -100,7 +100,7 @@ namespace ThiefMD.Controllers.SheetManager {
     public string get_markdown () {
         StringBuilder builder = new StringBuilder ();
         foreach (var sp in _active_editors) {
-            string text = (sp == _currentSheet) ? sp.editor.active_markdown () : sp.editor.buffer.text;
+            string text = (Sheet.areEqual(sp.sheet, _currentSheet.sheet)) ? sp.editor.active_markdown () : sp.editor.buffer.text;
             builder.append (FileManager.get_yamlless_markdown (text, 0, true, true, false));
         }
 
@@ -153,54 +153,64 @@ namespace ThiefMD.Controllers.SheetManager {
         return _currentSheet.sheet;
     }
 
-    private void open_file (string file_path, out Widgets.Editor editor) {
+    private bool open_file (string file_path, out Widgets.Editor editor) {
         if (_editor_pool.size > 0) {
             editor = _editor_pool.poll ();
-            editor.open_file (file_path);
+            return editor.open_file (file_path);
         } else {
             FileManager.open_file (file_path, out editor);
+            return editor != null;
         }
     }
 
     public static bool load_sheet (Sheet sheet) {
-        if (_currentSheet != null && sheet == _currentSheet.sheet && _active_editors.size == 1) {
+        if (_currentSheet != null && Sheet.areEqual(sheet, _currentSheet.sheet) && _active_editors.size == 1) {
+            debug ("Tried loading current sheet");
             return true;
         }
+
+        debug ("Opening sheet: %s", sheet.file_path ());
 
         var settings = AppSettings.get_default ();
         Widgets.Editor loaded_file = null;
 
         if (sheet == null) {
+            debug ("Invalid sheet provided");
             return false;
         }
 
         drain_and_save_active ();
 
+        bool success = false;
         _currentSheet = null;
         foreach (var editor in _editors) {
-            if (editor.sheet == sheet) {
+            if (Sheet.areEqual(editor.sheet, sheet)) {
+                debug ("Sheet found in queue");
                 _currentSheet = editor;
+                success = true;
             }
         }
 
         if (_currentSheet == null) {
             _currentSheet = new SheetPair ();
             _currentSheet.sheet = sheet;
-            open_file (sheet.file_path (), out _currentSheet.editor);
+            debug ("Opening sheet from disk");
+            success = open_file (sheet.file_path (), out _currentSheet.editor);
         } else {
             _editors.remove (_currentSheet);
         }
 
-        _currentSheet.sheet.active = true;
-        _currentSheet.editor.am_active = true;
-        _active_editors.add (_currentSheet);
-        loaded_file = _currentSheet.editor;
-        settings.last_file = sheet.file_path ();
+        if (success) {
+            _currentSheet.sheet.active = true;
+            _currentSheet.editor.am_active = true;
+            _active_editors.add (_currentSheet);
+            settings.last_file = sheet.file_path ();
+        }
 
-        debug ("Tried to load %s (%s)\n", sheet.file_path (), (loaded_file != null) ? "success" : "failed");
+        debug ("Tried to load %s (%s)\n", sheet.file_path (), (success) ? "success" : "failed");
 
         update_view ();
-        return loaded_file != null;
+        return success;
     }
 
     public static void silent_load_sheet (Sheet sheet) {
@@ -209,13 +219,13 @@ namespace ThiefMD.Controllers.SheetManager {
         }
 
         foreach (var editor in _editors) {
-            if (editor.sheet == sheet) {
+            if (Sheet.areEqual(editor.sheet, sheet)) {
                 return;
             }
         }
 
         foreach (var editor in _active_editors) {
-            if (editor.sheet == sheet) {
+            if (Sheet.areEqual(editor.sheet, sheet)) {
                 return;
             }
         }
@@ -251,9 +261,10 @@ namespace ThiefMD.Controllers.SheetManager {
         }
 
         // Create the file and refresh
-        if (parent_dir != "" && sheet != null) {
+        if (parent_dir != "" && sheet != null && sheet.get_sheets_path () != "") {
             if (FileManager.create_sheet(sheet.get_sheets_path (), file_name)) {
-                sheet.load_sheets ();
+                sheet.refresh ();
+                sheet.show_all ();
             }
         } else {
             warning ("Could not create file, no current sheet");
@@ -365,6 +376,7 @@ namespace ThiefMD.Controllers.SheetManager {
     public void redraw () {
         foreach (var editor in _active_editors) {
             editor.editor.show ();
+            editor.sheet.redraw ();
         }
     }
 
@@ -391,6 +403,7 @@ namespace ThiefMD.Controllers.SheetManager {
         while (_editors.size > Constants.KEEP_X_SHEETS_IN_MEMORY) {
             SheetPair clean = _editors.poll ();
             clean.editor.am_active = false;
+            clean.sheet = null;
             if (_editor_pool.size < Constants.EDITOR_POOL_SIZE) {
                 clean.editor.open_file ("");
                 _editor_pool.add (clean.editor);

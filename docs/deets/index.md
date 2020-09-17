@@ -37,7 +37,7 @@ Stay centered and stay focused. Type writer scrolling keeps your active line fix
 
 ![](/images/jekyll-minimark.png)
 
-Use [Jekyll](https://jekyllrb.com)? ThiefMD will surface the [front matter](https://jekyllrb.com/docs/front-matter) in the Sheets View using minimark.
+Use [Jekyll](https://jekyllrb.com)? ThiefMD will surface the [front matter](https://jekyllrb.com/docs/front-matter) in the Folder View using minimark.
 
 ## KaTeX Support
 

@@ -118,7 +118,6 @@ namespace ThiefMD.Widgets {
         }
 
         public void redraw () {
-            Preview.update_view ();
             string file_contents = FileManager.get_file_lines_yaml (_sheet_path, Constants.SHEET_PREVIEW_LINES);
             if (file_contents.chomp() != "") {
                 _label_buffer = "<small>" + SheetManager.mini_mark(file_contents) + "</small>";
@@ -139,13 +138,13 @@ namespace ThiefMD.Widgets {
                 Gtk.Menu menu = new Gtk.Menu ();
                 menu.attach_to_widget (this, null);
 
-                Gtk.MenuItem sort_sheets_by_name = new Gtk.MenuItem.with_label ((_("Sort Sheets by Filename Ascending")));
+                Gtk.MenuItem sort_sheets_by_name = new Gtk.MenuItem.with_label ((_("Sort by Filename Ascending")));
                 menu.add (sort_sheets_by_name);
                 sort_sheets_by_name.activate.connect (() => {
                     _parent.sort_sheets_by_name ();
                 });
 
-                Gtk.MenuItem sort_sheets_by_name_desc = new Gtk.MenuItem.with_label ((_("Sort Sheets by Filename Descending")));
+                Gtk.MenuItem sort_sheets_by_name_desc = new Gtk.MenuItem.with_label ((_("Sort by Filename Descending")));
                 menu.add (sort_sheets_by_name_desc);
                 sort_sheets_by_name_desc.activate.connect (() => {
                     _parent.sort_sheets_by_name (false);
@@ -173,6 +172,7 @@ namespace ThiefMD.Widgets {
                 menu.show_all ();
                 menu.popup_at_pointer (event);
             }
+
             return true;
         }
 
@@ -318,6 +318,12 @@ namespace ThiefMD.Widgets {
 
             Gtk.drag_finish (context, false, false, time);
             return;
+        }
+
+    public static bool areEqual (Sheet a, Sheet b) {
+            return (a._parent.get_sheets_path () == b._parent.get_sheets_path ()) &&
+                (a._sheet_path == b._sheet_path) &&
+                (a._label_buffer == b._label_buffer);
         }
     }
 }

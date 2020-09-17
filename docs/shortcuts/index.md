@@ -14,10 +14,10 @@ title: Shortcuts
 ## Editor Views
 
 * `Ctrl + 1` - Editor Only
-* `Ctrl + 2` - Editor and Sheets View
-* `Ctrl + 3` - Editor, Sheets, and Library View
+* `Ctrl + 2` - Editor and Folder View
+* `Ctrl + 3` - Editor, Folder, and Library View
 
-# Sheets Management
+# File Management
 
 * `Ctrl + S` - Force Save
 * `Ctrl + N` - New Sheet
