@@ -40,7 +40,6 @@ namespace ThiefMD.Widgets {
             settingsweb.enable_developer_extras = false;
             settingsweb.javascript_can_open_windows_automatically = false;
 
-            update_html_view ();
             var settings = AppSettings.get_default ();
             settings.changed.connect (() => {
                 if (this == instance) {
@@ -52,7 +51,7 @@ namespace ThiefMD.Widgets {
 
         public static void update_view () {
             PreviewWindow.update_preview_title ();
-            get_instance ().update_html_view ();
+            get_instance ().update_html_view (true, SheetManager.get_markdown ());
         }
 
         public static Preview get_instance () {

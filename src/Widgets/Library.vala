@@ -211,7 +211,6 @@ namespace ThiefMD.Widgets {
                 // Load ordered folders
                 foreach (var file_name in sheet_dir.metadata.folder_order) {
                     if (!file_name.has_prefix(".") && !sheet_dir.metadata.hidden_folders.contains(file_name)) {
-                        debug ("Loading from thiefsheets %s ", file_name);
                         string path = Path.build_filename (str_dir, file_name);
                         if (!has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
                             _lib_store.append (out child, iter);
@@ -230,7 +229,6 @@ namespace ThiefMD.Widgets {
                 string? file_name = null;
                 while ((file_name = dir.read_name()) != null) {
                     if (!file_name.has_prefix(".") && !sheet_dir.metadata.hidden_folders.contains(file_name)) {
-                        debug ("Found %s ", file_name);
                         string path = Path.build_filename (str_dir, file_name);
                         if (!has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
                             _lib_store.append (out child, iter);
@@ -355,9 +353,10 @@ namespace ThiefMD.Widgets {
                             if (parent != null) {
                                 parent._sheets.add_hidden_item (_selected._path);
                             }
+                            // Always touch lib store last as it changes selection
+                            remove_children (_selected._path);
                             _all_sheets.remove (_selected);
                             _lib_store.remove (ref hide_node);
-                            remove_children (_selected._path);
                         }
                     });
 
@@ -381,10 +380,11 @@ namespace ThiefMD.Widgets {
                         TreeIter remove_node = _selected_node;
                         if (_selected != null && _all_sheets.find (_selected) != null) {
                             debug ("Removing %s", _selected._path);
+                            // Always touch lib store last as it changes selection
+                            remove_children (_selected._path);
                             _all_sheets.remove (_selected);
                             settings.remove_from_library (_selected._path);
                             _lib_store.remove (ref remove_node);
-                            remove_children (_selected._path);
                         }
                     });
                     menu.add (menu_remove_item);

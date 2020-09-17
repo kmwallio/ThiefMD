@@ -184,6 +184,7 @@ namespace ThiefMD.Widgets {
         }
 
         public void refresh () {
+            bool am_empty = (_sheets.keys.size == 0);
             var keys = _sheets.keys;
             foreach (var file_check in metadata.sheet_order) {
                 string path = Path.build_filename(_sheets_dir, file_check);
@@ -197,6 +198,10 @@ namespace ThiefMD.Widgets {
                 }
             }
             reload_sheets ();
+
+            if (am_empty && (_sheets.keys.size != 0)) {
+                _view.remove (_empty);
+            }
         }
 
         public List<Sheet> get_sheets () {

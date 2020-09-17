@@ -20,6 +20,7 @@
 namespace ThiefMD.Controllers.Dialogs {
     public Gtk.FileChooserDialog create_file_chooser (string title,
             Gtk.FileChooserAction action) {
+        var settings = AppSettings.get_default ();
         var chooser = new Gtk.FileChooserDialog (title, null, action);
 
         chooser.add_button ("_Cancel", Gtk.ResponseType.CANCEL);
@@ -73,6 +74,14 @@ namespace ThiefMD.Controllers.Dialogs {
             mhtml_filter.add_pattern ("*.mhtml");
             mhtml_filter.add_pattern ("*.mht");
             chooser.add_filter (mhtml_filter);
+
+            if (settings.export_include_metadata_file) {
+                chooser.set_current_name ("my-great-novel.epub");
+                chooser.set_filter (epub_filter);
+            } else {
+                chooser.set_current_name ("my-great-work.pdf");
+                chooser.set_filter (pdf);
+            }
 
         } else if (action != Gtk.FileChooserAction.SELECT_FOLDER) {
             var filter1 = new Gtk.FileFilter ();

@@ -27,7 +27,6 @@ using ThiefMD.Widgets;
 namespace ThiefMD.Controllers.Pandoc {
     public bool make_epub (string output_file, string markdown) {
         string resolved_mkd = resolve_paths (markdown);
-        warning (resolved_mkd);
         string temp_file = FileManager.save_temp_file (resolved_mkd);
         bool res = false;
         if (temp_file != "") {

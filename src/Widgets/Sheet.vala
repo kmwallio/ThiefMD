@@ -118,7 +118,6 @@ namespace ThiefMD.Widgets {
         }
 
         public void redraw () {
-            Preview.update_view ();
             string file_contents = FileManager.get_file_lines_yaml (_sheet_path, Constants.SHEET_PREVIEW_LINES);
             if (file_contents.chomp() != "") {
                 _label_buffer = "<small>" + SheetManager.mini_mark(file_contents) + "</small>";
@@ -318,6 +317,12 @@ namespace ThiefMD.Widgets {
 
             Gtk.drag_finish (context, false, false, time);
             return;
+        }
+
+    public static bool areEqual (Sheet a, Sheet b) {
+            return (a._parent.get_sheets_path () == b._parent.get_sheets_path ()) &&
+                (a._sheet_path == b._sheet_path) &&
+                (a._label_buffer == b._label_buffer);
         }
     }
 }
