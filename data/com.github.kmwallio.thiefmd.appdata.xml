@@ -42,11 +42,24 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.0.8" date="2020-09-16" urgency="low">
+      <description>
+        <p>Share your writing, maybe publish that novel?</p>
+        <ul>
+          <li>Pandoc powered export. ePub, docx, pdf, it's now available</li>
+          <li>More export formatting options in the Preferences window</li>
+          <li>More keyboard short-cuts. Ctrl+B, Ctrl+I, you know what they do, and now they do them.</li>
+          <li>Undo/Redo history is now tied to the file. No more confusion.</li>
+          <li>Less bugs. Fixed an issue with duplicate listing in the Library.</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.7-orderlyfashion</url>
+    </release>
     <release version="0.0.7" date="2020-09-13" urgency="low">
       <description>
         <p>Organize your writing and maybe share that great novel you've been working on.</p>
         <ul>
-          <li>Sheets can now be reordered.</li>
+          <li>Files can now be reordered.</li>
           <li>Items in the Library can now be Reordered.</li>
           <li>You can now right-click on a folder in the Library and export it.</li>
         </ul>
