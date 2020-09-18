@@ -93,7 +93,7 @@ namespace ThiefMD.Widgets {
                 settings.export_include_metadata_file = epub_metadata_file.get_active ();
             });
             epub_metadata_file.tooltip_text = _("First Markdown File includes Author Metadata");
-            var epub_metadata_file_label = new Label(_("First Markdown file includes <a href='https://thiefmd.com/export/author-metadata'>Author metadata</a>"));
+            var epub_metadata_file_label = new Label(_("First Markdown file includes <a href='https://pandoc.org/MANUAL.html#epub-metadata'>Author metadata</a>"));
             epub_metadata_file_label.xalign = 0;
             epub_metadata_file_label.hexpand = true;
             epub_metadata_file_label.use_markup = true;
