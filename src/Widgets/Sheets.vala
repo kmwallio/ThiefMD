@@ -331,7 +331,7 @@ namespace ThiefMD.Widgets {
         }
 
         public void move_folder_after (string destination, string moved) {
-            if (!_reorderable.can_get_drop ()) {
+            if (!_reorderable.can_get_drop () || (destination == moved)) {
                 return;
             }
 
@@ -348,7 +348,7 @@ namespace ThiefMD.Widgets {
         }
 
         public void move_folder_before (string destination, string moved) {
-            if (!_reorderable.can_get_drop ()) {
+            if (!_reorderable.can_get_drop () || (destination == moved)) {
                 return;
             }
 
@@ -364,7 +364,7 @@ namespace ThiefMD.Widgets {
         }
 
         public void move_sheet_after (string destination, string moved) {
-            if (!_reorderable.can_get_drop ()) {
+            if (!_reorderable.can_get_drop () || (destination == moved)) {
                 return;
             }
 
@@ -384,7 +384,7 @@ namespace ThiefMD.Widgets {
         }
 
         public void move_sheet_before (string destination, string moved) {
-            if (!_reorderable.can_get_drop ()) {
+            if (!_reorderable.can_get_drop () || (destination == moved)) {
                 return;
             }
 
