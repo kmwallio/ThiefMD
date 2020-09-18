@@ -338,7 +338,7 @@ namespace ThiefMD.Widgets {
             metadata.folder_order.remove (moved);
             int index = metadata.folder_order.index_of (destination);
 
-            if (index + 1 < metadata.folder_order.size) {
+            if (index + 1 < metadata.folder_order.size && index >= 0) {
                 metadata.folder_order.insert (index + 1, moved);
             } else {
                 metadata.folder_order.add (moved);
@@ -354,7 +354,11 @@ namespace ThiefMD.Widgets {
 
             metadata.folder_order.remove (moved);
             int index = metadata.folder_order.index_of (destination);
-            metadata.folder_order.insert (index, moved);
+            if (index >= 0) {
+                metadata.folder_order.insert (index, moved);
+            } else {
+                metadata.folder_order.add (moved);
+            }
 
             save_metadata_file (true);
         }
