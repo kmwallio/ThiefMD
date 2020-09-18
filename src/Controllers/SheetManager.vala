@@ -156,8 +156,12 @@ namespace ThiefMD.Controllers.SheetManager {
         }
     }
 
-    public static Sheet get_sheet () {
-        return _currentSheet.sheet;
+    public static Sheet? get_sheet () {
+        if (_currentSheet != null) {
+            return _currentSheet.sheet;
+        }
+
+        return null;
     }
 
     private bool open_file (string file_path, out Widgets.Editor editor) {

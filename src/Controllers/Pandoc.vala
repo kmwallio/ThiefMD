@@ -143,7 +143,7 @@ namespace ThiefMD.Controllers.Pandoc {
         } else {
             string search_path = "";
             if (path == "") {
-                Sheet search_sheet = SheetManager.get_sheet ();
+                Sheet? search_sheet = SheetManager.get_sheet ();
                 search_path = (search_sheet != null) ? Path.get_dirname (search_sheet.file_path ()) : "";
             } else {
                 search_path = path;

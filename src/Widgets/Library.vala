@@ -200,6 +200,21 @@ namespace ThiefMD.Widgets {
                 }
             }
 
+            Timeout.add (150, pick_item);
+
+            return false;
+        }
+
+        private bool pick_item () {
+            if (_selected == null) {
+                foreach (LibPair pair in _all_sheets) {
+                    TreePath? tree_path = _lib_store.get_path (pair._iter);
+                    if (tree_path != null) {
+                        set_cursor (tree_path, null, false);
+                        break;
+                    }
+                }
+            }
             return false;
         }
 
@@ -281,7 +296,6 @@ namespace ThiefMD.Widgets {
                     markdown.append (sheet_markdown);
                     markdown.append ("\n");
                 }
-                
             }
 
             foreach (var folder in p._sheets.metadata.folder_order) {
