@@ -5,9 +5,10 @@ Summary: The markdown editor worth stealing.
 License: GPL-3.0+
 URL: https://thiefmd.com
 
-Source0: com.github.kmwallio.thiefmd-0.0.7.tar.xz
+Source0: %{name}-%{version}.tar.xz
 Source1: data/%{name}.appdata.xml
 
+Requires: pandoc
 BuildRequires: meson
 BuildRequires: vala
 BuildRequires: gcc
@@ -192,7 +193,7 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
-* Sun Sep 17 2020 kmwallio <mwallio@gmail.com> - 0.0.8
+* Thu Sep 17 2020 kmwallio <mwallio@gmail.com> - 0.0.8
 - Pandoc Export
 - More PDF Export options
 - Shortcut keys
