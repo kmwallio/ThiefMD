@@ -80,6 +80,7 @@ namespace ThiefMD.Controllers.SheetManager {
 
     private void update_view () {
         // Clear the view
+        _view.hide ();
         if (show_welcome) {
             _view.remove (_welcome_screen);
         }
@@ -93,8 +94,14 @@ namespace ThiefMD.Controllers.SheetManager {
                 _view.add (editor.editor);
             }
         }
-
         _view.show_all ();
+
+        foreach (var editor in _active_editors) {
+            editor.editor.queue_draw ();
+        }
+        _view.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.ALWAYS);
+        _view.queue_draw ();
+        _view.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
     }
 
     public string get_markdown () {

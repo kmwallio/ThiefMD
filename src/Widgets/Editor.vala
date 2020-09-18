@@ -185,7 +185,7 @@ namespace ThiefMD.Widgets {
                     // redrawing
                     //
                     size_allocate.connect (dynamic_margins);
-                    dynamic_margins ();
+                    move_margins (true);
                     should_scroll = true;
                     update_preview ();
                     spellcheck_enable();
@@ -523,6 +523,21 @@ namespace ThiefMD.Widgets {
                 return;
             }
 
+            move_margins ();
+        }
+
+        public void move_margins (bool wiggle = false) {
+            var settings = AppSettings.get_default ();
+
+            if (!ThiefApp.get_instance ().ready) {
+                return;
+            }
+
+            int w, h, m, p;
+            ThiefApp.get_instance ().main_window.get_size (out w, out h);
+
+            w = w - ThiefApp.get_instance ().pane_position;
+            last_height = h;
             last_width = w;
 
             // If ThiefMD is Full Screen, add additional padding
@@ -542,15 +557,29 @@ namespace ThiefMD.Widgets {
                     break;
             }
 
+            if (wiggle) {
+                left_margin = 0;
+                right_margin = 0;
+            }
+
             // Update margins
             left_margin = m;
             right_margin = m;
 
-            typewriter_scrolling ();
+            // Someday I'll learn how to redraw widgets and get
+            // TextViews to work the way I want...
+            // But today is not that day...
+            if (wiggle) {
+                ThiefApp.get_instance ().wiggle ();
+            }
 
-            // Keep the curson in view?
-            should_scroll = true;
-            move_typewriter_scolling ();
+            if (!wiggle) {
+                typewriter_scrolling ();
+
+                // Keep the curson in view?
+                should_scroll = true;
+                move_typewriter_scolling ();
+            }
         }
 
         private void typewriter_scrolling () {

@@ -165,6 +165,18 @@ namespace ThiefMD {
             });
         }
 
+        public void wiggle () {
+            var settings = AppSettings.get_default ();
+            if (!settings.fullscreen) {
+                int w, h;
+                main_window.get_size (out w, out h);
+                main_window.set_size_request (w + 1, h + 1);
+                main_window.set_size_request (w, h);
+                main_window.show_all ();
+                UI.show_view ();
+            }
+        }
+
         public static ThiefApp get_instance () {
             return _instance;
         }
