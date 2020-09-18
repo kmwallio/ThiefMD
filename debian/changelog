@@ -1,3 +1,12 @@
+com.github.kmwallio.thiefmd (0.0.8) xenial; urgency=low
+
+  * Pandoc Export
+  * More PDF Export options
+  * Shortcut keys
+  * Better undo management
+
+ -- kmwallio <kmwallio@DigiEmperor>  Thu, 17 Sep 2020 21:32:08 -0700
+
 com.github.kmwallio.thiefmd (0.0.7) xenial; urgency=low
 
   * Library Reordering

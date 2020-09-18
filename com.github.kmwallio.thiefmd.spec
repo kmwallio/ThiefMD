@@ -192,6 +192,11 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sun Sep 17 2020 kmwallio <mwallio@gmail.com> - 0.0.8
+- Pandoc Export
+- More PDF Export options
+- Shortcut keys
+- Better undo management
 * Sun Sep 13 2020 kmwallio <mwallio@gmail.com> - 0.0.7
 - Library Reordering
 - Sheets Reordering
