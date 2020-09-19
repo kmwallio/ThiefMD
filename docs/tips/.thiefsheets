@@ -1,6 +1,7 @@
 {
   "sheet-order" : [
     "index.md",
+    "linux-writing-tools.md",
     "jekyll.md",
     "static-site-generators.md",
     "novel-writing.md"
