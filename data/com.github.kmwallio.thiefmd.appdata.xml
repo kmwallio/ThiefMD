@@ -42,7 +42,21 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="0.0.8" date="2020-09-16" urgency="low">
+    <release version="0.0.9" date="2020-09-18" urgency="low">
+      <description>
+        <p>Share your writing, maybe publish that novel?</p>
+        <ul>
+          <li>This release fixes some bugs introduced in 0.0.8</li>
+          <li>Pandoc powered export. ePub, docx, pdf, it's now available</li>
+          <li>More export formatting options in the Preferences window</li>
+          <li>More keyboard short-cuts. Ctrl+B, Ctrl+I, you know what they do, and now they do them.</li>
+          <li>Undo/Redo history is now tied to the file. No more confusion.</li>
+          <li>Less bugs. Fixed an issue with duplicate listing in the Library.</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.7-orderlyfashion</url>
+    </release>
+    <release version="0.0.8" date="2020-09-17" urgency="low">
       <description>
         <p>Share your writing, maybe publish that novel?</p>
         <ul>

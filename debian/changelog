@@ -1,3 +1,12 @@
+com.github.kmwallio.thiefmd (0.0.9) xenial; urgency=low
+
+  * This release is a bugfix release
+  * Fix bug when trying to export with no file selected
+  * Select first folder added to the library if library is empty
+  * Show an error if invalid is provided to export dialog
+
+ -- kmwallio <mwallio@gmail.com>  Fri, 18 Sep 2020 17:35:59 -0700
+
 com.github.kmwallio.thiefmd (0.0.8) xenial; urgency=low
 
   * Pandoc Export

@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.0.8
+Version: 0.0.9
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
@@ -193,6 +193,11 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Fri Sep 18 2020 kmwallio <mwallio@gmail.com> - 0.0.9
+- This release is a bug fix release
+- Fix bug when trying to export with no file selected
+- Select first folder added to Library
+- Show error when unable to export file
 * Thu Sep 17 2020 kmwallio <mwallio@gmail.com> - 0.0.8
 - Pandoc Export
 - More PDF Export options
