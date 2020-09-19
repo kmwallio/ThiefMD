@@ -5,9 +5,23 @@ title: About
 
 # About
 
-ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app).
+ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app). It is [Open Source](https://github.com/kmwallio/ThiefMD) and based off of [other great open source software](#credit).
 
-It is my primary way of attempting to learn [Vala](https://wiki.gnome.org/Projects/Vala) and filling the gap of applications I miss from [Mac OS X](https://apple.com). 
+It is my primary way of attempting to learn [Vala](https://wiki.gnome.org/Projects/Vala) and filling in the gap of applications I miss from [macOS](https://apple.com). 
+
+# Features
+
+ThiefMD currently supports
+
+* Folder Import
+* Markdown Syntax Highlighting
+* Organization of Folders and Files
+* Live Preview
+* Export Preview
+* Folder Export to PDF, DocX, ePub and more
+* Import and Conversion of Ulysses Themes to GtkSourceView Styles
+  - Matching the UI to the selected theme
+* Type-Writer Scrolling
 
 # Credit
 
@@ -16,9 +30,9 @@ Great software is built on the shoulders of giants.
 * Code <s>stolen</s> *forked* from [Quilter](https://github.com/lainsce/quilter)
 * Font is [iA Writer Duospace](https://github.com/iaolo/iA-Fonts)
 * Inspired by [Ulysses](https://ulyssesapp.com)
-* Preview CSS is [Splendor](http://markdowncss.github.io/splendor)
+* Preview CSS is [Splendor](http://markdowncss.github.io/splendor) + [Modest](http://markdowncss.github.io/modest)
 * Markdown Rendering by [Discount](http://www.pell.portland.or.us/~orc/Code/discount)
-* Syntax Highlighting by [highlight.js](https://highlightjs.org)
+* Preview Syntax Highlighting by [highlight.js](https://highlightjs.org)
 * Math Rendering by [Katex](https://katex.org)
 * Multi Format Export by [Pandoc](https://pandoc.org)
 * Screenshots use [Vimix GTK Themes](https://github.com/vinceliuice/vimix-gtk-themes) and [Vimix Icon Theme](https://github.com/vinceliuice/vimix-icon-theme)
@@ -38,11 +52,11 @@ Great software is built on the shoulders of giants.
 * Light/Dark/User Themes
 * Export a file or folders
 * Compilation and preview of multiple files while maintaining order
+* Keep undo history tied to files
 
 ### Later on Markdown Support
 
 * Load multiple files into Editor View
-* Keep undo history tied to files
 * Additional export and preview themes
 
 ### I don't really want it but...

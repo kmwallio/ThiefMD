@@ -5,6 +5,13 @@ title: Novel Writing
 
 ThiefMD is great for organizing your markdown documents. With the ability to drag and drop to organize the order of your library, then export your work with a few clicks, ThiefMD can make compiling an epic story into a tiny task.
 
+- [Git for Writers](#git-for-writers)
+- [Markdown for Writing?](#markdown-for-writing)
+- [Structuring Your Novel](#structuring-your-novel)
+- [Sharing your Work](#sharing-your-work)
+- [Getting in the Zone](#getting-in-the-zone)
+- [Writing on Multiple Devices](#writing-on-multiple-devices)
+
 ## Git for Writers
 
 We recommend using [GitHub](https://github.com) or [GitLab](https://gitlab.com) as a way to store and backup your work. This [Guide to Git and GitHub for Writers](https://www.scrygroup.com/tutorial/2020-01-07/guide-to-git-github-for-writers) would be a good place to brush up on [git](https://git-scm.com/) if you're not familiar with git already.
@@ -18,6 +25,81 @@ While ThiefMD has been mildly tested, data loss, file sync conflicts, and good o
 With minimal effort to learn and remember, using Markdown will remove all of the hassle of learning a specific editing program, struggling with document formatting and design, and getting stuck in vendor lock-in.
 
 ThiefMD is a Markdown Editor that lets you focus on your words.
+
+## Structuring Your Novel
+
+We have a [sample novel project](https://github.com/ThiefMD/sample-novel) on GitHub featuring the first 5 chapters of Lewis Carrol's [Alice's Adventures in Wonderland](https://www.gutenberg.org/ebooks/28885).
+
+We like breaking down our projects into:
+
+```
+/Novel
+/Novel/title-page.md
+/Novel/Chapter-01/Part-1.md
+/Novel/Chapter-01/Part-2.md
+/Novel/Chapter-01/Part-3.md
+/Novel/Chapter-02/Part-X.md
+/Novel/Chapter-0Y/...
+```
+
+where each part is a scene in our chapter.
+
+If you wanted to, you could structure your novel like:
+
+```
+/Novel/title-page.md
+/Novel/Chapter-01.md
+/Novel/Chapter-02.md
+/Novel/...
+```
+
+and ThiefMD would still export your work to the desired format. You could even write your entire novel in a single markdown file, and ThiefMD would still be able to produce your ePub.
+
+Work in whatever way keeps you comfortable and helps you write. We'll do our best to stay out of the way.
+
+## Novel Metadata
+
+The title page contains our novel's metadata. When using metadata, make sure to tell ThiefMD the first file in the project includes the [author metadata](https://pandoc.org/MANUAL.html#epub-metadata).
+
+<div style="margin: 0 auto 0 auto; text-align: center"><img src="/images/preferences-metadata.png" style="width: 50%" /></div>
+
+The metadata in `title-page.md` should look something like:
+
+```yaml
+---
+title: My Great Novel
+author: My Name
+cover-image: /home/my-user/Pictures/cover.png
+---
+```
+
+During export, this will be embedded into the resulting ePub. The `cover-image` currently has to be the full path to your novel's cover image.
+
+![](/images/epub-export.png)
+
+## Sharing your Work
+
+![](/images/export_preview.png)
+
+<img src="/images/export.png" style="float: left; width: 35%" />Ready to share your work?
+
+Right-click on the folder you want to publish and click `Export Preview`. Items will be organized the same way they're kept in ThiefMD.
+
+This will bring up the `Publishing Preview` window. Double check that everything you want is there just the way you want it.
+
+<div style="clear: both"></div>
+
+<img src="/images/export_preferences.png" style="float: right; width: 35%" />
+
+Once you're ready, click on the `Export` button.
+
+Pick a place for your great work and pick a name.  Currently, ThiefMD supports PDF, DocX, [ePub](https://en.wikipedia.org/wiki/EPUB), HTML, [MHTML](https://en.wikipedia.org/wiki/MHTML), [LaTeX](https://www.latex-project.org/), and Markdown export.
+
+ThiefMD will generate the output based on the filename. `my-great-work.pdf` will create a PDF. `my-great-work.mhtml` will generate an HTML page with any images embedded into the same file. `my-great-work.md` will convert every single markdown file selected into a single markdown file you can share.
+
+Things not looking quite as planned? In the Export Preferences `Ctrl + ,` you can tweak the results based on how you organized your library.
+
+<div style="clear: both"></div>
 
 ## Getting in the Zone
 
@@ -36,30 +118,6 @@ You can keep writing without having to touch the scroll-bar to keep the cursor i
 ![](/images/theme_preferences.png)
 
 Make the editor your own. ThiefMD can load your favorite [Ulysses themes](https://styles.ulysses.app/themes). Find a theme that encourages you to write and get in the zone.
-
-## Sharing your Work
-
-![](/images/export_preview.png)
-
-<img src="/images/export.png" style="float: left; width: 35%" />Ready to share your work?
-
-Right-click on the folder you want to publish and click `Export Preview`. Items will be organized the same way they're kept in ThiefMD.
-
-This will bring up the `Publishing Preview` window. Double check that everything you want is there just the way you want it.
-
-<div style="clear: both"></div>
-
-<img src="/images/export_preferences.png" style="float: right; width: 35%" />
-
-Once you're ready, click on the `Export` button.
-
-Pick a place for your great work and pick a name.  Currently, ThiefMD supports PDF, HTML, [MHTML](https://en.wikipedia.org/wiki/MHTML), and Markdown export.
-
-ThiefMD will generate the output based on the filename. `my-great-work.pdf` will create a PDF. `my-great-work.mhtml` will generate an HTML page with any images embedded into the same file. `my-great-work.md` will convert every single markdown file selected into a single markdown file you can share.
-
-Things not looking quite as planned? In the Export Preferences `Ctrl + ,` you can tweak the results based on how you organized your library.
-
-<div style="clear: both"></div>
 
 ## Writing on Multiple Devices
 

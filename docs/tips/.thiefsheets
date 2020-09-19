@@ -2,6 +2,7 @@
   "sheet-order" : [
     "index.md",
     "jekyll.md",
+    "static-site-generators.md",
     "novel-writing.md"
   ],
   "hidden-folders" : [

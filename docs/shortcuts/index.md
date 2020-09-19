@@ -22,3 +22,9 @@ title: Shortcuts
 * `Ctrl + S` - Force Save
 * `Ctrl + N` - New Sheet
 * `Ctrl + Shift + P` - Launch Preview
+
+# Formatting
+
+* `Ctrl + B` - **\*\*Bold\*\***
+* `Ctrl + I` - *\*Italics\**
+* `Ctrl + D` - ~~&tilde;&tilde;Strikethrough&tilde;&tilde;~~

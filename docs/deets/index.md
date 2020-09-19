@@ -27,6 +27,20 @@ Relative paths? Absolute paths? Don't worry, ThiefMD will find the image you're 
 
 A separate window lets allows for better positioning, or multi-monitor support. Focus on your writing, or focus on your reading.
 
+## Compilation & Multi-Format Export
+
+<img src="/images/export_menu.png" style="width: 30%; float: right;" />
+
+Large projects go well broken down into smaller tasks. The same thing goes for [great writing](/tips/novel-writing).
+
+ThiefMD supports exporting your work from multiple folders and files. Publish to PDF to send to friends over e-mail. [ePub](https://en.wikipedia.org/wiki/EPUB) if you want to preview your novel in your favorite e-Reader. docx or LaTeX if you're getting ready to turn in a report or dissertation.
+
+However big the task, and wherever you need to take it, ThiefMD has you covered[^okay-its-pandoc].
+
+[^okay-its-pandoc]: Export powered by [Pandoc](https://pandoc.org). [Let us know](https://github.com/kmwallio/ThiefMD/issues) if we don't have you covered.,
+
+<div style="clear: both;"></div>
+
 ## Typewriter Scrolling
 
 ![](/images/typewriter_scrolling.gif)
@@ -43,7 +57,9 @@ Use [Jekyll](https://jekyllrb.com)? ThiefMD will surface the [front matter](http
 
 ![](/images/katex_preview.png)
 
-Use [KaTeX](https://katex.org) to render Math Equations in Previews. *Currently requires libmarkdown 2.2.0 or greater*.
+Use [KaTeX](https://katex.org) to render Math Equations in Previews. *Currently requires libmarkdown 2.2.0 or greater*[^flatpak-recommended].
+
+[^flatpak-recommended]: Using [flatpak](https://flathub.org/apps/details/com.github.kmwallio.thiefmd) will let ThiefMD use the latest and greatest versions of its dependencies.
 
 ## Syntax Highlighting
 
@@ -59,6 +75,8 @@ Import your favorite [Ulysses Themes](https://styles.ulysses.app/themes).[^ulyss
 
 [^ulysses-the-best]: [Ulysses](https://ulysses.app) is our writing tool of choice on [macOS](https://www.apple.com/macos).
 
-In the Preferences Window (`Ctrl + ,`), you can now drag [Ulysses Themes](https://styles.ulysses.app/themes) into the app and use them for the editor.
+In the Preferences Window (`Ctrl + ,`), you can now drag [Ulysses Themes](https://styles.ulysses.app/themes) into the app and use them.
+
+Get immersed and have ThiefMD match your editor, or just keep the colors in the editor by toggling "Match UI to Editor Theme" in the Preferences.
 
 <div style="clear: both;"></div>
