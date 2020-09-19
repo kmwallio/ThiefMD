@@ -75,6 +75,12 @@ namespace ThiefMD.Controllers.Dialogs {
             mhtml_filter.add_pattern ("*.mht");
             chooser.add_filter (mhtml_filter);
 
+            var tex_filter = new Gtk.FileFilter ();
+            tex_filter.set_filter_name (_("LaTeX file"));
+            tex_filter.add_mime_type ("application/x-tex");
+            tex_filter.add_pattern ("*.tex");
+            chooser.add_filter (tex_filter);
+
             if (settings.export_include_metadata_file) {
                 chooser.set_current_name ("my-great-novel.epub");
                 chooser.set_filter (epub_filter);

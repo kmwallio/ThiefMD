@@ -73,6 +73,37 @@ namespace ThiefMD.Controllers.Pandoc {
         return res;
     }
 
+    public bool make_tex (string output_file, string markdown) {
+        var settings = AppSettings.get_default ();
+        string temp_file = "";
+        if (settings.export_resolve_paths) {
+            temp_file = FileManager.save_temp_file (resolve_paths (markdown));
+        } else {
+            temp_file = FileManager.save_temp_file (markdown);
+        }
+
+        bool res = false;
+        if (temp_file != "") {
+            try {
+                string[] command = {
+                    "pandoc",
+                    "-s",
+                    temp_file,
+                    "-o",
+                    output_file
+                };
+                Subprocess pandoc = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
+                res = pandoc.wait ();
+                File temp = File.new_for_path (temp_file);
+                temp.delete ();
+            } catch (Error e) {
+                warning ("Could not generate epub: %s", e.message);
+            }
+        }
+
+        return res;
+    }
+
     public string resolve_paths (string markdown, string path = "") {
         string processed_mk = markdown;
 

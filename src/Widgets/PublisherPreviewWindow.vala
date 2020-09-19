@@ -88,6 +88,26 @@ namespace ThiefMD.Widgets {
                         Pandoc.make_epub (new_novel.get_path (), _markdown);
                     } else if (filename.has_suffix (".docx")) {
                         Pandoc.make_docx (new_novel.get_path (), _markdown);
+                    } else if (filename.has_suffix (".tex")) {
+                        Pandoc.make_tex (new_novel.get_path (), _markdown);
+                    } else {
+                        Gtk.Dialog prompt = new Gtk.Dialog.with_buttons (
+                            "Invalid Filename",
+                            ThiefApp.get_instance ().main_window,
+                            Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                            _("Close"),
+                            Gtk.ResponseType.NO);
+                        var contentarea = prompt.get_content_area ();
+                        var label = new Gtk.Label (_("Unable to determine type of file to export.\nPlease make sure you included a valid extension"));
+                        label.xalign = 0;
+                        contentarea.add (label);
+                        contentarea.show_all ();
+
+                        prompt.response.connect (() => {
+                            prompt.destroy ();
+                        });
+
+                        prompt.run ();
                     }
                 } catch (Error e) {
                     warning ("Could not save file %s: %s", new_novel.get_basename (), e.message);
