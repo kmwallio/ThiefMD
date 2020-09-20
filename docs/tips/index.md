@@ -8,6 +8,10 @@ title: Tips and Tricks
 * [Shortcuts](/shortcuts)
 * [Browsing the UI](/deets)
 
+## Linux
+
+* [Linux Writing Tools](/tips/linux-writing-tools)
+
 ## Static Site Generators
 
 * [Blogging with Jekyll](/tips/jekyll)
