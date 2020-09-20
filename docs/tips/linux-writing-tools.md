@@ -15,7 +15,7 @@ Looking to get started writing in Linux? Here's a list of apps we enjoy from [fl
 
 [LibreOffice](https://flathub.org/apps/details/org.libreoffice.LibreOffice) or [OnlyOffice](https://flathub.org/apps/details/org.onlyoffice.desktopeditors) are great for taking your DocX and putting on the finishing touches. The comments tool makes it great for getting feedback from editors. Styles will let you format the documentation for review or publishing. Start in markdown, finish with Pandoc or your favorite word processor.
 
-Prefer [LaTeX](https://latex-project.org)? [TeXstudio](https://flathub.org/apps/details/org.texstudio.TeXstudio) is a great way to preview and polish your work.
+Prefer [LaTeX](https://latex-project.org)? [TeXstudio](https://flathub.org/apps/details/org.texstudio.TeXstudio) is a great way to preview and polish your work. [Setzer](https://flathub.org/apps/details/org.cvfosammmm.Setzer) is a modern LaTeX editor built on GTK.
 
 ## Task Management and To-Do Keeping
 

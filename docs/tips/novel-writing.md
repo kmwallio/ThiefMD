@@ -14,7 +14,7 @@ ThiefMD is great for organizing your markdown documents. With the ability to dra
 
 ## Git for Writers
 
-We recommend using [GitHub](https://github.com) or [GitLab](https://gitlab.com) as a way to store and backup your work. This [Guide to Git and GitHub for Writers](https://www.scrygroup.com/tutorial/2020-01-07/guide-to-git-github-for-writers) would be a good place to brush up on [git](https://git-scm.com/) if you're not familiar with git already.
+We recommend using [GitHub](https://github.com) or [GitLab](https://gitlab.com) as a way to store and backup your work. This [Guide to Git and GitHub for Writers](https://www.scrygroup.com/tutorial/2020-01-07/guide-to-git-github-for-writers) would be a good place to brush up on [git](https://git-scm.com/) if you're not familiar with git already. D. Moonfire has a great post on [how he uses GitLab to manage his writing](https://d.moonfire.us/blog/2015/05/09/gitlab-projects).
 
 While ThiefMD has been mildly tested, data loss, file sync conflicts, and good old fashion acts of God can happen. Using Git will provide peace of mind knowing you can always recover your work, or find that sentence you deleted that wasn't "good enough" at the time.
 
