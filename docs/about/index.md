@@ -5,9 +5,11 @@ title: About
 
 # About
 
-ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app). It is [Open Source](https://github.com/kmwallio/ThiefMD) and based off of [other great open source software](#credit).
+<img src="/images/thiefmd_64.png" style="float: left; height: 64px; width: 64px;" />ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app). It is [Open Source](https://github.com/kmwallio/ThiefMD) and based off of [other great open source software](#credit).
 
 It is my primary way of attempting to learn [Vala](https://wiki.gnome.org/Projects/Vala) and filling in the gap of applications I miss from [macOS](https://apple.com). 
+
+<div style="clear: both;"></div>
 
 # Features
 

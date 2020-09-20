@@ -3,11 +3,11 @@ layout: page
 title: Thief Markdown Editor
 ---
 
-<img src="images/thief_library.png" style="float: right; width: 40%" />
+<img src="/images/thief_library.png" style="float: right; width: 40%" />
 
-# ThiefMD, the Markdown Editor built on the shoulders of others
+# <img src="/images/thiefmd_64.png" style="float: left; height: 1em; width: 1em;" /> ThiefMD, the Markdown Editor worth stealing
 
-Born from Open Source without knowing how Open Source works. ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app), based on open source code from [Quilter](https://github.com/lainsce/quilter) and other projects.
+Based on Open Source Technologies, ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app). ThiefMD is based on open source code from [Quilter](https://github.com/lainsce/quilter) and [other projects](/about#credit).
 
 Manage your <span class="pun">\*\*mark\*\*</span> without any <span class="ny">\-down\-</span>sides. Your library is your file system. Sync using any service you choose[^no-file-sync]. Even use [Git](https://git-scm.com/) to have a file history[^no-git].
 
@@ -22,6 +22,7 @@ Manage your <span class="pun">\*\*mark\*\*</span> without any <span class="ny">\
 ✅ Live Previews  
 ✅ Typewriter Scrolling  
 ✅ Full Screen Editing
+✅ Multiple Export Formats: PDF, ePub, docx, and more
 
 If anything goes wrong, it's probably because we implemented it wrong.  We're not liable for lost files or damage to your machine!
 
@@ -39,10 +40,6 @@ See what your work looks like in real time. Is that your battery draining? Yes, 
 
 # Get ThiefMD!
 
-## RPM or Deb?
-
-[Download the latest release](https://github.com/kmwallio/ThiefMD/releases).
-
 ## Flatpak
 
 [ThiefMD](https://flathub.org/apps/details/com.github.kmwallio.thiefmd) is now available on Flathub. Make sure you've added [flathub](https://flatpak.org/setup) to your system.
@@ -51,7 +48,11 @@ See what your work looks like in real time. Is that your battery draining? Yes, 
 flatpak install flathub com.github.kmwallio.thiefmd
 ```
 
-## Build from Source
+## RPM or Deb
+
+[Download the latest release](https://github.com/kmwallio/ThiefMD/releases).
+
+## Build from Source?
 
 Want to check out and build the source? [Instructions are on GitHub](https://github.com/kmwallio/ThiefMD#dependencies). It's built with Vala and GTK. There's no plans on porting to Mac or Windows. On Mac, we recommend [Ulysses](https://ulysses.app). On Windows, we recommend [Typora](https://typora.io).
 

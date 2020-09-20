@@ -43,12 +43,12 @@ It will be used for sanity checking the style-sheet used.
 
 ### Markdown Rendered Image
 
-![](docs/images/matt-hoffman-wheat.jpg)
+![](/images/matt-hoffman-wheat.jpg)
 
 ### HTML Rendered Image
 
-<div><img src="docs/images/matt-hoffman-wheat.jpg" /></div>
- 
+<div><img src="/images/matt-hoffman-wheat.jpg" /></div>
+
 ### Tables
 
 | Syntax | Description |
