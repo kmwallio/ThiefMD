@@ -222,8 +222,6 @@ namespace ThiefMD.Controllers.UI {
         } catch (Error e) {
             warning ("Could not set dynamic css: %s", e.message);
         }
-
-        SheetManager.refresh_scheme ();
     }
 
     public void set_css_scheme (Ultheme.HexColorPalette palette) {
