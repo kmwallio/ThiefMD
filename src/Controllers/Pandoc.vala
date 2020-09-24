@@ -111,6 +111,7 @@ namespace ThiefMD.Controllers.Pandoc {
             Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex css_url_search = new Regex ("url\\(['\"]?(.+?)['\"]?\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex cover_image_search = new Regex ("cover-image:\\s*['\"]?(.+?)['\"]?\\s*$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
 
             processed_mk = url_search.replace_eval (
                 processed_mk,
@@ -153,6 +154,19 @@ namespace ThiefMD.Controllers.Pandoc {
                         result.append ("\"");
                         return false;
                     });
+
+            processed_mk = cover_image_search.replace_eval (
+                processed_mk,
+                (ssize_t) processed_mk.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                (match_info, result) =>
+                {
+                    result.append ("cover-image: ");
+                    var url = match_info.fetch (1);
+                    result.append (find_file (url, path));
+                    return false;
+                });
         } catch (Error e) {
             warning ("Error generating preview: %s", e.message);
         }
