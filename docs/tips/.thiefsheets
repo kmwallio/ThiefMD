@@ -6,8 +6,6 @@
     "static-site-generators.md",
     "novel-writing.md"
   ],
-  "hidden-folders" : [
-  ],
-  "folder-order" : [
-  ]
+  "hidden-folders" : [],
+  "folder-order" : []
 }

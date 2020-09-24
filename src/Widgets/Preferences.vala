@@ -243,9 +243,7 @@ namespace ThiefMD.Widgets {
             ui_colorscheme_switch.set_active (settings.ui_editor_theme);
             ui_colorscheme_switch.notify["active"].connect (() => {
                 settings.ui_editor_theme = ui_colorscheme_switch.get_active ();
-                if (!settings.ui_editor_theme) {
-                    UI.reset_css ();
-                }
+                UI.load_css_scheme ();
             });
             ui_colorscheme_switch.tooltip_text = _("Toggle UI Matching");
             var ui_colorscheme_label = new Label(_("Match UI to Editor Theme"));

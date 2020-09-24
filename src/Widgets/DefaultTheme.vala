@@ -46,6 +46,7 @@ namespace ThiefMD.Widgets {
                 var settings2 = AppSettings.get_default ();
                 settings2.theme_id = "thiefmd";
                 SheetManager.refresh_scheme ();
+                UI.load_css_scheme ();
             });
 
             settings.changed.connect (() => {

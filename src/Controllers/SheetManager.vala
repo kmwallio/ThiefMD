@@ -212,7 +212,7 @@ namespace ThiefMD.Controllers.SheetManager {
         }
 
         if (success) {
-            _currentSheet.sheet.active = true;
+            _currentSheet.sheet.active_sheet = true;
             _currentSheet.editor.am_active = true;
             _active_editors.add (_currentSheet);
             settings.last_file = sheet.file_path ();
@@ -300,7 +300,7 @@ namespace ThiefMD.Controllers.SheetManager {
         foreach (var editor in _active_editors) {
             try {
                 _view.remove (editor.editor);
-                editor.sheet.active = false;
+                editor.sheet.active_sheet = false;
                 editor.editor.am_active = false;
                 editor.editor.save ();
                 editor.sheet.redraw ();
@@ -371,7 +371,7 @@ namespace ThiefMD.Controllers.SheetManager {
 
         if (remove_this != null) {
             remove_this.editor.am_active = false;
-            remove_this.sheet.active = false;
+            remove_this.sheet.active_sheet = false;
             _active_editors.remove (remove_this);
             _editors.remove (remove_this);
             _view.remove (remove_this.editor);
@@ -421,7 +421,7 @@ namespace ThiefMD.Controllers.SheetManager {
             } else {
                 clean.editor.clean ();
                 clean.editor = null;
-                clean.sheet.active = false;
+                clean.sheet.active_sheet = false;
                 clean.sheet = null;
                 clean = null;
             }

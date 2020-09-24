@@ -1,7 +1,7 @@
 {
   "app-id":"com.github.kmwallio.thiefmd",
   "runtime":"org.gnome.Platform",
-  "runtime-version":"3.36",
+  "runtime-version":"3.38",
   "sdk":"org.gnome.Sdk",
   "command":"com.github.kmwallio.thiefmd",
   "finish-args":[
@@ -88,37 +88,15 @@
         "x86_64"
       ],
       "buildsystem": "simple",
-      "cleanup": [
-        "/bin/pandoc",
-        "/bin/pandoc-siteproc"
-      ],
       "build-commands": [
-        "cp bin/pandoc /app/bin/pandoc",
-        "cp bin/pandoc-citeproc /app/bin/pandoc-citeproc"
+        "mv -v bin/pandoc /app/bin/pandoc",
+        "mv -v bin/pandoc-citeproc /app/bin/pandoc-citeproc"
       ],
       "sources": [
         {
           "type": "archive",
           "url": "https://github.com/jgm/pandoc/releases/download/2.10.1/pandoc-2.10.1-linux-amd64.tar.gz",
           "sha256": "a3ab481ad53f5568d7ec5263fbdd3478fb320d13b5d61a92fb5cee410186bd86"
-        }
-      ]
-    },
-    {
-      "name": "pandocarm64",
-      "only-arches": [
-        "aarch64"
-      ],
-      "buildsystem": "simple",
-      "cleanup": ["pandoc-2.9.2-aarch64"],
-      "build-commands": [
-        "cp pandoc-2.9.2-aarch64 /app/bin/pandoc"
-      ],
-      "sources": [
-        {
-          "type": "archive",
-          "url": "https://github.com/arm4rpi/pandoc-arm/releases/download/v0.1/pandoc-2.9.2-aarch64-static.tar.gz",
-          "sha256": "543c06f8a514cc737fcc1c146fc1426fd0794c29351c2608e8df55828fc2e35d"
         }
       ]
     },

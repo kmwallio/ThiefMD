@@ -128,7 +128,6 @@ namespace ThiefMD {
             sheets_pane.add2 (SheetManager.get_view ());
             sheets_pane.set_position (settings.view_library_width + settings.view_sheets_width);
 
-
             var provider = new Gtk.CssProvider ();
             provider.load_from_resource ("/com/github/kmwallio/thiefmd/app-main-stylesheet.css");
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
@@ -158,6 +157,7 @@ namespace ThiefMD {
             UI.set_sheets (start_sheet);
             library.set_active ();
             UI.load_user_themes ();
+            UI.load_css_scheme ();
 
             // Save on close
             shutdown.connect (() => {

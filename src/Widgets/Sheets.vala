@@ -176,7 +176,7 @@ namespace ThiefMD.Widgets {
 
         public bool has_active_sheet () {
             foreach (var sheet in _sheets) {
-                if (sheet.value.active) {
+                if (sheet.value.active_sheet) {
                     return true;
                 }
             }
@@ -263,7 +263,7 @@ namespace ThiefMD.Widgets {
                             _view.add (sheet);
 
                             if (settings.last_file == path) {
-                                sheet.active = true;
+                                sheet.active_sheet = true;
                                 SheetManager.load_sheet (sheet);
                             }
                         }
@@ -304,7 +304,7 @@ namespace ThiefMD.Widgets {
                             metadata.add_sheet (file_name);
 
                             if (settings.last_file == path) {
-                                sheet.active = true;
+                                sheet.active_sheet = true;
                                 SheetManager.load_sheet (sheet);
                             }
                         }

@@ -28,7 +28,7 @@ namespace ThiefMD.Widgets {
      * 
      * Button Widget pointing to a file on the system.
      */
-    public class Sheet : Gtk.Button {
+    public class Sheet : Gtk.ToggleButton {
         private string _sheet_path;
         private bool _selected;
         private Gtk.Label _label;
@@ -36,7 +36,7 @@ namespace ThiefMD.Widgets {
         private Sheets _parent;
 
         // Change style depending on sheet available in the editor
-        public bool active {
+        public bool active_sheet {
             set {
                 var header_context = this.get_style_context ();
                 if (value) {
@@ -44,6 +44,7 @@ namespace ThiefMD.Widgets {
                 } else {
                     header_context.remove_class ("thief-list-sheet-active");
                 }
+                active = value;
             }
 
             get {

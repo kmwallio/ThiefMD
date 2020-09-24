@@ -59,6 +59,7 @@ namespace ThiefMD.Widgets {
             app_box.attach (preview_box, 0, 1, 1, 3);
             app_box.hexpand = true;
 
+            // preview_items.add (new UserTheme ());
             preview_items.add (new DefaultTheme ());
             add (app_box);
 

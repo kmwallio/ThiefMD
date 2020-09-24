@@ -42,6 +42,15 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.0.10" date="2020-09-18" urgency="low">
+      <description>
+        <p>Share your writing, maybe publish that novel?</p>
+        <ul>
+          <li>Match User's Gtk Theme</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.7-orderlyfashion</url>
+    </release>
     <release version="0.0.9" date="2020-09-18" urgency="low">
       <description>
         <p>Share your writing, maybe publish that novel?</p>
