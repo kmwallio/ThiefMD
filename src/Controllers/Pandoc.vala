@@ -202,6 +202,14 @@ namespace ThiefMD.Controllers.Pandoc {
                     break;
                 }
 
+                // Check in static folder
+                file = Path.build_filename (search_path, "static", url);
+                if (FileUtils.test (file, FileTest.EXISTS)) {
+                    File tmp = File.new_for_path (file);
+                    result = tmp.get_path ();
+                    break;
+                }
+
                 idx = search_path.last_index_of_char ('/');
                 if (idx != -1) {
                     search_path = search_path[0:idx];
