@@ -71,7 +71,7 @@
             <description>When using a custom theme, use the dark color palette</description>
         </key>
         <key name="ui-editor-theme" type="b">
-            <default>true</default>
+            <default>false</default>
             <summary>UI to match Editor</summary>
             <description>When using a custom theme, change the UI to match the color palette</description>
         </key>
