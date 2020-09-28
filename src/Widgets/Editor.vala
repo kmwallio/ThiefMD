@@ -689,7 +689,7 @@ namespace ThiefMD.Widgets {
                         string page_type = (parent_folder.contains ("post") || parent_folder.contains ("draft")) ? "post" : "page";
                         string current_title = file.get_basename ();
                         string parent_path = file.get_parent ().get_path ().down ();
-                        bool add_draftmatter = parent_path.contains ("content/posts");
+                        bool add_draftmatter = parent_path.contains ("content/post");
                         current_title = current_title.substring (0, current_title.last_index_of ("."));
 
                         // Attempt to convert the file name into a title for the post
