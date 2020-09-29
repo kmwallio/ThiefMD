@@ -192,6 +192,10 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Tue Sep 29 2020 kmwallio <mwallio@gmail.com> - 0.0.10
+- Default to User's GTK Theme
+- Certain well-known hidden folders persist between restarts
+- Image path resolution for cover-image in ePub YAML front-matter
 * Fri Sep 18 2020 kmwallio <mwallio@gmail.com> - 0.0.9
 - This release is a bug fix release
 - Fix bug when trying to export with no file selected

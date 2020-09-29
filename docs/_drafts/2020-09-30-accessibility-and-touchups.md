@@ -9,6 +9,6 @@ We understand some users use Accessible GTK themes. By default, ThiefMD will now
 <!-- more -->
 
 * Improve accessibility by allowing toggle of usage of user's GTK Theme
-* In ePub YAML front-matter, ThiefMD can now find the full path to your cover-image during publishing
+* In [ePub YAML front-matter](https://pandoc.org/MANUAL.html#epub-metadata), ThiefMD can now find the full path to your cover-image during publishing
 * Working on some support for other static site generators
 * Squashing more bugs
