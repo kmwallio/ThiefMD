@@ -11,10 +11,12 @@
     "images"
   ],
   "folder-order" : [
+    "_drafts",
     "_posts",
     "tips",
     "about",
     "deets",
-    "shortcuts"
+    "shortcuts",
+    "download"
   ]
 }
