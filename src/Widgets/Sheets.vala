@@ -132,7 +132,10 @@ namespace ThiefMD.Widgets {
 
         public void add_hidden_item (string directory_path) {
             File ignore_dir = File.new_for_path (directory_path);
-            if (ignore_dir.query_exists ()) {
+            if (ignore_dir.query_exists () ||
+                ignore_dir.get_basename ().down () == "_site" ||
+                ignore_dir.get_basename ().down () == "public")
+            {
                 metadata.add_hidden_folder (ignore_dir.get_basename ());
             }
             save_library_order ();
