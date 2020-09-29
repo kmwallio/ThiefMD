@@ -1,3 +1,11 @@
+com.github.kmwallio.thiefmd (0.0.10) xenial; urgency=low
+
+  * Ability to use User's GTK Theme
+  * Keep certain well-known temporary folders in the hidden list after deletion
+  * Image path resolution for cover-image in ePub YAML front-matter
+
+ -- kmwallio <mwallio@gmail.com>  Tue, 29 Sep 2020 10:14:59 -0700
+
 com.github.kmwallio.thiefmd (0.0.9) xenial; urgency=low
 
   * This release is a bugfix release
