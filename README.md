@@ -56,7 +56,6 @@ meson
 ninja-build
 valac
 cmake
-libgranite-dev
 libgtkspell3-3-dev
 libwebkit2gtk-4.0-dev
 libmarkdown2-dev
@@ -79,7 +78,6 @@ clutter-gtk-devel
 webkit2gtk3-devel
 gtk3-devel
 gtksourceview3-devel
-granite-devel
 gtkspell3-devel
 libarchive-devel
 ```

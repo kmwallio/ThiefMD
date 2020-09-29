@@ -87,7 +87,6 @@ executable(
     asresources,
     c_args: c_args,
     dependencies: [
-        dependency('granite'),
         dependency('gobject-2.0'),
         dependency('gtksourceview-3.0'),
         dependency('gtk+-3.0'),

@@ -30,16 +30,6 @@
   ],
   "modules":[
     {
-      "name": "granite",
-      "buildsystem": "meson",
-      "cleanup": ["/bin", "/share/applications"],
-      "sources": [{
-        "type": "archive",
-        "url": "https://github.com/elementary/granite/archive/5.4.0.tar.gz",
-        "sha256": "8194031cac3b87d84a3fab9c30270485ce73f8b8ec23f26c9152b6859c8a18fd"
-      }]
-    },
-    {
       "name": "gtksourceview",
       "config-opts": [
         "--disable-gtk-doc"
