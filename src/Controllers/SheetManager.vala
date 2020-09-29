@@ -96,12 +96,13 @@ namespace ThiefMD.Controllers.SheetManager {
         }
         _view.show_all ();
 
-        foreach (var editor in _active_editors) {
-            editor.editor.queue_draw ();
-        }
         _view.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.ALWAYS);
         _view.queue_draw ();
         _view.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
+
+        foreach (var editor in _active_editors) {
+            editor.editor.queue_draw ();
+        }
     }
 
     public string get_markdown () {
