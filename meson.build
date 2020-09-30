@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.kmwallio.thiefmd', ['vala', 'c'],
-    version: '0.0.10'
+    version: '0.0.11'
 )
 
 # Application ID
@@ -53,6 +53,7 @@ endif
 add_project_arguments(['--vapidir', join_paths(meson.current_source_dir(), 'vapi')], language: 'vala')
 gxml_dep = dependency('gxml-0.18', fallback : [ 'gxml', 'libgxml_dep' ])
 ultheme_dep = dependency('ultheme-0.1', fallback : [ 'ultheme', 'libultheme_dep' ])
+writegood_dep = dependency('writegood-0.1', fallback : [ 'writegood', 'libwritegood_dep' ])
 
 executable(
     meson.project_name(),
@@ -96,6 +97,7 @@ executable(
         dependency('json-glib-1.0'),
         gxml_dep,
         ultheme_dep,
+        writegood_dep,
         libmarkdown
     ],
     vala_args: [

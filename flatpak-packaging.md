@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-You will need runtime `org.gnome.Platform` version `3.38` and sdk `org.gnome.Sdk` version `3.38` installed in flatpak.
+You will need run-time `org.gnome.Platform` version `3.38` and SDK `org.gnome.Sdk` version `3.38` installed in flatpak.
 
 These can be installed in either the user directory or system wide.
 

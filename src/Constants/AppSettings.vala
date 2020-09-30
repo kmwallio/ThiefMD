@@ -99,6 +99,17 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public double export_top_bottom_margins { get; set; }
         public bool export_include_metadata_file { get; set; }
 
+        private bool writegood_enabled = false;
+        public bool writegood {
+            set {
+                writegood_enabled = value;
+                changed ();
+            }
+            get {
+                return writegood_enabled;
+            }
+        }
+
         public string get_valid_theme_id () {
             UI.UserSchemes ().force_rescan ();
             foreach (var id in UI.UserSchemes ().scheme_ids) {

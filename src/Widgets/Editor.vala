@@ -38,11 +38,14 @@ namespace ThiefMD.Widgets {
         //
 
         public GtkSpell.Checker spell = null;
+        public WriteGood.Checker writegood = null;
+        private TimedMutex writegood_limit;
         public Gtk.TextTag warning_tag;
         public Gtk.TextTag error_tag;
         private int last_width = 0;
         private int last_height = 0;
         private bool spellcheck_active;
+        private bool writecheck_active;
         private bool typewriter_active;
 
         //
@@ -100,6 +103,7 @@ namespace ThiefMD.Widgets {
             });
             dynamic_margins ();
             spell = new GtkSpell.Checker ();
+            writegood = new WriteGood.Checker ();
 
             if (settings.spellcheck) {
                 debug ("Spellcheck active");
@@ -110,9 +114,18 @@ namespace ThiefMD.Widgets {
                 spellcheck_active = false;
             }
 
+            if (settings.writegood) {
+                writegood.attach (this);
+                writecheck_active = true;
+            } else {
+                writegood.detach ();
+                writecheck_active = false;
+            }
+
             last_width = settings.window_width;
             last_height = settings.window_height;
             preview_mutex = new TimedMutex ();
+            writegood_limit = new TimedMutex (1500);
         }
 
         public signal void changed ();
@@ -180,6 +193,12 @@ namespace ThiefMD.Widgets {
                         Timeout.add (Constants.AUTOSAVE_TIMEOUT, autosave);
                     }
 
+                    if (settings.writegood) {
+                        writecheck_active = true;
+                        writegood.attach (this);
+                        write_good_recheck ();
+                    }
+
                     //
                     // Register for redrawing of window for handling margins and other
                     // redrawing
@@ -211,6 +230,10 @@ namespace ThiefMD.Widgets {
                         buffer.changed.disconnect (on_change_notification);
                         size_allocate.disconnect (dynamic_margins);
                         settings.changed.disconnect (update_settings);
+                        if (settings.writegood) {
+                            writecheck_active = false;
+                            writegood.detach ();
+                        }
                     }
                     editable = false;
                     active = false;
@@ -340,6 +363,12 @@ namespace ThiefMD.Widgets {
             return settings.autosave;
         }
 
+        private void write_good_recheck () {
+            if (writegood_limit.can_do_action ()) {
+                writegood.recheck_all ();
+            }
+        }
+
         private Gtk.MenuItem? get_selected (Gtk.Menu? menu) {
             if (menu == null) return null;
             var active = menu.get_active () as Gtk.MenuItem;
@@ -374,6 +403,10 @@ namespace ThiefMD.Widgets {
             if (is_modified) {
                 changed ();
                 is_modified = false;
+            }
+
+            if (writecheck_active) {
+                write_good_recheck ();
             }
 
             // Move the preview if present
@@ -618,6 +651,15 @@ namespace ThiefMD.Widgets {
             set_scheme (settings.get_valid_theme_id ());
 
             spellcheck_enable();
+
+            if (!settings.writegood && writecheck_active) {
+                writecheck_active = false;
+                writegood.detach ();
+            } else if (settings.writegood && !writecheck_active) {
+                writecheck_active = true;
+                writegood.attach (this);
+                write_good_recheck ();
+            }
         }
 
         private void spellcheck_enable () {
@@ -663,6 +705,9 @@ namespace ThiefMD.Widgets {
 
             var settings = AppSettings.get_default ();
             this.populate_popup.connect ((source, menu) => {
+                Gtk.SeparatorMenuItem sep = new Gtk.SeparatorMenuItem ();
+                menu.add (sep);
+
                 Gtk.MenuItem menu_insert_datetime = new Gtk.MenuItem.with_label (_("Insert Datetime"));
                 menu_insert_datetime.activate.connect (() => {
                     DateTime now = new DateTime.now_local ();

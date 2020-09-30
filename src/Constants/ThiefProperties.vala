@@ -35,8 +35,9 @@ namespace ThiefMD {
             "Syntax Highlighting:\n<a href='https://highlightjs.org/'>highlight.js</a>\nCopyright © 2006 Ivan Sagalaev.\n<a href='https://github.com/highlightjs/highlight.js/blob/master/LICENSE'>BSD-3-Clause License</a>\n",
             "Math Rendering:\n<a href='https://katex.org/'>KaTeX</a>\nCopyright © 2013-2020 Khan Academy and other contributors.\n<a href='https://github.com/KaTeX/KaTeX/blob/master/LICENSE'>MIT License</a>\n",
             "XML Parsing:\n<a href='https://gitlab.gnome.org/GNOME/gxml/'>GXml</a>\n<a href='https://gitlab.gnome.org/GNOME/gxml/-/blob/master/COPYING'>GNU Lesser General Public License v2.1</a>\n",
-            "Pandoc Export:\n<a href='https://pandoc.org/'>Pandoc</a>, <a href='https://github.com/arm4rpi/pandoc-arm'>Pandoc for Raspberry Pi</a>\nCopyright © 2006-2020 John MacFarlane and others\n<a href='https://github.com/jgm/pandoc/blob/master/COPYRIGHT'>GNU General Public License v2.0</a>",
-        };
+            "Pandoc Export:\n<a href='https://pandoc.org/'>Pandoc</a>, <a href='https://github.com/arm4rpi/pandoc-arm'>Pandoc for Raspberry Pi</a>\nCopyright © 2006-2020 John MacFarlane and others\n<a href='https://github.com/jgm/pandoc/blob/master/COPYRIGHT'>GNU General Public License v2.0</a>\n",
+            "libwritegood-vala based on:\n<a href='https://github.com/btford/write-good'>write-good: Naive linter for English prose</a>\nCopyright © 2014-2019 Brian Ford\n<a href='https://github.com/btford/write-good/blob/master/LICENSE'>The MIT License (MIT)</a>\n",
+          };
         public const string PREVIEW_TEXT = """# %s
 The `markdown` editor worth stealing. *Focus* more on **writing**.
 > It's the best thing since sliced bread

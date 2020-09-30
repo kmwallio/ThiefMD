@@ -42,6 +42,15 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.0.11" date="2020-10-15" urgency="low">
+      <description>
+        <p>Can ThiefMD help you write better?</p>
+        <ul>
+          <li>Write-Good Support</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.11-writegood</url>
+    </release>
     <release version="0.0.10" date="2020-09-30" urgency="low">
       <description>
         <p>Share your writing, maybe publish that novel?</p>

@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.0.10
+Version: 0.0.11
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+

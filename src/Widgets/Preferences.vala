@@ -231,6 +231,15 @@ namespace ThiefMD.Widgets {
             var spellcheck_label = new Label(_("Check Spelling"));
             spellcheck_label.xalign = 0;
 
+            var writegood_switch = new Switch ();
+            writegood_switch.set_active (settings.writegood);
+            writegood_switch.notify["active"].connect (() => {
+                settings.writegood = writegood_switch.get_active ();
+            });
+            writegood_switch.tooltip_text = _("Toggle Write-Good");
+            var writegood_label = new Label(_("Enable Write-Good checks, passive voice, weasel words, and more"));
+            writegood_label.xalign = 0;
+
             var typewriter_switch = new Switch ();
             typewriter_switch.set_active (settings.typewriter_scrolling);
             typewriter_switch.notify["active"].connect (() => {
@@ -258,12 +267,14 @@ namespace ThiefMD.Widgets {
 
             grid.attach (spellcheck_switch, 1, 0, 1, 1);
             grid.attach (spellcheck_label, 2, 0, 2, 1);
-            grid.attach (typewriter_switch, 1, 1, 1, 1);
-            grid.attach (typewriter_label, 2, 1, 2, 1);
-            grid.attach (ui_colorscheme_switch, 1, 2, 1, 1);
-            grid.attach (ui_colorscheme_label, 2, 2, 2, 1);
-            grid.attach (perserve_library_switch, 1, 3, 1, 1);
-            grid.attach (perserve_library_label, 2, 3, 2, 1);
+            grid.attach (writegood_switch, 1, 1, 1, 1);
+            grid.attach (writegood_label, 2, 1, 2, 1);
+            grid.attach (typewriter_switch, 1, 2, 1, 1);
+            grid.attach (typewriter_label, 2, 2, 2, 1);
+            grid.attach (ui_colorscheme_switch, 1, 3, 1, 1);
+            grid.attach (ui_colorscheme_label, 2, 3, 2, 1);
+            grid.attach (perserve_library_switch, 1, 4, 1, 1);
+            grid.attach (perserve_library_label, 2, 4, 2, 1);
             grid.show_all ();
 
             return grid;
