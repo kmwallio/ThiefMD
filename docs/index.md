@@ -45,7 +45,7 @@ See what your work looks like in real time. Is that your battery draining? Yes, 
 [ThiefMD](https://flathub.org/apps/details/com.github.kmwallio.thiefmd) is now available on Flathub. Make sure you've added [flathub](https://flatpak.org/setup) to your system.
 
 ```bash
-flatpak install flathub com.github.kmwallio.thiefmd
+$ flatpak install flathub com.github.kmwallio.thiefmd
 ```
 
 ## RPM or Deb

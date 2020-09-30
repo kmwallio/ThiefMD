@@ -10,7 +10,7 @@ title: Download
 [ThiefMD](https://flathub.org/apps/details/com.github.kmwallio.thiefmd) is now available on Flathub. Make sure you've added [flathub](https://flatpak.org/setup) to your system.
 
 ```bash
-flatpak install flathub com.github.kmwallio.thiefmd
+$ flatpak install flathub com.github.kmwallio.thiefmd
 ```
 
 The flatpak contains all of the latest features of ThiefMD.
