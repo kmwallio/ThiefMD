@@ -45,6 +45,10 @@ Live Preview
 
 Typewriter Scrolling.
 
+![](docs/images/thiefmd-write-good.png)
+
+[Write-Good](https://github.com/ThiefMD/libwritegood-vala) recommendations and highlighting.
+
 ## Dependencies
 
 As part of the build, [gxml](https://gitlab.gnome.org/GNOME/gxml), [libwritegood-vala](https://github.com/ThiefMD/libwritegood-vala), and the [Ulysses Theme Parser](https://github.com/TwiRp/ultheme-vala) will be cloned and built.
@@ -103,4 +107,5 @@ $ sudo ninja install
 * Preview Syntax Highlighting by [highlight.js](https://highlightjs.org)
 * Math Rendering by [Katex](https://katex.org)
 * Multi-format Export by [Pandoc](https://pandoc.org)
+* Write-Good based on [btford/write-good](https://github.com/btford/write-good)
 * Screenshots use [Vimix GTK Themes](https://github.com/vinceliuice/vimix-gtk-themes) and [Vimix Icon Theme](https://github.com/vinceliuice/vimix-icon-theme)

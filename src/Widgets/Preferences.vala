@@ -247,6 +247,7 @@ namespace ThiefMD.Widgets {
             });
             typewriter_switch.tooltip_text = _("Toggle Spellcheck");
             var typewriter_label = new Label(_("Use TypeWriter Scrolling"));
+            typewriter_label.xalign = 0;
 
             var ui_colorscheme_switch = new Switch ();
             ui_colorscheme_switch.set_active (settings.ui_editor_theme);
@@ -256,6 +257,7 @@ namespace ThiefMD.Widgets {
             });
             ui_colorscheme_switch.tooltip_text = _("Toggle UI Matching");
             var ui_colorscheme_label = new Label(_("Match UI to Editor Theme"));
+            ui_colorscheme_label.xalign = 0;
 
             var perserve_library_switch = new Switch ();
             perserve_library_switch.set_active (settings.save_library_order);
@@ -264,6 +266,7 @@ namespace ThiefMD.Widgets {
             });
             perserve_library_switch.tooltip_text = _("Toggle Save Library Order");
             var perserve_library_label = new Label(_("Preserve Library Order"));
+            perserve_library_label.xalign = 0;
 
             grid.attach (spellcheck_switch, 1, 0, 1, 1);
             grid.attach (spellcheck_label, 2, 0, 2, 1);
