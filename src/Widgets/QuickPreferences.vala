@@ -33,7 +33,7 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
 
             _typewriter_button = new Gtk.ToggleButton.with_label ((_("Typewriter Scrolling")));
-            _typewriter_button.set_image (new Gtk.Image.from_icon_name ("preferences-desktop-keyboard", Gtk.IconSize.SMALL_TOOLBAR));
+            _typewriter_button.set_image (new Gtk.Image.from_icon_name ("input-keyboard-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
             _typewriter_button.set_always_show_image (true);
             _typewriter_button.tooltip_text = _("Toggle Typewriter Scrolling");
             _typewriter_button.set_active (settings.typewriter_scrolling);
@@ -43,7 +43,7 @@ namespace ThiefMD.Widgets {
             });
 
             _spellcheck_button = new Gtk.ToggleButton.with_label ((_("Check Spelling")));
-            _spellcheck_button.set_image (new Gtk.Image.from_icon_name ("tools-check-spelling", Gtk.IconSize.SMALL_TOOLBAR));
+            _spellcheck_button.set_image (new Gtk.Image.from_icon_name ("tools-check-spelling-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
             _spellcheck_button.set_always_show_image (true);
             _spellcheck_button.tooltip_text = _("Toggle Spellcheck");
             _spellcheck_button.set_active (settings.spellcheck);
@@ -53,7 +53,7 @@ namespace ThiefMD.Widgets {
             });
 
             _writegood_button = new Gtk.ToggleButton.with_label ((_("Write Good")));
-            _writegood_button.set_image (new Gtk.Image.from_icon_name ("tools-check-spelling", Gtk.IconSize.SMALL_TOOLBAR));
+            _writegood_button.set_image (new Gtk.Image.from_icon_name ("edit-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
             _writegood_button.set_always_show_image (true);
             _writegood_button.tooltip_text = _("Toggle Write Good");
             _writegood_button.set_active (settings.writegood);
