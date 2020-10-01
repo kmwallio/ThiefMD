@@ -184,6 +184,11 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/xml.lang
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/xslt.lang
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/yaml.lang
+/usr/include/writegood.h
+/usr/lib64/libwritegood.a
+/usr/lib64/pkgconfig/writegood.pc
+/usr/share/icons/hicolor/32x32/apps/com.github.kmwallio.thiefmd.svg
+/usr/share/vala/vapi/writegood.vapi
 
 %files devel
 %{_libdir}/libgxml-0.20.so
