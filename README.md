@@ -31,7 +31,7 @@ flatpak install flathub com.github.kmwallio.thiefmd
 
 ![](docs/images/thief_styles.png)
 
-[Ulysses Themes](https://styles.ulysses.app/themes) can be imported into the library. Displayed are [Tomorrow Dark](https://styles.ulysses.app/themes/tomorrow-qyp), Default ThiefMD Theme, [Dracula](https://styles.ulysses.app/themes/dracula-ZwJ), and [WWDC16](https://styles.ulysses.app/themes/wwdc16-04B).
+[Ulysses Themes](https://styles.ulysses.app/themes) can be imported into the library. Displayed are [Tomorrow Dark](https://styles.ulysses.app/themes/tomorrow-qyp), Default ThiefMD Theme, [Dracula](https://styles.ulysses.app/themes/dracula-ZwJ), and [WWDC16](https://styles.ulysses.app/themes/wwdc16-04B). Generate themes for Ulysses, ThiefMD, and your other favorite Markdown editors using our [theme generator](https://github.com/ThiefMD/theme-generator).
 
 ![](docs/images/drag_n_drop_sheets.gif)
 
