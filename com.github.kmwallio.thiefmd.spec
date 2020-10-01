@@ -192,6 +192,8 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Thu Oct 01 2020 kmwallio <mwallio@gmail.com> - 0.0.11
+- Write-Good support for writing suggestions
 * Tue Sep 29 2020 kmwallio <mwallio@gmail.com> - 0.0.10
 - Default to User's GTK Theme
 - Certain well-known hidden folders persist between restarts
