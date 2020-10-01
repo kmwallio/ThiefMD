@@ -363,9 +363,21 @@ namespace ThiefMD.Widgets {
             return settings.autosave;
         }
 
+        private bool writecheck_scheduled = false;
         private void write_good_recheck () {
-            if (writegood_limit.can_do_action ()) {
+            if (writegood_limit.can_do_action () && writecheck_active) {
                 writegood.recheck_all ();
+            } else if (writecheck_active) {
+                if (!writecheck_scheduled) {
+                    writecheck_scheduled = true;
+                    Timeout.add (1500, () => {
+                        if (writecheck_active) {
+                            writegood.recheck_all ();
+                        }
+                        writecheck_scheduled = false;
+                        return false;
+                    });
+                }
             }
         }
 
@@ -414,11 +426,19 @@ namespace ThiefMD.Widgets {
         }
 
         private TimedMutex preview_mutex;
+        private bool preview_scheduled = false;
         public void update_preview () {
             if (!preview_mutex.can_do_action ()) {
+                if (!preview_scheduled) {
+                    preview_scheduled = true;
+                    Timeout.add (750, () => {
+                        preview_scheduled = false;
+                        update_preview ();
+                        return false;
+                    });
+                }
                 return;
             }
-
             var cursor = buffer.get_insert ();
             if (cursor != null) {
                 Gtk.TextIter cursor_iter;

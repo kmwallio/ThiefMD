@@ -37,6 +37,7 @@ Great software is built on the shoulders of giants.
 * Preview Syntax Highlighting by [highlight.js](https://highlightjs.org)
 * Math Rendering by [Katex](https://katex.org)
 * Multi Format Export by [Pandoc](https://pandoc.org)
+* Write-Good based on [btford/write-good](https://github.com/btford/write-good)
 * Screenshots use [Vimix GTK Themes](https://github.com/vinceliuice/vimix-gtk-themes) and [Vimix Icon Theme](https://github.com/vinceliuice/vimix-icon-theme)
 
 ## Goals

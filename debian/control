@@ -10,7 +10,10 @@ Build-Depends: meson,
                libwebkit2gtk-4.0-dev,
                libmarkdown2-dev,
                libgtkspell3-3-dev,
-               pandoc
+               pandoc,
+               libclutter-1.0-dev,
+               libxml2-dev,
+               libarchive-dev
 Standards-Version: 4.5.0
 Homepage: https://thiefmd.com
 

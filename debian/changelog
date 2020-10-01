@@ -1,3 +1,10 @@
+com.github.kmwallio.thiefmd (0.0.11) xenial; urgency=low
+
+  * Add write-good support for writing recommendations
+  * Switch screenshots in release definition
+
+ -- kmwallio <mwallio@gmail.com>  Thu, 01 Oct 2020 14:37:56 -0700
+
 com.github.kmwallio.thiefmd (0.0.10) xenial; urgency=low
 
   * Ability to use User's GTK Theme

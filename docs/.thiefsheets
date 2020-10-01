@@ -8,7 +8,8 @@
     "_includes",
     "_layouts",
     "changeblog",
-    "images"
+    "images",
+    "css"
   ],
   "folder-order" : [
     "_drafts",
@@ -17,6 +18,8 @@
     "about",
     "deets",
     "shortcuts",
-    "download"
+    "download",
+    "opensource",
+    "css"
   ]
 }

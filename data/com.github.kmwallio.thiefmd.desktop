@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=ThiefMD
 GenericName=Thief Markdown Editor
-Comment=A plain yet rich writing environment
+Comment=The Markdown Editor worth Stealing
 Categories=Office
 Exec=com.github.kmwallio.thiefmd
 Icon=com.github.kmwallio.thiefmd

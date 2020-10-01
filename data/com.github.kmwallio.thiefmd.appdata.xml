@@ -30,19 +30,19 @@
   <screenshots>
     <screenshot type="default">
       <caption>ThiefMD, a Markdown Editor, with a file opened with syntax highlighting</caption>
-      <image>https://thiefmd.com/images/thiefmd.png</image>
+      <image>https://thiefmd.com/images/elem_lib.png</image>
     </screenshot>
     <screenshot>
-      <caption>ThiefMD, a Markdown Editor, showing a Library view with an open file</caption>
-      <image>https://thiefmd.com/images/thief_window.png</image>
+      <caption>ThiefMD, a Markdown Editor, themeing support</caption>
+      <image>https://thiefmd.com/images/elem_graphika.png</image>
     </screenshot>
     <screenshot>
-      <caption>ThiefMD, a Markdown Editor, showing Theme selection preferences to change the user interface</caption>
-      <image>https://thiefmd.com/images/theme_preferences.png</image>
+      <caption>ThiefMD, a Markdown Editor, showing the Export Preview interface</caption>
+      <image>https://thiefmd.com/images/elem_export.png</image>
     </screenshot>
   </screenshots>
   <releases>
-    <release version="0.0.11" date="2020-10-15" urgency="low">
+    <release version="0.0.11" date="2020-10-01" urgency="low">
       <description>
         <p>Can ThiefMD help you write better?</p>
         <ul>
@@ -132,4 +132,8 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.4-blogatog</url>
     </release>
   </releases>
+  <custom>
+    <value key="x-appcenter-color-primary">#FAFAFA</value>
+    <value key="x-appcenter-color-primary-text">rgb(12, 141, 177)</value>
+  </custom>
 </component>

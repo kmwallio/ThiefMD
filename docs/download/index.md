@@ -10,7 +10,7 @@ title: Download
 [ThiefMD](https://flathub.org/apps/details/com.github.kmwallio.thiefmd) is now available on Flathub. Make sure you've added [flathub](https://flatpak.org/setup) to your system.
 
 ```bash
-flatpak install flathub com.github.kmwallio.thiefmd
+$ flatpak install flathub com.github.kmwallio.thiefmd
 ```
 
 The flatpak contains all of the latest features of ThiefMD.
@@ -19,7 +19,7 @@ The flatpak contains all of the latest features of ThiefMD.
 
 [Download the latest release](https://github.com/kmwallio/ThiefMD/releases) from GitHub.
 
-RPM is built on [Fedora 32](https://getfedora.org) and supports [Katex](https://katex.org). DEB is built on [Ubuntu 20.04.1](https://ubuntu.com) and doesn't not have [Katex](https://katex.org).
+RPM is built on [Fedora 32](https://getfedora.org) and supports [Katex](https://katex.org). DEB is built on [Ubuntu 20.04.1](https://ubuntu.com) and does not have [Katex](https://katex.org).
 
 ## Build from Source
 
