@@ -18,24 +18,25 @@
  */
 
 namespace ThiefMD.Controllers.Dialogs {
-    public Gtk.FileChooserDialog create_file_chooser (string title,
+    public Gtk.FileChooserNative create_file_chooser (string title,
             Gtk.FileChooserAction action) {
         var settings = AppSettings.get_default ();
-        var chooser = new Gtk.FileChooserDialog (title, null, action);
 
-        chooser.add_button ("_Cancel", Gtk.ResponseType.CANCEL);
+        string accept = "";
+        string cancel = _("_Cancel");
         if (action == Gtk.FileChooserAction.OPEN) {
-            chooser.add_button ("_Open", Gtk.ResponseType.ACCEPT);
+            accept = _("_Open");
         } else if (action == Gtk.FileChooserAction.SAVE) {
-            chooser.add_button ("_Save", Gtk.ResponseType.ACCEPT);
-            chooser.set_do_overwrite_confirmation (true);
+            accept = _("_Save");
         } else if (action == Gtk.FileChooserAction.SELECT_FOLDER) {
-            chooser.add_button ("_Add to Library", Gtk.ResponseType.ACCEPT);
+            accept = _("_Add to Library");
         }
 
+        var chooser = new Gtk.FileChooserNative (title, null, action, accept, cancel);
         chooser.action = action;
 
         if (action == Gtk.FileChooserAction.SAVE) {
+            chooser.set_do_overwrite_confirmation (true);
             var pdf = new Gtk.FileFilter ();
             pdf.set_filter_name (_("PDF file"));
             pdf.add_mime_type ("application/pdf");
