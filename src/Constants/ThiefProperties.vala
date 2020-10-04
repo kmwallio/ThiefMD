@@ -75,6 +75,13 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
           color: @textColorGlobal;
         }
 
+        .thiefmd-toolbar button:active,
+        .thiefmd-toolbar button:hover,
+        .thiefmd-toolbar button:hover:active {
+          background: lighter(@colorPrimary);
+          color: @textColorGlobal;
+        }
+
         actionbar,
         .action-bar {
             border-top-color: transparent;
