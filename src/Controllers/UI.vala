@@ -219,6 +219,7 @@ namespace ThiefMD.Controllers.UI {
             provider.load_from_resource ("/com/github/kmwallio/thiefmd/app-stylesheet.css");
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
             active_provider = provider;
+            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
         } catch (Error e) {
             warning ("Could not set dynamic css: %s", e.message);
         }
