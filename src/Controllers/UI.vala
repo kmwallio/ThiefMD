@@ -247,7 +247,17 @@ namespace ThiefMD.Controllers.UI {
             var provider = new Gtk.CssProvider ();
             provider.load_from_data (new_css);
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_mode;
+            bool use_dark = settings.dark_mode;
+
+            // Use hue to determine if the background is dark or light as some themes
+            // include 2 dark themes or 2 light themes
+            Clutter.Color color = Clutter.Color.from_string (palette.global.background);
+            float hue, lum, sat;
+            color.to_hls (out hue, out lum, out sat);
+            use_dark = (lum < 0.5);
+
+            // Set dark theme
+            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = use_dark;
             active_provider = provider;
         } catch (Error e) {
             warning ("Could not set dynamic css: %s", e.message);

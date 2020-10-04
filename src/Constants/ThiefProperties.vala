@@ -69,7 +69,12 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         .thief-sheets {
             border-right: 1px solid alpha(@textColorGlobal, 0.2);
         }
-        
+
+        .thiefmd-toolbar button {
+          background: @colorPrimary;
+          color: @textColorGlobal;
+        }
+
         actionbar,
         .action-bar {
             border-top-color: transparent;
