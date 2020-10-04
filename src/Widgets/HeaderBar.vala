@@ -53,8 +53,6 @@ namespace ThiefMD.Widgets {
 
         private void build_ui () {
             var settings = AppSettings.get_default ();
-            set_title ("ThiefMD");
-
             new_sheet = new Gtk.MenuButton ();
             new_sheet_widget = new NewSheet ();
             new_sheet.has_tooltip = true;
@@ -114,12 +112,17 @@ namespace ThiefMD.Widgets {
         public void update_header () {
             var settings = AppSettings.get_default ();
 
-            if (settings.show_filename && settings.last_file != "") {
-                string file_name = settings.last_file.substring(settings.last_file.last_index_of("/") + 1);
-                set_title ("ThiefMD");
-                set_subtitle (file_name);
+            if (!settings.brandless) {
+                if (settings.show_filename && settings.last_file != "") {
+                    string file_name = settings.last_file.substring(settings.last_file.last_index_of("/") + 1);
+                    set_title ("ThiefMD");
+                    set_subtitle (file_name);
+                } else {
+                    set_title ("ThiefMD");
+                    set_subtitle ("");
+                }
             } else {
-                set_title ("ThiefMD");
+                set_title ("");
                 set_subtitle ("");
             }
         }

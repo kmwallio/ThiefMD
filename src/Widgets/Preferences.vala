@@ -259,6 +259,15 @@ namespace ThiefMD.Widgets {
             var ui_colorscheme_label = new Label(_("Match UI to Editor Theme"));
             ui_colorscheme_label.xalign = 0;
 
+            var brandless_switch = new Switch ();
+            brandless_switch.set_active (settings.brandless);
+            brandless_switch.notify["active"].connect (() => {
+                settings.brandless = brandless_switch.get_active ();
+            });
+            brandless_switch.tooltip_text = _("Hide meaningless UI Elements");
+            var brandless_label = new Label(_("Go Brandless"));
+            brandless_label.xalign = 0;
+
             var perserve_library_switch = new Switch ();
             perserve_library_switch.set_active (settings.save_library_order);
             perserve_library_switch.notify["active"].connect (() => {
@@ -268,16 +277,31 @@ namespace ThiefMD.Widgets {
             var perserve_library_label = new Label(_("Preserve Library Order"));
             perserve_library_label.xalign = 0;
 
-            grid.attach (spellcheck_switch, 1, 0, 1, 1);
-            grid.attach (spellcheck_label, 2, 0, 2, 1);
-            grid.attach (writegood_switch, 1, 1, 1, 1);
-            grid.attach (writegood_label, 2, 1, 2, 1);
-            grid.attach (typewriter_switch, 1, 2, 1, 1);
-            grid.attach (typewriter_label, 2, 2, 2, 1);
-            grid.attach (ui_colorscheme_switch, 1, 3, 1, 1);
-            grid.attach (ui_colorscheme_label, 2, 3, 2, 1);
-            grid.attach (perserve_library_switch, 1, 4, 1, 1);
-            grid.attach (perserve_library_label, 2, 4, 2, 1);
+            int g_row = 0;
+            grid.attach (spellcheck_switch, 1, g_row, 1, 1);
+            grid.attach (spellcheck_label, 2, g_row, 2, 1);
+            g_row++;
+
+            grid.attach (writegood_switch, 1, g_row, 1, 1);
+            grid.attach (writegood_label, 2, g_row, 2, 1);
+            g_row++;
+
+            grid.attach (typewriter_switch, 1, g_row, 1, 1);
+            grid.attach (typewriter_label, 2, g_row, 2, 1);
+            g_row++;
+
+            grid.attach (ui_colorscheme_switch, 1, g_row, 1, 1);
+            grid.attach (ui_colorscheme_label, 2, g_row, 2, 1);
+            g_row++;
+
+            grid.attach (brandless_switch, 1, g_row, 1, 1);
+            grid.attach (brandless_label, 2, g_row, 2, 1);
+            g_row++;
+
+            grid.attach (perserve_library_switch, 1, g_row, 1, 1);
+            grid.attach (perserve_library_label, 2, g_row, 2, 1);
+            g_row++;
+
             grid.show_all ();
 
             return grid;
