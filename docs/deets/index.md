@@ -75,7 +75,7 @@ Import your favorite [Ulysses Themes](https://styles.ulysses.app/themes).[^ulyss
 
 [^ulysses-the-best]: [Ulysses](https://ulysses.app) is our writing tool of choice on [macOS](https://www.apple.com/macos).
 
-In the Preferences Window (`Ctrl + ,`), you can now drag [Ulysses Themes](https://styles.ulysses.app/themes) into the app and use them.
+In the Preferences Window (`Ctrl + ,`), you can now drag [Ulysses Themes](https://styles.ulysses.app/themes) into the app and use them. Additional themes can be found on our [Themes Page](https://themes.thiefmd.com), or [make your own themes](https://themes.thiefmd.com/howto) from scratch.
 
 Get immersed and have ThiefMD match your editor, or just keep the colors in the editor by toggling "Match UI to Editor Theme" in the Preferences.
 
