@@ -67,6 +67,7 @@ libxml2-dev
 libclutter-1.0-dev
 libarchive-dev
 libgtk-3-dev
+libgee-0.8-dev
 libgtksourceview-3.0-dev
 ```
 

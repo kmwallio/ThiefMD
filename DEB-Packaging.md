@@ -8,7 +8,7 @@ Update list of new features
 
 ## Create new Package
 
-`debuild -us -uc`
+`debuild -S -sa`
 
 Packages will be in parent directory.
 
