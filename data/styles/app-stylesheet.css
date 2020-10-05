@@ -18,6 +18,18 @@ filechooser {
     color: @colorPrimary;
 }
 
+.thiefmd-toolbar button {
+    background: @colorPrimary;
+    color: @textColorPrimary;
+}
+
+.thiefmd-toolbar button:active,
+.thiefmd-toolbar button:hover,
+.thiefmd-toolbar button:hover:active {
+    background: lighter(@colorPrimary);
+    color: @textColorPrimary;
+}
+
 actionbar,
 .action-bar {
     border-top-color: transparent;

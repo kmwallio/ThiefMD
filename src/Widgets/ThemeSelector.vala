@@ -52,15 +52,20 @@ namespace ThiefMD.Widgets {
             drop_box = new PreviewDrop ();
             drop_box.xalign = 0;
 
-            var border = new Gtk.Frame("Drop Style.ultheme:");
+            var border = new Gtk.Frame(_("Drop Style.ultheme:"));
             border.add (drop_box);
 
             app_box.attach (border, 0, 0, 1, 1);
             app_box.attach (preview_box, 0, 1, 1, 3);
             app_box.hexpand = true;
 
+            var get_themes = new Gtk.Label (_("Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>."));
+            get_themes.use_markup = true;
+            get_themes.xalign = 0;
+
             // preview_items.add (new UserTheme ());
             preview_items.add (new DefaultTheme ());
+            app_box.attach (get_themes, 0, 5, 1, 1);
             add (app_box);
 
             load_themes ();

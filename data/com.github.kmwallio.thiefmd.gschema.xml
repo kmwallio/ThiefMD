@@ -75,6 +75,11 @@
             <summary>UI to match Editor</summary>
             <description>When using a custom theme, change the UI to match the color palette</description>
         </key>
+        <key name="brandless" type="b">
+            <default>false</default>
+            <summary>Hide UI Elements</summary>
+            <description>Hide meaningless UI elements</description>
+        </key>
         <key name="spellcheck" type="b">
             <default>true</default>
             <summary>Enable spellcheck</summary>
