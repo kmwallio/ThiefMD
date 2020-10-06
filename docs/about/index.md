@@ -5,11 +5,13 @@ title: About
 
 # About
 
+<div class="responsive-right hoffman"><img src="/images/preview.png" alt="ThiefMD's Live Preview Mode" /></div>
+
 <img src="/images/thiefmd_64.png" style="float: left; height: 64px; width: 64px;" />ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app). It is [Open Source](https://github.com/kmwallio/ThiefMD) and based off of [other great open source software](#credit).
 
-It is my primary way of attempting to learn [Vala](https://wiki.gnome.org/Projects/Vala) and filling in the gap of applications I miss from [macOS](https://apple.com). 
+It is my primary way of attempting to learn [Vala](https://wiki.gnome.org/Projects/Vala) and filling in the gap of applications I miss from [macOS](https://apple.com).
 
-<div style="clear: both;"></div>
+ThiefMD aims to make large [Markdown](https://daringfireball.net/projects/markdown/syntax) projects manageable. I've always wanted to write a novel, and hopefully ThiefMD will help me get there.
 
 # Features
 
@@ -24,6 +26,10 @@ ThiefMD currently supports
 * Import and Conversion of Ulysses Themes to GtkSourceView Styles
   - Matching the UI to the selected theme
 * Type-Writer Scrolling
+
+[Explore even more features](/deets)?
+
+<div class="clear"></div>
 
 # Credit
 
@@ -41,6 +47,8 @@ Great software is built on the shoulders of giants.
 * Screenshots use [Vimix GTK Themes](https://github.com/vinceliuice/vimix-gtk-themes) and [Vimix Icon Theme](https://github.com/vinceliuice/vimix-icon-theme)
 
 ## Goals
+
+<div class="responsive-right marcel"><img src="/images/theme_preferences.png" alt="Screenshot of multiple themes for ThiefMD" /></div>
 
 ### Initial
 
@@ -67,3 +75,11 @@ Great software is built on the shoulders of giants.
 * Timed sessions with typing statistics
 * Some sort of focus mode
 * Git-Backed Projects
+
+<div class="clear"></div>
+
+***
+
+<small>The photo of Wheat is by [Matt Hoffman](https://unsplash.com/@__matthoffman__), more Wheat by [Jonas Zürcher](https://unsplash.com/@tsueri), and even more wheat by [Gaelle Marcel](https://unsplash.com/@gaellemarcel).</small>
+
+***

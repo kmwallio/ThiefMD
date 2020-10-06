@@ -62,7 +62,7 @@ Spell checking and weasel word detection are also built in.
 
 <div class="clear"></div>
 
-<img src="images/brooke-cagle-happy-people.jpg" />
+<img src="/images/brooke-cagle-happy-people.jpg" />
 
 These is a stock photo of **happy** people.  They're not using ThiefMD. The photo of people is by [Brooke Cagle](https://unsplash.com/@brookecagle), Wheat by [Matt Hoffman](https://unsplash.com/@__matthoffman__), more Wheat by [Jonas Zürcher](https://unsplash.com/@tsueri), and even more wheat by [Gaelle Marcel](https://unsplash.com/@gaellemarcel).
 

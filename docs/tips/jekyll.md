@@ -11,7 +11,7 @@ This article assumes you already have a Git repository setup with your Jekyll in
 
 ## Creating a Post
 
-<div class="responsive-right jonas"><img src="/images/create_post.png" alt="Application screenshot showing creation of a new blog post" /></div>
+<div class="responsive-right-short jonas"><img src="/images/create_post.png" alt="Application screenshot showing creation of a new blog post" /></div>
 
 Creating a post is easy. Select `_posts` in the Library, click on the `New Post` icon, and enter in a filename `YYYY-MM-DD-title`.
 
@@ -61,10 +61,18 @@ Sorting by descending will have newer posts at the top, but any new post will be
 
 ### Committing
 
-[gitg](https://wiki.gnome.org/Apps/Gitg/) is a useful tool for managing git repositories and committing your posts.
+<div class="marcel"><img src="/images/gitg_post.png" alt="gitg application screenshot of committing a post" /></div>
 
-![](/images/gitg_post.png)
+[gitg](https://wiki.gnome.org/Apps/Gitg/) is a free and useful tool for managing git repositories and committing your posts. [Sublime Merge](https://www.sublimemerge.com) offers more power and features but has too many features if you're just blogging. [Learn X in Y Minutes](https://learnxinyminutes.com/docs/git) has a great git write for the command line.
 
-First, stage your changes. Then click `commit` in the lower right corner. After committing, you can go back into the timeline view to push your changes back onto the remote.
+<div class="responsive-right-short hoffman"><img src="/images/gitg_push.png" alt="Application screenshot showing gitg's push feature" /></div>
 
-![](/images/gitg_push.png)
+First, stage your changes. To stage your changes, double click on the post or right-click and choose "Stage changes". This will store the current version of the file in Git's history for version control.
+
+Click `commit` in the lower right corner once you've staged all the files you've modified.
+
+After committing, you can go back into the timeline view to push your changes back onto the remote.
+
+
+<div class="clear"></div>
+

@@ -1,22 +1,13 @@
 <style>
     @media only screen and (max-width: 600px) {
-        .responsive-left {
+        .responsive-left,
+        .responsive-right,
+        .responsive-right-short,
+        .responsive-left-short,
+        .responsive-center {
             clear: both;
             background-size: cover;
             width: 100%;
-        }
-
-        .responsive-right {
-            clear: both;
-            background-size: cover;
-            width: 100%;
-        }
-
-        .responsive-left-short {
-            float: left;
-            background-size: cover;
-            width: 100%;
-            margin-right: 5px;
         }
     }
 
@@ -35,11 +26,24 @@
             margin-right: 5px;
         }
 
+        .responsive-right-short {
+            float: right;
+            background-size: cover;
+            width: 40%;
+            margin-left: 5px;
+        }
+
         .responsive-right {
             float: right;
             background-size: cover;
             width: 60%;
             margin-left: 5px;
+        }
+
+        .responsive-center {
+            margin: 0 auto 0 auto;
+            text-align: center;
+            width: 50%;
         }
     }
 

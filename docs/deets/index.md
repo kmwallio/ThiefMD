@@ -16,7 +16,7 @@ Some of our favorites:
 
 ## Live Preview
 
-<div class="responsive-right marcel"><img src="/images/preview.png" /></div>
+<div class="responsive-right marcel"><img src="/images/preview.png" alt="ThiefMD's Live Preview Mode" /></div>
 
 `Ctrl + Shift + P` and see your markdown rendered instantly. Live preview updates as you type.
 
@@ -28,7 +28,7 @@ A separate window lets allows for better positioning, or multi-monitor support. 
 
 ## Compilation & Multi-Format Export
 
-<div class="responsive-left-short hoffman"><img src="/images/export_menu.png" /></div>
+<div class="responsive-left-short hoffman"><img src="/images/export_menu.png" alt="ThiefMD showing the export menu" /></div>
 
 Writing a novel is no easy feat. Epic undertakings are easier to accomplish broken down into feasible tasks. The same thing goes for [great writing](/tips/novel-writing).
 
@@ -44,9 +44,9 @@ However large the task and wherever you need to take it, ThiefMD has you covered
 
 ## Write-Good
 
-<div class="responsive-right jonas"><img src="/images/write-good.png" /></div>
+<div class="responsive-right jonas"><img src="/images/write-good.png" alt="ThiefMD highlighting and suggesting writing improvements" /></div>
 
-[Write-good](https://github.com/ThiefMD/libwritegood-vala) <span style="background: #0b8370; color: #FFF">was added</span> to ThiefMD to help check for passive voice.
+[Write-good](https://github.com/ThiefMD/libwritegood-vala) <span style="background: #0b8370; color: #FFF" title="Passive voice found, be active">was added</span> to ThiefMD to help check for passive voice.
 
 Powered by logic stolen from [btford/write-good](https://github.com/btford/write-good), ThiefMD can help improve your writing.
 
@@ -57,13 +57,13 @@ No more:
 * Meaningless Wordy Words
 * *and more*
 
-Toggle it on, or toggle it off. They're <span style="background: #20528c; color: #FFF">only</span> suggestions. <span style="background: #564a5e; color: #FFF">Whether you've found your voice, looking for your voice, or writing in multiple voices, ThiefMD will help you get to where you want to be.</span>
+Toggle it on, or toggle it off. They're <span style="background: #20528c; color: #FFF" title="Weak word found, be forceful">only</span> suggestions. <span style="background: #564a5e; color: #FFF" title="This sentence is very hard to read">Whether you've found your voice, looking for your voice, or writing in multiple voices, ThiefMD will help you get to where you want to be.</span>
 
 <div class="clear"></div>
 
 ## Typewriter Scrolling
 
-![](/images/typewriter_scrolling.gif)
+![ThiefMD's typewriter scrolling feature](/images/typewriter_scrolling.gif)
 
 Stay centered and stay focused. Type writer scrolling keeps your active line fixed, both in the editor and the preview.
 
@@ -71,7 +71,7 @@ No longer look for where you're typing keep your eye muscles on what matters mos
 
 ## YAML Frontmatter
 
-<div class="responsive-right marcel"><img src="/images/jekyll-minimark.png" /></div>
+<div class="responsive-right marcel"><img src="/images/jekyll-minimark.png" alt="ThiefMD rendering YAML frontmatter" /></div>
 
 Use [Jekyll](https://jekyllrb.com), [Hugo](https://gohugo.io), or another [Static Site Generator](https://www.staticgen.com/)?
 
@@ -85,7 +85,7 @@ Our [export logic](/tips/novel-writing#novel-metadata) also understands [whateve
 
 ## KaTeX Support
 
-<div class="responsive-left jonas"><img src="/images/katex_preview.png" /></div>
+<div class="responsive-left jonas"><img src="/images/katex_preview.png" alt="ThiefMD rendering a complex math formula" /></div>
 
 We do not like math, but we'll support it.
 
@@ -103,7 +103,7 @@ The sky's the limit, and ThiefMD will help get you there.
 
 ## Syntax Highlighting
 
-<div class="responsive-right hoffman"><img src="/images/syntax_preview.png" /></div>
+<div class="responsive-right hoffman"><img src="/images/syntax_preview.png" alt="ThiefMD syntax highlighting Vala code in various colors" /></div>
 
 Writing a dev blog? Updating your [DocFX](https://dotnet.github.io/docfx)?
 
@@ -115,7 +115,7 @@ I guess it's true what they say: the magic was inside ThiefMD all along.
 
 ## Theme Support
 
-<div class="responsive-left jonas"><img src="/images/theme_preferences.png" /></div>
+<div class="responsive-left jonas"><img src="/images/theme_preferences.png" alt="ThiefMD skinned in various vibrant colors" /></div>
 
 Light Theme, Dark Theme, Pink or Blue, make ThiefMD unique to you.
 
