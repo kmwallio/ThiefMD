@@ -23,6 +23,11 @@ filechooser {
     color: @textColorPrimary;
 }
 
+menu {
+    background: @windowColor;
+    color: darker(@colorPrimaryActive);
+}
+
 .thiefmd-toolbar button:active,
 .thiefmd-toolbar button:hover,
 .thiefmd-toolbar button:hover:active {

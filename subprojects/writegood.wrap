@@ -1,4 +1,4 @@
 [wrap-git]
-directory=libwritegood
+directory=writegood
 url=https://github.com/ThiefMD/libwritegood-vala.git
 revision=master

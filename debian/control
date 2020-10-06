@@ -3,6 +3,10 @@ Section: x11
 Priority: extra
 Maintainer: kmwallio <mwallio@gmail.com>
 Build-Depends: meson,
+               git,
+               ninja-build,
+               valac,
+               cmake,
                debhelper (>= 9),
                libgtk-3-dev,
                valac,
@@ -13,7 +17,8 @@ Build-Depends: meson,
                pandoc,
                libclutter-1.0-dev,
                libxml2-dev,
-               libarchive-dev
+               libarchive-dev,
+               libgee-0.8-dev
 Standards-Version: 4.5.0
 Homepage: https://thiefmd.com
 

@@ -8,11 +8,14 @@ ThiefMD is great for organizing your markdown documents. With the ability to dra
 - [Git for Writers](#git-for-writers)
 - [Markdown for Writing?](#markdown-for-writing)
 - [Structuring Your Novel](#structuring-your-novel)
+- [Novel Metadata](#novel-metadata)
 - [Sharing your Work](#sharing-your-work)
 - [Getting in the Zone](#getting-in-the-zone)
 - [Writing on Multiple Devices](#writing-on-multiple-devices)
 
 ## Git for Writers
+
+<div class="responsive-right-short hoffman"><img src="/images/preview.png" alt="ThiefMD's Live Preview Mode" /></div>
 
 We recommend using [GitHub](https://github.com) or [GitLab](https://gitlab.com) as a way to store and backup your work. This [Guide to Git and GitHub for Writers](https://www.scrygroup.com/tutorial/2020-01-07/guide-to-git-github-for-writers) would be a good place to brush up on [git](https://git-scm.com/) if you're not familiar with git already. D. Moonfire has a great post on [how he uses GitLab to manage his writing](https://d.moonfire.us/blog/2015/05/09/gitlab-projects).
 
@@ -25,6 +28,8 @@ While ThiefMD has been mildly tested, data loss, file sync conflicts, and good o
 With minimal effort to learn and remember, using Markdown will remove all of the hassle of learning a specific editing program, struggling with document formatting and design, and getting stuck in vendor lock-in.
 
 ThiefMD is a Markdown Editor that lets you focus on your words.
+
+<div class="clear"></div>
 
 ## Structuring Your Novel
 
@@ -61,7 +66,7 @@ Work in whatever way keeps you comfortable and helps you write. We'll do our bes
 
 The title page contains our novel's metadata. When using metadata, make sure to tell ThiefMD the first file in the project includes the [author metadata](https://pandoc.org/MANUAL.html#epub-metadata).
 
-<div style="margin: 0 auto 0 auto; text-align: center"><img src="/images/preferences-metadata.png" style="width: 50%" /></div>
+<div class="responsive-center marcel" style="overflow: hidden; height: 200px"><img src="/images/export_preferences.png" /></div>
 
 The metadata in `title-page.md` should look something like:
 
@@ -75,13 +80,17 @@ cover-image: /home/my-user/Pictures/cover.png
 
 During export, this will be embedded into the resulting ePub. The `cover-image` currently has to be the full path to your novel's cover image.
 
-![](/images/epub-export.png)
+<div class="responsive-center marcel"><img src="/images/epub-export.png" alt="Export Preview Window and resulting ePub" /></div>
+
+<div class="clear"></div>
 
 ## Sharing your Work
 
 ![](/images/export_preview.png)
 
-<img src="/images/export.png" style="float: left; width: 35%" />Ready to share your work?
+<div class="responsive-left-short hoffman"><img src="/images/export_menu.png" alt="Menu screenshot showcasing Export Preview option" /></div>
+
+Ready to share your work?
 
 Right-click on the folder you want to publish and click `Export Preview`. Items will be organized the same way they're kept in ThiefMD.
 
@@ -89,7 +98,7 @@ This will bring up the `Publishing Preview` window. Double check that everything
 
 <div style="clear: both"></div>
 
-<img src="/images/export_preferences.png" style="float: right; width: 35%" />
+<div class="responsive-right-short"><img src="/images/export_preferences.png" alt="Export Preferences Dialog" /></div>
 
 Once you're ready, click on the `Export` button.
 
@@ -115,9 +124,9 @@ You can keep writing without having to touch the scroll-bar to keep the cursor i
 
 `Ctrl + 3` will take you back to the Library view.
 
-![](/images/theme_preferences.png)
+<div class="hoffman"><img src="/images/theme_preferences.png" alt="Screenshot of multiple themes for ThiefMD" /></div>
 
-Make the editor your own. ThiefMD can load your favorite [Ulysses themes](https://styles.ulysses.app/themes). Find a theme that encourages you to write and get in the zone.
+Make the editor your own. [We have a selection of themes available](https://themes.thiefmd.com), and ThiefMD can load your favorite [Ulysses themes](https://styles.ulysses.app/themes). Find a theme that encourages you to write and get in the zone or [make your own](https://themes.thiefmd.com/howto).
 
 ## Writing on Multiple Devices
 

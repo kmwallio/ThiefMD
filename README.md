@@ -12,6 +12,14 @@ ThiefMD is a [Markdown](https://en.wikipedia.org/wiki/Markdown) editor that help
 flatpak install flathub com.github.kmwallio.thiefmd
 ```
 
+## Debian Based Distro Installation
+
+```bash
+sudo add-apt-repository ppa:thiefmd/thiefmd
+sudo apt-get update
+sudo apt-get install com.github.kmwallio.thiefmd
+```
+
 ## Features
 
  * Basic library at the moment
@@ -29,9 +37,9 @@ flatpak install flathub com.github.kmwallio.thiefmd
 
 ## Screenshots
 
-![](docs/images/thief_styles.png)
+![](docs/images/theme_preferences.png)
 
-[Ulysses Themes](https://styles.ulysses.app/themes) can be imported into the library. Displayed are [Tomorrow Dark](https://styles.ulysses.app/themes/tomorrow-qyp), Default ThiefMD Theme, [Dracula](https://styles.ulysses.app/themes/dracula-ZwJ), and [WWDC16](https://styles.ulysses.app/themes/wwdc16-04B). Generate themes for Ulysses, ThiefMD, and your other favorite Markdown editors using our [theme generator](https://github.com/ThiefMD/theme-generator).
+Download themes from [https://themes.thiefmd.com](https://themes.thiefmd.com) or [make your own](https://themes.thiefmd.com/howto). [Ulysses Themes](https://styles.ulysses.app/themes) can also be imported through the preferences `Ctrl+,`.
 
 ![](docs/images/drag_n_drop_sheets.gif)
 
@@ -45,7 +53,7 @@ Live Preview
 
 Typewriter Scrolling.
 
-![](docs/images/thiefmd-write-good.png)
+![](docs/images/write-good.png)
 
 [Write-Good](https://github.com/ThiefMD/libwritegood-vala) recommendations and highlighting.
 
@@ -67,6 +75,7 @@ libxml2-dev
 libclutter-1.0-dev
 libarchive-dev
 libgtk-3-dev
+libgee-0.8-dev
 libgtksourceview-3.0-dev
 ```
 
@@ -84,6 +93,8 @@ gtk3-devel
 gtksourceview3-devel
 gtkspell3-devel
 libarchive-devel
+libxml2-devel
+libgee-devel
 ```
 
 ## Building
@@ -95,11 +106,11 @@ $ ninja
 $ sudo ninja install
 ```
 
-[Prebuilt packages](https://github.com/kmwallio/ThiefMD/releases) are available for .deb and .rpm.
+[Prebuilt packages](https://github.com/kmwallio/ThiefMD/releases) are available.
 
 ## Acknowledgments
 
-* Code <s>stolen</s> *forked* from [Quilter](https://github.com/lainsce/quilter)
+* Code ~~stolen~~ *forked* from [Quilter](https://github.com/lainsce/quilter)
 * Font is [iA Writer Duospace](https://github.com/iaolo/iA-Fonts)
 * Inspired by [Ulysses](https://ulysses.app)
 * Preview CSS is [Splendor](http://markdowncss.github.io/splendor) + [Modest](http://markdowncss.github.io/modest)
@@ -108,4 +119,3 @@ $ sudo ninja install
 * Math Rendering by [Katex](https://katex.org)
 * Multi-format Export by [Pandoc](https://pandoc.org)
 * Write-Good based on [btford/write-good](https://github.com/btford/write-good)
-* Screenshots use [Vimix GTK Themes](https://github.com/vinceliuice/vimix-gtk-themes) and [Vimix Icon Theme](https://github.com/vinceliuice/vimix-icon-theme)

@@ -6,7 +6,7 @@ subprojects/gxml
 subprojects/gxml/*
 subprojects/ultheme
 subprojects/ultheme/*
-subprojects/libwritegood
-subprojects/libwritegood/*
+subprojects/writegood
+subprojects/writegood/*
 flatpak/.flatpak-builder/*
 flatpak/build*

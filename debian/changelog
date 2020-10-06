@@ -1,11 +1,21 @@
-com.github.kmwallio.thiefmd (0.0.11) xenial; urgency=low
+com.github.kmwallio.thiefmd (0.0.12) focal; urgency=low
+
+  * Update Dynamic CSS to include buttons and button hover
+  * Determine light/dark based on luminance of editor theme
+  * Add option to hide titles/go brandless
+  * Add link to new themes site with original ThiefMD themes
+  * Fix typos
+
+ -- kmwallio <mwallio@gmail.com>  Mon, 05 Oct 2020 11:25:37 -0700
+
+com.github.kmwallio.thiefmd (0.0.11) focal; urgency=low
 
   * Add write-good support for writing recommendations
   * Switch screenshots in release definition
 
  -- kmwallio <mwallio@gmail.com>  Thu, 01 Oct 2020 14:37:56 -0700
 
-com.github.kmwallio.thiefmd (0.0.10) xenial; urgency=low
+com.github.kmwallio.thiefmd (0.0.10) focal; urgency=low
 
   * Ability to use User's GTK Theme
   * Keep certain well-known temporary folders in the hidden list after deletion
@@ -13,7 +23,7 @@ com.github.kmwallio.thiefmd (0.0.10) xenial; urgency=low
 
  -- kmwallio <mwallio@gmail.com>  Tue, 29 Sep 2020 10:14:59 -0700
 
-com.github.kmwallio.thiefmd (0.0.9) xenial; urgency=low
+com.github.kmwallio.thiefmd (0.0.9) focal; urgency=low
 
   * This release is a bugfix release
   * Fix bug when trying to export with no file selected
@@ -22,7 +32,7 @@ com.github.kmwallio.thiefmd (0.0.9) xenial; urgency=low
 
  -- kmwallio <mwallio@gmail.com>  Fri, 18 Sep 2020 17:35:59 -0700
 
-com.github.kmwallio.thiefmd (0.0.8) xenial; urgency=low
+com.github.kmwallio.thiefmd (0.0.8) focal; urgency=low
 
   * Pandoc Export
   * More PDF Export options
@@ -31,7 +41,7 @@ com.github.kmwallio.thiefmd (0.0.8) xenial; urgency=low
 
  -- kmwallio <mwallio@gmail.com>  Thu, 17 Sep 2020 21:32:08 -0700
 
-com.github.kmwallio.thiefmd (0.0.7) xenial; urgency=low
+com.github.kmwallio.thiefmd (0.0.7) focal; urgency=low
 
   * Library Reordering
   * Sheets Reordering
@@ -39,7 +49,7 @@ com.github.kmwallio.thiefmd (0.0.7) xenial; urgency=low
 
  -- kmwallio <mwallio@gmail.com>  Sun, 13 Sep 2020 18:03:44 -0700
 
-com.github.kmwallio.thiefmd (0.0.6) xenial; urgency=low
+com.github.kmwallio.thiefmd (0.0.6) focal; urgency=low
 
   * Adding theme support
   * Improve UI for About and Preferences
@@ -47,14 +57,14 @@ com.github.kmwallio.thiefmd (0.0.6) xenial; urgency=low
 
  -- kmwallio <mwallio@gmail.com>  Tue, 08 Sep 2020 23:24:43 -0700
 
-com.github.kmwallio.thiefmd (0.0.5) xenial; urgency=low
+com.github.kmwallio.thiefmd (0.0.5) focal; urgency=low
 
   * Fix bug with () rendering
   * Add Syntax Highlighting and KaTeX
 
  -- kmwallio <mwallio@gmail.com>  Thu, 03 Sep 2020 00:21:57 -0700
 
-com.github.kmwallio.thiefmd (0.0.4) xenial; urgency=low
+com.github.kmwallio.thiefmd (0.0.4) focal; urgency=low
 
   * Drag and Drop Support for moving sheets in library
   * About dialog with license links
@@ -62,20 +72,20 @@ com.github.kmwallio.thiefmd (0.0.4) xenial; urgency=low
 
  -- kmwallio <mwallio@gmail.com>  Wed, 02 Sep 2020 20:19:37 -0700
 
-com.github.kmwallio.thiefmd (0.0.3) xenial; urgency=low
+com.github.kmwallio.thiefmd (0.0.3) focal; urgency=low
 
   * Library support for new sub-directories
   * More keyboard shortcuts
 
  -- kmwallio <mwallio@gmail.com>  Sun, 30 Aug 2020 16:21:58 -0700
 
-com.github.kmwallio.thiefmd (0.0.2) xenial; urgency=low
+com.github.kmwallio.thiefmd (0.0.2) focal; urgency=low
 
   * Add Library and Sheets management menus
 
  -- kmwallio <mwallio@gmail.com>  Sat, 29 Aug 2020 21:19:29 -0700
 
-com.github.kmwallio.thiefmd (0.0.1) xenial; urgency=low
+com.github.kmwallio.thiefmd (0.0.1) focal; urgency=low
 
   * Initial release.
 

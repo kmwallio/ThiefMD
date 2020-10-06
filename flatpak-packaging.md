@@ -28,15 +28,3 @@ A .desktop file should be created and added to the proper path. If this is a the
 8. Test the build. and submit a pull request to `master` if satisfied.
 9. ???
 10. Profit
-
-## Installing non-flatpak'd themes
-
-ThiefMD currently requests home directory permissions, so themes installed in the user's home directory will work.
-
-The theme in the screenshots is [Vimix Gtk](https://github.com/vinceliuice/vimix-gtk-themes).
-
-1. Clone the repo
-  `git clone https://github.com/vinceliuice/vimix-gtk-themes.git`
-2. `cd vimix-gtk-themes`
-3. If using the system install of the gnome runtime
-  `sudo ./install.sh -a -d /var/lib/flatpak/runtime/org.gnome.Platform/x86_64/3.36/active/files/share/themes`

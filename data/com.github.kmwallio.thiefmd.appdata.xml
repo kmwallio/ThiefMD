@@ -29,19 +29,35 @@
   </keywords>
   <screenshots>
     <screenshot type="default">
-      <caption>ThiefMD, a Markdown Editor, with a file opened with syntax highlighting</caption>
-      <image>https://thiefmd.com/images/thiefmd.png</image>
-    </screenshot>
-    <screenshot>
       <caption>ThiefMD, a Markdown Editor, showing a Library view with an open file</caption>
       <image>https://thiefmd.com/images/thief_window.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>ThiefMD, a Markdown Editor, rendering a live preview of markdown being modified</caption>
+      <image>https://thiefmd.com/images/preview.png</image>
     </screenshot>
     <screenshot>
       <caption>ThiefMD, a Markdown Editor, showing Theme selection preferences to change the user interface</caption>
       <image>https://thiefmd.com/images/theme_preferences.png</image>
     </screenshot>
+    <screenshot>
+      <caption>ThiefMD, a Markdown Editor, showing Write-Good suggestions finding passive voice</caption>
+      <image>https://thiefmd.com/images/write-good.png</image>
+    </screenshot>
   </screenshots>
   <releases>
+    <release version="0.0.12" date="2020-10-05" urgency="low">
+      <description>
+        <p>Can ThiefMD help you write better?</p>
+        <ul>
+          <li>Write-Good Support, highlight potential writing issues like long sentences, passive voice, repeat words, and more</li>
+          <li>Improved theme engine. We've added luminance detection to help keep the UI usable</li>
+          <li>Add option to go brandless, lose the UI, get lost in your writing</li>
+          <li>We've launched a new theme's site and theme generator. Make ThiefMD uniquely yours</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.11-writegood</url>
+    </release>
     <release version="0.0.11" date="2020-10-01" urgency="low">
       <description>
         <p>Can ThiefMD help you write better?</p>
