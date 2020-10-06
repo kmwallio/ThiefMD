@@ -1,20 +1,97 @@
 <style>
+    @media only screen and (max-width: 600px) {
+        .responsive-left {
+            clear: both;
+            background-size: cover;
+            width: 100%;
+        }
+
+        .responsive-right {
+            clear: both;
+            background-size: cover;
+            width: 100%;
+        }
+
+        .responsive-left-short {
+            float: left;
+            background-size: cover;
+            width: 100%;
+            margin-right: 5px;
+        }
+    }
+
+    @media only screen and (min-width: 600px) {
+        .responsive-left {
+            float: left;
+            background-size: cover;
+            width: 60%;
+            margin-right: 5px;
+        }
+
+        .responsive-left-short {
+            float: left;
+            background-size: cover;
+            width: 40%;
+            margin-right: 5px;
+        }
+
+        .responsive-right {
+            float: right;
+            background-size: cover;
+            width: 60%;
+            margin-left: 5px;
+        }
+    }
+
+    .hoffman {
+        background-image: url(/images/matt-hoffman-wheat.jpg);
+    }
+
+    .jonas {
+        background-image: url(/images/jonas-zurcher-wheat.jpg);
+    }
+
+    .marcel {
+        background-image: url(/images/gaelle-marcel-wheat.jpg);
+    }
+
+    .clear {
+        clear: both;
+        width: 100%;
+        height: 2em;
+    }
+
     .container, .container-fluid {
         padding-top: 1em;
     }
+
     .container img, .container-fluid img {
         width: 100%;
     }
 
     .pun {
         font-weight: bold;
-        color: rgb(235, 62, 212);
+        color: #064658;
     }
 
     .ny {
         font-weight: bold;
-        color: rgb(41, 138, 250);
+        color: #0C8DB1;
     }
+
+    .center-images {
+        text-align: center;
+    }
+
+    .center-images img {
+        max-width: 30%;
+        min-width: 150px;
+        padding: 5px;
+        display: inline-block;
+        margin: 0 auto 0 auto;
+    }
+
     .entry-date{display:block;width:140px;overflow:hidden;text-align:right;float:left;font-size:.75em;color:rgba(0,0,0,0.2);margin-left:-150px}
+
     .entry-title{font-size:1.7em;}
 </style>
