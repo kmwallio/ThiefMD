@@ -52,12 +52,7 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 
 %files
 %{_bindir}/com.github.kmwallio.thiefmd
-%{_libdir}/libgxml-0.20.so.2
-%{_libdir}/libgxml-0.20.so.2.0.2
-/usr/include/gxml-0.20/gxml/gxml.h
 /usr/include/ultheme.h
-/usr/lib64/girepository-1.0/GXml-0.20.typelib
-/usr/lib64/pkgconfig/gxml-0.20.pc
 /usr/lib64/pkgconfig/ultheme.pc
 /usr/share/applications/com.github.kmwallio.thiefmd.desktop
 /usr/share/com.github.kmwallio.thiefmd/scripts/auto-render.min.js
@@ -127,37 +122,13 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 /usr/share/com.github.kmwallio.thiefmd/styles/katex.min.css
 /usr/share/com.github.kmwallio.thiefmd/styles/preview.css
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-Regular.ttf
-/usr/share/gir-1.0/GXml-0.20.gir
 /usr/share/glib-2.0/schemas/com.github.kmwallio.thiefmd.gschema.xml
 /usr/share/gtksourceview-3.0/styles/thiefmd.xml
 /usr/share/icons/hicolor/128x128/apps/com.github.kmwallio.thiefmd.svg
 /usr/share/icons/hicolor/48x48/apps/com.github.kmwallio.thiefmd.svg
 /usr/share/icons/hicolor/64x64/apps/com.github.kmwallio.thiefmd.svg
 /usr/share/icons/hicolor/symbolicxsymbolic/apps/com.github.kmwallio.thiefmd.svg
-/usr/share/locale/ca/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/cs/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/da/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/de/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/el/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/en_GB/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/es/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/eu/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/fr/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/hu/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/id/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/pl/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/pt/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/pt_BR/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/ro/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/sl/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/sr/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/sr@latin/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/sv/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/uk/LC_MESSAGES/GXml-0.20.mo
-/usr/share/locale/zh_CN/LC_MESSAGES/GXml-0.20.mo
 /usr/share/metainfo/com.github.kmwallio.thiefmd.appdata.xml
-/usr/share/vala/vapi/gxml-0.20.deps
-/usr/share/vala/vapi/gxml-0.20.vapi
 /usr/share/vala/vapi/ultheme.vapi
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/css.lang
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-3.0/language-specs/def.lang
@@ -189,9 +160,6 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 /usr/lib64/pkgconfig/writegood.pc
 /usr/share/icons/hicolor/32x32/apps/com.github.kmwallio.thiefmd.svg
 /usr/share/vala/vapi/writegood.vapi
-
-%files devel
-%{_libdir}/libgxml-0.20.so
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig

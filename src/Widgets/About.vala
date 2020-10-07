@@ -130,7 +130,7 @@ namespace ThiefMD.Widgets {
             Gtk.ScrolledWindow scrl = new Gtk.ScrolledWindow (null, null);
             Gtk.Grid scrl_grid = new Grid ();
             int i = 1;
-            int nat_w;
+
             foreach (var credit in ThiefProperties.GIANTS) {
                 var credit_label = new Gtk.Label (credit);
                 credit_label.hexpand = true;

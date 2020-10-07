@@ -28,7 +28,6 @@ namespace ThiefMD.Widgets {
             window.key_press_event.connect ((e) => {
                 uint keycode = e.hardware_keycode;
                 var settings = AppSettings.get_default ();
-                var instance = ThiefApp.get_instance ();
 
                 // Quit
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
