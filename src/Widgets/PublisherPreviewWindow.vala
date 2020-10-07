@@ -29,6 +29,7 @@ namespace ThiefMD.Widgets {
 
         public class PublisherPreviewWindow (string markdown) {
             preview = new Preview ();
+            preview.exporting = true;
             preview.update_html_view (false, markdown);
             _markdown = markdown;
             build_ui ();

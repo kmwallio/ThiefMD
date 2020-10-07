@@ -127,6 +127,24 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             color: @textColorGlobal;
         }""";
 
+        public const string NO_CSS_CSS = """
+        @media print {
+          tr,
+          img {
+            page-break-inside: avoid;
+            max-width: 100%;
+          }
+
+          img {
+            max-width: 100% !important;
+          }
+        }
+
+        img {
+          max-width: 100%;
+        }
+        """;
+
         public const string PRINT_CSS = """@media print {
             *,
             *:before,
@@ -136,55 +154,56 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
               box-shadow: none !important;
               text-shadow: none !important;
             }
-          
+
             a,
             a:visited {
               text-decoration: underline;
             }
-          
-            a[href]:after {
-              %s
-            }
-          
+
             abbr[title]:after {
               content: " (" attr(title) ")";
             }
-          
+
             a[href^="#"]:after,
             a[href^="javascript:"]:after {
               content: "";
             }
-          
+
             pre,
             blockquote {
               border: 1px solid #999;
               page-break-inside: avoid;
             }
-          
+
             thead {
               display: table-header-group;
             }
-          
+
             tr,
             img {
               page-break-inside: avoid;
+              max-width: 100%;
             }
-          
+
             img {
               max-width: 100% !important;
             }
-          
+
             p,
             h2,
             h3 {
               orphans: 3;
               widows: 3;
             }
-          
+
             h2,
             h3 {
               page-break-after: avoid;
             }
+          }
+
+          img {
+            max-width: 100%;
           }""";
     }
 }

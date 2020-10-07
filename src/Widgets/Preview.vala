@@ -28,6 +28,7 @@ namespace ThiefMD.Widgets {
     public class Preview : WebKit.WebView {
         private static Preview? instance = null;
         public string html;
+        public bool exporting = false;
 
         public Preview () {
             Object(user_content_manager: new UserContentManager());
@@ -72,30 +73,50 @@ namespace ThiefMD.Widgets {
 
         private string set_stylesheet () {
             var settings = AppSettings.get_default ();
+            return get_style_header (settings.preview_css, settings.export_css);
+        }
+
+        public string get_style_header (string preview_css = "", string export_css = "", bool print_only = false) {
             var style = "";
-                style += """<link rel="stylesheet" type="text/css" href='""";
-                style += Build.PKGDATADIR + "/styles/preview.css";
-                style += "' />\n";
+            if (!exporting) {
                 style += """<link rel="stylesheet" type="text/css" href='""";
                 style += Build.PKGDATADIR + "/styles/highlight.css";
                 style += "' />\n";
                 style += """<link rel="stylesheet" type="text/css" href='""";
                 style += Build.PKGDATADIR + "/styles/katex.min.css";
                 style += "' />\n";
+            } else {
+                style += """<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">""";
+            }
 
             // If typewriter scrolling is enabled, add padding to match editor
 
-            style += "<style>\n";
-            if (settings.typewriter_scrolling) {
-                style = style + ".markdown-body{padding-top:40%;padding-bottom:40%}\n";
-            } else {
-                style = style + ".markdown-body{padding-bottom:10%}\n";
+            style += "\n<style>\n";
+            if (!print_only) {
+                File css_file = null;
+                if (preview_css == "splendor") {
+                    css_file = File.new_for_path (Build.PKGDATADIR + "/styles/preview.css");
+                } else if (preview_css != "") {
+                    css_file = File.new_for_path (Build.PKGDATADIR + "/preview.css");
+                }
+                if (css_file != null && css_file.query_exists ()) {
+                    style = style + FileManager.get_file_contents (css_file.get_path ());
+                }
             }
 
-            if (!settings.export_include_urls) {
-                style = style + ThiefProperties.PRINT_CSS.printf ("""content: "";""");
+            if (exporting) {
+                style += Build.PKGDATADIR + "/styles/highlight.css";
+            }
+
+            if (export_css == "splendor") {
+                style += ThiefProperties.PRINT_CSS.printf ("""content: " (" attr(href) ")";""");
+            } else if (export_css != "") {
+                File css_file = File.new_for_path (export_css + "/preview.css");
+                if (css_file.query_exists ()) {
+                    style += FileManager.get_file_contents (css_file.get_path ());
+                }
             } else {
-                style = style + ThiefProperties.PRINT_CSS.printf ("""content: " (" attr(href) ")";""");
+                style += ThiefProperties.NO_CSS_CSS;
             }
             style += "\n</style>\n";
 
@@ -199,16 +220,23 @@ namespace ThiefMD.Widgets {
         private string get_javascript_header () {
             string script;
 
-               // Find our ThiefMark and move it to the same position of the cursor
-            script = "<script src='";
-            script += Build.PKGDATADIR + "/scripts/highlight.js";
-            script += "'></script>\n";
-            script += """<script src='""";
-            script += Build.PKGDATADIR + "/scripts/katex.min.js";
-            script += "'></script>";
-            script += "<script src='";
-            script += Build.PKGDATADIR + "/scripts/auto-render.min.js";
-            script += "'></script>";
+            if (!exporting) {
+                script = "<script src='";
+                script += Build.PKGDATADIR + "/scripts/highlight.js";
+                script += "'></script>\n";
+                script += """<script src='""";
+                script += Build.PKGDATADIR + "/scripts/katex.min.js";
+                script += "'></script>";
+                script += "<script src='";
+                script += Build.PKGDATADIR + "/scripts/auto-render.min.js";
+                script += "'></script>";
+            } else {
+                script = """
+                <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js" integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4" crossorigin="anonymous"></script>
+                <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js" integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+                <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/highlight.min.js"></script>
+                """;
+            }
 
             return script;
         }

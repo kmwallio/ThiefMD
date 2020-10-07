@@ -108,16 +108,6 @@ namespace ThiefMD.Widgets {
             export_resolve_paths_label.xalign = 0;
             export_resolve_paths_label.hexpand = true;
 
-            var pdf_include_urls_switch = new Switch ();
-            pdf_include_urls_switch.set_active (settings.export_include_urls);
-            pdf_include_urls_switch.notify["active"].connect (() => {
-                settings.export_include_urls = pdf_include_urls_switch.get_active ();
-            });
-            pdf_include_urls_switch.tooltip_text = _("Include URLs in PDF");
-            var pdf_include_urls_label = new Label(_("Insert URLs into resulting PDF"));
-            pdf_include_urls_label.xalign = 0;
-            pdf_include_urls_label.hexpand = true;
-
             var page_setup_label = new Gtk.Label (_("<b>Page Setup</b>"));
             page_setup_label.hexpand = true;
             page_setup_label.xalign = 0;
@@ -179,18 +169,6 @@ namespace ThiefMD.Widgets {
 
             grid.attach (export_resolve_paths_switch, 1, g, 1, 1);
             grid.attach (export_resolve_paths_label, 2, g, 1, 1);
-            g++;
-
-            grid.attach (pdf_include_urls_switch, 1, g, 1, 1);
-            grid.attach (pdf_include_urls_label, 2, g, 2, 1);
-            g++;
-
-            grid.attach (pdf_include_urls_switch, 1, g, 1, 1);
-            grid.attach (pdf_include_urls_label, 2, g, 2, 1);
-            g++;
-
-            grid.attach (pdf_include_urls_switch, 1, g, 1, 1);
-            grid.attach (pdf_include_urls_label, 2, g, 2, 1);
             g++;
 
             grid.attach (page_setup_label, 1, g, 2, 1);
