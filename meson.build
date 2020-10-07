@@ -52,8 +52,15 @@ endif
 # Let's define our executable
 add_project_arguments(['--vapidir', join_paths(meson.current_source_dir(), 'vapi')], language: 'vala')
 
-ultheme_dep = dependency('ultheme-0.1', fallback : [ 'ultheme', 'libultheme_dep' ])
-writegood_dep = dependency('writegood-0.1', fallback : [ 'writegood', 'libwritegood_dep' ])
+ultheme_dep = dependency('ultheme', required: false)
+if not ultheme_dep.found()
+    ultheme_dep = dependency('ultheme', fallback : [ 'ultheme', 'libultheme_dep' ])
+endif
+
+writegood_dep = dependency('writegood', required: false)
+if not writegood_dep.found()
+    writegood_dep = dependency('writegood', fallback : [ 'writegood', 'libwritegood_dep' ])
+endif
 
 executable(
     meson.project_name(),
