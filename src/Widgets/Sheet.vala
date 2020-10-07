@@ -30,7 +30,6 @@ namespace ThiefMD.Widgets {
      */
     public class Sheet : Gtk.ToggleButton {
         private string _sheet_path;
-        private bool _selected;
         private Gtk.Label _label;
         private string _label_buffer;
         private Sheets _parent;
@@ -303,7 +302,6 @@ namespace ThiefMD.Widgets {
                 header_context.remove_class ("thief-drop-below");
             }
 
-            string file_to_parse = "";
             File file = dnd_get_file (selection_data, target_type);
             if (!file.query_exists ()) {
                 Gtk.drag_finish (context, false, false, time);

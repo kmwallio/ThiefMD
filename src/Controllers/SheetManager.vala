@@ -120,7 +120,6 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     private Thread<bool> sheet_worker_thread;
-    TimedMutex load_sheets;
     Mutex loading_sheets;
     public void set_sheets (Sheets sheets) {
         _current_sheets = sheets;
@@ -184,7 +183,6 @@ namespace ThiefMD.Controllers.SheetManager {
         debug ("Opening sheet: %s", sheet.file_path ());
 
         var settings = AppSettings.get_default ();
-        Widgets.Editor loaded_file = null;
 
         if (sheet == null) {
             debug ("Invalid sheet provided");
@@ -348,11 +346,7 @@ namespace ThiefMD.Controllers.SheetManager {
         var settings = AppSettings.get_default ();
         var scheme_id = settings.get_valid_theme_id ();
         foreach (var editor in _active_editors) {
-            try {
-                editor.editor.set_scheme (scheme_id);
-            } catch (Error e) {
-                warning ("Could not save file %s: %s", editor.sheet.file_path (), e.message);
-            }
+            editor.editor.set_scheme (scheme_id);
         }
     }
 

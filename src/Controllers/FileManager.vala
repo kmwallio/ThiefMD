@@ -65,21 +65,17 @@ namespace ThiefMD.Controllers.FileManager {
         var lock = new FileLock ();
         var settings = AppSettings.get_default ();
 
-        try {
-            string text;
-            var file = File.new_for_path (file_path);
+        string text;
+        var file = File.new_for_path (file_path);
 
-            if (file.query_exists ()) {
-                string filename = file.get_path ();
-                debug ("Reading %s\n", filename);
-                editor = new Widgets.Editor (filename);
-                settings.last_file = filename;
-                file_opened = true;
-            } else {
-                warning ("File does not exist\n");
-            }
-        } catch (Error e) {
-            warning ("Error: %s", e.message);
+        if (file.query_exists ()) {
+            string filename = file.get_path ();
+            debug ("Reading %s\n", filename);
+            editor = new Widgets.Editor (filename);
+            settings.last_file = filename;
+            file_opened = true;
+        } else {
+            warning ("File does not exist\n");
         }
     }
 
@@ -94,7 +90,6 @@ namespace ThiefMD.Controllers.FileManager {
     {
         bool moved = false;
         bool is_active = false;
-        var settings = AppSettings.get_default ();
 
         if (SheetManager.close_active_file (source_file))
         {
@@ -365,11 +360,7 @@ namespace ThiefMD.Controllers.FileManager {
     public void save () throws Error {
         debug ("Save button pressed.");
 
-        try {
-            SheetManager.save_active ();
-        } catch (Error e) {
-            warning ("Unexpected error during save: " + e.message);
-        }
+        SheetManager.save_active ();
     }
 
     public static bool create_sheet (string parent_folder, string file_name) {

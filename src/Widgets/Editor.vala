@@ -564,8 +564,6 @@ namespace ThiefMD.Widgets {
         }
 
         public void dynamic_margins () {
-            var settings = AppSettings.get_default ();
-
             if (!ThiefApp.get_instance ().ready) {
                 return;
             }

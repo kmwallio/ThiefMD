@@ -186,19 +186,15 @@ namespace ThiefMD.Controllers.UI {
     public void clear_css () {
         var settings = AppSettings.get_default ();
 
-        try {
-            if (active_provider != null) {
-                Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), active_provider);
-                active_provider = null;
-            }
+        if (active_provider != null) {
+            Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), active_provider);
+            active_provider = null;
+        }
 
-            if (settings.theme_id == "thiefmd") {
-                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
-            } else {
-                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_mode;
-            }
-        } catch (Error e) {
-            warning ("Could not clear CSS: %s", e.message);
+        if (settings.theme_id == "thiefmd") {
+            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
+        } else {
+            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_mode;
         }
     }
 
@@ -210,19 +206,15 @@ namespace ThiefMD.Controllers.UI {
             return;
         }
 
-        try {
-            if (active_provider != null) {
-                Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), active_provider);
-                active_provider = null;
-            }
-            var provider = new Gtk.CssProvider ();
-            provider.load_from_resource ("/com/github/kmwallio/thiefmd/app-stylesheet.css");
-            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-            active_provider = provider;
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
-        } catch (Error e) {
-            warning ("Could not set dynamic css: %s", e.message);
+        if (active_provider != null) {
+            Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), active_provider);
+            active_provider = null;
         }
+        var provider = new Gtk.CssProvider ();
+        provider.load_from_resource ("/com/github/kmwallio/thiefmd/app-stylesheet.css");
+        Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        active_provider = provider;
+        Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
     }
 
     public void set_css_scheme (Ultheme.HexColorPalette palette) {

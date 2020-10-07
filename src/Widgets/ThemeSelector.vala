@@ -165,7 +165,6 @@ namespace ThiefMD.Widgets {
                 uint target_type,
                 uint time)
             {
-                string file_to_parse = "";
                 File file = dnd_get_file (selection_data, target_type);
                 if (!file.query_exists ()) {
                     Gtk.drag_finish (context, false, false, time);
