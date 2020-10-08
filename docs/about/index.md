@@ -48,7 +48,7 @@ Great software is built on the shoulders of giants.
 
 ## Goals
 
-<div class="responsive-right marcel"><img src="/images/epub-export.png" alt="Screenshot of multiple themes for ThiefMD" /></div>
+<div class="responsive-right marcel"><img src="/images/epub-export.png" alt="Screenshot of ePub Generated with ThiefMD" /></div>
 
 ### Initial
 

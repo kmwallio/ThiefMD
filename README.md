@@ -29,11 +29,12 @@ sudo apt-get install com.github.kmwallio.thiefmd
  * Sheet Management
  * Shortcut key bindings
  * Themes
+ * Export
 
 ## Planning
 
  * Better library organization
- * Export
+ * Dedicated Markdown Editor
 
 ## Screenshots
 
@@ -45,9 +46,9 @@ Download themes from [https://themes.thiefmd.com](https://themes.thiefmd.com) or
 
 Drag and Drop organizing of the library.
 
-![](docs/images/preview.png)
+![](docs/images/epub-export.png)
 
-Live Preview
+Live Preview & Export Preview
 
 ![](docs/images/typewriter_scrolling.gif)
 
