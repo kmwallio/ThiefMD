@@ -36,7 +36,7 @@ namespace ThiefMD.Widgets {
             preview.override_css = css;
             preview.update_html_view (false, ThiefProperties.PREVIEW_CSS_MARKDOWN.printf (make_title(css != "" ? css : "None")));
             preview.hexpand = true;
-            preview.vexpand = true;
+            preview.vexpand = false;
             preview.zoom_level = 0.25;
             prev_window.set_size_request (Constants.CSS_PREVIEW_WIDTH, Constants.CSS_PREVIEW_HEIGHT);
             set_size_request (Constants.CSS_PREVIEW_WIDTH, Constants.CSS_PREVIEW_HEIGHT);

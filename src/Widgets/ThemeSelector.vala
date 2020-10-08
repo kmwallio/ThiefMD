@@ -25,7 +25,7 @@ using Gdk;
 namespace ThiefMD.Widgets {
     public class CssSelector : Gtk.Box {
         private string css_type;
-        private Gtk.Grid app_box;
+        private Gtk.FlowBox app_box;
         private Gee.LinkedList<Gtk.Widget> wids;
         public CssSelector (string what) {
             css_type = what;
@@ -34,12 +34,11 @@ namespace ThiefMD.Widgets {
         }
 
         public void build_ui () {
-            app_box = new Gtk.Grid ();
-            app_box.margin = 12;
-            app_box.row_spacing = 12;
-            app_box.column_spacing = 12;
-            app_box.orientation = Orientation.HORIZONTAL;
-            app_box.hexpand = true;
+            app_box = new Gtk.FlowBox ();
+            app_box.margin = 6;
+            app_box.max_children_per_line = 3;
+            app_box.homogeneous = true;
+            app_box.expand = false;
 
             var preview_box = new Gtk.ScrolledWindow (null, null);
             preview_box.add (app_box);

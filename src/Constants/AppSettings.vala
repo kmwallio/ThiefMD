@@ -49,7 +49,7 @@ namespace ThiefMD {
         // Number of lines to preview
         public const int SHEET_PREVIEW_LINES = 3;
         public const int CSS_PREVIEW_WIDTH = 75;
-        public const int CSS_PREVIEW_HEIGHT = 50;
+        public const int CSS_PREVIEW_HEIGHT = 100;
 
         // Max time for animations in milliseconds
         public const int ANIMATION_TIME = 150;

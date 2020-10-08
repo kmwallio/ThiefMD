@@ -184,14 +184,14 @@ namespace ThiefMD.Widgets {
             print_css_label.xalign = 0;
             print_css_label.use_markup = true;
             var print_css_selector = new CssSelector ("print");
-            print_css_selector.set_size_request (cur_w, Constants.CSS_PREVIEW_HEIGHT + 5);
+            print_css_selector.set_size_request (cur_w, (int)(1.2 * Constants.CSS_PREVIEW_HEIGHT + 5));
 
             var css_label = new Gtk.Label (_("<b>Preview and ePub CSS</b>"));
             css_label.hexpand = true;
             css_label.xalign = 0;
             css_label.use_markup = true;
             var css_selector = new CssSelector ("preview");
-            css_selector.set_size_request (cur_w, Constants.CSS_PREVIEW_HEIGHT + 5);
+            css_selector.set_size_request (cur_w, (int)(1.2 * Constants.CSS_PREVIEW_HEIGHT + 5));
 
             var add_css_button = new Gtk.Button.with_label (_("Add Export Style"));
             add_css_button.hexpand = true;
@@ -230,6 +230,7 @@ namespace ThiefMD.Widgets {
             grid.attach (pagebreak_sheet_label, 2, g, 2, 1);
             g++;
             grid.attach (paper_size, 1, g, 2, 1);
+            g++;
 
             grid.attach (print_css_label, 1, g, 2, 1);
             g++;
