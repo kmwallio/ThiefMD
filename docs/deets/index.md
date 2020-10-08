@@ -24,6 +24,8 @@ Relative paths? Absolute paths? Don't worry, ThiefMD will find the image you're 
 
 A separate window lets allows for better positioning, or multi-monitor support. Focus on your writing, or focus on your reading.
 
+Customize the results with [Export Styles](/tips/export-styles). Just a little CSS, and you can see how the results will look on your blog, PDF, or ePUB.
+
 <div class="clear"></div>
 
 ## Compilation & Multi-Format Export

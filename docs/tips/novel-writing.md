@@ -108,6 +108,8 @@ ThiefMD will generate the output based on the filename. `my-great-work.pdf` will
 
 Things not looking quite as planned? In the Export Preferences `Ctrl + ,` you can tweak the results based on how you organized your library.
 
+Want more advanced control of how your book looks? [Export Styles](/tips/export-styles) requires a little CSS know-how to get your book looking great.
+
 <div style="clear: both"></div>
 
 ## Getting in the Zone
