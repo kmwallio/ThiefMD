@@ -197,6 +197,12 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Mon Oct 05 2020 kmwallio <mwallio@gmail.com> - 0.0.12
+- Update Dynamic CSS to include buttons and button hover
+- Determine light/dark based on luminance of editor theme
+- Add option to hide titles/go brandless
+- Add link to new themes site with original ThiefMD themes
+- Fix typos
 * Thu Oct 01 2020 kmwallio <mwallio@gmail.com> - 0.0.11
 - Write-Good support for writing suggestions
 * Tue Sep 29 2020 kmwallio <mwallio@gmail.com> - 0.0.10
