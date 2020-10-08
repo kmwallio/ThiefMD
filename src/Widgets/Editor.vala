@@ -736,7 +736,6 @@ namespace ThiefMD.Widgets {
                 Gtk.MenuItem menu_insert_frontmatter = new Gtk.MenuItem.with_label (_("Insert YAML Frontmatter"));
                 menu_insert_frontmatter.activate.connect (() => {
                     if (!buffer.text.has_prefix ("---")) {
-                        var settings_menu = AppSettings.get_default ();
                         int new_cursor_location = 0;
                         Regex date = null;
                         try {
@@ -774,17 +773,7 @@ namespace ThiefMD.Widgets {
                             warning ("Could not generate title");
                         }
 
-                        current_title = current_title.replace ("_", " ");
-                        current_title = current_title.replace ("-", " ");
-                        string [] parts = current_title.split (" ");
-                        if (parts != null && parts.length != 0) {
-                            current_title = "";
-                            foreach (var part in parts) {
-                                part = part.substring (0, 1).up () + part.substring (1).down ();
-                                current_title += part + " ";
-                            }
-                            current_title = current_title.chomp ();
-                        }
+                        current_title = make_title (current_title);
 
                         // Build the front matter
                         string frontmatter = "---\n";

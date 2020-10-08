@@ -24,6 +24,8 @@ Relative paths? Absolute paths? Don't worry, ThiefMD will find the image you're 
 
 A separate window lets allows for better positioning, or multi-monitor support. Focus on your writing, or focus on your reading.
 
+Customize the results with [Export Styles](/tips/export-styles). Just a little CSS, and you can see how the results will look on your blog, PDF, or ePUB.
+
 <div class="clear"></div>
 
 ## Compilation & Multi-Format Export
@@ -93,7 +95,7 @@ Use [KaTeX](https://katex.org) to render Math Equations in Previews.
 
 This requires libmarkdown 2.2.0 or greater. Using [flatpak](https://flathub.org/apps/details/com.github.kmwallio.thiefmd) will let ThiefMD use the latest and greatest versions of its dependencies. Ubuntu 20.04 won't have Math Previews, but Fedora 32+ and Ubuntu 20.10 will.
 
-Although the preview may look a little too mathemagical, [LaTeX](https://www.latex-project.org) export will have you looking professional.
+For more power, [LaTeX](https://www.latex-project.org) export will have you looking professional.
 
 Export and finalize your work in [TeXstudio](https://flathub.org/apps/details/org.texstudio.TeXstudio), [Setzer](https://flathub.org/apps/details/org.cvfosammmm.Setzer), or your favorite LaTeX editor.
 

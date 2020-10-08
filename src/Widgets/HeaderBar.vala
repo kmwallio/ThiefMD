@@ -25,7 +25,6 @@ namespace ThiefMD.Widgets {
         private static Headerbar? instance = null;
 
         private Gtk.Button change_view_button;
-        private Gtk.Button search_button;
         private Gtk.Button add_library_button;
         private Gtk.MenuButton new_sheet;
         private Gtk.MenuButton menu_button;

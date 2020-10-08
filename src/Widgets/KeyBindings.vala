@@ -67,11 +67,7 @@ namespace ThiefMD.Widgets {
                 // Save
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
                     if (match_keycode (Gdk.Key.s, keycode)) {
-                        try {
-                            SheetManager.save_active ();
-                        } catch (Error e) {
-                            warning ("Unexpected error during open: " + e.message);
-                        }
+                        SheetManager.save_active ();
                     }
                 }
 

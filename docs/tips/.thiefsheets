@@ -3,8 +3,8 @@
     "index.md",
     "linux-writing-tools.md",
     "jekyll.md",
-    "static-site-generators.md",
-    "novel-writing.md"
+    "novel-writing.md",
+    "export-styles.md"
   ],
   "hidden-folders" : [],
   "folder-order" : []

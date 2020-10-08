@@ -188,7 +188,6 @@ namespace ThiefMD.Widgets {
 
         public void refresh () {
             bool am_empty = (_sheets.keys.size == 0);
-            var keys = _sheets.keys;
             foreach (var file_check in metadata.sheet_order) {
                 string path = Path.build_filename(_sheets_dir, file_check);
                 File file = File.new_for_path (path);
@@ -252,28 +251,24 @@ namespace ThiefMD.Widgets {
             }
 
             // Load from metadata file
-            try {
-                foreach (var file_name in metadata.sheet_order) {
-                    debug("Loading %s \n", file_name);
-                    string path = Path.build_filename(_sheets_dir, file_name);
-                    File file = File.new_for_path (path);
-                    if (file.query_exists () && !_sheets.has_key (file_name)) {
-                        if ((!FileUtils.test(path, FileTest.IS_DIR)) &&
-                            (path.down ().has_suffix(".md") || path. down().has_suffix(".markdown"))) {
+            foreach (var file_name in metadata.sheet_order) {
+                debug("Loading %s \n", file_name);
+                string path = Path.build_filename(_sheets_dir, file_name);
+                File file = File.new_for_path (path);
+                if (file.query_exists () && !_sheets.has_key (file_name)) {
+                    if ((!FileUtils.test(path, FileTest.IS_DIR)) &&
+                        (path.down ().has_suffix(".md") || path. down().has_suffix(".markdown"))) {
 
-                            Sheet sheet = new Sheet (path, this);
-                            _sheets.set (file_name, sheet);
-                            _view.add (sheet);
+                        Sheet sheet = new Sheet (path, this);
+                        _sheets.set (file_name, sheet);
+                        _view.add (sheet);
 
-                            if (settings.last_file == path) {
-                                sheet.active_sheet = true;
-                                SheetManager.load_sheet (sheet);
-                            }
+                        if (settings.last_file == path) {
+                            sheet.active_sheet = true;
+                            SheetManager.load_sheet (sheet);
                         }
                     }
                 }
-            } catch (Error e) {
-                warning ("Could not load file cache information: %s", e.message);
             }
 
             // Load anything new in the folder

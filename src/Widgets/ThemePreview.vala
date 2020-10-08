@@ -21,6 +21,61 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
+    public class CssPreview : Gtk.ToggleButton {
+        private Gtk.OffscreenWindow prev_window;
+        private Preview preview;
+        private bool print_css;
+        private string css_name;
+
+        public CssPreview (string css, bool is_print) {
+            preview = new Preview ();
+            css_name = css;
+            print_css = is_print;
+            prev_window = new Gtk.OffscreenWindow ();
+            preview.print_only = is_print;
+            preview.override_css = css;
+            preview.update_html_view (false, ThiefProperties.PREVIEW_CSS_MARKDOWN.printf (make_title(css != "" ? css : "None")));
+            preview.hexpand = true;
+            preview.vexpand = true;
+            preview.zoom_level = 0.25;
+            prev_window.set_size_request (Constants.CSS_PREVIEW_WIDTH, Constants.CSS_PREVIEW_HEIGHT);
+            set_size_request (Constants.CSS_PREVIEW_WIDTH, Constants.CSS_PREVIEW_HEIGHT);
+
+            add (preview);
+
+            clicked.connect (() => {
+                switch_to_this_css ();
+            });
+
+            var settings = AppSettings.get_default ();
+            settings.changed.connect (() => {
+                set_preview_state ();
+            });
+            set_preview_state ();
+        }
+
+        private void switch_to_this_css () {
+            var settings = AppSettings.get_default ();
+
+            if (print_css) {
+                settings.print_css = css_name;
+            } else {
+                settings.preview_css = css_name;
+            }
+        }
+
+        private void set_preview_state () {
+            var settings = AppSettings.get_default ();
+            if (settings.print_css == css_name && print_css) {
+                active = true;
+            } else if (settings.preview_css == css_name && !print_css) {
+                active = true;
+            } else {
+                active = false;
+            }
+        }
+    }
+
     public class ThemePreview : Gtk.ToggleButton {
         private Ultheme.Parser theme;
         private Gtk.SourceView view;

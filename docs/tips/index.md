@@ -7,6 +7,7 @@ title: Tips and Tricks
 
 * [Shortcuts](/shortcuts)
 * [Browsing the UI](/deets)
+* [Export Styles](/tips/export-styles)
 
 ## Linux
 

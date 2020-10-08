@@ -48,7 +48,7 @@ Great software is built on the shoulders of giants.
 
 ## Goals
 
-<div class="responsive-right marcel"><img src="/images/theme_preferences.png" alt="Screenshot of multiple themes for ThiefMD" /></div>
+<div class="responsive-right marcel"><img src="/images/epub-export.png" alt="Screenshot of ePub Generated with ThiefMD" /></div>
 
 ### Initial
 
@@ -64,14 +64,11 @@ Great software is built on the shoulders of giants.
 * Export a file or folders
 * Compilation and preview of multiple files while maintaining order
 * Keep undo history tied to files
-
-### Later on Markdown Support
-
-* Load multiple files into Editor View
 * Additional export and preview themes
 
-### I don't really want it but...
+### Later on Markdown Support (Soon to Come)
 
+* Load multiple files into Editor View
 * Timed sessions with typing statistics
 * Some sort of focus mode
 * Git-Backed Projects

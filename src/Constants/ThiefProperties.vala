@@ -38,11 +38,40 @@ namespace ThiefMD {
             "Pandoc Export:\n<a href='https://pandoc.org/'>Pandoc</a>\nCopyright © 2006-2020 John MacFarlane and others\n<a href='https://github.com/jgm/pandoc/blob/master/COPYRIGHT'>GNU General Public License v2.0</a>\n",
             "libwritegood-vala based on:\n<a href='https://github.com/btford/write-good'>write-good: Naive linter for English prose</a>\nCopyright © 2014-2019 Brian Ford\n<a href='https://github.com/btford/write-good/blob/master/LICENSE'>The MIT License (MIT)</a>\n",
           };
+
+        public const string[] PAPER_SIZES_FRIENDLY_NAME = {
+          "A3 (11.7 x 16.5 inches)",
+          "A4 (8 x 11 inches)",
+          "A5 (5.8 x 8.3 inches)",
+          "B5 (6.93 x 9.84 inches)",
+          "Executive (7 x 10 inches)",
+          "Legal (8.5 x 14 inches)",
+          "Letter (8.5 x 11 inches)"
+        };
+
+        public const string[] PAPER_SIZES_GTK_NAME = {
+          Gtk.PAPER_NAME_A3,
+          Gtk.PAPER_NAME_A4,
+          Gtk.PAPER_NAME_A5,
+          Gtk.PAPER_NAME_B5,
+          Gtk.PAPER_NAME_EXECUTIVE,
+          Gtk.PAPER_NAME_LEGAL,
+          Gtk.PAPER_NAME_LETTER
+        };
         public const string PREVIEW_TEXT = """# %s
 The `markdown` editor worth stealing. *Focus* more on **writing**.
 > It's the best thing since sliced bread
 [ThiefMD](https://thiefmd.com)
 """;
+
+        public const string PREVIEW_CSS_MARKDOWN = """# %s
+
+Paragraph example
+
+## H2
+
+Paragraph example""";
+
         public const string DYNAMIC_CSS = """@define-color colorPrimary %s;
         @define-color colorPrimaryActive %s;
         @define-color textColorPrimary %s;
@@ -127,6 +156,24 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             color: @textColorGlobal;
         }""";
 
+        public const string NO_CSS_CSS = """
+        @media print {
+          tr,
+          img {
+            page-break-inside: avoid;
+            max-width: 100%;
+          }
+
+          img {
+            max-width: 100% !important;
+          }
+        }
+
+        img {
+          max-width: 100%;
+        }
+        """;
+
         public const string PRINT_CSS = """@media print {
             *,
             *:before,
@@ -136,55 +183,56 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
               box-shadow: none !important;
               text-shadow: none !important;
             }
-          
+
             a,
             a:visited {
               text-decoration: underline;
             }
-          
-            a[href]:after {
-              %s
-            }
-          
+
             abbr[title]:after {
               content: " (" attr(title) ")";
             }
-          
+
             a[href^="#"]:after,
             a[href^="javascript:"]:after {
               content: "";
             }
-          
+
             pre,
             blockquote {
               border: 1px solid #999;
               page-break-inside: avoid;
             }
-          
+
             thead {
               display: table-header-group;
             }
-          
+
             tr,
             img {
               page-break-inside: avoid;
+              max-width: 100%;
             }
-          
+
             img {
               max-width: 100% !important;
             }
-          
+
             p,
             h2,
             h3 {
               orphans: 3;
               widows: 3;
             }
-          
+
             h2,
             h3 {
               page-break-after: avoid;
             }
+          }
+
+          img {
+            max-width: 100%;
           }""";
     }
 }

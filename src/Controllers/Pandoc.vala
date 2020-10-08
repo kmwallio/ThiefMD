@@ -26,6 +26,7 @@ using ThiefMD.Widgets;
 
 namespace ThiefMD.Controllers.Pandoc {
     public bool make_epub (string output_file, string markdown) {
+        var settings = AppSettings.get_default ();
         string resolved_mkd = resolve_paths (markdown);
         string temp_file = FileManager.save_temp_file (resolved_mkd);
         bool res = false;
@@ -37,6 +38,18 @@ namespace ThiefMD.Controllers.Pandoc {
                     "-o",
                     output_file
                 };
+                if (settings.preview_css != "") {
+                    File css_file = null;
+                    if (settings.preview_css == "modest-splendor") {
+                        css_file = File.new_for_path (Path.build_filename(Build.PKGDATADIR, "styles", "preview.css"));
+                    } else if (settings.preview_css != "") {
+                        css_file = File.new_for_path (Path.build_filename(UserData.css_path, settings.preview_css,"preview.css"));
+                    }
+                    if (css_file != null && css_file.query_exists ()) {
+                        command += "--css";
+                        command += css_file.get_path ();
+                    }
+                }
                 Subprocess pandoc = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
                 res = pandoc.wait ();
                 File temp = File.new_for_path (temp_file);

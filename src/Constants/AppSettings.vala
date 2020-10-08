@@ -48,6 +48,8 @@ namespace ThiefMD {
 
         // Number of lines to preview
         public const int SHEET_PREVIEW_LINES = 3;
+        public const int CSS_PREVIEW_WIDTH = 75;
+        public const int CSS_PREVIEW_HEIGHT = 50;
 
         // Max time for animations in milliseconds
         public const int ANIMATION_TIME = 150;
@@ -94,11 +96,13 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public bool export_break_folders { get; set; }
         public bool export_break_sheets { get; set; }
         public bool export_resolve_paths { get; set; }
-        public bool export_include_urls { get; set; }
         public double export_side_margins { get; set; }
         public double export_top_bottom_margins { get; set; }
         public bool export_include_metadata_file { get; set; }
         public bool brandless { get; set; }
+        public string preview_css { get; set; }
+        public string print_css { get; set; }
+        public string export_paper_size { get; set; }
 
         private bool writegood_enabled = false;
         public bool writegood {
@@ -211,6 +215,8 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public signal void changed ();
 
         private AppSettings () {
+            preview_css = "";
+            print_css = "";
             app_settings = new GLib.Settings ("com.github.kmwallio.thiefmd");
             app_settings.bind ("fullscreen", this, "fullscreen", SettingsBindFlags.DEFAULT);
             app_settings.bind ("show-num-lines", this, "show_num_lines", SettingsBindFlags.DEFAULT);
@@ -240,10 +246,12 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("export-break-folders", this, "export_break_folders", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-break-sheets", this, "export_break_sheets", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-resolve-paths", this, "export_resolve_paths", SettingsBindFlags.DEFAULT);
-            app_settings.bind ("export-include-urls", this, "export_include_urls", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-side-margins", this, "export_side_margins", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-top-bottom-margins", this, "export_top_bottom_margins", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-include-metadata-file", this, "export_include_metadata_file", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("preview-css", this, "preview_css", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("print-css", this, "print_css", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("export-paper-size", this, "export_paper_size", SettingsBindFlags.DEFAULT);
 
             app_settings.changed.connect (() => {
                 changed ();
