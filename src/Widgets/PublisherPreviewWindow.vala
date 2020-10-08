@@ -75,7 +75,7 @@ namespace ThiefMD.Widgets {
             }
 
             if (settings.print_css == "") {
-                preview_css.set_active (0);
+                print_css.set_active (0);
             }
 
             preview_type.changed.connect (() => {
