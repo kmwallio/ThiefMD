@@ -157,8 +157,6 @@ namespace ThiefMD.Widgets {
 
             var mkd = new Markdown.Document.from_gfm_string (processed_mk.data, 0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x04000000 + 0x00400000 + 0x10000000 + 0x40000000);
             mkd.compile (0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x00400000 + 0x04000000 + 0x40000000 + 0x10000000);
-
-            string result;
             mkd.get_document (out processed_mk);
 
             return (processed_mk.chomp () != "");

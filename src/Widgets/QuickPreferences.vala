@@ -62,8 +62,6 @@ namespace ThiefMD.Widgets {
                 settings.writegood = _writegood_button.active;
             });
 
-            var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
-
             var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
 
             var preview_button = new Gtk.ModelButton ();

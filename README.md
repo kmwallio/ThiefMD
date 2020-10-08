@@ -59,7 +59,7 @@ Typewriter Scrolling.
 
 ## Dependencies
 
-As part of the build, [gxml](https://gitlab.gnome.org/GNOME/gxml), [libwritegood-vala](https://github.com/ThiefMD/libwritegood-vala), and the [Ulysses Theme Parser](https://github.com/TwiRp/ultheme-vala) will be cloned and built.
+As part of the build, [libwritegood-vala](https://github.com/ThiefMD/libwritegood-vala) and the [Ulysses Theme Parser](https://github.com/TwiRp/ultheme-vala) will be cloned and built.
 
 ### Ubuntu
 

@@ -51,9 +51,16 @@ endif
 
 # Let's define our executable
 add_project_arguments(['--vapidir', join_paths(meson.current_source_dir(), 'vapi')], language: 'vala')
-gxml_dep = dependency('gxml-0.18', fallback : [ 'gxml', 'libgxml_dep' ])
-ultheme_dep = dependency('ultheme-0.1', fallback : [ 'ultheme', 'libultheme_dep' ])
-writegood_dep = dependency('writegood-0.1', fallback : [ 'writegood', 'libwritegood_dep' ])
+
+ultheme_dep = dependency('ultheme', required: false)
+if not ultheme_dep.found()
+    ultheme_dep = dependency('ultheme', fallback : [ 'ultheme', 'libultheme_dep' ])
+endif
+
+writegood_dep = dependency('writegood', required: false)
+if not writegood_dep.found()
+    writegood_dep = dependency('writegood', fallback : [ 'writegood', 'libwritegood_dep' ])
+endif
 
 executable(
     meson.project_name(),
@@ -95,7 +102,7 @@ executable(
         dependency('webkit2gtk-4.0'),
         dependency('clutter-1.0'),
         dependency('json-glib-1.0'),
-        gxml_dep,
+        dependency('gee-0.8'),
         ultheme_dep,
         writegood_dep,
         libmarkdown
