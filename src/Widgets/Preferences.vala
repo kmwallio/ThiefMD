@@ -161,6 +161,23 @@ namespace ThiefMD.Widgets {
             pagebreak_sheet_label.xalign = 0;
             pagebreak_sheet_label.hexpand = true;
 
+            var paper_size = new Gtk.ComboBoxText ();
+            paper_size.hexpand = true;
+            for (int i = 0; i < ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.length; i++) {
+                paper_size.append_text (ThiefProperties.PAPER_SIZES_FRIENDLY_NAME[i]);
+
+                if (settings.export_paper_size == ThiefProperties.PAPER_SIZES_GTK_NAME[i]) {
+                    paper_size.set_active (i);
+                }
+            }
+
+            paper_size.changed.connect (() => {
+                int option = paper_size.get_active ();
+                if (option >= 0 && option < ThiefProperties.PAPER_SIZES_GTK_NAME.length) {
+                    settings.export_paper_size = ThiefProperties.PAPER_SIZES_GTK_NAME[option];
+                }
+            });
+
             int cur_w = this.get_allocated_width ();
             var print_css_label = new Gtk.Label (_("<b>PDF Print CSS</b>"));
             print_css_label.hexpand = true;
@@ -212,6 +229,7 @@ namespace ThiefMD.Widgets {
             grid.attach (pagebreak_sheet_switch, 1, g, 1, 1);
             grid.attach (pagebreak_sheet_label, 2, g, 2, 1);
             g++;
+            grid.attach (paper_size, 1, g, 2, 1);
 
             grid.attach (print_css_label, 1, g, 2, 1);
             g++;

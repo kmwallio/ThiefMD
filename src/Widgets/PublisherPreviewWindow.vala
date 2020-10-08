@@ -78,19 +78,21 @@ namespace ThiefMD.Widgets {
                 print_css.set_active (0);
             }
 
-            preview_type.changed.connect (() => {
-                if (preview_type.get_active () == 0) {
-                    preview.print_only = false;
-                    preview.update_html_view (false, _markdown);
-                    headerbar.remove (print_css);
-                    headerbar.pack_start (preview_css);
-                } else {
-                    preview.print_only = true;
-                    preview.update_html_view (false, _markdown);
-                    headerbar.remove (preview_css);
-                    headerbar.pack_start (print_css);
+            var paper_size = new Gtk.ComboBoxText ();
+            paper_size.hexpand = true;
+            for (int i = 0; i < ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.length; i++) {
+                paper_size.append_text (ThiefProperties.PAPER_SIZES_FRIENDLY_NAME[i]);
+
+                if (settings.export_paper_size == ThiefProperties.PAPER_SIZES_GTK_NAME[i]) {
+                    paper_size.set_active (i);
                 }
-                headerbar.show_all ();
+            }
+
+            paper_size.changed.connect (() => {
+                int option = paper_size.get_active ();
+                if (option >= 0 && option < ThiefProperties.PAPER_SIZES_GTK_NAME.length) {
+                    settings.export_paper_size = ThiefProperties.PAPER_SIZES_GTK_NAME[option];
+                }
             });
 
             preview_css.changed.connect (() => {
@@ -115,6 +117,25 @@ namespace ThiefMD.Widgets {
             export_button.has_tooltip = true;
             export_button.tooltip_text = (_("Export Item"));
             export_button.set_image (new Gtk.Image.from_icon_name("document-export", Gtk.IconSize.LARGE_TOOLBAR));
+
+            preview_type.changed.connect (() => {
+                if (preview_type.get_active () == 0) {
+                    preview.print_only = false;
+                    preview.update_html_view (false, _markdown);
+                    headerbar.remove (print_css);
+                    headerbar.remove (paper_size);
+                    headerbar.pack_start (preview_css);
+                } else {
+                    preview.print_only = true;
+                    preview.update_html_view (false, _markdown);
+                    headerbar.remove (preview_css);
+                    headerbar.pack_start (print_css);
+                    headerbar.pack_end (paper_size);
+                }
+                headerbar.show_all ();
+            });
+
+
             export_button.clicked.connect (() => {
                 File new_novel = Dialogs.display_save_dialog (preview_type.get_active () == 0);
 
@@ -128,7 +149,7 @@ namespace ThiefMD.Widgets {
                         var print_operation = new WebKit.PrintOperation (preview);
                         var print_settings = new Gtk.PrintSettings ();
                         print_settings.set_printer (_("Print to File"));
-                        var page_size = new Gtk.PaperSize(Gtk.PAPER_NAME_LETTER);
+                        var page_size = new Gtk.PaperSize(settings.export_paper_size);
                         var page_setup = new Gtk.PageSetup();
                         print_settings[Gtk.PRINT_SETTINGS_OUTPUT_URI] = new_novel.get_uri ();
                         page_setup.set_paper_size_and_default_margins(page_size);

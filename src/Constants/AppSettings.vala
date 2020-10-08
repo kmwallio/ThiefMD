@@ -102,6 +102,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public bool brandless { get; set; }
         public string preview_css { get; set; }
         public string print_css { get; set; }
+        public string export_paper_size { get; set; }
 
         private bool writegood_enabled = false;
         public bool writegood {
@@ -250,6 +251,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("export-include-metadata-file", this, "export_include_metadata_file", SettingsBindFlags.DEFAULT);
             app_settings.bind ("preview-css", this, "preview_css", SettingsBindFlags.DEFAULT);
             app_settings.bind ("print-css", this, "print_css", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("export-paper-size", this, "export_paper_size", SettingsBindFlags.DEFAULT);
 
             app_settings.changed.connect (() => {
                 changed ();

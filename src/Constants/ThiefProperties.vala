@@ -38,6 +38,26 @@ namespace ThiefMD {
             "Pandoc Export:\n<a href='https://pandoc.org/'>Pandoc</a>\nCopyright © 2006-2020 John MacFarlane and others\n<a href='https://github.com/jgm/pandoc/blob/master/COPYRIGHT'>GNU General Public License v2.0</a>\n",
             "libwritegood-vala based on:\n<a href='https://github.com/btford/write-good'>write-good: Naive linter for English prose</a>\nCopyright © 2014-2019 Brian Ford\n<a href='https://github.com/btford/write-good/blob/master/LICENSE'>The MIT License (MIT)</a>\n",
           };
+
+        public const string[] PAPER_SIZES_FRIENDLY_NAME = {
+          "A3 (11.7 x 16.5 inches)",
+          "A4 (8 x 11 inches)",
+          "A5 (5.8 x 8.3 inches)",
+          "B5 (6.93 x 9.84 inches)",
+          "Executive (7 x 10 inches)",
+          "Legal (8.5 x 14 inches)",
+          "Letter (8.5 x 11 inches)"
+        };
+
+        public const string[] PAPER_SIZES_GTK_NAME = {
+          Gtk.PAPER_NAME_A3,
+          Gtk.PAPER_NAME_A4,
+          Gtk.PAPER_NAME_A5,
+          Gtk.PAPER_NAME_B5,
+          Gtk.PAPER_NAME_EXECUTIVE,
+          Gtk.PAPER_NAME_LEGAL,
+          Gtk.PAPER_NAME_LETTER
+        };
         public const string PREVIEW_TEXT = """# %s
 The `markdown` editor worth stealing. *Focus* more on **writing**.
 > It's the best thing since sliced bread
