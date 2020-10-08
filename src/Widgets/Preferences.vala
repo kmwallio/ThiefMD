@@ -161,6 +161,33 @@ namespace ThiefMD.Widgets {
             pagebreak_sheet_label.xalign = 0;
             pagebreak_sheet_label.hexpand = true;
 
+            int cur_w = this.get_allocated_width ();
+            var print_css_label = new Gtk.Label (_("<b>PDF Print CSS</b>"));
+            print_css_label.hexpand = true;
+            print_css_label.xalign = 0;
+            print_css_label.use_markup = true;
+            var print_css_selector = new CssSelector ("print");
+            print_css_selector.set_size_request (cur_w, Constants.CSS_PREVIEW_HEIGHT + 5);
+
+            var css_label = new Gtk.Label (_("<b>Preview and ePub CSS</b>"));
+            css_label.hexpand = true;
+            css_label.xalign = 0;
+            css_label.use_markup = true;
+            var css_selector = new CssSelector ("preview");
+            css_selector.set_size_request (cur_w, Constants.CSS_PREVIEW_HEIGHT + 5);
+
+            var add_css_button = new Gtk.Button.with_label (_("Add Export Style"));
+            add_css_button.hexpand = true;
+
+            add_css_button.clicked.connect (() => {
+                File new_css_pkg = Dialogs.display_open_dialog (".*");
+                if (new_css_pkg != null && new_css_pkg.query_exists ()) {
+                    FileManager.load_css_pkg (new_css_pkg);
+                    print_css_selector.refresh ();
+                    css_selector.refresh ();
+                }
+            });
+
             int g = 1;
 
             grid.attach (epub_metadata_file, 1, g, 1, 1);
@@ -184,6 +211,19 @@ namespace ThiefMD.Widgets {
             g++;
             grid.attach (pagebreak_sheet_switch, 1, g, 1, 1);
             grid.attach (pagebreak_sheet_label, 2, g, 2, 1);
+            g++;
+
+            grid.attach (print_css_label, 1, g, 2, 1);
+            g++;
+            grid.attach (print_css_selector, 1, g, 2, 2);
+            g += 2;
+
+            grid.attach (css_label, 1, g, 2, 1);
+            g++;
+            grid.attach (css_selector, 1, g, 2, 2);
+            g += 2;
+
+            grid.attach (add_css_button, 1, g, 2, 1);
             g++;
 
             grid.show_all ();

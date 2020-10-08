@@ -18,6 +18,28 @@
  */
 
 namespace ThiefMD {
+    errordomain ThiefError {
+        FILE_NOT_FOUND,
+        FILE_NOT_VALID_ARCHIVE,
+        FILE_NOT_VALID_THEME
+    }
+
+    public string make_title (string text) {
+        string current_title = text.replace ("_", " ");
+        current_title = current_title.replace ("-", " ");
+        string [] parts = current_title.split (" ");
+        if (parts != null && parts.length != 0) {
+            current_title = "";
+            foreach (var part in parts) {
+                part = part.substring (0, 1).up () + part.substring (1).down ();
+                current_title += part + " ";
+            }
+            current_title = current_title.chomp ();
+        }
+
+        return current_title;
+    }
+
     public class TimedMutex {
         private bool can_action;
         private Mutex droptex;

@@ -45,12 +45,78 @@ namespace ThiefMD.Widgets {
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-toolbar");
 
-            Gtk.Button export_button = new Gtk.Button ();
+            var preview_type = new Gtk.ComboBoxText ();
+            preview_type.append_text (_("HTML/ePUB"));
+            preview_type.append_text (_("Print/PDF"));
+            preview_type.set_active (0);
+
+            var preview_css = new Gtk.ComboBoxText ();
+            var preview_options = CssSelector.list_css ("preview");
+            for (int i = 0; i < preview_options.size; i++) {
+                preview_css.append_text (preview_options.get (i));
+
+                if (preview_options.get (i) == settings.preview_css) {
+                    preview_css.set_active (i);
+                }
+            }
+
+            if (settings.preview_css == "") {
+                preview_css.set_active (0);
+            }
+
+            var print_css = new Gtk.ComboBoxText ();
+            var print_options = CssSelector.list_css ("print");
+            for (int i = 0; i < print_options.size; i++) {
+                print_css.append_text (print_options.get (i));
+
+                if (print_options.get (i) == settings.print_css) {
+                    print_css.set_active (i);
+                }
+            }
+
+            if (settings.print_css == "") {
+                preview_css.set_active (0);
+            }
+
+            preview_type.changed.connect (() => {
+                if (preview_type.get_active () == 0) {
+                    preview.print_only = false;
+                    preview.update_html_view (false, _markdown);
+                    headerbar.remove (print_css);
+                    headerbar.pack_start (preview_css);
+                } else {
+                    preview.print_only = true;
+                    preview.update_html_view (false, _markdown);
+                    headerbar.remove (preview_css);
+                    headerbar.pack_start (print_css);
+                }
+                headerbar.show_all ();
+            });
+
+            preview_css.changed.connect (() => {
+                if (preview_css.get_active () >= 0 && preview_css.get_active () < preview_options.size) {
+                    string new_css = preview_options.get (preview_css.get_active ());
+                    new_css = (new_css == "None") ? "" : new_css;
+                    settings.preview_css = new_css;
+                    preview.update_html_view (false, _markdown);
+                }
+            });
+
+            print_css.changed.connect (() => {
+                if (print_css.get_active () >= 0 && print_css.get_active () < print_options.size) {
+                    string new_css = print_options.get (print_css.get_active ());
+                    new_css = (new_css == "None") ? "" : new_css;
+                    settings.print_css = new_css;
+                    preview.update_html_view (false, _markdown);
+                }
+            });
+
+            Gtk.Button export_button = new Gtk.Button.with_label (_("Export"));
             export_button.has_tooltip = true;
             export_button.tooltip_text = (_("Export Item"));
             export_button.set_image (new Gtk.Image.from_icon_name("document-export", Gtk.IconSize.LARGE_TOOLBAR));
             export_button.clicked.connect (() => {
-                File new_novel = Dialogs.display_save_dialog ();
+                File new_novel = Dialogs.display_save_dialog (preview_type.get_active () == 0);
 
                 if (new_novel == null){
                     return;
@@ -114,6 +180,9 @@ namespace ThiefMD.Widgets {
                     warning ("Could not save file %s: %s", new_novel.get_basename (), e.message);
                 }
             });
+
+            headerbar.pack_start (preview_type);
+            headerbar.pack_start (preview_css);
 
             headerbar.pack_end (export_button);
             headerbar.set_show_close_button (true);

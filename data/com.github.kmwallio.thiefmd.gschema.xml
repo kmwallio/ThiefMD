@@ -143,5 +143,15 @@
             <range min="0.0" max="3.5"/>
             <summary>Size in inches the top and bottom margins of the export document should be</summary>
         </key>
+        <key name="preview-css" type="s">
+            <default>"modest-splendor"</default>
+            <summary>CSS to use for Previews and ePub</summary>
+            <description>CSS to use for Live Previews and ePub Export</description>
+        </key>
+        <key name="print-css" type="s">
+            <default>"modest-splendor"</default>
+            <summary>CSS to use for Printing PDFs</summary>
+            <description>CSS to use for PDF Export</description>
+        </key>
     </schema>
 </schemalist>

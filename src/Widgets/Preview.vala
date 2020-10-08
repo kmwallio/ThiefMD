@@ -29,6 +29,8 @@ namespace ThiefMD.Widgets {
         private static Preview? instance = null;
         public string html;
         public bool exporting = false;
+        public bool print_only = false;
+        public string? override_css = null;
 
         public Preview () {
             Object(user_content_manager: new UserContentManager());
@@ -73,10 +75,11 @@ namespace ThiefMD.Widgets {
 
         private string set_stylesheet () {
             var settings = AppSettings.get_default ();
-            return get_style_header (settings.preview_css, settings.export_css);
+            return get_style_header (override_css != null ? override_css : settings.preview_css, override_css != null ? override_css : settings.print_css);
         }
 
-        public string get_style_header (string preview_css = "", string export_css = "", bool print_only = false) {
+        public string get_style_header (string preview_css = "", string print_css = "") {
+            var settings = AppSettings.get_default ();
             var style = "";
             if (!exporting) {
                 style += """<link rel="stylesheet" type="text/css" href='""";
@@ -94,10 +97,10 @@ namespace ThiefMD.Widgets {
             style += "\n<style>\n";
             if (!print_only) {
                 File css_file = null;
-                if (preview_css == "splendor") {
-                    css_file = File.new_for_path (Build.PKGDATADIR + "/styles/preview.css");
+                if (preview_css == "modest-splendor") {
+                    css_file = File.new_for_path (Path.build_filename(Build.PKGDATADIR, "styles", "preview.css"));
                 } else if (preview_css != "") {
-                    css_file = File.new_for_path (Build.PKGDATADIR + "/preview.css");
+                    css_file = File.new_for_path (Path.build_filename(UserData.css_path, preview_css,"preview.css"));
                 }
                 if (css_file != null && css_file.query_exists ()) {
                     style = style + FileManager.get_file_contents (css_file.get_path ());
@@ -105,15 +108,24 @@ namespace ThiefMD.Widgets {
             }
 
             if (exporting) {
-                style += Build.PKGDATADIR + "/styles/highlight.css";
+                style += FileManager.get_file_contents (Build.PKGDATADIR + "/styles/highlight.css");
+            } else {
+                if (settings.typewriter_scrolling && override_css == null) {
+                    style += ".markdown-body{padding-top:40%;padding-bottom:40%}\n";
+                }
             }
 
-            if (export_css == "splendor") {
+            if (print_css == "modest-splendor") {
                 style += ThiefProperties.PRINT_CSS.printf ("""content: " (" attr(href) ")";""");
-            } else if (export_css != "") {
-                File css_file = File.new_for_path (export_css + "/preview.css");
+            } else if (print_css != "") {
+                File css_file = File.new_for_path (Path.build_filename(UserData.css_path, preview_css,"print.css"));
                 if (css_file.query_exists ()) {
+                    style += "@media print {\n";
                     style += FileManager.get_file_contents (css_file.get_path ());
+                    style += "}";
+                    if (print_only) {
+                        style += FileManager.get_file_contents (css_file.get_path ());
+                    }
                 }
             } else {
                 style += ThiefProperties.NO_CSS_CSS;
@@ -173,7 +185,12 @@ namespace ThiefMD.Widgets {
         }
 
         private bool get_preview_markdown (string raw_mk, out string processed_mk) {
-            processed_mk = Pandoc.resolve_paths (raw_mk);
+            var settings = AppSettings.get_default ();
+            if (!exporting || settings.export_resolve_paths) {
+                processed_mk = Pandoc.resolve_paths (raw_mk);
+            } else {
+                processed_mk = raw_mk;
+            }
             processed_mk = FileManager.get_yamlless_markdown(processed_mk, 0, true, true, false);
 
             var mkd = new Markdown.Document.from_gfm_string (processed_mk.data, 0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x04000000 + 0x00400000 + 0x10000000 + 0x40000000);

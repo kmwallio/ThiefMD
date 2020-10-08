@@ -42,6 +42,11 @@ namespace ThiefMD.Controllers.UserData {
                         data_path,
                         Constants.DATA_SCHEMES);
 
+        css_path = Path.build_path (
+                        Path.DIR_SEPARATOR_S,
+                        data_path,
+                        Constants.DATA_CSS);
+
         UI.UserSchemes ().append_search_path (scheme_path);
 
         try {
@@ -57,6 +62,15 @@ namespace ThiefMD.Controllers.UserData {
             File scheme_file = File.new_for_path (scheme_path);
             if (!scheme_file.query_exists ()) {
                 scheme_file.make_directory_with_parents ();
+            }
+        } catch (Error e) {
+            warning ("Error: %s\n", e.message);
+        }
+
+        try {
+            File css_file = File.new_for_path (css_path);
+            if (!css_file.query_exists ()) {
+                css_file.make_directory_with_parents ();
             }
         } catch (Error e) {
             warning ("Error: %s\n", e.message);

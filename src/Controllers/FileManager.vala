@@ -23,6 +23,69 @@ using ThiefMD.Widgets;
 namespace ThiefMD.Controllers.FileManager {
     public static bool disable_save = false;
 
+    public void load_css_pkg (File css_pkg) {
+        if (!css_pkg.query_exists ()) {
+            return;
+        }
+
+        try {
+            var archive = new Archive.Read ();
+            throw_on_failure (archive.support_filter_all ());
+            throw_on_failure (archive.support_format_all ());
+            throw_on_failure (archive.open_filename (css_pkg.get_path (), 10240));
+            string theme_name = css_pkg.get_basename ();
+            theme_name = theme_name.substring (0, theme_name.last_index_of ("."));
+            if (theme_name == null || theme_name.chug ().chomp () == "") {
+                return;
+            }
+            File theme_dest = File.new_for_path (Path.build_filename (UserData.css_path, theme_name));
+
+            // Browse files in archive.
+            unowned Archive.Entry entry;
+            while (archive.next_header (out entry) == Archive.Result.OK) {
+                // Extract theme into memory
+                if (entry.pathname ().has_suffix (".css")){
+                    uint8[] buffer = null;
+                    Posix.off_t offset;
+                    string css_buffer = "";
+                    while (archive.read_data_block (out buffer, out offset) == Archive.Result.OK) {
+                        if (buffer == null) {
+                            break;
+                        }
+                        if (buffer[buffer.length - 1] != 0) {
+                            buffer += 0;
+                        }
+                        css_buffer += (string)buffer;
+                    }
+
+                    if (!theme_dest.query_exists ()) {
+                        theme_dest.make_directory_with_parents ();
+                    }
+
+                    string dest = "preview.css";
+                    if (entry.pathname ().down ().has_suffix("print.css") || entry.pathname ().down ().has_suffix("pdf.css")) {
+                        dest = "print.css";
+                    }
+                    File dest_file = File.new_for_path (Path.build_filename (theme_dest.get_path (), dest));
+                    save_file (dest_file, css_buffer.data);
+                } else {
+                    archive.read_data_skip ();
+                }
+            }
+        } catch (Error e) {
+            warning ("Error loading archive: %s", e.message);
+        }
+    }
+
+    private void throw_on_failure (Archive.Result res) throws Error {
+        if ((res == Archive.Result.OK) ||
+            (res == Archive.Result.WARN)) {
+            return;
+        }
+
+        throw new ThiefError.FILE_NOT_FOUND ("Could not read archive");
+    }
+
     public void save_file (File save_file, uint8[] buffer) throws Error {
         if (save_file.query_exists ()) {
             save_file.delete ();
@@ -65,7 +128,6 @@ namespace ThiefMD.Controllers.FileManager {
         var lock = new FileLock ();
         var settings = AppSettings.get_default ();
 
-        string text;
         var file = File.new_for_path (file_path);
 
         if (file.query_exists ()) {

@@ -43,6 +43,15 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
 > It's the best thing since sliced bread
 [ThiefMD](https://thiefmd.com)
 """;
+
+        public const string PREVIEW_CSS_MARKDOWN = """# %s
+
+Paragraph example
+
+## H2
+
+Paragraph example""";
+
         public const string DYNAMIC_CSS = """@define-color colorPrimary %s;
         @define-color colorPrimaryActive %s;
         @define-color textColorPrimary %s;

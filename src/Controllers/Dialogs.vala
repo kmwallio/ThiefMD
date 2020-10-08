@@ -19,8 +19,7 @@
 
 namespace ThiefMD.Controllers.Dialogs {
     public Gtk.FileChooserNative create_file_chooser (string title,
-            Gtk.FileChooserAction action) {
-        var settings = AppSettings.get_default ();
+            Gtk.FileChooserAction action, string ext = "") {
 
         string accept = "";
         string cancel = _("_Cancel");
@@ -82,20 +81,50 @@ namespace ThiefMD.Controllers.Dialogs {
             tex_filter.add_pattern ("*.tex");
             chooser.add_filter (tex_filter);
 
-            if (settings.export_include_metadata_file) {
+            if (ext == "epub") {
                 chooser.set_current_name ("my-great-novel.epub");
                 chooser.set_filter (epub_filter);
-            } else {
+            } else if (ext == "pdf") {
                 chooser.set_current_name ("my-great-work.pdf");
                 chooser.set_filter (pdf);
             }
 
+            chooser.selection_changed.connect (() => {
+                string current_file = chooser.get_current_name ();
+                string filter_name = chooser.filter.get_filter_name ().down ();
+                string filter_ext = "md";
+                if (filter_name.contains ("markdown")) {
+                    filter_ext = "md";
+                } else if (filter_name.contains ("epub")) {
+                    filter_ext = "epub";
+                } else if (filter_name.contains ("pdf")) {
+                    filter_ext = "pdf";
+                } else if (filter_name.contains ("doc")) {
+                    filter_ext = "docx";
+                } else if (filter_name.contains ("mhtml")) {
+                    filter_ext = "mhtml";
+                } else if (filter_name.contains ("html")) {
+                    filter_ext = "html";
+                } else if (filter_name.contains ("latex")) {
+                    filter_ext = "tex";
+                }
+
+                if (current_file.last_index_of (".") != -1) {
+                    current_file = current_file.substring (0, current_file.last_index_of (".") + 1) + filter_ext;
+                } else {
+                    current_file += filter_ext;
+                }
+                chooser.set_current_name (current_file);
+            });
+
         } else if (action != Gtk.FileChooserAction.SELECT_FOLDER) {
-            var filter1 = new Gtk.FileFilter ();
-            filter1.set_filter_name (_("Markdown files"));
-            filter1.add_pattern ("*.md");
-            filter1.add_pattern ("*.markdown");
-            chooser.add_filter (filter1);
+            if (ext == "") {
+                var filter1 = new Gtk.FileFilter ();
+                filter1.set_filter_name (_("Markdown files"));
+                filter1.add_pattern ("*.md");
+                filter1.add_pattern ("*.markdown");
+                chooser.add_filter (filter1);
+            }
 
             var filter = new Gtk.FileFilter ();
             filter.set_filter_name (_("All files"));
@@ -116,9 +145,9 @@ namespace ThiefMD.Controllers.Dialogs {
         return path;
     }
 
-    public File display_open_dialog () {
+    public File display_open_dialog (string ext = "") {
         var chooser = create_file_chooser (_("Open file"),
-                Gtk.FileChooserAction.OPEN);
+                Gtk.FileChooserAction.OPEN, ext);
         File file = null;
 
         if (chooser.run () == Gtk.ResponseType.ACCEPT)
@@ -128,9 +157,9 @@ namespace ThiefMD.Controllers.Dialogs {
         return file;
     }
 
-    public File display_save_dialog () {
+    public File display_save_dialog (bool epub_ext = true) {
         var chooser = create_file_chooser (_("Save file"),
-                Gtk.FileChooserAction.SAVE);
+                Gtk.FileChooserAction.SAVE, epub_ext ? "epub" : "pdf");
         File file = null;
 
         if (chooser.run () == Gtk.ResponseType.ACCEPT)
