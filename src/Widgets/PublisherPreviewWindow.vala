@@ -212,7 +212,7 @@ namespace ThiefMD.Widgets {
             title = _("Publishing Preview");
 
             ThiefApp.get_instance ().main_window.get_size (out w, out h);
-            transient_for = ThiefApp.get_instance ().main_window;
+            parent = ThiefApp.get_instance ().main_window;
             destroy_with_parent = true;
 
             w = w - ThiefApp.get_instance ().pane_position;
