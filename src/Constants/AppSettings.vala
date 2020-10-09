@@ -64,7 +64,11 @@ namespace ThiefMD {
         // Arbitrary strings
         public const string FIRST_USE = """# Click on a sheet to get started
 
-First time here?  Drag a folder into the library, or click on the Folder icon to select a folder to add.""";
+First time here?  Drag a folder into the library, or click on the Folder icon to select a folder to add.
+
+## Thief Tip:
+
+%s""";
     }
 
     public class AppSettings : Object {
