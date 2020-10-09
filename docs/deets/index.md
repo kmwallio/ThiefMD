@@ -115,9 +115,21 @@ I guess it's true what they say: the magic was inside ThiefMD all along.
 
 <div class="clear"></div>
 
+## Import from almost Anywhere
+
+<div class="responsive-left marcel"><img src="/images/import-epub.png" /></div>
+
+Already started your work in [LibreOffice Writer](https://www.libreoffice.org/discover/writer)? Published your ePUB but need to make some changes? ThiefMD has your back.
+
+Whether you're stealing something from the Public Domain or improving your own work, ThiefMD won't judge you. ThiefMD will assist you.
+
+DocX, Odt, HTML, and other file acronyms can be dragged into the Library. Watch in wonder as they convert to Markdown under the covers.
+
+Once you've made your changes, feel free to export them back. Or even [export them to something else](tips/novel-writing#sharing-your-work).
+
 ## Theme Support
 
-<div class="responsive-left jonas"><img src="/images/theme_preferences.png" alt="ThiefMD skinned in various vibrant colors" /></div>
+<div class="responsive-right jonas"><img src="/images/theme_preferences.png" alt="ThiefMD skinned in various vibrant colors" /></div>
 
 Light Theme, Dark Theme, Pink or Blue, make ThiefMD unique to you.
 

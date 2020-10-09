@@ -78,42 +78,20 @@ namespace ThiefMD.Controllers.FileManager {
             Regex non_supported_tags = new Regex ("(\\[\\]\\{[=\\#sw\\.[^\\}]*\\n?\\r?[^\\}]*?\\})", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex non_supported_tags2 = new Regex ("(\\{[=\\#sw\\.[^\\}]*\\n?\\r?[^\\}]*?\\})", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex random_colons = new Regex ("^([:\\\\])+\\s*$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex empty_lines = new Regex ("\\n\\s*\\n\\s*\\n", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex end_break = new Regex ("\\\\$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex sentence_break = new Regex ("([a-zA-Z,;:\\\"])\\n([a-zA-Z,;:\\\"\\()])", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
 
-            resdown = non_supported_tags.replace_eval (
-                resdown,
-                (ssize_t) resdown.length,
-                0,
-                RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
-                {
-                    result.append ("");
-                    return false;
-                });
-
-            resdown = non_supported_tags2.replace_eval (
-                resdown,
-                (ssize_t) resdown.length,
-                0,
-                RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
-                {
-                    result.append ("");
-                    return false;
-                });
-
-            resdown = random_colons.replace_eval (
-                resdown,
-                (ssize_t) resdown.length,
-                0,
-                RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
-                {
-                    result.append ("");
-                    return false;
-                });
-
+            resdown = non_supported_tags.replace (resdown, resdown.length, 0, "");
+            resdown = non_supported_tags2.replace (resdown, resdown.length, 0, "");
+            resdown = random_colons.replace (resdown, resdown.length, 0, "");
+            resdown = empty_lines.replace (resdown, resdown.length, 0, "\n\n");
+            resdown = end_break.replace (resdown, resdown.length, 0, "  ");
+            resdown = sentence_break.replace (resdown, resdown.length, 0, "\\1 \\2");
             resdown = resdown.replace ("\n\n\n", "\n\n"); // Switch 3 empty lines to 2
             resdown = resdown.replace ("\n\n\n", "\n\n"); // Switch 3 empty lines to 2
+            resdown = resdown.replace ("\\\'", "'");
+            resdown = resdown.replace ("\\\"", "\"");
         } catch (Error e) {
             warning ("Could not strip special formatters: %s", e.message);
         }
