@@ -26,6 +26,7 @@ ThiefMD currently supports
 * Import and Conversion of Ulysses Themes to GtkSourceView Styles
   - Matching the UI to the selected theme
 * Type-Writer Scrolling
+* Import DocX, ePUB, HTML, and more to Markdown
 
 [Explore even more features](/deets)?
 
@@ -42,7 +43,7 @@ Great software is built on the shoulders of giants.
 * Markdown Rendering by [Discount](http://www.pell.portland.or.us/~orc/Code/discount)
 * Preview Syntax Highlighting by [highlight.js](https://highlightjs.org)
 * Math Rendering by [Katex](https://katex.org)
-* Multi Format Export by [Pandoc](https://pandoc.org)
+* Multi-format Export & Import by [Pandoc](https://pandoc.org)
 * Write-Good based on [btford/write-good](https://github.com/btford/write-good)
 * Screenshots use [Vimix GTK Themes](https://github.com/vinceliuice/vimix-gtk-themes) and [Vimix Icon Theme](https://github.com/vinceliuice/vimix-icon-theme)
 

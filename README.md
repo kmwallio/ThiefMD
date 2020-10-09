@@ -120,5 +120,5 @@ $ sudo ninja install
 * Preview Scroll stolen from [this Stackoverflow](https://stackoverflow.com/questions/8922107/javascript-scrollintoview-middle-alignment) by [Rohan Orton](https://stackoverflow.com/users/2800005/rohan-orton)
 * Preview Syntax Highlighting by [highlight.js](https://highlightjs.org)
 * Math Rendering by [Katex](https://katex.org)
-* Multi-format Export by [Pandoc](https://pandoc.org)
+* Multi-format Export & Import by [Pandoc](https://pandoc.org)
 * Write-Good based on [btford/write-good](https://github.com/btford/write-good)
