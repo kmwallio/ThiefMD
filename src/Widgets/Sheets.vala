@@ -186,6 +186,25 @@ namespace ThiefMD.Widgets {
             return false;
         }
 
+        public void close_active_files () {
+            foreach (var sheet in _sheets) {
+                if (sheet.value.active_sheet) {
+                    SheetManager.close_active_file (sheet.value.file_path ());
+                }
+            }
+        }
+
+        public Gee.List<Sheet> get_active_sheets () {
+            Gee.LinkedList<Sheet> active_sheets = new Gee.LinkedList<Sheet> ();
+            foreach (var sheet in _sheets) {
+                if (sheet.value.active_sheet) {
+                    active_sheets.add (sheet.value);
+                }
+            }
+
+            return active_sheets;
+        }
+
         public void refresh () {
             bool am_empty = (_sheets.keys.size == 0);
             foreach (var file_check in metadata.sheet_order) {

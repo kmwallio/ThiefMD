@@ -121,7 +121,7 @@ namespace ThiefMD.Controllers.SheetManager {
 
     private Thread<bool> sheet_worker_thread;
     Mutex loading_sheets;
-    public void set_sheets (Sheets sheets) {
+    public void set_sheets (Sheets? sheets) {
         _current_sheets = sheets;
         UI.set_sheets (sheets);
     }
@@ -180,14 +180,13 @@ namespace ThiefMD.Controllers.SheetManager {
             return true;
         }
 
-        debug ("Opening sheet: %s", sheet.file_path ());
-
         var settings = AppSettings.get_default ();
-
         if (sheet == null) {
             debug ("Invalid sheet provided");
             return false;
         }
+
+        debug ("Opening sheet: %s", sheet.file_path ());
 
         drain_and_save_active ();
 

@@ -370,6 +370,10 @@ namespace ThiefMD.Widgets {
                         TreeIter hide_node = _selected_node;
                         if (_selected != null && _all_sheets.find (_selected) != null) {
                             debug ("Hiding %s", _selected._path);
+                            if (SheetManager._current_sheets == _selected._sheets) {
+                                SheetManager.set_sheets (null);
+                            }
+                            _selected._sheets.close_active_files ();
                             LibPair? parent = get_item (_selected._sheets.get_parent_sheets_path ());
                             if (parent != null) {
                                 parent._sheets.add_hidden_item (_selected._path);
@@ -401,6 +405,10 @@ namespace ThiefMD.Widgets {
                         TreeIter remove_node = _selected_node;
                         if (_selected != null && _all_sheets.find (_selected) != null) {
                             debug ("Removing %s", _selected._path);
+                            if (SheetManager._current_sheets == _selected._sheets) {
+                                SheetManager.set_sheets (null);
+                            }
+                            _selected._sheets.close_active_files ();
                             // Always touch lib store last as it changes selection
                             remove_children (_selected._path);
                             _all_sheets.remove (_selected);
