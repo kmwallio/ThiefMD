@@ -184,6 +184,7 @@ namespace ThiefMD.Controllers.UI {
             }
         } else {
             reset_css ();
+            set_scheme = true;
         }
 
         // Attempt to wait for app instance to be ready.
