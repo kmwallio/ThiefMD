@@ -71,3 +71,7 @@ I'm basically ~~stealing~~ copying and pasting examples from [https://www.markdo
 ### Math (requires libmarkdown 2.2.0 or greater)
 
 $$\int_{a}^{b} x^2 dx$$
+
+$$f(x)=a_0+a_2x^2$$
+
+$$x_{1,2}=\frac{-b\pm\sqrt{b^2-4ac}}{2a}$$
