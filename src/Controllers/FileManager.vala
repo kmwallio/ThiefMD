@@ -23,6 +23,180 @@ using ThiefMD.Widgets;
 namespace ThiefMD.Controllers.FileManager {
     public static bool disable_save = false;
 
+    public void import_file (string file_path, Sheets parent) {
+        File import_f = File.new_for_path (file_path);
+        string ext = file_path.substring (file_path.last_index_of (".") + 1).down ();
+        debug ("Importing (%s): %s", ext, import_f.get_path ());
+
+        // Supported import file extensions
+        if (ext == "docx" ||
+            ext == "odt" ||
+            ext == "html" ||
+            ext == "tex" ||
+            ext == "epub" ||
+            ext == "textile" ||
+            ext == "html" ||
+            ext == "fb2" ||
+            ext == "dbk" ||
+            ext == "xml" ||
+            ext == "opml" ||
+            ext == "rst")
+        {
+            Thinking worker = new Thinking (_("Importing File"), () => {
+                string dest_name = import_f.get_basename ();
+                dest_name = dest_name.substring (0, dest_name.last_index_of ("."));
+                dest_name += ".md";
+                debug ("Attempt to create: %s", dest_name);
+                string dest_path = Path.build_filename (parent.get_sheets_path (), dest_name);
+                if (Pandoc.make_md_from_file (dest_path, import_f.get_path ())) {
+                    if (ext == "docx" || ext == "odt" || ext == "epub" || ext == "fb2") {
+                        string new_markdown = get_file_contents (dest_path);
+                        Gee.LinkedList<string> files_to_find = Pandoc.file_import_paths (new_markdown);
+                        string formatted_markdown = strip_external_formatters (new_markdown);
+                        extract_files_to_dest (import_f.get_path (), files_to_find, parent.get_sheets_path ());
+                        if (formatted_markdown != "") {
+                            File write_twice = File.new_for_path (dest_path);
+                            try {
+                                save_file (write_twice, formatted_markdown.data);
+                            } catch (Error e) {
+                                warning ("Could not strip external formatting: %s", e.message);
+                            }
+                        }
+                    }
+                }
+            });
+            worker.run ();
+        }
+
+        parent.refresh ();
+        ThiefApp.get_instance ().library.refresh_dir (parent);
+    }
+
+    private string strip_external_formatters (string markdown) {
+        string resdown = markdown;
+        try {
+            Regex non_supported_tags = new Regex ("(\\[\\]\\{[=\\#sw\\.[^\\}]*\\n?\\r?[^\\}]*?\\})", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex non_supported_tags2 = new Regex ("(\\{[=\\#sw\\.[^\\}]*\\n?\\r?[^\\}]*?\\})", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex random_colons = new Regex ("^([:\\\\])+\\s*$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+
+            resdown = non_supported_tags.replace_eval (
+                resdown,
+                (ssize_t) resdown.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                (match_info, result) =>
+                {
+                    result.append ("");
+                    return false;
+                });
+
+            resdown = non_supported_tags2.replace_eval (
+                resdown,
+                (ssize_t) resdown.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                (match_info, result) =>
+                {
+                    result.append ("");
+                    return false;
+                });
+
+            resdown = random_colons.replace_eval (
+                resdown,
+                (ssize_t) resdown.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                (match_info, result) =>
+                {
+                    result.append ("");
+                    return false;
+                });
+
+            resdown = resdown.replace ("\n\n\n", "\n\n"); // Switch 3 empty lines to 2
+            resdown = resdown.replace ("\n\n\n", "\n\n"); // Switch 3 empty lines to 2
+        } catch (Error e) {
+            warning ("Could not strip special formatters: %s", e.message);
+        }
+        return resdown;
+    }
+
+    private bool list_contains (
+        string needle,
+        Gee.List<string> haystack,
+        out string place_file_at,
+        bool case_insensitive = true,
+        bool match_as_suffix = true)
+    {
+        foreach (string hay in haystack) {
+            if (hay == needle) {
+                place_file_at = hay;
+                return true;
+            } else if (case_insensitive && hay.down() == needle.down ()) {
+                place_file_at = hay;
+                return true;
+            } else if (match_as_suffix && needle.has_suffix (hay)) {
+                place_file_at = hay;
+                return true;
+            } else if (match_as_suffix && case_insensitive && needle.down ().has_suffix (hay.down ())) {
+                place_file_at = hay;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void extract_files_to_dest (string archive_path, Gee.LinkedList<string> files, string destination_path) {
+        File arch_file = File.new_for_path (archive_path);
+        File dest = File.new_for_path (destination_path);
+        if (!arch_file.query_exists ()) {
+            return;
+        }
+
+        try {
+            debug ("Looking for: %s", string.joinv (", ", files.to_array ()));
+            var archive = new Archive.Read ();
+            throw_on_failure (archive.support_filter_all ());
+            throw_on_failure (archive.support_format_all ());
+            throw_on_failure (archive.open_filename (arch_file.get_path (), 10240));
+
+            unowned Archive.Entry entry;
+            while (archive.next_header (out entry) == Archive.Result.OK) {
+                // Extract theme into memory
+                debug ("Found: %s", entry.pathname ());
+                string extraction_path = "";
+                if (list_contains(entry.pathname (), files, out extraction_path)) {
+                    uint8[] buffer = null;
+                    Array<uint8> bin_buffer = new Array<uint8> ();
+                    Posix.off_t offset;
+                    while (archive.read_data_block (out buffer, out offset) == Archive.Result.OK) {
+                        if (buffer == null) {
+                            break;
+                        }
+
+                        bin_buffer.append_vals (buffer, buffer.length);
+                    }
+
+                    if (bin_buffer.length != 0) {
+                        File dest_file = File.new_for_path (Path.build_filename (dest.get_path (), extraction_path));
+                        File dest_parent = dest_file.get_parent ();
+                        debug ("Extracting: %s to %s", entry.pathname (), dest_file.get_path ());
+                        if (dest_parent != null) {
+                            if (!dest_parent.query_exists ()) {
+                                dest_parent.make_directory_with_parents ();
+                            }
+                            save_file (dest_file, bin_buffer.data);
+                        }
+                    }
+                } else {
+                    archive.read_data_skip ();
+                }
+            }
+        } catch (Error e) {
+            warning ("Error loading archive: %s", e.message);
+        }
+    }
+
     public void load_css_pkg (File css_pkg) {
         if (!css_pkg.query_exists ()) {
             return;

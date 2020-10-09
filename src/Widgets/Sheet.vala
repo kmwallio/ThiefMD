@@ -167,6 +167,9 @@ namespace ThiefMD.Widgets {
                 menu_delete_sheet.activate.connect (() => {
                     debug ("Got remove for sheet %s", _sheet_path);
                     _parent.remove_sheet (this);
+                    if (active_sheet) {
+                        SheetManager.close_active_file (_sheet_path);
+                    }
                     FileManager.move_to_trash (_sheet_path);
                 });
                 menu.show_all ();
@@ -303,15 +306,21 @@ namespace ThiefMD.Widgets {
             }
 
             File file = dnd_get_file (selection_data, target_type);
+            debug ("Got file: %s", file.get_path ());
             if (!file.query_exists ()) {
                 Gtk.drag_finish (context, false, false, time);
                 return;
             }
 
-            if (y > mid) {
-                _parent.move_sheet_after (this.file_name (), file.get_basename ());
+            if (ThiefApp.get_instance ().library.file_in_library (file.get_path ())) {
+                if (y > mid) {
+                    _parent.move_sheet_after (this.file_name (), file.get_basename ());
+                } else {
+                    _parent.move_sheet_before (this.file_name (), file.get_basename ());
+                }
             } else {
-                _parent.move_sheet_before (this.file_name (), file.get_basename ());
+                debug ("Importing file");
+                FileManager.import_file (file.get_path (), _parent);
             }
 
 

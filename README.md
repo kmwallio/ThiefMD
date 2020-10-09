@@ -30,10 +30,12 @@ sudo apt-get install com.github.kmwallio.thiefmd
  * Shortcut key bindings
  * Themes
  * Export
+ * Import (DocX, ePUB, HTML, rst, textile, and more...)
 
 ## Planning
 
  * Better library organization
+ * Writing Statistics
  * Dedicated Markdown Editor
 
 ## Screenshots

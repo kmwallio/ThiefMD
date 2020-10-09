@@ -86,6 +86,36 @@ namespace ThiefMD.Controllers.Pandoc {
         return res;
     }
 
+    public bool make_md_from_file (string output_file_path, string input_file_path) {
+        File output_file = File.new_for_path (output_file_path);
+        File input_file = File.new_for_path (input_file_path);
+        bool res = false;
+        if (output_file.query_exists ()) {
+            warning ("%s already exists, exiting", output_file_path);
+            return res;
+        }
+
+        if (!input_file.query_exists ()) {
+            warning ("%s does not exist, exiting", output_file_path);
+            return res;
+        }
+
+        try {
+            string[] command = {
+                "pandoc",
+                "-o",
+                output_file.get_path (),
+                input_file.get_path ()
+            };
+            Subprocess pandoc = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
+            res = pandoc.wait ();
+        } catch (Error e) {
+            warning ("Could not generate epub: %s", e.message);
+        }
+
+        return res;
+    }
+
     public bool make_tex (string output_file, string markdown) {
         var settings = AppSettings.get_default ();
         string temp_file = "";
@@ -115,6 +145,62 @@ namespace ThiefMD.Controllers.Pandoc {
         }
 
         return res;
+    }
+
+    public Gee.LinkedList<string> file_import_paths (string markdown) {
+        Gee.LinkedList<string> sub_files = new Gee.LinkedList<string> ();
+
+        try {
+            Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex css_url_search = new Regex ("url\\(['\"]?(.+?)['\"]?\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+
+            url_search.replace_eval (
+                markdown,
+                (ssize_t) markdown.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                (match_info, result) =>
+                {
+                    var url = match_info.fetch (1);
+                    if (!url.contains (":")) {
+                        sub_files.add (url);
+                    }
+                    return false;
+                });
+
+            src_search.replace_eval (
+                markdown,
+                (ssize_t) markdown.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                (match_info, result) =>
+                {
+                    var url = match_info.fetch (1);
+                    if (!url.contains (":")) {
+                        sub_files.add (url);
+                    }
+                    return false;
+                });
+
+            css_url_search.replace_eval (
+                markdown,
+                (ssize_t) markdown.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                (match_info, result) =>
+                {
+                    var url = match_info.fetch (1);
+                    if (!url.contains (":")) {
+                        sub_files.add (url);
+                    }
+                    return false;
+                });
+        } catch (Error e) {
+            warning ("Could not find files: %s", e.message);
+        }
+
+        return sub_files;
     }
 
     public string resolve_paths (string markdown, string path = "") {

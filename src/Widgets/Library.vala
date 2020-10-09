@@ -218,6 +218,13 @@ namespace ThiefMD.Widgets {
             return false;
         }
 
+        public void refresh_dir (Sheets sheet_dir) {
+            LibPair? p = get_item (sheet_dir.get_sheets_path ());
+            if (p != null) {
+                parse_dir (sheet_dir, sheet_dir.get_sheets_path (), p._iter);
+            }
+        }
+
         private void parse_dir (Sheets sheet_dir, string str_dir, TreeIter iter) {
             try {
                 // Create child iter
@@ -565,6 +572,11 @@ namespace ThiefMD.Widgets {
                 }
             }
 
+            if (p == null) {
+                Gtk.drag_finish (context, false, false, time);
+                return;
+            }
+
             // Deal with what we are given from source
             if ((selection_data != null) && (selection_data.get_length() >= 0)) 
             {
@@ -604,47 +616,53 @@ namespace ThiefMD.Widgets {
                     }
                     else
                     {
-                        debug ("Prompting for action");
-                        Dialog prompt = new Dialog.with_buttons (
-                            "Move into Library",
-                            ThiefApp.get_instance ().main_window,
-                            DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                            _("Copy"),
-                            Gtk.ResponseType.NO,
-                            _("Move"),
-                            Gtk.ResponseType.YES);
+                        if (file_to_move.has_suffix (".md") || file_to_move.has_suffix (".markdown")) {
+                            debug ("Prompting for action");
+                            Dialog prompt = new Dialog.with_buttons (
+                                "Move into Library",
+                                ThiefApp.get_instance ().main_window,
+                                DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                _("Copy"),
+                                Gtk.ResponseType.NO,
+                                _("Move"),
+                                Gtk.ResponseType.YES);
 
-                        prompt.response.connect((response_id) =>
-                        {
-                            prompt.close();
-                            if (response_id == Gtk.ResponseType.NO)
+                            prompt.response.connect((response_id) =>
                             {
-                                try
+                                prompt.close();
+                                if (response_id == Gtk.ResponseType.NO)
                                 {
-                                    debug ("Copying %s to %s", file_to_move, p._path);
-                                    FileManager.copy_item (file_to_move, p._path);
+                                    try
+                                    {
+                                        debug ("Copying %s to %s", file_to_move, p._path);
+                                        FileManager.copy_item (file_to_move, p._path);
+                                    }
+                                    catch (Error e)
+                                    {
+                                        warning ("Hit failure trying to move item in library: %s", e.message);
+                                    }
                                 }
-                                catch (Error e)
+                                else if (response_id == Gtk.ResponseType.YES)
                                 {
-                                    warning ("Hit failure trying to move item in library: %s", e.message);
+                                    try
+                                    {
+                                        debug ("Moving %s to %s", file_to_move, p._path);
+                                        FileManager.move_item (file_to_move, p._path);
+                                    }
+                                    catch (Error e)
+                                    {
+                                        warning ("Hit failure trying to move item in library: %s", e.message);
+                                    }
                                 }
-                            }
-                            else if (response_id == Gtk.ResponseType.YES)
-                            {
-                                try
-                                {
-                                    debug ("Moving %s to %s", file_to_move, p._path);
-                                    FileManager.move_item (file_to_move, p._path);
-                                }
-                                catch (Error e)
-                                {
-                                    warning ("Hit failure trying to move item in library: %s", e.message);
-                                }
-                            }
-                            refresh_sheets (p._path);
-                        });
+                                refresh_sheets (p._path);
+                            });
 
-                        prompt.show_all ();
+                            prompt.show_all ();
+                        } else {
+                            debug ("Importing file");
+                            FileManager.import_file (file.get_path (), p._sheets);
+                            parse_dir (_selected._sheets, _selected._path, _selected_node);
+                        }
                     }
                 }
                 else
