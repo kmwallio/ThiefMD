@@ -152,8 +152,6 @@ namespace ThiefMD {
             new KeyBindings (main_window);
 
             UserData.create_data_directories ();
-
-            ready = true;
             main_window.show_all ();
 
             // Restore preview view
@@ -167,6 +165,9 @@ namespace ThiefMD {
             shutdown.connect (() => {
                 SheetManager.save_active ();
             });
+
+            // Go go go!
+            ready = true;
         }
 
         public static ThiefApp get_instance () {

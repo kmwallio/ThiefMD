@@ -162,8 +162,18 @@ namespace ThiefMD.Controllers.UI {
     public void load_css_scheme () {
         var settings = AppSettings.get_default ();
         Ultheme.HexColorPalette palette;
+
+        // Attempt to wait for app instance to be ready.
+        if (!ThiefApp.get_instance ().ready) {
+            Timeout.add (150, () => {
+                load_css_scheme ();
+                return false;
+            });
+            return;
+        }
+
         debug ("Using %s", settings.custom_theme);
-        if (settings.ui_editor_theme && settings.theme_id != "thiefmd") {
+        if (settings.theme_id != "thiefmd") {
             string style_path = Path.build_filename (UserData.style_path, settings.custom_theme);
             File style = File.new_for_path (style_path);
             if (style.query_exists ()) {
@@ -176,7 +186,7 @@ namespace ThiefMD.Controllers.UI {
                     }
                     set_css_scheme (palette);
                 } catch (Error e) {
-                    warning ("Could not load previous style: %s", e.message);
+                    warning ("Could not load previous style (%s): %s", settings.custom_theme, e.message);
                 }
             }
         } else {
@@ -219,6 +229,7 @@ namespace ThiefMD.Controllers.UI {
     public void set_css_scheme (Ultheme.HexColorPalette palette) {
         var settings = AppSettings.get_default ();
         current_palette = palette;
+        set_dark_mode_based_on_colors ();
         if (palette == null || !settings.ui_editor_theme) { 
             return;
         }
@@ -239,7 +250,6 @@ namespace ThiefMD.Controllers.UI {
             var provider = new Gtk.CssProvider ();
             provider.load_from_data (new_css);
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-            set_dark_mode_based_on_colors ();
             active_provider = provider;
         } catch (Error e) {
             warning ("Could not set dynamic css: %s", e.message);
@@ -247,6 +257,8 @@ namespace ThiefMD.Controllers.UI {
     }
 
     private void set_dark_mode_based_on_colors () {
+        var settings = AppSettings.get_default ();
+
         if (current_palette != null) {
             // Use luminance to determine if the background is dark or light as some themes
             // include 2 dark themes or 2 light themes
@@ -257,7 +269,6 @@ namespace ThiefMD.Controllers.UI {
             // Set dark theme
             Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = (lum < 0.5);
         } else {
-            var settings = AppSettings.get_default ();
             if (settings.theme_id != "thiefmd") {
                 Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_mode;
             } else {
