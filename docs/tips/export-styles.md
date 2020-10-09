@@ -7,7 +7,7 @@ title: Export Styles
 
 Want more control over the live preview and export options? Then creating an export style package is the way to go.
 
-It sounds complicated, but it's just a [ZIP](https://en.wikipedia.org/wiki/Zip_(file_format)) file with at least 1 [CSS file](https://en.wikipedia.org/wiki/CSS) in it.
+It sounds complicated, but it's just a [ZIP](https://en.wikipedia.org/wiki/Zip_(file_format)) file with at least 1 [CSS file](https://en.wikipedia.org/wiki/CSS) in it. You can find some samples at [https://themes.thiefmd.com/export-css](https://themes.thiefmd.com/export-css).
 
 ## Export Package Contents
 
@@ -90,5 +90,26 @@ pre {
 
 img {
   max-width: 100%;
+}
+```
+
+### Adding Page breaks
+
+By default, ThiefMD allows users to configure page breaks in the Preferences (`Ctrl+,`). This allows for the user to control some formatting without modifying CSS, but doesn't provide much power. If `# Heading 1` means a new Chapter on a new Page for you, you could add to your CSS:
+
+```css
+h1 {
+  page-break-before: always;
+}
+```
+
+This will result in `# Heading 1` to always start a new page.
+
+If you always want code to be on it's own sample page, you could similarly do:
+
+```css
+code {
+  page-break-before: always;
+  page-break-after: always;
 }
 ```
