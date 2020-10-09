@@ -86,6 +86,7 @@ executable(
     'src/Widgets/ThemeSelector.vala',
     'src/Widgets/DefaultTheme.vala',
     'src/Widgets/ThemePreview.vala',
+    'src/Widgets/Thinking.vala',
     'src/Controllers/FileManager.vala',
     'src/Controllers/Dialogs.vala',
     'src/Controllers/SheetManager.vala',
