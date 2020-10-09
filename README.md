@@ -38,6 +38,14 @@ sudo apt-get install com.github.kmwallio.thiefmd
  * Writing Statistics
  * Dedicated Markdown Editor
 
+## Resources
+
+ * [https://themes.thiefmd.com](https://themes.thiefmd.com) - [GitHub Source](https://github.com/ThiefMD/themes): Themes made for ThiefMD
+ * [Theme-Generator](https://github.com/ThiefMD/theme-generator): GUI Application to assist in customizing ThiefMD Themes
+ * [alices-adventures-in-wonderland sample novel](https://github.com/ThiefMD/sample-novel): Example project structure for writing a novel
+ * [Pandoc](https://pandoc.org): Universal document converter, used for import and export. [Useful documentation on front-matter in manual](https://pandoc.org/MANUAL.html#epub-metadata)
+ * [@thiefmd1 on twitter](https://twitter.com/thiefmd1): Release announcements, teasing new features, programming humor, and retweeting writing tips
+
 ## Screenshots
 
 ![](docs/images/theme_preferences.png)
