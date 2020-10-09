@@ -192,11 +192,7 @@ namespace ThiefMD.Controllers.UI {
             active_provider = null;
         }
 
-        if (settings.theme_id == "thiefmd") {
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
-        } else {
-            set_dark_mode_based_on_colors ();
-        }
+        set_dark_mode_based_on_colors ();
     }
 
     public void reset_css () {
