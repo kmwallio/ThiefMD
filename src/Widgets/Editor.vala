@@ -61,7 +61,7 @@ namespace ThiefMD.Widgets {
             settings.changed.connect (update_settings);
 
             if (!open_file (file_path)) {
-                set_text (Constants.FIRST_USE, true);
+                set_text (Constants.FIRST_USE.printf (ThiefProperties.THIEF_TIPS[Random.int_range(0, ThiefProperties.THIEF_TIPS.length)]), true);
                 editable = false;
             }
 

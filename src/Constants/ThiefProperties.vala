@@ -58,6 +58,15 @@ namespace ThiefMD {
           Gtk.PAPER_NAME_LEGAL,
           Gtk.PAPER_NAME_LETTER
         };
+
+        public const string[] THIEF_TIPS = {
+          "Don't like what you see? Hit `Ctrl+,` to access the preferences.",
+          "No built in dark mode? Dark themes are available at https://themes.thiefmd.com. Add more in the Preferences (`Ctrl+,`).",
+          "Don't like the preview? Hit `Ctrl+,` to access the preferences and click Export.",
+          "Want to import a ePub, HTML, or DocX? Add a folder to the library, then drag the file onto the folder.",
+          "Ready to publish your great work? Right-click on the folder and choose \"Export Preview\""
+        };
+
         public const string PREVIEW_TEXT = """# %s
 The `markdown` editor worth stealing. *Focus* more on **writing**.
 > It's the best thing since sliced bread
@@ -65,12 +74,11 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
 """;
 
         public const string PREVIEW_CSS_MARKDOWN = """# %s
-
-Paragraph example
-
-## H2
-
-Paragraph example""";
+The `markdown` editor worth stealing. *Focus* more on **writing**.
+## Users Say:
+> It's the best thing since sliced bread
+[ThiefMD](https://thiefmd.com)
+""";
 
         public const string DYNAMIC_CSS = """@define-color colorPrimary %s;
         @define-color colorPrimaryActive %s;
