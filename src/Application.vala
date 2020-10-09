@@ -75,14 +75,19 @@ namespace ThiefMD {
             var settings = AppSettings.get_default ();
 
             string start_dir = "";
-            if (settings.last_file != "") {
-                start_dir = settings.last_file.substring(0, settings.last_file.last_index_of("/"));
-                debug ("Starting with %s\n", start_dir);
-            }
-
+            settings.validate_library ();
             if (settings.library_list == "") {
                 settings.last_file = "";
                 start_dir = "";
+            } else {
+                if (!settings.page_in_library (settings.last_file)) {
+                    settings.last_file = "";
+                }
+            }
+
+            if (settings.last_file != "") {
+                start_dir = settings.last_file.substring(0, settings.last_file.last_index_of("/"));
+                debug ("Starting with %s\n", start_dir);
             }
 
             main_window = new Gtk.ApplicationWindow (this);

@@ -272,7 +272,7 @@ namespace ThiefMD.Widgets {
         public bool file_in_library (string file_path) {
             foreach (LibPair p in _all_sheets)
             {
-                if (file_path.has_prefix (p._path))
+                if (file_path.down ().has_prefix (p._path.down ()))
                 {
                     return true;
                 }
@@ -572,11 +572,6 @@ namespace ThiefMD.Widgets {
                 }
             }
 
-            if (p == null) {
-                Gtk.drag_finish (context, false, false, time);
-                return;
-            }
-
             // Deal with what we are given from source
             if ((selection_data != null) && (selection_data.get_length() >= 0)) 
             {
@@ -616,6 +611,12 @@ namespace ThiefMD.Widgets {
                     }
                     else
                     {
+                        // Requires path to drag to
+                        if (p == null) {
+                            Gtk.drag_finish (context, false, false, time);
+                            return;
+                        }
+
                         if (file_to_move.has_suffix (".md") || file_to_move.has_suffix (".markdown")) {
                             debug ("Prompting for action");
                             Dialog prompt = new Dialog.with_buttons (
@@ -674,6 +675,12 @@ namespace ThiefMD.Widgets {
             // Default behavior
             if (dnd_success)
             {
+                // Requires path to drag to
+                if (p == null) {
+                    Gtk.drag_finish (context, false, false, time);
+                    return;
+                }
+
                 try
                 {
                     debug ("Moving %s to %s", file_to_move, p._path);

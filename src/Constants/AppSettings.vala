@@ -130,6 +130,17 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             return library_list.split(";");
         }
 
+        public bool page_in_library (string page) {
+            string[] checks = library ();
+            foreach (var check in checks) {
+                if (page.down ().has_prefix (check.down())) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void validate_library () {
             string[] current_library = library();
             string new_library = "";
