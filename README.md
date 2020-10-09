@@ -29,7 +29,7 @@ sudo apt-get install com.github.kmwallio.thiefmd
  * Sheet Management
  * Shortcut key bindings
  * Themes
- * Export
+ * Export (DocX, ePUB, PDF, HTML, Markdown, and more...)
  * Import (DocX, ePUB, HTML, rst, textile, and more...)
 
 ## Planning
