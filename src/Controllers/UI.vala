@@ -24,6 +24,7 @@ namespace ThiefMD.Controllers.UI {
     private bool _init = false;
     private bool _show_filename = false;
     private Gtk.CssProvider active_provider = null;
+    private Ultheme.HexColorPalette current_palette = null;
 
     //
     // Sheets Management
@@ -194,7 +195,7 @@ namespace ThiefMD.Controllers.UI {
         if (settings.theme_id == "thiefmd") {
             Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
         } else {
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_mode;
+            set_dark_mode_based_on_colors ();
         }
     }
 
@@ -210,15 +211,18 @@ namespace ThiefMD.Controllers.UI {
             Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), active_provider);
             active_provider = null;
         }
+
         var provider = new Gtk.CssProvider ();
         provider.load_from_resource ("/com/github/kmwallio/thiefmd/app-stylesheet.css");
         Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         active_provider = provider;
         Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
+        current_palette = null;
     }
 
     public void set_css_scheme (Ultheme.HexColorPalette palette) {
         var settings = AppSettings.get_default ();
+        current_palette = palette;
         if (palette == null || !settings.ui_editor_theme) { 
             return;
         }
@@ -239,20 +243,30 @@ namespace ThiefMD.Controllers.UI {
             var provider = new Gtk.CssProvider ();
             provider.load_from_data (new_css);
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-            bool use_dark = settings.dark_mode;
-
-            // Use hue to determine if the background is dark or light as some themes
-            // include 2 dark themes or 2 light themes
-            Clutter.Color color = Clutter.Color.from_string (palette.global.background);
-            float hue, lum, sat;
-            color.to_hls (out hue, out lum, out sat);
-            use_dark = (lum < 0.5);
-
-            // Set dark theme
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = use_dark;
+            set_dark_mode_based_on_colors ();
             active_provider = provider;
         } catch (Error e) {
             warning ("Could not set dynamic css: %s", e.message);
+        }
+    }
+
+    private void set_dark_mode_based_on_colors () {
+        if (current_palette != null) {
+            // Use luminance to determine if the background is dark or light as some themes
+            // include 2 dark themes or 2 light themes
+            Clutter.Color color = Clutter.Color.from_string (current_palette.global.background);
+            float hue, lum, sat;
+            color.to_hls (out hue, out lum, out sat);
+
+            // Set dark theme
+            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = (lum < 0.5);
+        } else {
+            var settings = AppSettings.get_default ();
+            if (settings.theme_id != "thiefmd") {
+                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_mode;
+            } else {
+                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
+            }
         }
     }
 
