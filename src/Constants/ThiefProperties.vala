@@ -65,7 +65,8 @@ namespace ThiefMD {
           "Don't like the preview? Hit `Ctrl+,` to access the preferences and click Export.",
           "Want to import a ePub, HTML, or DocX? Add a folder to the library, then drag the file onto the folder.",
           "Ready to publish your great work? Right-click on the folder and choose \"Export Preview\"",
-          "Want to block out the world? Full-screen is just an `F11` away."
+          "Want to block out the world? Full-screen is just an `F11` away.",
+          "Quickly switch view modes with `Ctrl+1`, `Ctrl+2`, and `Ctrl+3`."
         };
 
         public const string PREVIEW_TEXT = """# %s
