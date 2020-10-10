@@ -233,6 +233,7 @@ namespace ThiefMD.Controllers.UI {
         current_palette = palette;
         set_dark_mode_based_on_colors ();
         if (palette == null || !settings.ui_editor_theme) { 
+            clear_css ();
             return;
         }
 
