@@ -20,7 +20,7 @@ Some of our favorites:
 
 `Ctrl + Shift + P` and see your markdown rendered instantly. Live preview updates as you type.
 
-Relative paths? Absolute paths? Don't worry, ThiefMD will find the image you're looking for.
+Relative paths? Absolute paths? Don't worry, ThiefMD finds the images you're looking for.
 
 A separate window lets allows for better positioning, or multi-monitor support. Focus on your writing, or focus on your reading.
 
@@ -77,9 +77,9 @@ No longer look for where you're typing keep your eye muscles on what matters mos
 
 Use [Jekyll](https://jekyllrb.com), [Hugo](https://gohugo.io), or another [Static Site Generator](https://www.staticgen.com/)?
 
-ThiefMD will surface the [front matter](https://jekyllrb.com/docs/front-matter) in the Folder View using minimark.
+ThiefMD surfaces the [front matter](https://jekyllrb.com/docs/front-matter) in the Folder View using minimark.
 
-Live preview will also render any `title:` making your post look like art.
+Live preview also rendera any `title:` making your post look like art.
 
 Our [export logic](/tips/novel-writing#novel-metadata) also understands [whatever metadata you may throw at it](https://pandoc.org/MANUAL.html#epub-metadata).
 
@@ -144,6 +144,20 @@ In the Preferences Window (`Ctrl + ,`), you can now drag themes into the app.
 Get immersed and match the whole UI or keep the colors for your words.
 
 Discover more themes at [https://themes.thiefmd.com](https://themes.thiefmd.com) or [make your own](https://themes.thiefmd.com/howto) from scratch.
+
+<div style="clear: both;"></div>
+
+## Super Fast Search
+
+<div class="responsive-left jonas"><img src="/images/thief_search.png" alt="ThiefMD showing library search and highlighting in current file" /></div>
+
+Whether you know where you're looking or what you're looking for, ThiefMD will help you get there.
+
+`Ctrl+F` to search the current file.
+
+`Ctrl+Shift+F` searches your entire library.
+
+Get lost in your writing and find your way back to wherever you need to go, all within ThiefMD.
 
 <div style="clear: both;"></div>
 

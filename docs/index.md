@@ -43,7 +43,7 @@ If anything goes wrong, it's probably because we implemented it wrong.  We're no
 
 See what your work looks like in real time. Is that your battery draining? Yes, and the Markdown it's powering never looked so good.
 
-A separate window allows for focusing on your writing or reading. From [blogging](/tips/jekyll) to [novel writing](/tips/novel-writing), ThiefMD will help your words look good 😎
+A separate window allows for focusing on your writing or reading. From [blogging](/tips/jekyll) to [novel writing](/tips/novel-writing), ThiefMD helps your words look good 😎
 
 Once you like what you see, [export with ease](/tips/novel-writing#sharing-your-work) to ePub, DocX, PDF, and more.
 
