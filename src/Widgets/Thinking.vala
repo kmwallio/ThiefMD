@@ -52,7 +52,7 @@ namespace ThiefMD.Widgets {
                 return true;
             } else {
                 if (running.trylock ()) {
-                    warning ("Doing work.");
+                    debug ("Doing work.");
                     work ();
                     running.unlock ();
                     this.destroy ();

@@ -44,7 +44,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Global search
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK != 0 & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
                     if (match_keycode (Gdk.Key.f, keycode)) {
                         SearchWindow search = new SearchWindow ();
                         search.show_all ();
@@ -52,7 +52,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Preview
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK != 0 & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
                     if (match_keycode (Gdk.Key.p, keycode)) {
                         PreviewWindow pvw = PreviewWindow.get_instance ();
                         pvw.show_all ();

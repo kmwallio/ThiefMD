@@ -87,7 +87,7 @@ libclutter-1.0-dev
 libarchive-dev
 libgtk-3-dev
 libgee-0.8-dev
-libgtksourceview-3.0-dev
+libgtksourceview-4-dev
 ```
 
 ### Fedora
@@ -101,7 +101,7 @@ libmarkdown-devel
 clutter-gtk-devel
 webkit2gtk3-devel
 gtk3-devel
-gtksourceview3-devel
+gtksourceview4-devel
 gtkspell3-devel
 libarchive-devel
 libxml2-devel

@@ -142,7 +142,7 @@ namespace ThiefMD.Widgets {
         }
 
         public void update_terms () {
-            warning ("Updating search term");
+            debug ("Updating search term");
             bool respawn = active_search_term != search.text;
             active_search_term = search.text;
 
@@ -158,7 +158,7 @@ namespace ThiefMD.Widgets {
         }
 
         public void create_searchers () {
-            warning ("spawning seachers");
+            debug ("spawning seachers");
             if (!Thread.supported ()) {
                 debug ("Thread support not available...");
                 foreach (var search in searchable) {
