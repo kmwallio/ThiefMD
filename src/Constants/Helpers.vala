@@ -40,6 +40,23 @@ namespace ThiefMD {
         return current_title;
     }
 
+    public string get_base_library_path (string path) {
+        var settings = AppSettings.get_default ();
+        string res = path;
+        foreach (var base_lib in settings.library ()) {
+            if (res.has_prefix (base_lib)) {
+                File f = File.new_for_path (base_lib);
+                string base_chop = f.get_parent ().get_path ();
+                res = res.substring (base_chop.length);
+                if (res.has_prefix ("/")) {
+                    res = res.substring (1);
+                }
+            }
+        }
+
+        return res;
+    }
+
     public class TimedMutex {
         private bool can_action;
         private Mutex droptex;

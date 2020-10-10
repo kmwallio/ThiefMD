@@ -101,6 +101,10 @@
             <default>false</default>
             <summary>Show (true) or Hide (false) the line numbers</summary>
         </key>
+        <key name="show-writing-statistics" type="b">
+            <default>false</default>
+            <summary>Show writing statistics bar</summary>
+        </key>
         <key name="fullscreen" type="b">
             <default>false</default>
             <summary>Whether ThiefMD should be fullscreen or not</summary>

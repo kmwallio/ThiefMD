@@ -33,6 +33,7 @@ namespace ThiefMD.Widgets {
         private Gtk.Label _label;
         private string _label_buffer;
         private Sheets _parent;
+        private int _word_count;
 
         // Change style depending on sheet available in the editor
         public bool active_sheet {
@@ -119,13 +120,21 @@ namespace ThiefMD.Widgets {
         }
 
         public void redraw () {
+            var settings = AppSettings.get_default ();
             string file_contents = FileManager.get_file_lines_yaml (_sheet_path, Constants.SHEET_PREVIEW_LINES);
+
+            _word_count = FileManager.get_word_count (_sheet_path);
             if (file_contents.chomp() != "") {
                 _label_buffer = "<small>" + SheetManager.mini_mark(file_contents) + "</small>";
             } else {
                 _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of("/") + 1) + "</b>";
             }
             _label.set_label (_label_buffer);
+            settings.writing_changed ();
+        }
+
+        public int get_word_count () {
+            return _word_count;
         }
 
         //

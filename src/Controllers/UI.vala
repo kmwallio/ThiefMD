@@ -36,7 +36,9 @@ namespace ThiefMD.Controllers.UI {
         }
 
         if (preview_mutex.can_do_action ()) {
+            var settings = AppSettings.get_default ();
             Preview.get_instance ().update_html_view (true, SheetManager.get_markdown ());
+            settings.writing_changed ();
         }
     }
 
@@ -187,6 +189,10 @@ namespace ThiefMD.Controllers.UI {
             set_scheme = true;
         }
 
+        if (settings.show_writing_statistics) {
+            ThiefApp.get_instance ().stats_bar.show_statistics ();
+        }
+
         // Attempt to wait for app instance to be ready.
         if (!set_scheme) {
             Timeout.add (50, () => {
@@ -197,8 +203,6 @@ namespace ThiefMD.Controllers.UI {
     }
 
     public void clear_css () {
-        var settings = AppSettings.get_default ();
-
         if (active_provider != null) {
             Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), active_provider);
             active_provider = null;

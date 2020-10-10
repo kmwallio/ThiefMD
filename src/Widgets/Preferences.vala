@@ -296,6 +296,20 @@ namespace ThiefMD.Widgets {
             var ui_colorscheme_label = new Label(_("Match UI to Editor Theme"));
             ui_colorscheme_label.xalign = 0;
 
+            var ui_writing_statistics_switch = new Switch ();
+            ui_writing_statistics_switch.set_active (settings.show_writing_statistics);
+            ui_writing_statistics_switch.notify["active"].connect (() => {
+                settings.show_writing_statistics = ui_writing_statistics_switch.get_active ();
+                if (settings.show_writing_statistics) {
+                    ThiefApp.get_instance ().stats_bar.show_statistics ();
+                } else {
+                    ThiefApp.get_instance ().stats_bar.hide_statistics ();
+                }
+            });
+            ui_writing_statistics_switch.tooltip_text = _("Toggle Writing Statistics");
+            var ui_writing_statistics_label = new Label(_("Show writing statistics"));
+            ui_writing_statistics_label.xalign = 0;
+
             var brandless_switch = new Switch ();
             brandless_switch.set_active (settings.brandless);
             brandless_switch.notify["active"].connect (() => {
@@ -325,6 +339,10 @@ namespace ThiefMD.Widgets {
 
             grid.attach (typewriter_switch, 1, g_row, 1, 1);
             grid.attach (typewriter_label, 2, g_row, 2, 1);
+            g_row++;
+
+            grid.attach (ui_writing_statistics_switch, 1, g_row, 1, 1);
+            grid.attach (ui_writing_statistics_label, 2, g_row, 2, 1);
             g_row++;
 
             grid.attach (ui_colorscheme_switch, 1, g_row, 1, 1);

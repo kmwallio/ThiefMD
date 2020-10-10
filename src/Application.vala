@@ -31,6 +31,7 @@ namespace ThiefMD {
         public Gtk.Paned library_pane;
         public Gtk.ScrolledWindow library_view;
         public SearchBar search_bar;
+        public StatisticsBar stats_bar;
         public bool ready = false;
 
         public ThiefApp () {
@@ -144,12 +145,13 @@ namespace ThiefMD {
             main_window.set_titlebar (toolbar);
             debug ("Window (%d, %d)\n", settings.window_width, settings.window_height);
 
-            //  var vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            //  vbox.add (search_bar);
-            //  vbox.add (sheets_pane);
+            var vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            vbox.add (sheets_pane);
+            stats_bar = new StatisticsBar ();
+            vbox.add (stats_bar);
 
             main_window.set_default_size (settings.window_width, settings.window_height);
-            main_window.add (sheets_pane);
+            main_window.add (vbox);
             main_window.hide_titlebar_when_maximized = false;
             is_fullscreen = settings.fullscreen;
 

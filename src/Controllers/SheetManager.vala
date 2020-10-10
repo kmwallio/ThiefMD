@@ -142,11 +142,31 @@ namespace ThiefMD.Controllers.SheetManager {
                 found = _search_context.forward (start, out match_start, out match_end, out wrap);
             }
             if (found) {
-                var settings = AppSettings.get_default ();
                 _search_sheet.editor.scroll_to_iter (match_start, 0.0, true, 0.0, Constants.TYPEWRITER_POSITION);
                 _last_search = match_end;
             }
         }
+    }
+
+    public string get_current_file_path () {
+        if (_currentSheet != null) {
+            return _currentSheet.sheet.file_path ();
+        }
+
+        return _("No file opened.");
+    }
+
+    public void get_word_count_stats (out int word_count, out int reading_hours, out int reading_minutes, out int reading_seconds) {
+        word_count = 0;
+        foreach (var editor in _active_editors) {
+            word_count += editor.sheet.get_word_count ();
+        }
+        int timereadings = word_count / Constants.WORDS_PER_SECOND;
+        reading_hours = timereadings / 3600;
+        timereadings = timereadings % 3600;
+        reading_minutes = timereadings / 60;
+        timereadings = timereadings % 60;
+        reading_seconds = timereadings;
     }
 
     public void search_prev () {
