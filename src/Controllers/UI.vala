@@ -262,7 +262,7 @@ namespace ThiefMD.Controllers.UI {
     private void set_dark_mode_based_on_colors () {
         var settings = AppSettings.get_default ();
 
-        if (current_palette != null) {
+        if (current_palette != null && settings.theme_id != "thiefmd") {
             // Use luminance to determine if the background is dark or light as some themes
             // include 2 dark themes or 2 light themes
             Clutter.Color color = Clutter.Color.from_string (current_palette.global.background);

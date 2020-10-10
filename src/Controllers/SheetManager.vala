@@ -35,6 +35,7 @@ namespace ThiefMD.Controllers.SheetManager {
     private Gtk.SourceSearchContext _search_context;
     private Gtk.SourceSearchSettings _search_settings;
     private Gtk.TextIter? _last_search;
+    private bool _search_buffer_changed;
 
     public void init () {
         if (_editors == null) {
@@ -69,6 +70,7 @@ namespace ThiefMD.Controllers.SheetManager {
             _box_view.add (_bar);
             _box_view.add (_view);
             _box_view.show_all ();
+            _search_buffer_changed = true;
         }
     }
 
@@ -113,6 +115,12 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     public void search_next () {
+        if (_search_buffer_changed) {
+            search_for (ThiefApp.get_instance ().search_bar.get_search_text ());
+            _search_buffer_changed = false;
+            return;
+        }
+
         if (_search_context != null && _search_sheet != null) {
             var cursor = _search_sheet.editor.buffer.get_insert ();
             Gtk.TextIter start, search_start, end, match_start, match_end;
@@ -142,6 +150,12 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     public void search_prev () {
+        if (_search_buffer_changed) {
+            search_for (ThiefApp.get_instance ().search_bar.get_search_text ());
+            _search_buffer_changed = false;
+            return;
+        }
+
         if (_search_context != null && _search_sheet != null) {
             var cursor = _search_sheet.editor.buffer.get_insert ();
             Gtk.TextIter start, search_start, end, match_start, match_end;
@@ -167,10 +181,6 @@ namespace ThiefMD.Controllers.SheetManager {
                 _last_search = match_start;
             }
         }
-    }
-
-    public void done_search () {
-
     }
 
     public void show_error (string error_message) {
@@ -510,6 +520,7 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     public void last_modified (Widgets.Editor modified_editor) {
+        _search_buffer_changed = true;
         if (_currentSheet != null && _currentSheet.editor == modified_editor) {
             return;
         }
