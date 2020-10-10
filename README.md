@@ -31,6 +31,7 @@ sudo apt-get install com.github.kmwallio.thiefmd
  * Themes
  * Export (DocX, ePUB, PDF, HTML, Markdown, and more...)
  * Import (DocX, ePUB, HTML, rst, textile, and more...)
+ * Search `Ctrl+F` for the current file, and `Ctrl+Shift+F` for the *entire* library
 
 ## Planning
 
