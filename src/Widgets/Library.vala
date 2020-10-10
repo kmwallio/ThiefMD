@@ -280,6 +280,31 @@ namespace ThiefMD.Widgets {
             return false;
         }
 
+        public Sheet? find_sheet_for_path (string file_path) {
+            int len = 0;
+            Sheets? parent = null;
+            foreach (LibPair p in _all_sheets)
+            {
+                if (file_path.down ().has_prefix (p._path.down ()))
+                {
+                    if (p._path.length > len) {
+                        len = p._path.length;
+                        parent = p._sheets;
+                    }
+                }
+            }
+            
+            if (parent != null) {
+                foreach (var potential in parent.get_sheets ()) {
+                    if (potential.file_path () == file_path) {
+                        return potential;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         private string build_novel (LibPair p, bool metadata = false) {
             StringBuilder markdown = new StringBuilder ();
             var settings = AppSettings.get_default ();
@@ -323,6 +348,14 @@ namespace ThiefMD.Widgets {
             }
 
             return markdown.str;
+        }
+
+        public Gee.ArrayList<Sheets> get_all_sheets () {
+            Gee.ArrayList<Sheets> all_sheets = new Gee.ArrayList<Sheets> ();
+            foreach (var p in _all_sheets) {
+                all_sheets.add (p._sheets);
+            }
+            return all_sheets;
         }
 
         //

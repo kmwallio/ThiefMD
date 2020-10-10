@@ -88,7 +88,7 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         @define-color textColorActive %s;
         @define-color textColorGlobal %s;
         
-        .thiefmd-toolbar {
+        .thiefmd-toolbar, .thief-search-box {
             border-bottom-color: transparent;
             border-bottom-width: 1px;
             background: @colorPrimary;
@@ -109,14 +109,19 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             border-right: 1px solid alpha(@textColorGlobal, 0.2);
         }
 
-        .thiefmd-toolbar button {
+        .thiefmd-toolbar button,
+        .thief-search-button,
+        .thief-search-matches {
           background: @colorPrimary;
           color: @textColorGlobal;
         }
 
         .thiefmd-toolbar button:active,
         .thiefmd-toolbar button:hover,
-        .thiefmd-toolbar button:hover:active {
+        .thiefmd-toolbar button:hover:active,
+        .thief-search-button:hover,
+        .thief-search-button:active,
+        .thief-search-button:hover:active {
           background: lighter(@colorPrimary);
           color: @textColorGlobal;
         }
@@ -136,9 +141,15 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             border-radius: 0;
         }
         
-        .thief-list-sheet-active {
+        .thief-list-sheet-active,
+        .thief-search-input {
             background: lighter(@colorPrimary);
             color: @textColorPrimary;
+        }
+
+        .thief-search-input:focus {
+          background: @colorPrimaryActive;
+          color: @textColorActive;
         }
 
         filechooser {
@@ -162,7 +173,7 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         }
         
         placessidebar *:selected, treeview.view:selected {
-            background: @colorPrimary;
+            background: lighter(@colorPrimary);
             color: @textColorGlobal;
         }""";
 

@@ -71,6 +71,7 @@ namespace ThiefMD.Widgets {
             clicked.connect (() => {
                 debug ("Loading %s\n", _sheet_path);
                 SheetManager.load_sheet (this);
+                active = active_sheet;
             });
 
             // Add ability to be dragged

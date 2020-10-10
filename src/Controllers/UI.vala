@@ -162,15 +162,7 @@ namespace ThiefMD.Controllers.UI {
     public void load_css_scheme () {
         var settings = AppSettings.get_default ();
         Ultheme.HexColorPalette palette;
-
-        // Attempt to wait for app instance to be ready.
-        if (!ThiefApp.get_instance ().ready) {
-            Timeout.add (150, () => {
-                load_css_scheme ();
-                return false;
-            });
-            return;
-        }
+        bool set_scheme = false;
 
         debug ("Using %s", settings.custom_theme);
         if (settings.theme_id != "thiefmd") {
@@ -185,12 +177,22 @@ namespace ThiefMD.Controllers.UI {
                         theme.get_light_theme_palette (out palette);
                     }
                     set_css_scheme (palette);
+                    set_scheme = true;
                 } catch (Error e) {
                     warning ("Could not load previous style (%s): %s", settings.custom_theme, e.message);
                 }
             }
         } else {
             reset_css ();
+            set_scheme = true;
+        }
+
+        // Attempt to wait for app instance to be ready.
+        if (!set_scheme) {
+            Timeout.add (50, () => {
+                load_css_scheme ();
+                return false;
+            });
         }
     }
 
@@ -231,6 +233,7 @@ namespace ThiefMD.Controllers.UI {
         current_palette = palette;
         set_dark_mode_based_on_colors ();
         if (palette == null || !settings.ui_editor_theme) { 
+            clear_css ();
             return;
         }
 

@@ -20,5 +20,6 @@ ThiefMD can now even import your (or someone else's) existing work! Just drag an
 * Change PDF CSS
 * Change PDF Paper Size
 * Import ePUB, DocX, HTML, and [more](https://pandoc.org). It's Pandoc under the hoods with a little thievery sprinkled on top
+* Editor Search `Ctrl+F` and Library Search `Ctrl+Shift+F`
 
 ![](/images/import-epub.png)
