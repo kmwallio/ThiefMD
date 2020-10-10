@@ -95,7 +95,7 @@ namespace ThiefMD.Controllers.UI {
             GLib.FileUtils.get_contents (file.get_path (), out old_text);
             string old_theme = Checksum.compute_for_string (ChecksumType.MD5, old_text);
 
-            return new_theme == old_theme;
+            return new_theme != old_theme;
         } catch (Error e) {
             return true;
         }
