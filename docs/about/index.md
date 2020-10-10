@@ -20,6 +20,7 @@ ThiefMD currently supports
 * Folder Import
 * Markdown Syntax Highlighting
 * Organization of Folders and Files
+* Search individual files (`Ctrl+F`) or the entire library (`Ctrl+Shift+F`)
 * Live Preview
 * Export Preview
 * Folder Export to PDF, DocX, ePub and more
