@@ -42,6 +42,7 @@ namespace ThiefMD.Widgets {
         private TimedMutex writegood_limit;
         public Gtk.TextTag warning_tag;
         public Gtk.TextTag error_tag;
+        public Gtk.TextTag highlight_tag;
         private int last_width = 0;
         private int last_height = 0;
         private bool spellcheck_active;
@@ -83,6 +84,13 @@ namespace ThiefMD.Widgets {
 
             error_tag = new Gtk.TextTag ("error_bg");
             error_tag.underline = Pango.Underline.ERROR;
+
+            highlight_tag = new Gtk.TextTag ("search-match");
+            highlight_tag.background_rgba = Gdk.RGBA () { red = 1.0, green = 0.8, blue = 0.13, alpha = 1.0 };
+            highlight_tag.foreground_rgba = Gdk.RGBA () { red = 0.0, green = 0.0, blue = 0.0, alpha = 1.0 };
+            highlight_tag.background_set = true;
+            highlight_tag.foreground_set = true;
+
 
             buffer.tag_table.add (error_tag);
             buffer.tag_table.add (warning_tag);
@@ -444,9 +452,7 @@ namespace ThiefMD.Widgets {
                 Gtk.TextIter cursor_iter;
                 Gtk.TextIter start, end;
                 buffer.get_bounds (out start, out end);
-
                 buffer.get_iter_at_mark (out cursor_iter, cursor);
-                buffer.get_iter_at_mark (out cursor_iter, cursor);;
 
                 string before = buffer.get_text (start, cursor_iter, true);
                 string last_line = before.substring (before.last_index_of ("\n") + 1);

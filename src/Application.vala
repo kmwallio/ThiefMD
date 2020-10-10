@@ -92,7 +92,6 @@ namespace ThiefMD {
             }
 
             main_window = new Gtk.ApplicationWindow (this);
-            SheetManager.init ();
 
             // Attempt to set taskbar icon
             try {
@@ -117,7 +116,11 @@ namespace ThiefMD {
             }
 
             toolbar = Headerbar.get_instance ();
+            // Have to init search bar before sheet manager
+            search_bar = new SearchBar ();
+            SheetManager.init ();
             library = new Library ();
+
             sheets_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             library_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             library_view = new Gtk.ScrolledWindow (null, null);
@@ -141,13 +144,12 @@ namespace ThiefMD {
             main_window.set_titlebar (toolbar);
             debug ("Window (%d, %d)\n", settings.window_width, settings.window_height);
 
-            search_bar = new SearchBar ();
-            var vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            vbox.add (search_bar);
-            vbox.add (sheets_pane);
+            //  var vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            //  vbox.add (search_bar);
+            //  vbox.add (sheets_pane);
 
             main_window.set_default_size (settings.window_width, settings.window_height);
-            main_window.add (vbox);
+            main_window.add (sheets_pane);
             main_window.hide_titlebar_when_maximized = false;
             is_fullscreen = settings.fullscreen;
 
