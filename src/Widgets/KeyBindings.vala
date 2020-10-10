@@ -43,6 +43,22 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
+                // Global search
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK != 0 & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.f, keycode)) {
+                        SearchWindow search = new SearchWindow ();
+                        search.show_all ();
+                    }
+                }
+
+                // Preview
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK != 0 & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.p, keycode)) {
+                        PreviewWindow pvw = PreviewWindow.get_instance ();
+                        pvw.show_all ();
+                    }
+                }
+
                 // New Sheet
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                     if (match_keycode (Gdk.Key.n, keycode)) {
@@ -78,14 +94,6 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
-                // Preview
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
-                    if (match_keycode (Gdk.Key.p, keycode)) {
-                        PreviewWindow pvw = PreviewWindow.get_instance ();
-                        pvw.show_all ();
-                    }
-                }
-
                 // Preferences
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                     if (match_keycode (Gdk.Key.comma, keycode)) {
@@ -102,7 +110,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Redo
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK + Gdk.ModifierType.SHIFT_MASK) != 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK & Gdk.ModifierType.SHIFT_MASK) != 0) {
                     if (match_keycode (Gdk.Key.z, keycode)) {
                         SheetManager.redo ();
                     }
@@ -138,7 +146,9 @@ namespace ThiefMD.Widgets {
                 }
 
                 if (match_keycode (Gdk.Key.Escape, keycode)) {
-                    if (settings.fullscreen) {
+                    if (ThiefApp.get_instance ().search_bar.should_escape_search ()) {
+                        ThiefApp.get_instance ().search_bar.deactivate_search ();
+                    } else if (settings.fullscreen) {
                         settings.fullscreen = false;
                     }
                 }

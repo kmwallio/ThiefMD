@@ -27,6 +27,7 @@ namespace ThiefMD.Widgets {
         private Gtk.Button prev;
         private Gtk.Label matches;
         private Gtk.Box box;
+        private bool searched = false;
 
         public SearchBar () {
             transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
@@ -37,11 +38,21 @@ namespace ThiefMD.Widgets {
             box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 
             matches = new Gtk.Label ("                           ");
+            var header_context = matches.get_style_context ();
+            header_context.add_class ("thief-search-matches");
             search_text = new Gtk.Entry ();
+            header_context = search_text.get_style_context ();
+            header_context.add_class ("thief-search-input");
             next = new Gtk.Button ();
+            header_context = next.get_style_context ();
+            header_context.add_class ("thief-search-button");
             next.set_image (new Gtk.Image.from_icon_name ("go-next-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
             prev = new Gtk.Button ();
+            header_context = prev.get_style_context ();
+            header_context.add_class ("thief-search-button");
             prev.set_image (new Gtk.Image.from_icon_name ("go-next-rtl-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            header_context = box.get_style_context ();
+            header_context.add_class ("thief-search-box");
 
             //  grid.attach (search_text, 0, 0, 2, 1);
             //  grid.attach (prev, 2, 0, 1, 1);
@@ -65,6 +76,10 @@ namespace ThiefMD.Widgets {
             });
 
             search_text.activate.connect (() => {
+                if (!searched) {
+                    SheetManager.search_for (search_text.text);
+                    searched = true;
+                }
                 SheetManager.search_next ();
             });
 
@@ -73,13 +88,18 @@ namespace ThiefMD.Widgets {
             hexpand = true;
         }
 
+        public void search_for (string term) {
+            search_text.text = term;
+            SheetManager.search_for (search_text.text);
+        }
+
         public void set_match_count (int match_count) {
             if (match_count < 0) {
                 matches.label = "";
             } else {
                 matches.label = _("(%d occurences)").printf (match_count);
             }
-            warning ("Have %d matches", match_count);
+            debug ("Have %d matches", match_count);
             box.show_all ();
         }
 
@@ -95,8 +115,17 @@ namespace ThiefMD.Widgets {
             return search_text.has_focus;
         }
 
+        public bool search_enabled () {
+            return (child_revealed && search_text.text.chug ().chomp () != "");
+        }
+
+        public string get_search_text () {
+            return search_text.text;
+        }
+
         public void deactivate_search () {
             set_match_count (-1);
+            searched = false;
             search_text.changed.disconnect (update_text);
             SheetManager.search_for (null);
             set_reveal_child (false);
@@ -111,6 +140,7 @@ namespace ThiefMD.Widgets {
 
         private void update_text () {
             string search = search_text.text;
+            searched = true;
             SheetManager.search_for (search);
         }
     }

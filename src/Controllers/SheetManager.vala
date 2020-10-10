@@ -82,6 +82,7 @@ namespace ThiefMD.Controllers.SheetManager {
         if (_search_settings != null && text == null) {
             _search_settings.search_text = text;
         }
+
         if (_currentSheet == null) {
             return;
         }
@@ -133,6 +134,7 @@ namespace ThiefMD.Controllers.SheetManager {
                 found = _search_context.forward (start, out match_start, out match_end, out wrap);
             }
             if (found) {
+                var settings = AppSettings.get_default ();
                 _search_sheet.editor.scroll_to_iter (match_start, 0.0, true, 0.0, Constants.TYPEWRITER_POSITION);
                 _last_search = match_end;
             }
@@ -327,6 +329,13 @@ namespace ThiefMD.Controllers.SheetManager {
         debug ("Tried to load %s (%s)\n", sheet.file_path (), (success) ? "success" : "failed");
 
         update_view ();
+
+        if (ThiefApp.get_instance ().search_bar.search_enabled ()) {
+            Timeout.add (250, () => {
+                search_for (ThiefApp.get_instance ().search_bar.get_search_text ());
+                return false;
+            });
+        }
         return success;
     }
 
@@ -402,7 +411,7 @@ namespace ThiefMD.Controllers.SheetManager {
         return result;
     }
 
-    private static void drain_and_save_active () {
+    public void drain_and_save_active () {
         foreach (var editor in _active_editors) {
             try {
                 _view.remove (editor.editor);
@@ -419,7 +428,7 @@ namespace ThiefMD.Controllers.SheetManager {
         check_queue ();
     }
 
-    private static void save_active () {
+    private void save_active () {
         foreach (var editor in _active_editors) {
             try {
                 editor.editor.save ();
