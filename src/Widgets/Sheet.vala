@@ -33,6 +33,7 @@ namespace ThiefMD.Widgets {
         private Gtk.Label _label;
         private string _label_buffer;
         private Sheets _parent;
+        private int _word_count;
 
         // Change style depending on sheet available in the editor
         public bool active_sheet {
@@ -71,6 +72,7 @@ namespace ThiefMD.Widgets {
             clicked.connect (() => {
                 debug ("Loading %s\n", _sheet_path);
                 SheetManager.load_sheet (this);
+                active = active_sheet;
             });
 
             // Add ability to be dragged
@@ -118,13 +120,21 @@ namespace ThiefMD.Widgets {
         }
 
         public void redraw () {
+            var settings = AppSettings.get_default ();
             string file_contents = FileManager.get_file_lines_yaml (_sheet_path, Constants.SHEET_PREVIEW_LINES);
+
+            _word_count = FileManager.get_word_count (_sheet_path);
             if (file_contents.chomp() != "") {
                 _label_buffer = "<small>" + SheetManager.mini_mark(file_contents) + "</small>";
             } else {
                 _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of("/") + 1) + "</b>";
             }
             _label.set_label (_label_buffer);
+            settings.writing_changed ();
+        }
+
+        public int get_word_count () {
+            return _word_count;
         }
 
         //
@@ -167,6 +177,9 @@ namespace ThiefMD.Widgets {
                 menu_delete_sheet.activate.connect (() => {
                     debug ("Got remove for sheet %s", _sheet_path);
                     _parent.remove_sheet (this);
+                    if (active_sheet) {
+                        SheetManager.close_active_file (_sheet_path);
+                    }
                     FileManager.move_to_trash (_sheet_path);
                 });
                 menu.show_all ();
@@ -303,15 +316,21 @@ namespace ThiefMD.Widgets {
             }
 
             File file = dnd_get_file (selection_data, target_type);
+            debug ("Got file: %s", file.get_path ());
             if (!file.query_exists ()) {
                 Gtk.drag_finish (context, false, false, time);
                 return;
             }
 
-            if (y > mid) {
-                _parent.move_sheet_after (this.file_name (), file.get_basename ());
+            if (ThiefApp.get_instance ().library.file_in_library (file.get_path ())) {
+                if (y > mid) {
+                    _parent.move_sheet_after (this.file_name (), file.get_basename ());
+                } else {
+                    _parent.move_sheet_before (this.file_name (), file.get_basename ());
+                }
             } else {
-                _parent.move_sheet_before (this.file_name (), file.get_basename ());
+                debug ("Importing file");
+                FileManager.import_file (file.get_path (), _parent);
             }
 
 

@@ -62,7 +62,7 @@ namespace ThiefMD.Widgets {
             }
             UI.update_preview ();
 
-            transient_for = ThiefApp.get_instance ().main_window;
+            parent = ThiefApp.get_instance ().main_window;
             destroy_with_parent = true;
             ThiefApp.get_instance ().main_window.get_size (out w, out h);
             w = w - ThiefApp.get_instance ().pane_position;

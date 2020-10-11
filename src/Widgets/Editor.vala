@@ -42,6 +42,7 @@ namespace ThiefMD.Widgets {
         private TimedMutex writegood_limit;
         public Gtk.TextTag warning_tag;
         public Gtk.TextTag error_tag;
+        public Gtk.TextTag highlight_tag;
         private int last_width = 0;
         private int last_height = 0;
         private bool spellcheck_active;
@@ -61,7 +62,7 @@ namespace ThiefMD.Widgets {
             settings.changed.connect (update_settings);
 
             if (!open_file (file_path)) {
-                set_text (Constants.FIRST_USE, true);
+                set_text (Constants.FIRST_USE.printf (ThiefProperties.THIEF_TIPS[Random.int_range(0, ThiefProperties.THIEF_TIPS.length)]), true);
                 editable = false;
             }
 
@@ -83,6 +84,13 @@ namespace ThiefMD.Widgets {
 
             error_tag = new Gtk.TextTag ("error_bg");
             error_tag.underline = Pango.Underline.ERROR;
+
+            highlight_tag = new Gtk.TextTag ("search-match");
+            highlight_tag.background_rgba = Gdk.RGBA () { red = 1.0, green = 0.8, blue = 0.13, alpha = 1.0 };
+            highlight_tag.foreground_rgba = Gdk.RGBA () { red = 0.0, green = 0.0, blue = 0.0, alpha = 1.0 };
+            highlight_tag.background_set = true;
+            highlight_tag.foreground_set = true;
+
 
             buffer.tag_table.add (error_tag);
             buffer.tag_table.add (warning_tag);
@@ -444,9 +452,7 @@ namespace ThiefMD.Widgets {
                 Gtk.TextIter cursor_iter;
                 Gtk.TextIter start, end;
                 buffer.get_bounds (out start, out end);
-
                 buffer.get_iter_at_mark (out cursor_iter, cursor);
-                buffer.get_iter_at_mark (out cursor_iter, cursor);;
 
                 string before = buffer.get_text (start, cursor_iter, true);
                 string last_line = before.substring (before.last_index_of ("\n") + 1);
@@ -736,7 +742,6 @@ namespace ThiefMD.Widgets {
                 Gtk.MenuItem menu_insert_frontmatter = new Gtk.MenuItem.with_label (_("Insert YAML Frontmatter"));
                 menu_insert_frontmatter.activate.connect (() => {
                     if (!buffer.text.has_prefix ("---")) {
-                        var settings_menu = AppSettings.get_default ();
                         int new_cursor_location = 0;
                         Regex date = null;
                         try {
@@ -774,17 +779,7 @@ namespace ThiefMD.Widgets {
                             warning ("Could not generate title");
                         }
 
-                        current_title = current_title.replace ("_", " ");
-                        current_title = current_title.replace ("-", " ");
-                        string [] parts = current_title.split (" ");
-                        if (parts != null && parts.length != 0) {
-                            current_title = "";
-                            foreach (var part in parts) {
-                                part = part.substring (0, 1).up () + part.substring (1).down ();
-                                current_title += part + " ";
-                            }
-                            current_title = current_title.chomp ();
-                        }
+                        current_title = make_title (current_title);
 
                         // Build the front matter
                         string frontmatter = "---\n";

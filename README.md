@@ -29,11 +29,23 @@ sudo apt-get install com.github.kmwallio.thiefmd
  * Sheet Management
  * Shortcut key bindings
  * Themes
+ * Export (DocX, ePUB, PDF, HTML, Markdown, and more...)
+ * Import (DocX, ePUB, HTML, rst, textile, and more...)
+ * Search `Ctrl+F` for the current file, and `Ctrl+Shift+F` for the *entire* library
+ * Writing Statistics
 
 ## Planning
 
  * Better library organization
- * Export
+ * Dedicated Markdown Editor
+
+## Resources
+
+ * [https://themes.thiefmd.com](https://themes.thiefmd.com) - [GitHub Source](https://github.com/ThiefMD/themes): Themes made for ThiefMD
+ * [Theme-Generator](https://github.com/ThiefMD/theme-generator): GUI Application to assist in customizing ThiefMD Themes
+ * [alices-adventures-in-wonderland sample novel](https://github.com/ThiefMD/sample-novel): Example project structure for writing a novel
+ * [Pandoc](https://pandoc.org): Universal document converter, used for import and export. [Useful documentation on front-matter in manual](https://pandoc.org/MANUAL.html#epub-metadata)
+ * [@thiefmd1 on twitter](https://twitter.com/thiefmd1): Release announcements, teasing new features, programming humor, and retweeting writing tips
 
 ## Screenshots
 
@@ -45,9 +57,9 @@ Download themes from [https://themes.thiefmd.com](https://themes.thiefmd.com) or
 
 Drag and Drop organizing of the library.
 
-![](docs/images/preview.png)
+![](docs/images/epub-export.png)
 
-Live Preview
+Live Preview & Export Preview
 
 ![](docs/images/typewriter_scrolling.gif)
 
@@ -76,7 +88,7 @@ libclutter-1.0-dev
 libarchive-dev
 libgtk-3-dev
 libgee-0.8-dev
-libgtksourceview-3.0-dev
+libgtksourceview-4-dev
 ```
 
 ### Fedora
@@ -90,7 +102,7 @@ libmarkdown-devel
 clutter-gtk-devel
 webkit2gtk3-devel
 gtk3-devel
-gtksourceview3-devel
+gtksourceview4-devel
 gtkspell3-devel
 libarchive-devel
 libxml2-devel
@@ -117,5 +129,5 @@ $ sudo ninja install
 * Preview Scroll stolen from [this Stackoverflow](https://stackoverflow.com/questions/8922107/javascript-scrollintoview-middle-alignment) by [Rohan Orton](https://stackoverflow.com/users/2800005/rohan-orton)
 * Preview Syntax Highlighting by [highlight.js](https://highlightjs.org)
 * Math Rendering by [Katex](https://katex.org)
-* Multi-format Export by [Pandoc](https://pandoc.org)
+* Multi-format Export & Import by [Pandoc](https://pandoc.org)
 * Write-Good based on [btford/write-good](https://github.com/btford/write-good)

@@ -46,6 +46,18 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.1.0" date="2020-10-10" urgency="low">
+      <description>
+        <p>Get things in out and done with ThiefMD.</p>
+        <ul>
+          <li>New File Search `Ctrl+F` and Library Search `Ctrl+Shift+F`</li>
+          <li>Import items. Just drag a docx, opt, ePUB, HTML, or whatever you feel like trying onto a folder in the Library to import</li>
+          <li>More Advanced Export Options. Change the Preview Theme, and PDF Page Size</li>
+          <li>Writing Statistics, get word count and reading count for an individual file, or a project in the library</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.0-inandout</url>
+    </release>
     <release version="0.0.12" date="2020-10-05" urgency="low">
       <description>
         <p>Can ThiefMD help you write better?</p>

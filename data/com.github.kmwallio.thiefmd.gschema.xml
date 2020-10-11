@@ -101,6 +101,10 @@
             <default>false</default>
             <summary>Show (true) or Hide (false) the line numbers</summary>
         </key>
+        <key name="show-writing-statistics" type="b">
+            <default>false</default>
+            <summary>Show writing statistics bar</summary>
+        </key>
         <key name="fullscreen" type="b">
             <default>false</default>
             <summary>Whether ThiefMD should be fullscreen or not</summary>
@@ -129,10 +133,6 @@
             <default>true</default>
             <summary>Convert relative paths to absolute paths</summary>
         </key>
-        <key name="export-include-urls" type="b">
-            <default>false</default>
-            <summary>Insert URLs next to Links in PDFs</summary>
-        </key>
         <key name="export-include-metadata-file" type="b">
             <default>false</default>
             <summary>First Markdown File includes author metadata</summary>
@@ -146,6 +146,20 @@
             <default>1.0</default>
             <range min="0.0" max="3.5"/>
             <summary>Size in inches the top and bottom margins of the export document should be</summary>
+        </key>
+        <key name="export-paper-size" type="s">
+            <default>"na_letter"</default>
+            <summary>Paper size to use for PDF Export</summary>
+        </key>
+        <key name="preview-css" type="s">
+            <default>"modest-splendor"</default>
+            <summary>CSS to use for Previews and ePub</summary>
+            <description>CSS to use for Live Previews and ePub Export</description>
+        </key>
+        <key name="print-css" type="s">
+            <default>"modest-splendor"</default>
+            <summary>CSS to use for Printing PDFs</summary>
+            <description>CSS to use for PDF Export</description>
         </key>
     </schema>
 </schemalist>

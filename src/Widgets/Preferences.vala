@@ -108,16 +108,6 @@ namespace ThiefMD.Widgets {
             export_resolve_paths_label.xalign = 0;
             export_resolve_paths_label.hexpand = true;
 
-            var pdf_include_urls_switch = new Switch ();
-            pdf_include_urls_switch.set_active (settings.export_include_urls);
-            pdf_include_urls_switch.notify["active"].connect (() => {
-                settings.export_include_urls = pdf_include_urls_switch.get_active ();
-            });
-            pdf_include_urls_switch.tooltip_text = _("Include URLs in PDF");
-            var pdf_include_urls_label = new Label(_("Insert URLs into resulting PDF"));
-            pdf_include_urls_label.xalign = 0;
-            pdf_include_urls_label.hexpand = true;
-
             var page_setup_label = new Gtk.Label (_("<b>Page Setup</b>"));
             page_setup_label.hexpand = true;
             page_setup_label.xalign = 0;
@@ -171,6 +161,50 @@ namespace ThiefMD.Widgets {
             pagebreak_sheet_label.xalign = 0;
             pagebreak_sheet_label.hexpand = true;
 
+            var paper_size = new Gtk.ComboBoxText ();
+            paper_size.hexpand = true;
+            for (int i = 0; i < ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.length; i++) {
+                paper_size.append_text (ThiefProperties.PAPER_SIZES_FRIENDLY_NAME[i]);
+
+                if (settings.export_paper_size == ThiefProperties.PAPER_SIZES_GTK_NAME[i]) {
+                    paper_size.set_active (i);
+                }
+            }
+
+            paper_size.changed.connect (() => {
+                int option = paper_size.get_active ();
+                if (option >= 0 && option < ThiefProperties.PAPER_SIZES_GTK_NAME.length) {
+                    settings.export_paper_size = ThiefProperties.PAPER_SIZES_GTK_NAME[option];
+                }
+            });
+
+            int cur_w = this.get_allocated_width ();
+            var print_css_label = new Gtk.Label (_("<b>PDF Print CSS</b>"));
+            print_css_label.hexpand = true;
+            print_css_label.xalign = 0;
+            print_css_label.use_markup = true;
+            var print_css_selector = new CssSelector ("print");
+            print_css_selector.set_size_request (cur_w, (int)(1.2 * Constants.CSS_PREVIEW_HEIGHT + 5));
+
+            var css_label = new Gtk.Label (_("<b>Preview and ePub CSS</b>"));
+            css_label.hexpand = true;
+            css_label.xalign = 0;
+            css_label.use_markup = true;
+            var css_selector = new CssSelector ("preview");
+            css_selector.set_size_request (cur_w, (int)(1.2 * Constants.CSS_PREVIEW_HEIGHT + 5));
+
+            var add_css_button = new Gtk.Button.with_label (_("Add Export Style"));
+            add_css_button.hexpand = true;
+
+            add_css_button.clicked.connect (() => {
+                File new_css_pkg = Dialogs.display_open_dialog (".*");
+                if (new_css_pkg != null && new_css_pkg.query_exists ()) {
+                    FileManager.load_css_pkg (new_css_pkg);
+                    print_css_selector.refresh ();
+                    css_selector.refresh ();
+                }
+            });
+
             int g = 1;
 
             grid.attach (epub_metadata_file, 1, g, 1, 1);
@@ -179,18 +213,6 @@ namespace ThiefMD.Widgets {
 
             grid.attach (export_resolve_paths_switch, 1, g, 1, 1);
             grid.attach (export_resolve_paths_label, 2, g, 1, 1);
-            g++;
-
-            grid.attach (pdf_include_urls_switch, 1, g, 1, 1);
-            grid.attach (pdf_include_urls_label, 2, g, 2, 1);
-            g++;
-
-            grid.attach (pdf_include_urls_switch, 1, g, 1, 1);
-            grid.attach (pdf_include_urls_label, 2, g, 2, 1);
-            g++;
-
-            grid.attach (pdf_include_urls_switch, 1, g, 1, 1);
-            grid.attach (pdf_include_urls_label, 2, g, 2, 1);
             g++;
 
             grid.attach (page_setup_label, 1, g, 2, 1);
@@ -206,6 +228,21 @@ namespace ThiefMD.Widgets {
             g++;
             grid.attach (pagebreak_sheet_switch, 1, g, 1, 1);
             grid.attach (pagebreak_sheet_label, 2, g, 2, 1);
+            g++;
+            grid.attach (paper_size, 1, g, 2, 1);
+            g++;
+
+            grid.attach (print_css_label, 1, g, 2, 1);
+            g++;
+            grid.attach (print_css_selector, 1, g, 2, 2);
+            g += 2;
+
+            grid.attach (css_label, 1, g, 2, 1);
+            g++;
+            grid.attach (css_selector, 1, g, 2, 2);
+            g += 2;
+
+            grid.attach (add_css_button, 1, g, 2, 1);
             g++;
 
             grid.show_all ();
@@ -259,6 +296,20 @@ namespace ThiefMD.Widgets {
             var ui_colorscheme_label = new Label(_("Match UI to Editor Theme"));
             ui_colorscheme_label.xalign = 0;
 
+            var ui_writing_statistics_switch = new Switch ();
+            ui_writing_statistics_switch.set_active (settings.show_writing_statistics);
+            ui_writing_statistics_switch.notify["active"].connect (() => {
+                settings.show_writing_statistics = ui_writing_statistics_switch.get_active ();
+                if (settings.show_writing_statistics) {
+                    ThiefApp.get_instance ().stats_bar.show_statistics ();
+                } else {
+                    ThiefApp.get_instance ().stats_bar.hide_statistics ();
+                }
+            });
+            ui_writing_statistics_switch.tooltip_text = _("Toggle Writing Statistics");
+            var ui_writing_statistics_label = new Label(_("Show writing statistics"));
+            ui_writing_statistics_label.xalign = 0;
+
             var brandless_switch = new Switch ();
             brandless_switch.set_active (settings.brandless);
             brandless_switch.notify["active"].connect (() => {
@@ -288,6 +339,10 @@ namespace ThiefMD.Widgets {
 
             grid.attach (typewriter_switch, 1, g_row, 1, 1);
             grid.attach (typewriter_label, 2, g_row, 2, 1);
+            g_row++;
+
+            grid.attach (ui_writing_statistics_switch, 1, g_row, 1, 1);
+            grid.attach (ui_writing_statistics_label, 2, g_row, 2, 1);
             g_row++;
 
             grid.attach (ui_colorscheme_switch, 1, g_row, 1, 1);

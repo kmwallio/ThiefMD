@@ -38,18 +38,57 @@ namespace ThiefMD {
             "Pandoc Export:\n<a href='https://pandoc.org/'>Pandoc</a>\nCopyright © 2006-2020 John MacFarlane and others\n<a href='https://github.com/jgm/pandoc/blob/master/COPYRIGHT'>GNU General Public License v2.0</a>\n",
             "libwritegood-vala based on:\n<a href='https://github.com/btford/write-good'>write-good: Naive linter for English prose</a>\nCopyright © 2014-2019 Brian Ford\n<a href='https://github.com/btford/write-good/blob/master/LICENSE'>The MIT License (MIT)</a>\n",
           };
+
+        public const string[] PAPER_SIZES_FRIENDLY_NAME = {
+          "A3 (11.7 x 16.5 inches)",
+          "A4 (8 x 11 inches)",
+          "A5 (5.8 x 8.3 inches)",
+          "B5 (6.93 x 9.84 inches)",
+          "Executive (7 x 10 inches)",
+          "Legal (8.5 x 14 inches)",
+          "Letter (8.5 x 11 inches)"
+        };
+
+        public const string[] PAPER_SIZES_GTK_NAME = {
+          Gtk.PAPER_NAME_A3,
+          Gtk.PAPER_NAME_A4,
+          Gtk.PAPER_NAME_A5,
+          Gtk.PAPER_NAME_B5,
+          Gtk.PAPER_NAME_EXECUTIVE,
+          Gtk.PAPER_NAME_LEGAL,
+          Gtk.PAPER_NAME_LETTER
+        };
+
+        public const string[] THIEF_TIPS = {
+          "Don't like what you see? Hit `Ctrl+,` to access the preferences.",
+          "No built in dark mode? Dark themes are available at https://themes.thiefmd.com. Add more in the Preferences (`Ctrl+,`).",
+          "Don't like the preview? Hit `Ctrl+,` to access the preferences and click Export.",
+          "Want to import a ePub, HTML, or DocX? Add a folder to the library, then drag the file onto the folder.",
+          "Ready to publish your great work? Right-click on the folder and choose \"Export Preview\"",
+          "Want to block out the world? Full-screen is just an `F11` away.",
+          "Quickly switch view modes with `Ctrl+1`, `Ctrl+2`, and `Ctrl+3`."
+        };
+
         public const string PREVIEW_TEXT = """# %s
 The `markdown` editor worth stealing. *Focus* more on **writing**.
 > It's the best thing since sliced bread
 [ThiefMD](https://thiefmd.com)
 """;
+
+        public const string PREVIEW_CSS_MARKDOWN = """# %s
+The `markdown` editor worth stealing. *Focus* more on **writing**.
+## Users Say:
+> It's the best thing since sliced bread
+[ThiefMD](https://thiefmd.com)
+""";
+
         public const string DYNAMIC_CSS = """@define-color colorPrimary %s;
         @define-color colorPrimaryActive %s;
         @define-color textColorPrimary %s;
         @define-color textColorActive %s;
         @define-color textColorGlobal %s;
         
-        .thiefmd-toolbar {
+        .thiefmd-toolbar, .thief-search-box {
             border-bottom-color: transparent;
             border-bottom-width: 1px;
             background: @colorPrimary;
@@ -70,14 +109,19 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             border-right: 1px solid alpha(@textColorGlobal, 0.2);
         }
 
-        .thiefmd-toolbar button {
+        .thiefmd-toolbar button,
+        .thief-search-button,
+        .thief-search-matches {
           background: @colorPrimary;
           color: @textColorGlobal;
         }
 
         .thiefmd-toolbar button:active,
         .thiefmd-toolbar button:hover,
-        .thiefmd-toolbar button:hover:active {
+        .thiefmd-toolbar button:hover:active,
+        .thief-search-button:hover,
+        .thief-search-button:active,
+        .thief-search-button:hover:active {
           background: lighter(@colorPrimary);
           color: @textColorGlobal;
         }
@@ -97,9 +141,15 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             border-radius: 0;
         }
         
-        .thief-list-sheet-active {
+        .thief-list-sheet-active,
+        .thief-search-input {
             background: lighter(@colorPrimary);
             color: @textColorPrimary;
+        }
+
+        .thief-search-input:focus {
+          background: @colorPrimaryActive;
+          color: @textColorActive;
         }
 
         filechooser {
@@ -123,9 +173,27 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         }
         
         placessidebar *:selected, treeview.view:selected {
-            background: @colorPrimary;
+            background: lighter(@colorPrimary);
             color: @textColorGlobal;
         }""";
+
+        public const string NO_CSS_CSS = """
+        @media print {
+          tr,
+          img {
+            page-break-inside: avoid;
+            max-width: 100%;
+          }
+
+          img {
+            max-width: 100% !important;
+          }
+        }
+
+        img {
+          max-width: 100%;
+        }
+        """;
 
         public const string PRINT_CSS = """@media print {
             *,
@@ -136,55 +204,56 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
               box-shadow: none !important;
               text-shadow: none !important;
             }
-          
+
             a,
             a:visited {
               text-decoration: underline;
             }
-          
-            a[href]:after {
-              %s
-            }
-          
+
             abbr[title]:after {
               content: " (" attr(title) ")";
             }
-          
+
             a[href^="#"]:after,
             a[href^="javascript:"]:after {
               content: "";
             }
-          
+
             pre,
             blockquote {
               border: 1px solid #999;
               page-break-inside: avoid;
             }
-          
+
             thead {
               display: table-header-group;
             }
-          
+
             tr,
             img {
               page-break-inside: avoid;
+              max-width: 100%;
             }
-          
+
             img {
               max-width: 100% !important;
             }
-          
+
             p,
             h2,
             h3 {
               orphans: 3;
               widows: 3;
             }
-          
+
             h2,
             h3 {
               page-break-after: avoid;
             }
+          }
+
+          img {
+            max-width: 100%;
           }""";
     }
 }

@@ -37,6 +37,10 @@ Prefer [LaTeX](https://latex-project.org)? [TeXstudio](https://flathub.org/apps/
 
 [Foliate](https://flathub.org/apps/details/com.github.johnfactotum.Foliate) is a simple e-reader for Linux. With multiple viewing modes, you'll be sure to find the one that keeps you turning pages.
 
+## RSS
+
+[Feeds](https://flathub.org/apps/details/org.gabmus.gfeeds) is a simple and powerful RSS reader. Stay up to date with the news, or keep getting those daily writing tips and prompts. Feeds' clean and minimal interface will have you focused on your reading while you're not writing.
+
 ## Twitter
 
 [Cawbird](https://flathub.org/apps/details/uk.co.ibboard.cawbird) will help you stay up to date in the twitterverse. Share what your working on or just take a break.

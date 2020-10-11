@@ -10,6 +10,7 @@ ThiefMD is great for organizing your markdown documents. With the ability to dra
 - [Structuring Your Novel](#structuring-your-novel)
 - [Novel Metadata](#novel-metadata)
 - [Sharing your Work](#sharing-your-work)
+- [Importing Existing Work](#importing-existing-work)
 - [Getting in the Zone](#getting-in-the-zone)
 - [Writing on Multiple Devices](#writing-on-multiple-devices)
 
@@ -74,11 +75,11 @@ The metadata in `title-page.md` should look something like:
 ---
 title: My Great Novel
 author: My Name
-cover-image: /home/my-user/Pictures/cover.png
+cover-image: /images/cover.png
 ---
 ```
 
-During export, this will be embedded into the resulting ePub. The `cover-image` currently has to be the full path to your novel's cover image.
+During export, this will be embedded into the resulting ePub.
 
 <div class="responsive-center marcel"><img src="/images/epub-export.png" alt="Export Preview Window and resulting ePub" /></div>
 
@@ -108,7 +109,23 @@ ThiefMD will generate the output based on the filename. `my-great-work.pdf` will
 
 Things not looking quite as planned? In the Export Preferences `Ctrl + ,` you can tweak the results based on how you organized your library.
 
+Want more advanced control of how your book looks? [Export Styles](/tips/export-styles) requires a little CSS know-how to get your book looking great.
+
 <div style="clear: both"></div>
+
+## Importing Existing Work
+
+<div class="responsive-left-short marcel"><img src="/images/import-epub.png" /></div>
+
+Already working on something great? If it's a folder of Markdown files, just drag it into the Library.
+
+Coming from DocX, OPT, HTML, or something else? Made an ePUB and lost the source Markdown? Drag the file onto an existing folder in the Library, and if ThiefMD supports it, it will convert the file to Markdown.
+
+Files containing image assets (like DocX, OPT, or ePub) will have their images added to the library.
+
+You'll have to re-add your [novel's metadata](#novel-metadata), but it beats having to type the whole thing over again.
+
+<div class="clear"></div>
 
 ## Getting in the Zone
 

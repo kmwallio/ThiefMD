@@ -24,6 +24,7 @@ namespace ThiefMD.Controllers.UI {
     private bool _init = false;
     private bool _show_filename = false;
     private Gtk.CssProvider active_provider = null;
+    private Ultheme.HexColorPalette current_palette = null;
 
     //
     // Sheets Management
@@ -35,7 +36,9 @@ namespace ThiefMD.Controllers.UI {
         }
 
         if (preview_mutex.can_do_action ()) {
+            var settings = AppSettings.get_default ();
             Preview.get_instance ().update_html_view (true, SheetManager.get_markdown ());
+            settings.writing_changed ();
         }
     }
 
@@ -94,7 +97,7 @@ namespace ThiefMD.Controllers.UI {
             GLib.FileUtils.get_contents (file.get_path (), out old_text);
             string old_theme = Checksum.compute_for_string (ChecksumType.MD5, old_text);
 
-            return new_theme == old_theme;
+            return new_theme != old_theme;
         } catch (Error e) {
             return true;
         }
@@ -161,8 +164,10 @@ namespace ThiefMD.Controllers.UI {
     public void load_css_scheme () {
         var settings = AppSettings.get_default ();
         Ultheme.HexColorPalette palette;
+        bool set_scheme = false;
+
         debug ("Using %s", settings.custom_theme);
-        if (settings.ui_editor_theme && settings.theme_id != "thiefmd") {
+        if (settings.theme_id != "thiefmd") {
             string style_path = Path.build_filename (UserData.style_path, settings.custom_theme);
             File style = File.new_for_path (style_path);
             if (style.query_exists ()) {
@@ -174,28 +179,36 @@ namespace ThiefMD.Controllers.UI {
                         theme.get_light_theme_palette (out palette);
                     }
                     set_css_scheme (palette);
+                    set_scheme = true;
                 } catch (Error e) {
-                    warning ("Could not load previous style: %s", e.message);
+                    warning ("Could not load previous style (%s): %s", settings.custom_theme, e.message);
                 }
             }
         } else {
             reset_css ();
+            set_scheme = true;
+        }
+
+        if (settings.show_writing_statistics) {
+            ThiefApp.get_instance ().stats_bar.show_statistics ();
+        }
+
+        // Attempt to wait for app instance to be ready.
+        if (!set_scheme) {
+            Timeout.add (50, () => {
+                load_css_scheme ();
+                return false;
+            });
         }
     }
 
     public void clear_css () {
-        var settings = AppSettings.get_default ();
-
         if (active_provider != null) {
             Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), active_provider);
             active_provider = null;
         }
 
-        if (settings.theme_id == "thiefmd") {
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
-        } else {
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_mode;
-        }
+        set_dark_mode_based_on_colors ();
     }
 
     public void reset_css () {
@@ -210,16 +223,21 @@ namespace ThiefMD.Controllers.UI {
             Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), active_provider);
             active_provider = null;
         }
+
         var provider = new Gtk.CssProvider ();
         provider.load_from_resource ("/com/github/kmwallio/thiefmd/app-stylesheet.css");
         Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         active_provider = provider;
         Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
+        current_palette = null;
     }
 
     public void set_css_scheme (Ultheme.HexColorPalette palette) {
         var settings = AppSettings.get_default ();
+        current_palette = palette;
+        set_dark_mode_based_on_colors ();
         if (palette == null || !settings.ui_editor_theme) { 
+            clear_css ();
             return;
         }
 
@@ -239,20 +257,30 @@ namespace ThiefMD.Controllers.UI {
             var provider = new Gtk.CssProvider ();
             provider.load_from_data (new_css);
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-            bool use_dark = settings.dark_mode;
-
-            // Use hue to determine if the background is dark or light as some themes
-            // include 2 dark themes or 2 light themes
-            Clutter.Color color = Clutter.Color.from_string (palette.global.background);
-            float hue, lum, sat;
-            color.to_hls (out hue, out lum, out sat);
-            use_dark = (lum < 0.5);
-
-            // Set dark theme
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = use_dark;
             active_provider = provider;
         } catch (Error e) {
             warning ("Could not set dynamic css: %s", e.message);
+        }
+    }
+
+    private void set_dark_mode_based_on_colors () {
+        var settings = AppSettings.get_default ();
+
+        if (current_palette != null && settings.theme_id != "thiefmd") {
+            // Use luminance to determine if the background is dark or light as some themes
+            // include 2 dark themes or 2 light themes
+            Clutter.Color color = Clutter.Color.from_string (current_palette.global.background);
+            float hue, lum, sat;
+            color.to_hls (out hue, out lum, out sat);
+
+            // Set dark theme
+            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = (lum < 0.5);
+        } else {
+            if (settings.theme_id != "thiefmd") {
+                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_mode;
+            } else {
+                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
+            }
         }
     }
 
@@ -267,7 +295,7 @@ namespace ThiefMD.Controllers.UI {
             string custom_languages = Path.build_path (
                 Path.DIR_SEPARATOR_S,
                 Build.PKGDATADIR,
-                "gtksourceview-3.0",
+                "gtksourceview-4",
                 "language-specs");
             string[] language_paths = {
                 custom_languages

@@ -18,6 +18,48 @@
  */
 
 namespace ThiefMD {
+    errordomain ThiefError {
+        FILE_NOT_FOUND,
+        FILE_NOT_VALID_ARCHIVE,
+        FILE_NOT_VALID_THEME
+    }
+
+    public string make_title (string text) {
+        string current_title = text.replace ("_", " ");
+        current_title = current_title.replace ("-", " ");
+        string [] parts = current_title.split (" ");
+        if (parts != null && parts.length != 0) {
+            current_title = "";
+            foreach (var part in parts) {
+                part = part.substring (0, 1).up () + part.substring (1).down ();
+                current_title += part + " ";
+            }
+            current_title = current_title.chomp ();
+        }
+
+        return current_title;
+    }
+
+    public string get_base_library_path (string path) {
+        var settings = AppSettings.get_default ();
+        if (path == null) {
+            return "No file opened";
+        }
+        string res = path;
+        foreach (var base_lib in settings.library ()) {
+            if (res.has_prefix (base_lib)) {
+                File f = File.new_for_path (base_lib);
+                string base_chop = f.get_parent ().get_path ();
+                res = res.substring (base_chop.length);
+                if (res.has_prefix ("/")) {
+                    res = res.substring (1);
+                }
+            }
+        }
+
+        return res;
+    }
+
     public class TimedMutex {
         private bool can_action;
         private Mutex droptex;

@@ -22,6 +22,8 @@ title: Shortcuts
 * `Ctrl + S` - Force Save
 * `Ctrl + N` - New Sheet
 * `Ctrl + Shift + P` - Launch Preview
+* `Ctrl + F` - Search Current File
+* `Ctrl + Shift + F` - Search Entire Library
 
 # Formatting
 

@@ -25,7 +25,6 @@ namespace ThiefMD.Widgets {
         private static Headerbar? instance = null;
 
         private Gtk.Button change_view_button;
-        private Gtk.Button search_button;
         private Gtk.Button add_library_button;
         private Gtk.MenuButton new_sheet;
         private Gtk.MenuButton menu_button;
@@ -116,7 +115,12 @@ namespace ThiefMD.Widgets {
                 if (settings.show_filename && settings.last_file != "") {
                     string file_name = settings.last_file.substring(settings.last_file.last_index_of("/") + 1);
                     set_title ("ThiefMD");
-                    set_subtitle (file_name);
+                    File lf = File.new_for_path (settings.last_file);
+                    if (lf.query_exists ()) {
+                        set_subtitle (file_name);
+                    } else {
+                        set_subtitle ("");
+                    }
                 } else {
                     set_title ("ThiefMD");
                     set_subtitle ("");

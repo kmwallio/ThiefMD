@@ -30,6 +30,8 @@ namespace ThiefMD {
         public Gtk.Paned sheets_pane;
         public Gtk.Paned library_pane;
         public Gtk.ScrolledWindow library_view;
+        public SearchBar search_bar;
+        public StatisticsBar stats_bar;
         public bool ready = false;
 
         public ThiefApp () {
@@ -75,18 +77,22 @@ namespace ThiefMD {
             var settings = AppSettings.get_default ();
 
             string start_dir = "";
+            settings.validate_library ();
+            if (settings.library_list == "") {
+                settings.last_file = "";
+                start_dir = "";
+            } else {
+                if (!settings.page_in_library (settings.last_file)) {
+                    settings.last_file = "";
+                }
+            }
+
             if (settings.last_file != "") {
                 start_dir = settings.last_file.substring(0, settings.last_file.last_index_of("/"));
                 debug ("Starting with %s\n", start_dir);
             }
 
-            if (settings.library_list == "") {
-                settings.last_file = "";
-                start_dir = "";
-            }
-
             main_window = new Gtk.ApplicationWindow (this);
-            SheetManager.init ();
 
             // Attempt to set taskbar icon
             try {
@@ -111,7 +117,11 @@ namespace ThiefMD {
             }
 
             toolbar = Headerbar.get_instance ();
+            // Have to init search bar before sheet manager
+            search_bar = new SearchBar ();
+            SheetManager.init ();
             library = new Library ();
+
             sheets_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             library_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             library_view = new Gtk.ScrolledWindow (null, null);
@@ -135,8 +145,13 @@ namespace ThiefMD {
             main_window.set_titlebar (toolbar);
             debug ("Window (%d, %d)\n", settings.window_width, settings.window_height);
 
+            var vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            vbox.add (sheets_pane);
+            stats_bar = new StatisticsBar ();
+            vbox.add (stats_bar);
+
             main_window.set_default_size (settings.window_width, settings.window_height);
-            main_window.add (sheets_pane);
+            main_window.add (vbox);
             main_window.hide_titlebar_when_maximized = false;
             is_fullscreen = settings.fullscreen;
 
@@ -147,8 +162,6 @@ namespace ThiefMD {
             new KeyBindings (main_window);
 
             UserData.create_data_directories ();
-
-            ready = true;
             main_window.show_all ();
 
             // Restore preview view
@@ -162,6 +175,9 @@ namespace ThiefMD {
             shutdown.connect (() => {
                 SheetManager.save_active ();
             });
+
+            // Go go go!
+            ready = true;
         }
 
         public static ThiefApp get_instance () {

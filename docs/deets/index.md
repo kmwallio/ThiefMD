@@ -20,9 +20,11 @@ Some of our favorites:
 
 `Ctrl + Shift + P` and see your markdown rendered instantly. Live preview updates as you type.
 
-Relative paths? Absolute paths? Don't worry, ThiefMD will find the image you're looking for.
+Relative paths? Absolute paths? Don't worry, ThiefMD finds the images you're looking for.
 
 A separate window lets allows for better positioning, or multi-monitor support. Focus on your writing, or focus on your reading.
+
+Customize the results with [Export Styles](/tips/export-styles). Just a little CSS, and you can see how the results will look on your blog, PDF, or ePUB. [See what people have shared](https://themes.thiefmd.com/export-css).
 
 <div class="clear"></div>
 
@@ -75,9 +77,9 @@ No longer look for where you're typing keep your eye muscles on what matters mos
 
 Use [Jekyll](https://jekyllrb.com), [Hugo](https://gohugo.io), or another [Static Site Generator](https://www.staticgen.com/)?
 
-ThiefMD will surface the [front matter](https://jekyllrb.com/docs/front-matter) in the Folder View using minimark.
+ThiefMD surfaces the [front matter](https://jekyllrb.com/docs/front-matter) in the Folder View using minimark.
 
-Live preview will also render any `title:` making your post look like art.
+Live preview also rendera any `title:` making your post look like art.
 
 Our [export logic](/tips/novel-writing#novel-metadata) also understands [whatever metadata you may throw at it](https://pandoc.org/MANUAL.html#epub-metadata).
 
@@ -93,7 +95,7 @@ Use [KaTeX](https://katex.org) to render Math Equations in Previews.
 
 This requires libmarkdown 2.2.0 or greater. Using [flatpak](https://flathub.org/apps/details/com.github.kmwallio.thiefmd) will let ThiefMD use the latest and greatest versions of its dependencies. Ubuntu 20.04 won't have Math Previews, but Fedora 32+ and Ubuntu 20.10 will.
 
-Although the preview may look a little too mathemagical, [LaTeX](https://www.latex-project.org) export will have you looking professional.
+For more power, [LaTeX](https://www.latex-project.org) export will have you looking professional.
 
 Export and finalize your work in [TeXstudio](https://flathub.org/apps/details/org.texstudio.TeXstudio), [Setzer](https://flathub.org/apps/details/org.cvfosammmm.Setzer), or your favorite LaTeX editor.
 
@@ -113,9 +115,23 @@ I guess it's true what they say: the magic was inside ThiefMD all along.
 
 <div class="clear"></div>
 
+## Import from almost Anywhere
+
+<div class="responsive-left-short marcel"><img src="/images/import-epub.png" /></div>
+
+Already started your work in [LibreOffice Writer](https://www.libreoffice.org/discover/writer)? Published your ePUB but need to make some changes? ThiefMD has your back.
+
+Whether you're stealing something from the Public Domain or improving your own work, ThiefMD won't judge you. ThiefMD will assist you.
+
+DocX, Odt, HTML, and other file acronyms can be dragged into the Library. Watch in wonder as they convert to Markdown under the covers.
+
+Once you've made your changes, feel free to export them back. Or even [export them to something else](/tips/novel-writing#sharing-your-work).
+
+<div class="clear"></div>
+
 ## Theme Support
 
-<div class="responsive-left jonas"><img src="/images/theme_preferences.png" alt="ThiefMD skinned in various vibrant colors" /></div>
+<div class="responsive-right jonas"><img src="/images/theme_preferences.png" alt="ThiefMD skinned in various vibrant colors" /></div>
 
 Light Theme, Dark Theme, Pink or Blue, make ThiefMD unique to you.
 
@@ -129,7 +145,35 @@ Get immersed and match the whole UI or keep the colors for your words.
 
 Discover more themes at [https://themes.thiefmd.com](https://themes.thiefmd.com) or [make your own](https://themes.thiefmd.com/howto) from scratch.
 
-<div style="clear: both;"></div>
+<div class="clear"></div>
+
+## Super Fast Search
+
+<div class="responsive-left jonas"><img src="/images/thief_search.png" alt="ThiefMD showing library search and highlighting in current file" /></div>
+
+Whether you know where you're looking or what you're looking for, ThiefMD will help you get there.
+
+`Ctrl+F` to search the current file.
+
+`Ctrl+Shift+F` searches your entire library.
+
+Get lost in your writing and find your way back to wherever you need to go, all within ThiefMD.
+
+<div class="clear"></div>
+
+## Writing Statistics
+
+<div class="responsive-right marcel"><img src="/images/writing_statistics.png" alt="ThiefMD tracking statistics for a whole project and an individual chapter" /></div>
+
+Working on [NaNoWriMo](https://nanowrimo.org)? Making sure you hit your book report's word count? Trying to make progress on a chapter?
+
+Keep track of it all with Writing Statistics. Turn it on or off in the preferences.
+
+Right-click on a Library Item to pop out a window tracking a project or chapter. Or enable the status bar for tracking the file you're working on.
+
+Currently key bound to `Ctrl+Shift+S` until we can think of something better.
+
+<div class="clear"></div>
 
 ***
 

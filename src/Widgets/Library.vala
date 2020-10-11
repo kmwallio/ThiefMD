@@ -218,6 +218,13 @@ namespace ThiefMD.Widgets {
             return false;
         }
 
+        public void refresh_dir (Sheets sheet_dir) {
+            LibPair? p = get_item (sheet_dir.get_sheets_path ());
+            if (p != null) {
+                parse_dir (sheet_dir, sheet_dir.get_sheets_path (), p._iter);
+            }
+        }
+
         private void parse_dir (Sheets sheet_dir, string str_dir, TreeIter iter) {
             try {
                 // Create child iter
@@ -265,12 +272,66 @@ namespace ThiefMD.Widgets {
         public bool file_in_library (string file_path) {
             foreach (LibPair p in _all_sheets)
             {
-                if (file_path.has_prefix (p._path))
+                if (file_path.down ().has_prefix (p._path.down ()))
                 {
                     return true;
                 }
             }
             return false;
+        }
+
+        public Sheet? find_sheet_for_path (string file_path) {
+            int len = 0;
+            Sheets? parent = null;
+            foreach (LibPair p in _all_sheets)
+            {
+                if (file_path.down ().has_prefix (p._path.down ()))
+                {
+                    if (p._path.length > len) {
+                        len = p._path.length;
+                        parent = p._sheets;
+                    }
+                }
+            }
+            
+            if (parent != null) {
+                foreach (var potential in parent.get_sheets ()) {
+                    if (potential.file_path () == file_path) {
+                        return potential;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public int get_word_count_for_path (string path) {
+            int wc = 0;
+            LibPair? p = get_item (path);
+            if (p != null) {
+                foreach (var file in p._sheets.get_sheets ()) {
+                    wc += file.get_word_count ();
+                }
+
+                foreach (var folder in p._sheets.metadata.folder_order) {
+                    string next_path = Path.build_filename (p._path, folder);
+                    if (FileUtils.test (next_path, FileTest.IS_DIR) && !FileUtils.test (next_path, FileTest.IS_SYMLINK)) {
+                        wc += get_word_count_for_path (next_path);
+                    }
+                }
+            }
+
+            return wc;
+        }
+
+        public string get_novel (string path) {
+            var settings = AppSettings.get_default ();
+            string novel = "";
+            LibPair? p = get_item (path);
+            if (p != null) {
+                novel = build_novel (p, settings.export_include_metadata_file);
+            }
+            return novel;
         }
 
         private string build_novel (LibPair p, bool metadata = false) {
@@ -318,6 +379,14 @@ namespace ThiefMD.Widgets {
             return markdown.str;
         }
 
+        public Gee.ArrayList<Sheets> get_all_sheets () {
+            Gee.ArrayList<Sheets> all_sheets = new Gee.ArrayList<Sheets> ();
+            foreach (var p in _all_sheets) {
+                all_sheets.add (p._sheets);
+            }
+            return all_sheets;
+        }
+
         //
         // Mouse Click Actions
         //
@@ -338,6 +407,16 @@ namespace ThiefMD.Widgets {
                     }
                 });
                 menu.add (menu_preview_item);
+
+                Gtk.MenuItem menu_writing_stats = new Gtk.MenuItem.with_label (_("Writing Statistics"));
+                menu_writing_stats.activate.connect (() => {
+                    if (_selected != null && _all_sheets.find (_selected) != null) {
+                        ProjectStatitics project_stat_window = new ProjectStatitics (_selected._path);
+                        project_stat_window.show_all ();
+                        project_stat_window.update_wordcount ();
+                    }
+                });
+                menu.add (menu_writing_stats);
 
                 menu.add (new Gtk.SeparatorMenuItem ());
 
@@ -363,6 +442,10 @@ namespace ThiefMD.Widgets {
                         TreeIter hide_node = _selected_node;
                         if (_selected != null && _all_sheets.find (_selected) != null) {
                             debug ("Hiding %s", _selected._path);
+                            _selected._sheets.close_active_files ();
+                            if (SheetManager._current_sheets == _selected._sheets) {
+                                SheetManager.set_sheets (null);
+                            }
                             LibPair? parent = get_item (_selected._sheets.get_parent_sheets_path ());
                             if (parent != null) {
                                 parent._sheets.add_hidden_item (_selected._path);
@@ -371,6 +454,7 @@ namespace ThiefMD.Widgets {
                             remove_children (_selected._path);
                             _all_sheets.remove (_selected);
                             _lib_store.remove (ref hide_node);
+                            settings.writing_changed ();
                         }
                     });
 
@@ -383,6 +467,7 @@ namespace ThiefMD.Widgets {
                         _selected._sheets.remove_hidden_items ();
                         parse_dir (_selected._sheets, _selected._path, _selected_node);
                     }
+                    settings.writing_changed ();
                 });
                 menu.add (menu_reveal_items);
 
@@ -394,11 +479,16 @@ namespace ThiefMD.Widgets {
                         TreeIter remove_node = _selected_node;
                         if (_selected != null && _all_sheets.find (_selected) != null) {
                             debug ("Removing %s", _selected._path);
+                            _selected._sheets.close_active_files ();
+                            if (SheetManager._current_sheets == _selected._sheets) {
+                                SheetManager.set_sheets (null);
+                            }
                             // Always touch lib store last as it changes selection
                             remove_children (_selected._path);
                             _all_sheets.remove (_selected);
                             settings.remove_from_library (_selected._path);
                             _lib_store.remove (ref remove_node);
+                            settings.writing_changed ();
                         }
                     });
                     menu.add (menu_remove_item);
@@ -604,47 +694,59 @@ namespace ThiefMD.Widgets {
                     }
                     else
                     {
-                        debug ("Prompting for action");
-                        Dialog prompt = new Dialog.with_buttons (
-                            "Move into Library",
-                            ThiefApp.get_instance ().main_window,
-                            DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                            _("Copy"),
-                            Gtk.ResponseType.NO,
-                            _("Move"),
-                            Gtk.ResponseType.YES);
+                        // Requires path to drag to
+                        if (p == null) {
+                            Gtk.drag_finish (context, false, false, time);
+                            return;
+                        }
 
-                        prompt.response.connect((response_id) =>
-                        {
-                            prompt.close();
-                            if (response_id == Gtk.ResponseType.NO)
-                            {
-                                try
-                                {
-                                    debug ("Copying %s to %s", file_to_move, p._path);
-                                    FileManager.copy_item (file_to_move, p._path);
-                                }
-                                catch (Error e)
-                                {
-                                    warning ("Hit failure trying to move item in library: %s", e.message);
-                                }
-                            }
-                            else if (response_id == Gtk.ResponseType.YES)
-                            {
-                                try
-                                {
-                                    debug ("Moving %s to %s", file_to_move, p._path);
-                                    FileManager.move_item (file_to_move, p._path);
-                                }
-                                catch (Error e)
-                                {
-                                    warning ("Hit failure trying to move item in library: %s", e.message);
-                                }
-                            }
-                            refresh_sheets (p._path);
-                        });
+                        if (file_to_move.has_suffix (".md") || file_to_move.has_suffix (".markdown")) {
+                            debug ("Prompting for action");
+                            Dialog prompt = new Dialog.with_buttons (
+                                "Move into Library",
+                                ThiefApp.get_instance ().main_window,
+                                DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                _("Copy"),
+                                Gtk.ResponseType.NO,
+                                _("Move"),
+                                Gtk.ResponseType.YES);
 
-                        prompt.show_all ();
+                            prompt.response.connect((response_id) =>
+                            {
+                                prompt.close();
+                                if (response_id == Gtk.ResponseType.NO)
+                                {
+                                    try
+                                    {
+                                        debug ("Copying %s to %s", file_to_move, p._path);
+                                        FileManager.copy_item (file_to_move, p._path);
+                                    }
+                                    catch (Error e)
+                                    {
+                                        warning ("Hit failure trying to move item in library: %s", e.message);
+                                    }
+                                }
+                                else if (response_id == Gtk.ResponseType.YES)
+                                {
+                                    try
+                                    {
+                                        debug ("Moving %s to %s", file_to_move, p._path);
+                                        FileManager.move_item (file_to_move, p._path);
+                                    }
+                                    catch (Error e)
+                                    {
+                                        warning ("Hit failure trying to move item in library: %s", e.message);
+                                    }
+                                }
+                                refresh_sheets (p._path);
+                            });
+
+                            prompt.show_all ();
+                        } else {
+                            debug ("Importing file");
+                            FileManager.import_file (file.get_path (), p._sheets);
+                            parse_dir (_selected._sheets, _selected._path, _selected_node);
+                        }
                     }
                 }
                 else
@@ -656,6 +758,12 @@ namespace ThiefMD.Widgets {
             // Default behavior
             if (dnd_success)
             {
+                // Requires path to drag to
+                if (p == null) {
+                    Gtk.drag_finish (context, false, false, time);
+                    return;
+                }
+
                 try
                 {
                     debug ("Moving %s to %s", file_to_move, p._path);

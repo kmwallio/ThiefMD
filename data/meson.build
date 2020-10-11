@@ -24,12 +24,12 @@ install_data(
 
 install_data(
     join_paths('schemes', 'thiefmd.xml'),
-    install_dir: join_paths(get_option('datadir'), 'gtksourceview-3.0', 'styles')
+    install_dir: join_paths(get_option('datadir'), 'gtksourceview-4', 'styles')
 )
 
 install_subdir(
     join_paths('language-specs'),
-    install_dir: join_paths(get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'gtksourceview-3.0')
+    install_dir: join_paths(get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'gtksourceview-4')
 )
 
 
