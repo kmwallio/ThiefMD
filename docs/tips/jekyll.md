@@ -63,7 +63,10 @@ Sorting by descending will have newer posts at the top, but any new post will be
 
 <div class="marcel"><img src="/images/gitg_post.png" alt="gitg application screenshot of committing a post" /></div>
 
-[gitg](https://wiki.gnome.org/Apps/Gitg/) is a free and useful tool for managing git repositories and committing your posts. [Sublime Merge](https://www.sublimemerge.com) offers more power and features but has too many features if you're just blogging. [Learn X in Y Minutes](https://learnxinyminutes.com/docs/git) has a great git write for the command line.
+[gitg](https://wiki.gnome.org/Apps/Gitg/) is a free and useful tool for managing git repositories and committing your posts[^fn-gitg-flathub]. [Sublime Merge](https://www.sublimemerge.com) offers more power and features but has too many features if you're just blogging[^fn-sublime-merge-flathub]. [Learn X in Y Minutes](https://learnxinyminutes.com/docs/git) has a great git write for the command line.
+
+[^fn-gitg-flathub]: gitg is available on [flathub](https://flathub.org/apps/details/org.gnome.gitg).
+[^fn-sublime-merge-flathub]: Sublime Merge is available on [flathub](https://flathub.org/apps/details/com.sublimemerge.App)
 
 <div class="responsive-right-short hoffman"><img src="/images/gitg_push.png" alt="Application screenshot showing gitg's push feature" /></div>
 
