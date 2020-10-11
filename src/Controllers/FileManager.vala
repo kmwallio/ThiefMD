@@ -426,11 +426,16 @@ namespace ThiefMD.Controllers.FileManager {
 
             while (valid_frontmatter) {
                 next_newline = buffer.index_of_char('\n', last_newline + 1);
-                if (next_newline == -1) {
+                if (next_newline == -1 && !((buffer.length > last_newline + 1) && buffer.substring (last_newline + 1).has_prefix("---"))) {
                     valid_frontmatter = false;
                     break;
                 }
-                line = buffer[last_newline+1:next_newline];
+
+                if (next_newline == -1) {
+                    line = buffer.substring (last_newline + 1);
+                } else {
+                    line = buffer[last_newline+1:next_newline];
+                }
                 line = line.replace (ThiefProperties.THIEF_MARK_CONST, "");
                 last_newline = next_newline;
 
