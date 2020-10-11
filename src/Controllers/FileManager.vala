@@ -353,6 +353,40 @@ namespace ThiefMD.Controllers.FileManager {
         return file_contents;
     }
 
+    public int get_word_count (string file_path) {
+        string markdown = get_yamlless_markdown (get_file_contents (file_path), 0, true, true, false);
+
+        // This is for an approximate word count, not trying to be secure or anything...
+        try {
+            Regex style = new Regex ("<style\\b[^<]*(?:(?!<\\/style>)<[^<]*)*<\\/style>", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex script = new Regex ("<script\\b[^<]*(?:(?!<\\/script>)<[^<]*)*<\\/script>", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex random_tags = new Regex ("<\\/?(div|p|script|img|td|tr|table|small|u|b|strong|em|sup|sub|span)[^>]*>", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex words = new Regex ("\\s+\\n*", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+
+            markdown = style.replace (markdown, markdown.length, 0, " ");
+            markdown = script.replace (markdown, markdown.length, 0, " ");
+            markdown = random_tags.replace (markdown, markdown.length, 0, " ");
+            markdown = markdown.replace ("*", "").replace ("#", "").replace (">", "").replace ("|", "").replace ("-", "").replace ("_", "");
+            markdown = words.replace (markdown, markdown.length, 0, " ");
+            markdown = markdown.chomp ().chug ();
+
+            return words.split (markdown, RegexMatchFlags.NOTEMPTY | RegexMatchFlags.NOTEMPTY_ATSTART | RegexMatchFlags.NEWLINE_ANY).length;
+        } catch (Error e) {
+            warning ("Could not get accurate count: %s", e.message);
+        }
+
+        return 0;
+    }
+
+    public bool get_parsed_markdown (string raw_mk, out string processed_mk) {
+        var settings = AppSettings.get_default ();
+        var mkd = new Markdown.Document.from_gfm_string (raw_mk.data, 0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x04000000 + 0x00400000 + 0x10000000 + 0x40000000);
+        mkd.compile (0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x00400000 + 0x04000000 + 0x40000000 + 0x10000000);
+        mkd.get_document (out processed_mk);
+
+        return (processed_mk.chomp () != "");
+    }
+
     public string get_yamlless_markdown (string markdown, int lines, bool non_empty = true, bool include_title = true, bool include_date = true)
     {
         string buffer = markdown;

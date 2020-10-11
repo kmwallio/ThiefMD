@@ -61,6 +61,10 @@ namespace ThiefMD {
         public const string DATA_SCHEMES = "schemes";
         public const string DATA_CSS = "css";
 
+        // Reading Statistics
+        public const int WORDS_PER_MINUTE = 200;
+        public const int WORDS_PER_SECOND = WORDS_PER_MINUTE / 60;
+
         // Arbitrary strings
         public const string FIRST_USE = """# Click on a sheet to get started
 
@@ -107,6 +111,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public string preview_css { get; set; }
         public string print_css { get; set; }
         public string export_paper_size { get; set; }
+        public bool show_writing_statistics { get; set; }
 
         private bool writegood_enabled = false;
         public bool writegood {
@@ -229,6 +234,8 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
 
         public signal void changed ();
 
+        public signal void writing_changed ();
+
         private AppSettings () {
             preview_css = "";
             print_css = "";
@@ -267,6 +274,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("preview-css", this, "preview_css", SettingsBindFlags.DEFAULT);
             app_settings.bind ("print-css", this, "print_css", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-paper-size", this, "export_paper_size", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("show-writing-statistics", this, "show_writing_statistics", SettingsBindFlags.DEFAULT);
 
             app_settings.changed.connect (() => {
                 changed ();

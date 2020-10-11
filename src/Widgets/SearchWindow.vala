@@ -96,10 +96,6 @@ namespace ThiefMD.Widgets {
             displayed = new Gee.LinkedList<SearchDisplay> ();
             build_ui ();
             one_click = new TimedMutex (750);
-
-            destroy.connect (() => {
-                searching = false;
-            });
         }
 
         private void build_ui () {
@@ -202,17 +198,7 @@ namespace ThiefMD.Widgets {
                         dis.file_path = res.file_path;
                         dis.search_term = res.search_term;
                         dis.result = new Gtk.Button ();
-                        string lib_path = "";
-                        foreach (var base_lib in settings.library ()) {
-                            if (res.file_path.has_prefix (base_lib)) {
-                                File f = File.new_for_path (base_lib);
-                                string base_chop = f.get_parent ().get_path ();
-                                lib_path = res.file_path.substring (base_chop.length);
-                                if (lib_path.has_prefix ("/")) {
-                                    lib_path = lib_path.substring (1);
-                                }
-                            }
-                        }
+                        string lib_path = get_base_library_path (res.file_path);
                         if (lib_path == "") {
                             lib_path = res.file_path;
                         }

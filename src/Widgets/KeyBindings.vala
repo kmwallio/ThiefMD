@@ -94,6 +94,13 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
+                // Toggle statistics bar
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.s, keycode)) {
+                        ThiefApp.get_instance ().stats_bar.toggle_statistics ();
+                    }
+                }
+
                 // Preferences
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                     if (match_keycode (Gdk.Key.comma, keycode)) {

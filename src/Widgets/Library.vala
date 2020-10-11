@@ -305,6 +305,35 @@ namespace ThiefMD.Widgets {
             return null;
         }
 
+        public int get_word_count_for_path (string path) {
+            int wc = 0;
+            LibPair? p = get_item (path);
+            if (p != null) {
+                foreach (var file in p._sheets.get_sheets ()) {
+                    wc += file.get_word_count ();
+                }
+
+                foreach (var folder in p._sheets.metadata.folder_order) {
+                    string next_path = Path.build_filename (p._path, folder);
+                    if (FileUtils.test (next_path, FileTest.IS_DIR) && !FileUtils.test (next_path, FileTest.IS_SYMLINK)) {
+                        wc += get_word_count_for_path (next_path);
+                    }
+                }
+            }
+
+            return wc;
+        }
+
+        public string get_novel (string path) {
+            var settings = AppSettings.get_default ();
+            string novel = "";
+            LibPair? p = get_item (path);
+            if (p != null) {
+                novel = build_novel (p, settings.export_include_metadata_file);
+            }
+            return novel;
+        }
+
         private string build_novel (LibPair p, bool metadata = false) {
             StringBuilder markdown = new StringBuilder ();
             var settings = AppSettings.get_default ();
@@ -378,6 +407,16 @@ namespace ThiefMD.Widgets {
                     }
                 });
                 menu.add (menu_preview_item);
+
+                Gtk.MenuItem menu_writing_stats = new Gtk.MenuItem.with_label (_("Writing Statistics"));
+                menu_writing_stats.activate.connect (() => {
+                    if (_selected != null && _all_sheets.find (_selected) != null) {
+                        ProjectStatitics project_stat_window = new ProjectStatitics (_selected._path);
+                        project_stat_window.show_all ();
+                        project_stat_window.update_wordcount ();
+                    }
+                });
+                menu.add (menu_writing_stats);
 
                 menu.add (new Gtk.SeparatorMenuItem ());
 
