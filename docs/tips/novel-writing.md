@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Novel Writing
+thieftags: #novel-writing, #markdown
 ---
 
 ThiefMD is great for organizing your markdown documents. With the ability to drag and drop to organize the order of your library, then export your work with a few clicks, ThiefMD can make compiling an epic story into a tiny task.

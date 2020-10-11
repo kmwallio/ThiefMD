@@ -20,3 +20,7 @@ title: Tips and Tricks
 ## Novel Writers
 
 * [ThiefMD for Novel Writing](/tips/novel-writing)
+
+## Tricks
+
+* [Searching and Tags](/tips/searching-and-tags)

@@ -166,9 +166,18 @@ namespace ThiefMD.Widgets {
         }
 
         public void live_reload () {
+            if (active_search_term != search.text) {
+                active_search_term = search.text;
+            }
+
+            if (active_search_term == null || active_search_term.chomp ().chug () == "") {
+                return;
+            }
+
             if (!start_search.trylock ()) {
                 return;
             }
+
             if (!searching) {
                 if (ui_remove.trylock ()) {
                     if (ui_update.trylock ()) {

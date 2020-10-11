@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Linux Writing Tools
+thieftags: #novel-writing
 ---
 
 # Linux Writing Tools
