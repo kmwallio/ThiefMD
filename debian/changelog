@@ -1,4 +1,4 @@
-com.github.kmwallio.thiefmd (0.0.13) focal; urgency=low
+com.github.kmwallio.thiefmd (0.1.0) focal; urgency=low
 
   * Import DocX, ePUB, HTML, and more, just drag the file onto a library folder
   * New Export Tool, change CSS, Page Size, and more
