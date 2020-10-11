@@ -48,7 +48,7 @@ namespace ThiefMD {
                 file_to_parse = (string) selection_data.get_data();
             break;
             default:
-                print ("Invalid data type\n");
+                warning ("Invalid data type");
             break;
         }
 
