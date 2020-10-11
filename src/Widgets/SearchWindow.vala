@@ -76,8 +76,8 @@ namespace ThiefMD.Widgets {
 
     public class SearchWindow : Gtk.Window {
         Gtk.HeaderBar headerbar;
-        public Gee.LinkedList<SearchResult> results;
-        Gee.LinkedList<SearchDisplay> displayed;
+        public Gee.ConcurrentList<SearchResult> results;
+        Gee.ConcurrentList<SearchDisplay> displayed;
         Gtk.Entry search;
         string active_search_term;
         Mutex ui_update;
@@ -92,8 +92,8 @@ namespace ThiefMD.Widgets {
             ui_update = Mutex ();
             ui_remove = Mutex ();
             thread_update = Mutex ();
-            results = new Gee.LinkedList<SearchResult> ();
-            displayed = new Gee.LinkedList<SearchDisplay> ();
+            results = new Gee.ConcurrentList<SearchResult> ();
+            displayed = new Gee.ConcurrentList<SearchDisplay> ();
             build_ui ();
             one_click = new TimedMutex (750);
         }
@@ -195,7 +195,7 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             if (ui_update.trylock ()) {
                 while (!results.is_empty) {
-                    SearchResult res = results.poll ();
+                    SearchResult res = results.remove_at (0);
                     if (res.search_term == active_search_term) {
                         SearchDisplay dis = new SearchDisplay ();
                         dis.file_path = res.file_path;
