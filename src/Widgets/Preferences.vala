@@ -25,18 +25,20 @@ using Gdk;
 namespace ThiefMD.Widgets {
     public class Preferences : Dialog {
         private Stack stack;
+        private Gtk.HeaderBar bar;
 
         public Preferences () {
             set_transient_for (ThiefApp.get_instance ().main_window);
-            resizable = false;
-            deletable = false;
+            resizable = true;
+            deletable = true;
             modal = true;
             build_ui ();
         }
 
         private void build_ui () {
+            add_headerbar ();
             this.set_border_width (20);
-            title = _("Preferences");
+            title = "";
             window_position = WindowPosition.CENTER;
 
             stack = new Stack ();
@@ -50,7 +52,8 @@ namespace ThiefMD.Widgets {
 
             Box box = new Box (Orientation.VERTICAL, 0);
 
-            box.add (switcher);
+            bar.set_custom_title (switcher);
+            // box.add (switcher);
             box.add (stack);
             this.get_content_area().add (box);
 
@@ -78,10 +81,15 @@ namespace ThiefMD.Widgets {
             return grid;
         }
 
-        private Grid export_grid () {
+        private Widget export_grid () {
             var settings = AppSettings.get_default ();
+            var export_scroller = new ScrolledWindow (null, null);
+            export_scroller.hexpand = true;
+            export_scroller.vexpand = true;
+            export_scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+
             Grid grid = new Grid ();
-            grid.margin = 12;
+            grid.margin = 0;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
             grid.orientation = Orientation.VERTICAL;
@@ -104,7 +112,7 @@ namespace ThiefMD.Widgets {
                 settings.export_resolve_paths = export_resolve_paths_switch.get_active ();
             });
             export_resolve_paths_switch.tooltip_text = _("Resolve full paths to resources");
-            var export_resolve_paths_label = new Label(_("Resolve full paths to resources on export (ePub, docx required)"));
+            var export_resolve_paths_label = new Label(_("Resolve full paths to resources on export"));
             export_resolve_paths_label.xalign = 0;
             export_resolve_paths_label.hexpand = true;
 
@@ -232,22 +240,23 @@ namespace ThiefMD.Widgets {
             grid.attach (paper_size, 1, g, 2, 1);
             g++;
 
-            grid.attach (print_css_label, 1, g, 2, 1);
+            grid.attach (print_css_label, 1, g, 3, 1);
             g++;
-            grid.attach (print_css_selector, 1, g, 2, 2);
+            grid.attach (print_css_selector, 1, g, 3, 2);
             g += 2;
 
-            grid.attach (css_label, 1, g, 2, 1);
+            grid.attach (css_label, 1, g, 3, 1);
             g++;
-            grid.attach (css_selector, 1, g, 2, 2);
+            grid.attach (css_selector, 1, g, 3, 2);
             g += 2;
 
-            grid.attach (add_css_button, 1, g, 2, 1);
+            grid.attach (add_css_button, 1, g, 3, 1);
             g++;
 
             grid.show_all ();
 
-            return grid;
+            export_scroller.add (grid);
+            return export_scroller;
         }
 
         private Grid editor_grid () {
@@ -360,6 +369,14 @@ namespace ThiefMD.Widgets {
             grid.show_all ();
 
             return grid;
+        }
+
+        public void add_headerbar () {
+            bar = new Gtk.HeaderBar ();
+            bar.set_show_close_button (true);
+            bar.set_title ("");
+
+            this.set_titlebar(bar);
         }
     }
 }

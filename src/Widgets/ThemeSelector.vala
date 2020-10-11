@@ -39,11 +39,7 @@ namespace ThiefMD.Widgets {
             app_box.max_children_per_line = 3;
             app_box.homogeneous = true;
             app_box.expand = false;
-
-            var preview_box = new Gtk.ScrolledWindow (null, null);
-            preview_box.add (app_box);
-            preview_box.hexpand = true;
-            preview_box.vexpand = true;
+            app_box.hexpand = true;
 
             var none = new CssPreview ("", css_type == "print");
             var modest_splendor = new CssPreview ("modest-splendor", css_type == "print");
@@ -52,7 +48,7 @@ namespace ThiefMD.Widgets {
 
             load_css ();
 
-            add (preview_box);
+            add (app_box);
         }
 
         public void refresh () {
