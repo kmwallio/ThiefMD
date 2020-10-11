@@ -67,6 +67,7 @@ Great software is built on the shoulders of giants.
 * Compilation and preview of multiple files while maintaining order
 * Keep undo history tied to files
 * Additional export and preview themes
+* Writing Statistics
 
 ### Later on Markdown Support (Soon to Come)
 

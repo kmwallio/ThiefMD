@@ -32,11 +32,11 @@ sudo apt-get install com.github.kmwallio.thiefmd
  * Export (DocX, ePUB, PDF, HTML, Markdown, and more...)
  * Import (DocX, ePUB, HTML, rst, textile, and more...)
  * Search `Ctrl+F` for the current file, and `Ctrl+Shift+F` for the *entire* library
+ * Writing Statistics
 
 ## Planning
 
  * Better library organization
- * Writing Statistics
  * Dedicated Markdown Editor
 
 ## Resources
