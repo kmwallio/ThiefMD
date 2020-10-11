@@ -79,7 +79,7 @@ Use [Jekyll](https://jekyllrb.com), [Hugo](https://gohugo.io), or another [Stati
 
 ThiefMD surfaces the [front matter](https://jekyllrb.com/docs/front-matter) in the Folder View using minimark.
 
-Live preview also rendera any `title:` making your post look like art.
+Live preview also renders any `title:` making your post look like art.
 
 Our [export logic](/tips/novel-writing#novel-metadata) also understands [whatever metadata you may throw at it](https://pandoc.org/MANUAL.html#epub-metadata).
 
