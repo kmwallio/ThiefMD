@@ -109,7 +109,6 @@ namespace ThiefMD.Widgets {
 
             search_results = new Gtk.Grid ();
             search_results.orientation = Gtk.Orientation.VERTICAL;
-            searchable = ThiefApp.get_instance ().library.get_all_sheets ();
 
             var scroller = new Gtk.ScrolledWindow (null, null);
             scroller.hexpand = true;
@@ -125,7 +124,7 @@ namespace ThiefMD.Widgets {
             headerbar.pack_start (search);
             headerbar.set_show_close_button (true);
             set_titlebar (headerbar);
-            parent = ThiefApp.get_instance ().main_window;
+            transient_for = ThiefApp.get_instance ().main_window;
             destroy_with_parent = true;
 
             int w, h;
@@ -158,6 +157,7 @@ namespace ThiefMD.Widgets {
 
         public void create_searchers () {
             debug ("spawning seachers");
+            searchable = ThiefApp.get_instance ().library.get_all_sheets ();
             if (!Thread.supported ()) {
                 debug ("Thread support not available...");
                 foreach (var search in searchable) {
