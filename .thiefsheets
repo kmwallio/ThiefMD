@@ -1,6 +1,7 @@
 {
   "sheet-order" : [
     "README.md",
+    "CONTRIBUTING.md",
     "DEB-Packaging.md",
     "RPM-Packaging.md",
     "flatpak-packaging.md"
