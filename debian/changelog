@@ -1,3 +1,12 @@
+com.github.kmwallio.thiefmd (0.0.13) focal; urgency=low
+
+  * Import DocX, ePUB, HTML, and more, just drag the file onto a library folder
+  * New Export Tool, change CSS, Page Size, and more
+  * Library Search and Editor Search
+  * Writing Statistics
+
+ -- kmwallio <mwallio@gmail.com>  Sat, 10 Oct 2020 18:17:24 -0700
+
 com.github.kmwallio.thiefmd (0.0.12) focal; urgency=low
 
   * Update Dynamic CSS to include buttons and button hover

@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.kmwallio.thiefmd', ['vala', 'c'],
-    version: '0.0.12'
+    version: '0.1.0'
 )
 
 # Application ID
@@ -52,16 +52,6 @@ endif
 # Let's define our executable
 add_project_arguments(['--vapidir', join_paths(meson.current_source_dir(), 'vapi')], language: 'vala')
 
-ultheme_dep = dependency('ultheme', required: false)
-if not ultheme_dep.found()
-    ultheme_dep = dependency('ultheme', fallback : [ 'ultheme', 'libultheme_dep' ])
-endif
-
-writegood_dep = dependency('writegood', required: false)
-if not writegood_dep.found()
-    writegood_dep = dependency('writegood', fallback : [ 'writegood', 'libwritegood_dep' ])
-endif
-
 executable(
     meson.project_name(),
     'src/Application.vala',
@@ -97,6 +87,11 @@ executable(
     'src/Controllers/UI.vala',
     'src/Controllers/UserData.vala',
     'src/Controllers/Pandoc.vala',
+    'src/ultheme/src/HexColors.vala',
+    'src/ultheme/src/Ultheme.vala',
+    'src/writegood/src/language.vala',
+    'src/writegood/src/writegood.vala',
+    'src/writegood/src/en_us.vala',
     asresources,
     c_args: c_args,
     dependencies: [
@@ -109,8 +104,7 @@ executable(
         dependency('json-glib-1.0'),
         dependency('gee-0.8'),
         dependency('libarchive'),
-        ultheme_dep,
-        writegood_dep,
+        dependency('libxml-2.0'),
         libmarkdown
     ],
     vala_args: [

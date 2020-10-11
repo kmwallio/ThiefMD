@@ -114,6 +114,9 @@ namespace ThiefMD.Widgets {
             var scroller = new Gtk.ScrolledWindow (null, null);
             scroller.hexpand = true;
             scroller.vexpand = true;
+            scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+            header_context = scroller.get_style_context ();
+            header_context.add_class ("thief-sheets");
             search_results.hexpand = true;
             scroller.add (search_results);
 
@@ -204,6 +207,7 @@ namespace ThiefMD.Widgets {
                         }
                         var label = new Gtk.Label ("<b>" + lib_path + "</b>\n" + res.text_highlight);
                         label.xalign = 0;
+                        label.set_ellipsize (Pango.EllipsizeMode.END);
                         label.use_markup = true;
                         dis.result.add (label);
                         dis.result.hexpand = true;

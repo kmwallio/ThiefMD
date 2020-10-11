@@ -115,7 +115,7 @@ namespace ThiefMD.Widgets {
             _sheets_dir = path;
             _view = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
-            set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+            set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
             add (_view);
 
             debug ("Got %s\n", _sheets_dir);
@@ -174,6 +174,9 @@ namespace ThiefMD.Widgets {
                 _sheets.unset (sheet.file_name (), out val);
                 _view.remove (val);
                 metadata.sheet_order.remove (sheet.file_name ());
+                if (_sheets.is_empty) {
+                    show_empty ();
+                }
             }
         }
 
@@ -389,7 +392,7 @@ namespace ThiefMD.Widgets {
 
             metadata.sheet_order.remove (moved);
             int index = metadata.sheet_order.index_of (destination);
-            
+
             if (index + 1 < metadata.sheet_order.size) {
                 metadata.sheet_order.insert (index + 1, moved);
             } else {
