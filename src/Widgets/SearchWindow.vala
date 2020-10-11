@@ -74,6 +74,7 @@ namespace ThiefMD.Widgets {
                 }
             }
             debug ("Thread done, %d found", res_count);
+            to_update.remove_thread ();
             return;
         }
     }
@@ -84,6 +85,7 @@ namespace ThiefMD.Widgets {
         Gee.ConcurrentList<SearchDisplay> displayed;
         Gtk.Entry search;
         string active_search_term;
+        Mutex start_search;
         Mutex ui_update;
         Mutex ui_remove;
         Mutex thread_update;
@@ -97,6 +99,7 @@ namespace ThiefMD.Widgets {
             ui_update = Mutex ();
             ui_remove = Mutex ();
             thread_update = Mutex ();
+            start_search = Mutex ();
             results = new Gee.ConcurrentList<SearchResult> ();
             displayed = new Gee.ConcurrentList<SearchDisplay> ();
             build_ui ();
@@ -163,6 +166,9 @@ namespace ThiefMD.Widgets {
         }
 
         public void live_reload () {
+            if (!start_search.trylock ()) {
+                return;
+            }
             if (!searching) {
                 if (ui_remove.trylock ()) {
                     if (ui_update.trylock ()) {
@@ -180,6 +186,7 @@ namespace ThiefMD.Widgets {
                     ui_remove.unlock ();
                 }
             }
+            start_search.unlock ();
         }
 
         public void update_terms () {
@@ -187,15 +194,18 @@ namespace ThiefMD.Widgets {
             bool respawn = active_search_term != search.text;
             active_search_term = search.text;
 
-            if (!searching) {
-                searching = true;
+            start_search.lock ();
+            // stop all current threads
+            if (searching) {
+                searching = false;
             }
 
-            if (respawn) {
-                create_searchers ();
-                GLib.Idle.add (update_search);
-                GLib.Idle.add (remove_search);
+            while (running_threads > 0) {
+                searching = false;
             }
+            start_search.unlock ();
+
+            live_reload ();
         }
 
         public void create_searchers () {
@@ -204,12 +214,16 @@ namespace ThiefMD.Widgets {
             if (!Thread.supported ()) {
                 debug ("Thread support not available...");
                 foreach (var search in searchable) {
+                    if (!searching) {
+                        break;
+                    }
                     SearchThread not_a_thread = new SearchThread (active_search_term, search, this);
                     not_a_thread.search ();
                 }
             } else {
                 foreach (var search in searchable) {
                     SearchThread thread = new SearchThread (active_search_term, search, this);
+                    add_thread ();
                     var nt = new Thread<void> ("search_thread" + search.get_sheets_path (), thread.search);
                 }
             }
