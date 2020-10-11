@@ -50,6 +50,8 @@ It is recommended to fork and work from the beta branch as this branch always co
 * [beta](https://github.com/kmwallio/ThiefMD/tree/beta): The beta branch is where most feature work is branched from or winds up. This branch should remain mostly stable.
 * [master](https://github.com/kmwallio/ThiefMD): This is the branch we release off of. This branch must remain usable.
 
+Please make sure your code changes build and run when [packaged as a flatpak](/flatpak-packaging.md).
+
 ## Feature Screenshots
 
 Try to take screenshots using the default GNOME Adwaita Theme and Icons.
