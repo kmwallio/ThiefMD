@@ -153,7 +153,7 @@ namespace ThiefMD.Controllers.SheetManager {
             return _currentSheet.sheet.file_path ();
         }
 
-        return _("No file opened.");
+        return _("No file opened");
     }
 
     public void get_word_count_stats (out int word_count, out int reading_hours, out int reading_minutes, out int reading_seconds) {

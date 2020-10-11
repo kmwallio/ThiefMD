@@ -145,7 +145,7 @@ Get immersed and match the whole UI or keep the colors for your words.
 
 Discover more themes at [https://themes.thiefmd.com](https://themes.thiefmd.com) or [make your own](https://themes.thiefmd.com/howto) from scratch.
 
-<div style="clear: both;"></div>
+<div class="clear"></div>
 
 ## Super Fast Search
 
@@ -159,7 +159,21 @@ Whether you know where you're looking or what you're looking for, ThiefMD will h
 
 Get lost in your writing and find your way back to wherever you need to go, all within ThiefMD.
 
-<div style="clear: both;"></div>
+<div class="clear"></div>
+
+## Writing Statistics
+
+<div class="responsive-right marcel"><img src="/images/writing_statistics.png" alt="ThiefMD tracking statistics for a whole project and an individual chapter" /></div>
+
+Working on [NaNoWriMo](https://nanowrimo.org)? Making sure you hit your book report's word count? Trying to make progress on a chapter?
+
+Keep track of it all with Writing Statistics. Turn it on or off in the preferences.
+
+Right-click on a Library Item to pop out a window tracking a project or chapter. Or enable the status bar for tracking the file you're working on.
+
+Currently key bound to `Ctrl+Shift+S` until we can think of something better.
+
+<div class="clear"></div>
 
 ***
 

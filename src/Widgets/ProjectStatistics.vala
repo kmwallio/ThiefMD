@@ -37,7 +37,7 @@ namespace ThiefMD.Widgets {
         private void build_ui () {
             var settings = AppSettings.get_default ();
             headerbar = new Gtk.HeaderBar ();
-            headerbar.set_title (get_base_library_path (monitor_path).replace ("/", " / ") + _(" Statistics"));
+            headerbar.set_title (get_base_library_path (monitor_path).replace ("/", " / "));
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-toolbar");
@@ -104,6 +104,12 @@ namespace ThiefMD.Widgets {
         }
 
         public void update_wordcount () {
+            if (!ThiefApp.get_instance ().library.file_in_library (monitor_path)) {
+                var settings = AppSettings.get_default ();
+                settings.writing_changed.disconnect (update_wordcount);
+                destroy ();
+                return;
+            }
             word_count = ThiefApp.get_instance ().library.get_word_count_for_path (monitor_path);
             int timereadings = word_count / Constants.WORDS_PER_SECOND;
             int hours = timereadings / 3600;
@@ -117,10 +123,11 @@ namespace ThiefMD.Widgets {
             }
 
             word_label.label = "<b>" + word_count.to_string () + "</b> " + _("words");
-            reading_time.label = "<b>%d %s %d %s %d %s</b>".printf (
-                hours, _("Hours"),
-                minutes, _("Minutes"),
-                seconds, _("seconds"));
+            reading_time.label = _("<b>Reading Time:</b>\n%d %s\n%d %s\n%d %s").printf (
+                hours, (hours == 1) ? _("Hour") : _("Hours"),
+                minutes, (minutes == 1) ? _("Minute") : _("Minutes"),
+                seconds, (seconds == 1) ? _("Seconds") : _("Seconds")
+            );
         }
     }
 }

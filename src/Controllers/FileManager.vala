@@ -362,11 +362,23 @@ namespace ThiefMD.Controllers.FileManager {
             Regex script = new Regex ("<script\\b[^<]*(?:(?!<\\/script>)<[^<]*)*<\\/script>", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex random_tags = new Regex ("<\\/?(div|p|script|img|td|tr|table|small|u|b|strong|em|sup|sub|span)[^>]*>", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex words = new Regex ("\\s+\\n*", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex num_bullets = new Regex ("^\\s*[0-9]+\\.\\s+");
 
+            markdown = num_bullets.replace (markdown, markdown.length, 0, " ");
             markdown = style.replace (markdown, markdown.length, 0, " ");
             markdown = script.replace (markdown, markdown.length, 0, " ");
             markdown = random_tags.replace (markdown, markdown.length, 0, " ");
-            markdown = markdown.replace ("*", "").replace ("#", "").replace (">", "").replace ("|", "").replace ("-", "").replace ("_", "");
+            // Markdown special characters?
+            markdown = markdown.replace ("*", "")
+                                .replace ("#", "")
+                                .replace (">", "")
+                                .replace ("|", "")
+                                .replace ("-", "")
+                                .replace ("_", "")
+                                .replace ("`", "")
+                                .replace ("=", "")
+                                .replace ("+", "");
+
             markdown = words.replace (markdown, markdown.length, 0, " ");
             markdown = markdown.chomp ().chug ();
 

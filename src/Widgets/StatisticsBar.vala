@@ -87,14 +87,18 @@ namespace ThiefMD.Widgets {
             SheetManager.get_word_count_stats (out wordcount, out hours, out minutes, out seconds);
             string working_on = SheetManager.get_current_file_path ();
 
+            if (working_on == null) {
+                working_on = _("No file opened");
+            }
+
             if (wordcount > 0 && (hours + minutes + seconds == 0)) {
                 seconds = 1;
             }
 
-            reading_time.label = (_("%d hours %d minutes and %d seconds reading time.")).printf (
-                hours,
-                minutes,
-                seconds
+            reading_time.label = (_("%d %s %d %s and %d %s reading time.")).printf (
+                hours, (hours == 1) ? _("hour") : _("hours"),
+                minutes, (minutes == 1) ? _("minute") : _("minutes"),
+                seconds, (seconds == 1) ? _("seconds") : _("seconds")
             );
 
             active_file.label = (_("%s : %d words.")).printf (

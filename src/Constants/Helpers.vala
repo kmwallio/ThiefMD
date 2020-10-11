@@ -42,6 +42,9 @@ namespace ThiefMD {
 
     public string get_base_library_path (string path) {
         var settings = AppSettings.get_default ();
+        if (path == null) {
+            return "No file opened";
+        }
         string res = path;
         foreach (var base_lib in settings.library ()) {
             if (res.has_prefix (base_lib)) {
