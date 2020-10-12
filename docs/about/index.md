@@ -38,7 +38,7 @@ ThiefMD currently supports
 Great software is built on the shoulders of giants.
 
 * Code <s>stolen</s> *forked* from [Quilter](https://github.com/lainsce/quilter)
-* Font is [iA Writer Duospace](https://github.com/iaolo/iA-Fonts)
+* Fonts are [iA Writer Duospace](https://github.com/iaolo/iA-Fonts) and [Courier Prime](https://quoteunquoteapps.com/courierprime)
 * Inspired by [Ulysses](https://ulyssesapp.com)
 * Preview CSS is [Splendor](http://markdowncss.github.io/splendor) + [Modest](http://markdowncss.github.io/modest)
 * Markdown Rendering by [Discount](http://www.pell.portland.or.us/~orc/Code/discount)
