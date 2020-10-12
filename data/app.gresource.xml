@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
     <gresource prefix="/com/github/kmwallio/thiefmd">
-        <file alias="app-main-stylesheet.css" compressed="true">styles/app-main-stylesheet.css</file>
         <file alias="app-stylesheet.css" compressed="true">styles/app-stylesheet.css</file>
     </gresource>
     <gresource prefix="/com/github/kmwallio/thiefmd/icons">

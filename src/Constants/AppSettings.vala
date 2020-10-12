@@ -65,6 +65,9 @@ namespace ThiefMD {
         public const int WORDS_PER_MINUTE = 200;
         public const int WORDS_PER_SECOND = WORDS_PER_MINUTE / 60;
 
+        // Font settings
+        public const double SIZE_1_REM_IN_PT = 12;
+
         // Arbitrary strings
         public const string FIRST_USE = """# Click on a sheet to get started
 
@@ -112,6 +115,8 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public string print_css { get; set; }
         public string export_paper_size { get; set; }
         public bool show_writing_statistics { get; set; }
+        public string font_family { get; set; }
+        public int font_size { get; set; default = 12; }
 
         private bool writegood_enabled = false;
         public bool writegood {
@@ -133,6 +138,22 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             }
 
             return "thiefmd";
+        }
+
+        public string get_css_font_family () {
+            if (font_family == null || font_family.chug ().chomp () == "") {
+                return "font-family: 'iA Writer Duospace'";
+            } else {
+                return "font-family: '%s'".printf (font_family.chomp ().chug ());
+            }
+        }
+
+        public int get_css_font_size () {
+            if (font_size <= 0 || font_size > 240) {
+                return (int)Constants.SIZE_1_REM_IN_PT;
+            } else {
+                return font_size;
+            }
         }
 
         public string[] library () {
@@ -275,6 +296,8 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("print-css", this, "print_css", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-paper-size", this, "export_paper_size", SettingsBindFlags.DEFAULT);
             app_settings.bind ("show-writing-statistics", this, "show_writing_statistics", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("font-size", this, "font_size", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("font-family", this, "font_family", SettingsBindFlags.DEFAULT);
 
             app_settings.changed.connect (() => {
                 changed ();
