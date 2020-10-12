@@ -194,7 +194,7 @@ namespace ThiefMD.Widgets {
             processed_mk = FileManager.get_yamlless_markdown(
                 processed_mk,
                 0,      // Cap number of lines
-                false,   // Remove empty lines
+                true,   // Include empty lines
                 settings.export_include_yaml_title, // H1 title:
                 false); // Include date
 

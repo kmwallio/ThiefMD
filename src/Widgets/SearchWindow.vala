@@ -57,6 +57,7 @@ namespace ThiefMD.Widgets {
                 if (index != -1) {
                     int start = (index - 10) >= 0 ? (index - 10) : 0;
                     int end = (index + 50) < contents.length ? 50 : -1;
+                    string title, date;
                     SearchResult res = new SearchResult ();
                     res.occurrences = contents.down ().split (search_term.down ()).length - 1;
                     res.file_path = files.nth_data (i).file_path ();
@@ -65,7 +66,7 @@ namespace ThiefMD.Widgets {
                     res.text_highlight = res.text_highlight.replace ("\n", " ");
                     res.text_highlight = res.text_highlight.replace ("&", "&amp;");
                     res.text_highlight = res.text_highlight.replace ("<", "&lt;").replace (">", "&gt;");
-                    res.text_highlight = SheetManager.mini_mark (FileManager.get_file_lines_yaml (files.nth_data (i).file_path (), Constants.SHEET_PREVIEW_LINES)) + "\n..." + res.text_highlight + "...";
+                    res.text_highlight = SheetManager.mini_mark (FileManager.get_file_lines_yaml (files.nth_data (i).file_path (), Constants.SHEET_PREVIEW_LINES, false, out title, out date)) + "\n..." + res.text_highlight + "...";
                     res.text_highlight = res.text_highlight.down ().replace (search_term.down (), "<b>" + search_term + "</b>");
                     res.file_sheet = files.nth_data (i);
                     to_update.results.add (res);

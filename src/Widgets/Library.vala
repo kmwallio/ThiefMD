@@ -348,7 +348,7 @@ namespace ThiefMD.Widgets {
                     sheet_markdown = FileManager.get_yamlless_markdown(
                         sheet_markdown,
                         0,       // Cap number of lines
-                        false,   // Remove empty lines
+                        true,   // Include empty lines
                         settings.export_include_yaml_title, // H1 title:
                         false);
 
