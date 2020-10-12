@@ -133,6 +133,10 @@
             <default>true</default>
             <summary>Convert relative paths to absolute paths</summary>
         </key>
+        <key name="export-include-yaml-title" type="b">
+            <default>true</default>
+            <summary>Include YAML title as H1 Heading in Preview and Export</summary>
+        </key>
         <key name="export-include-metadata-file" type="b">
             <default>false</default>
             <summary>First Markdown File includes author metadata</summary>

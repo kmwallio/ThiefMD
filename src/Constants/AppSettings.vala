@@ -110,6 +110,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public double export_side_margins { get; set; }
         public double export_top_bottom_margins { get; set; }
         public bool export_include_metadata_file { get; set; }
+        public bool export_include_yaml_title { get; set; }
         public bool brandless { get; set; }
         public string preview_css { get; set; }
         public string print_css { get; set; }
@@ -292,6 +293,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("export-side-margins", this, "export_side_margins", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-top-bottom-margins", this, "export_top_bottom_margins", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-include-metadata-file", this, "export_include_metadata_file", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("export-include-yaml-title", this, "export_include_yaml_title", SettingsBindFlags.DEFAULT);
             app_settings.bind ("preview-css", this, "preview_css", SettingsBindFlags.DEFAULT);
             app_settings.bind ("print-css", this, "print_css", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-paper-size", this, "export_paper_size", SettingsBindFlags.DEFAULT);

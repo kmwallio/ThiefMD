@@ -191,7 +191,12 @@ namespace ThiefMD.Widgets {
             } else {
                 processed_mk = raw_mk;
             }
-            processed_mk = FileManager.get_yamlless_markdown(processed_mk, 0, true, true, false);
+            processed_mk = FileManager.get_yamlless_markdown(
+                processed_mk,
+                0,      // Cap number of lines
+                false,   // Remove empty lines
+                settings.export_include_yaml_title, // H1 title:
+                false); // Include date
 
             var mkd = new Markdown.Document.from_gfm_string (processed_mk.data,
                 Markdown.DocumentFlags.TOC + 

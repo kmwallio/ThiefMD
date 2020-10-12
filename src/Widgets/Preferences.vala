@@ -119,6 +119,16 @@ namespace ThiefMD.Widgets {
             export_resolve_paths_label.xalign = 0;
             export_resolve_paths_label.hexpand = true;
 
+            var export_include_yaml_title_switch = new Switch ();
+            export_include_yaml_title_switch.set_active (settings.export_include_yaml_title);
+            export_include_yaml_title_switch.notify["active"].connect (() => {
+                settings.export_include_yaml_title = export_include_yaml_title_switch.get_active ();
+            });
+            export_include_yaml_title_switch.tooltip_text = _("Include YAML title as Heading");
+            var export_include_yaml_title_label = new Label(_("Include YAML title as H1 Heading"));
+            export_include_yaml_title_label.xalign = 0;
+            export_include_yaml_title_label.hexpand = true;
+
             var page_setup_label = new Gtk.Label (_("<b>Page Setup</b>"));
             page_setup_label.hexpand = true;
             page_setup_label.xalign = 0;
@@ -224,6 +234,10 @@ namespace ThiefMD.Widgets {
 
             grid.attach (export_resolve_paths_switch, 1, g, 1, 1);
             grid.attach (export_resolve_paths_label, 2, g, 1, 1);
+            g++;
+
+            grid.attach (export_include_yaml_title_switch, 1, g, 1, 1);
+            grid.attach (export_include_yaml_title_label, 2, g, 1, 1);
             g++;
 
             grid.attach (page_setup_label, 1, g, 2, 1);

@@ -354,7 +354,8 @@ namespace ThiefMD.Controllers.FileManager {
     }
 
     public int get_word_count (string file_path) {
-        string markdown = get_yamlless_markdown (get_file_contents (file_path), 0, true, true, false);
+        var settings = AppSettings.get_default ();
+        string markdown = get_yamlless_markdown (get_file_contents (file_path), 0, true, settings.export_include_yaml_title, false);
 
         // This is for an approximate word count, not trying to be secure or anything...
         try {

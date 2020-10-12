@@ -345,7 +345,13 @@ namespace ThiefMD.Widgets {
                 }
 
                 if (!metadata) {
-                    sheet_markdown = FileManager.get_yamlless_markdown(sheet_markdown, 0, true, true, false);
+                    sheet_markdown = FileManager.get_yamlless_markdown(
+                        sheet_markdown,
+                        0,       // Cap number of lines
+                        false,   // Remove empty lines
+                        settings.export_include_yaml_title, // H1 title:
+                        false);
+
                     markdown.append (sheet_markdown);
                     if (settings.export_break_sheets) {
                         markdown.append ("\n<div style='page-break-before: always'></div>\n");
