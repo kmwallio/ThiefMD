@@ -6,7 +6,7 @@ thieftags: #blogging
 
 If you're looking to start a blog, consider [Jekyll](https://jekyllrb.com/). You'll be able to publish on [GitHub](https://pages.github.com/), [GitLab](https://docs.gitlab.com/ee/user/project/pages/), or any other host.
 
-ThiefMD will make it easy to manage and update your site's content.
+ThiefMD makes it easy to manage and update your site's content.
 
 This article assumes you already have a Git repository setup with your Jekyll install.  Jekyll has an in-depth guide [online here](https://jekyllrb.com/docs/step-by-step/01-setup/).
 
@@ -38,13 +38,47 @@ date: 2020-10-05 11:38
 
 If you're using [themes](https://jekyllrb.com/docs/themes), the layout says what template to use. Most themes have `page` and `post`. The `date` is the publishing time. Adding `categories` can help readers find related posts or build good archive pages. `tags` are also supported by Jekyll.
 
-On some versions of Jekyll, Jekyll won't publish the post until after the `date`.  This makes it useful for drafting or scheduling articles.
+You can configure Jekyll so it won't publish the post until after the `date`.  This makes it useful for drafting or scheduling articles.
 
 You can read more in [Jekyll's Documentation](https://jekyllrb.com/docs/front-matter). Many of these tips also work with [Hugo](https://gohugo.io) and other static site generators.
 
 <div class="clear"></div>
 
-### Moving Posts
+## Updating the _config.yml for Drafts
+
+### Using _drafts folder
+
+By default, items in the `_drafts` folder are excluded from being built and previewed. If you want the drafts folder to be included, you can add:
+
+```yaml
+show_drafts: true
+```
+
+to your `_config.yml`. This can be combined with `future` or `unpublished`. Learn more at Jykell's [Configuration Options](https://jekyllrb.com/docs/configuration/options).
+
+#### Previewing Drafts
+
+If `show_drafts` is not set in your `_config.yml`, you can ask the serve command to render `_drafts`.
+
+```bash
+jekyll serve --drafts
+```
+
+### Using future dates
+
+In your `_config.yml` add:
+
+```yaml
+future: false
+```
+
+This will prevent Jekyll from publishing any posts in the future. For previewing those posts, you can run:
+
+```bash
+jekyll serve --future
+```
+
+## Moving Posts
 
 <div class="responsive-right"><img src="/images/drag_n_drop_sheets.gif" alt="Application animation showing drag and drop support of posts" /></div>
 

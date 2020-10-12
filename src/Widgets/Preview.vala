@@ -193,8 +193,21 @@ namespace ThiefMD.Widgets {
             }
             processed_mk = FileManager.get_yamlless_markdown(processed_mk, 0, true, true, false);
 
-            var mkd = new Markdown.Document.from_gfm_string (processed_mk.data, 0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x04000000 + 0x00400000 + 0x10000000 + 0x40000000);
-            mkd.compile (0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x00400000 + 0x04000000 + 0x40000000 + 0x10000000);
+            var mkd = new Markdown.Document.from_gfm_string (processed_mk.data,
+                Markdown.DocumentFlags.TOC + 
+                Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.EXTRA_FOOTNOTE + 
+                Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.DLEXTRA + 
+                Markdown.DocumentFlags.FENCEDCODE + Markdown.DocumentFlags.GITHUBTAGS + 
+                Markdown.DocumentFlags.LATEX + Markdown.DocumentFlags.URLENCODEDANCHOR + 
+                Markdown.DocumentFlags.NOSTYLE + Markdown.DocumentFlags.EXPLICITLIST);
+    
+            mkd.compile (
+                Markdown.DocumentFlags.TOC + Markdown.DocumentFlags.AUTOLINK + 
+                Markdown.DocumentFlags.EXTRA_FOOTNOTE + 
+                Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.DLEXTRA +
+                Markdown.DocumentFlags.FENCEDCODE + Markdown.DocumentFlags.GITHUBTAGS +
+                Markdown.DocumentFlags.LATEX + Markdown.DocumentFlags.URLENCODEDANCHOR +
+                Markdown.DocumentFlags.EXPLICITLIST + Markdown.DocumentFlags.NOSTYLE);
             mkd.get_document (out processed_mk);
 
             return (processed_mk.chomp () != "");
