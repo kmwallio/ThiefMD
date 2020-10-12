@@ -75,3 +75,8 @@ $$\int_{a}^{b} x^2 dx$$
 $$f(x)=a_0+a_2x^2$$
 
 $$x_{1,2}=\frac{-b\pm\sqrt{b^2-4ac}}{2a}$$
+
+### GitHub Style Lists
+
+- [ ] foo
+- [x] bar
