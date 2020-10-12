@@ -24,6 +24,7 @@ namespace ThiefMD.Controllers.UI {
     private bool _init = false;
     private bool _show_filename = false;
     private Gtk.CssProvider active_provider = null;
+    private Gtk.CssProvider font_provider = null;
     private Ultheme.HexColorPalette current_palette = null;
 
     //
@@ -151,6 +152,33 @@ namespace ThiefMD.Controllers.UI {
         debug ("Themes loaded");
 
         return false;
+    }
+
+    public void load_font () {
+        var settings = AppSettings.get_default ();
+        if (font_provider != null) {
+            Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), font_provider);
+            font_provider = null;
+        }
+
+        if (settings.get_css_font_family () == "") {
+            return;
+        }
+
+        // Assuming 12pt is 1rem, scale to original CSS based on that
+        string new_font = ThiefProperties.FONT_SETTINGS.printf (
+            settings.get_css_font_family (), ((settings.get_css_font_size () / Constants.SIZE_1_REM_IN_PT) * 1.25),
+            settings.get_css_font_family (), ((settings.get_css_font_size () / Constants.SIZE_1_REM_IN_PT) * 1.35),
+            settings.get_css_font_family (), ((settings.get_css_font_size () / Constants.SIZE_1_REM_IN_PT) * 1.45)
+        );
+
+        try {
+            font_provider = new Gtk.CssProvider ();
+            font_provider.load_from_data (new_font);
+            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), font_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        } catch (Error e) {
+            warning ("Error setting font: %s", e.message);
+        }
     }
 
     public Gtk.SourceStyleSchemeManager UserSchemes () {

@@ -161,5 +161,15 @@
             <summary>CSS to use for Printing PDFs</summary>
             <description>CSS to use for PDF Export</description>
         </key>
+        <key name="font-family" type="s">
+            <default>"iA Writer Duospace"</default>
+            <summary>Font Family to use</summary>
+            <description>Font Family for editor to use</description>
+        </key>
+        <key name="font-size" type="i">
+            <default>12</default>
+            <summary>Font Size to use</summary>
+            <description>Font Size for editor to use</description>
+        </key>
     </schema>
 </schemalist>

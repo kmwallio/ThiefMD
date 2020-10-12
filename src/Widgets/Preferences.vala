@@ -74,7 +74,10 @@ namespace ThiefMD.Widgets {
             grid.orientation = Orientation.VERTICAL;
             grid.hexpand = true;
 
+            ThiefFontSelector font_selector = new ThiefFontSelector ();
+
             ThemeSelector theme_selector = new ThemeSelector ();
+            grid.add (font_selector);
             grid.add (theme_selector);
             grid.show_all ();
 

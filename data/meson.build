@@ -7,6 +7,19 @@ foreach i : icon_sizes
     )
 endforeach
 
+
+font_types = ['Bold', 'Italic', 'BoldItalic', 'Regular']
+fonts = ['Courier Prime', 'iAWriterDuospace']
+
+foreach f : fonts
+    foreach ft : font_types
+        install_data(
+            join_paths('font', f + '-' + ft + '.ttf'),
+            install_dir: join_paths(get_option('datadir'), 'fonts', 'truetype', 'thiefmd')
+        )
+    endforeach
+endforeach
+
 install_data(
     meson.project_name() + '.desktop',
     install_dir: join_paths(get_option('datadir'), 'applications')
@@ -30,12 +43,6 @@ install_data(
 install_subdir(
     join_paths('language-specs'),
     install_dir: join_paths(get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'gtksourceview-4')
-)
-
-
-install_data(
-    join_paths('font', 'iAWriterDuospace-Regular.ttf'),
-    install_dir: join_paths(get_option('datadir'), 'fonts', 'truetype', 'thiefmd')
 )
 
 install_data(
