@@ -58,6 +58,7 @@ namespace ThiefMD.Controllers.SheetManager {
         if (_view == null) {
             _welcome_screen = new Widgets.Editor ("");
             _view = new Gtk.ScrolledWindow (null, null);
+            _view.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
         }
 
         if (_box_view == null) {
