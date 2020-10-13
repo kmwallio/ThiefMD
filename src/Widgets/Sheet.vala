@@ -214,6 +214,14 @@ namespace ThiefMD.Widgets {
                     pvw.show_all ();
                 });
 
+                Gtk.MenuItem menu_export_sheet = new Gtk.MenuItem.with_label (_("Export"));
+                menu.add (menu_export_sheet);
+                menu_export_sheet.activate.connect (() => {
+                    string preview_markdown = FileManager.get_file_contents (_sheet_path);
+                    PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown);
+                    ppw.show_all ();
+                });
+
                 menu.add (new Gtk.SeparatorMenuItem ());
 
                 //  Gtk.MenuItem menu_rename = new Gtk.MenuItem.with_label (_("Rename File"));
