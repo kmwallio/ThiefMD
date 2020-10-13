@@ -79,6 +79,7 @@ executable(
     'src/Widgets/SearchBar.vala',
     'src/Widgets/StatisticsBar.vala',
     'src/Widgets/SearchWindow.vala',
+    'src/Widgets/ThiefPane.vala',
     'src/Widgets/ThemePreview.vala',
     'src/Widgets/Thinking.vala',
     'src/Controllers/FileManager.vala',

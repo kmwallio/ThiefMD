@@ -322,6 +322,20 @@ namespace ThiefMD.Widgets {
             var ui_colorscheme_label = new Label(_("Match UI to Editor Theme"));
             ui_colorscheme_label.xalign = 0;
 
+            var headerbar_switch = new Switch ();
+            headerbar_switch.set_active (settings.hide_toolbar);
+            headerbar_switch.notify["active"].connect (() => {
+                settings.hide_toolbar = headerbar_switch.get_active ();
+                if (settings.hide_toolbar) {
+                    ThiefApp.get_instance ().toolbar.hide_headerbar ();
+                } else {
+                    ThiefApp.get_instance ().toolbar.show_headerbar ();
+                }
+            });
+            headerbar_switch.tooltip_text = _("Toggle Headerbar");
+            var headerbar_label = new Label(_("Enable hiding of the Headerbar"));
+            headerbar_label.xalign = 0;
+
             var ui_writing_statistics_switch = new Switch ();
             ui_writing_statistics_switch.set_active (settings.show_writing_statistics);
             ui_writing_statistics_switch.notify["active"].connect (() => {
@@ -365,6 +379,10 @@ namespace ThiefMD.Widgets {
 
             grid.attach (typewriter_switch, 1, g_row, 1, 1);
             grid.attach (typewriter_label, 2, g_row, 2, 1);
+            g_row++;
+
+            grid.attach (headerbar_switch, 1, g_row, 1, 1);
+            grid.attach (headerbar_label, 2, g_row, 2, 1);
             g_row++;
 
             grid.attach (ui_writing_statistics_switch, 1, g_row, 1, 1);

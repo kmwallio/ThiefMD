@@ -115,7 +115,7 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         @define-color textColorActive %s;
         @define-color textColorGlobal %s;
         
-        .thiefmd-toolbar, .thief-search-box {
+        .thief-toolbar, .thiefmd-toolbar, .thief-search-box {
             border-bottom-color: transparent;
             border-bottom-width: 1px;
             background: @colorPrimary;
@@ -160,7 +160,17 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             color: @textColorPrimary;
             box-shadow: 0 1px transparent inset;
         }
-        
+
+        .thief-search-results {
+          padding: 0;
+          margin: 0;
+        }
+
+        .thief-search-results * {
+          margin: 0px;
+          padding: 0px;
+        }
+
         .thief-list-sheet {
             background: @colorPrimary;
             border-bottom: 1px solid @textColorGlobal;
@@ -169,7 +179,10 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         }
         
         .thief-list-sheet-active,
-        .thief-search-input {
+        .thief-search-input,
+        .thief-search-results *:hover,
+        .thief-search-results *:active,
+        .thief-search-results *:hover:active {
             background: lighter(@colorPrimary);
             color: @textColorPrimary;
         }

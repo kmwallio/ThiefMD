@@ -173,6 +173,7 @@ namespace ThiefMD.Widgets {
 
         public void build_ui () {
             app_box = new Gtk.FlowBox ();
+            app_box.orientation = Gtk.Orientation.HORIZONTAL;
             app_box.margin = 6;
             app_box.max_children_per_line = 3;
             app_box.homogeneous = true;

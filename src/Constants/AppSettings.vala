@@ -32,6 +32,16 @@ namespace ThiefMD {
         // Timing Constants
         public const int AUTOSAVE_TIMEOUT = 3000;
 
+        // Autohide Toolbar settings
+        // Distance mouse has to travel from last hiding time ^ 2
+        public const double MOUSE_SENSITIVITY = 225;
+        // Time in milliseconds to check if mouse still in motion
+        // After MOUSE_IN_MOTION_TIME of no motion, the headerbar will hide
+        public const int MOUSE_IN_MOTION_TIME = 1000;
+        // Frequency in time to check if the mouse is still in motion
+        // once motion is detected. Should be > MOUSE_IN_MOTION_TIME
+        public const int MOUSE_MOTION_CHECK_TIME = 2500;
+
         // Default number of sheets to keep history of
         public const int KEEP_X_SHEETS_IN_MEMORY = 10;
         // Pool allows for faster file opens. If it's greater
@@ -48,6 +58,7 @@ namespace ThiefMD {
 
         // Number of lines to preview
         public const int SHEET_PREVIEW_LINES = 3;
+        public const int SEARCH_PREVIEW_LINES = 4;
         public const int CSS_PREVIEW_WIDTH = 75;
         public const int CSS_PREVIEW_HEIGHT = 100;
 
@@ -118,6 +129,9 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public bool show_writing_statistics { get; set; }
         public string font_family { get; set; }
         public int font_size { get; set; default = 12; }
+
+        public bool hide_toolbar { get; set; default = false; }
+        public bool menu_active { get; set; default = false; }
 
         private bool writegood_enabled = false;
         public bool writegood {

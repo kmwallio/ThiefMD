@@ -43,6 +43,18 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
+                // Headerbar
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.h, keycode)) {
+                        settings.hide_toolbar = !settings.hide_toolbar;
+                        if (settings.hide_toolbar) {
+                            ThiefApp.get_instance ().toolbar.hide_headerbar ();
+                        } else {
+                            ThiefApp.get_instance ().toolbar.show_headerbar ();
+                        }
+                    }
+                }
+
                 // Global search
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
                     if (match_keycode (Gdk.Key.f, keycode)) {
