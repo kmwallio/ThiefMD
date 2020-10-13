@@ -69,7 +69,7 @@
     -->
     <!-- Note: line break can't be used in regex, so only underline is matched. -->
     <context id="setext-header" style-ref="header">
-      <match>^(-{4,}|=+)[ \t]*$</match>
+      <match>^(-{3,}|=+)[ \t]*$</match>
     </context>
 
     <!-- Examples:
