@@ -254,7 +254,7 @@ namespace ThiefMD.Controllers.SheetManager {
             builder.append (FileManager.get_yamlless_markdown (
                 text,
                 0,
-                false,
+                true,
                 settings.export_include_yaml_title,
                 false));
         }

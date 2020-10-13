@@ -26,15 +26,49 @@ namespace ThiefMD.Widgets {
         public string file_path;
         public Sheet file_sheet;
         public string text_highlight;
+        public string mini_mark;
         public int occurrences;
     }
 
-    public class SearchDisplay {
+    public class SearchDisplay : Gtk.Button {
         public string search_term;
         public string file_path;
+        public string mini_mark;
         public Sheet file_sheet;
-        public Gtk.Button result;
         public int occurrences;
+
+        public void double_check () {
+            string contents = FileManager.get_file_contents (file_path);
+            int index = contents.down ().index_of (search_term.down ());
+            if (index != -1) {
+                string title, date;
+                mini_mark = SheetManager.mini_mark (FileManager.get_file_lines_yaml (file_path, Constants.SEARCH_PREVIEW_LINES, true, out title, out date));
+                int index2 = contents.down ().index_of (search_term.down (), mini_mark.length + 6 + ((title != "") ? title.length + 7 : 0) + ((date != "") ? date.length + 6 : 0));
+                if (index2 != -1) {
+                    index = index2;
+                }
+                int start = (index - 10) >= 0 ? (index - 10) : 0;
+                int end = (index + 50) < contents.length ? 50 : -1;
+                occurrences = contents.down ().split (search_term.down ()).length - 1;
+                string text_highlight = contents.substring (start, end);
+                text_highlight = text_highlight.replace ("\n", " ");
+                text_highlight = text_highlight.replace ("&", "&amp;");
+                text_highlight = text_highlight.replace ("<", "&lt;").replace (">", "&gt;");
+                text_highlight = mini_mark + "\n..." + text_highlight + "...";
+                text_highlight = text_highlight.down ().replace (search_term.down (), "<b>" + search_term + "</b>");
+                string lib_path = get_base_library_path (file_path);
+                if (lib_path == "") {
+                    lib_path = file_path;
+                }
+                var label = new Gtk.Label ("<b>" + lib_path + " (" + occurrences.to_string () + " matches)</b>\n" + text_highlight);
+                label.xalign = 0;
+                label.set_ellipsize (Pango.EllipsizeMode.END);
+                label.use_markup = true;
+                remove (get_child ());
+                add (label);
+                show_all ();
+            }
+        }
     }
 
     public class SearchThread {
@@ -55,9 +89,15 @@ namespace ThiefMD.Widgets {
                 string contents = FileManager.get_file_contents (files.nth_data (i).file_path ());
                 int index = contents.down ().index_of (search_term.down ());
                 if (index != -1) {
+                    SearchResult res = new SearchResult ();
+                    string title, date;
+                    res.mini_mark = SheetManager.mini_mark (FileManager.get_file_lines_yaml (files.nth_data (i).file_path (), Constants.SEARCH_PREVIEW_LINES, true, out title, out date));
+                    int index2 = contents.down ().index_of (search_term.down (), res.mini_mark.length + 6 + ((title != "") ? title.length + 7 : 0) + ((date != "") ? date.length + 6 : 0));
+                    if (index2 != -1) {
+                        index = index2;
+                    }
                     int start = (index - 10) >= 0 ? (index - 10) : 0;
                     int end = (index + 50) < contents.length ? 50 : -1;
-                    SearchResult res = new SearchResult ();
                     res.occurrences = contents.down ().split (search_term.down ()).length - 1;
                     res.file_path = files.nth_data (i).file_path ();
                     res.search_term = search_term;
@@ -65,7 +105,7 @@ namespace ThiefMD.Widgets {
                     res.text_highlight = res.text_highlight.replace ("\n", " ");
                     res.text_highlight = res.text_highlight.replace ("&", "&amp;");
                     res.text_highlight = res.text_highlight.replace ("<", "&lt;").replace (">", "&gt;");
-                    res.text_highlight = SheetManager.mini_mark (FileManager.get_file_lines_yaml (files.nth_data (i).file_path (), Constants.SHEET_PREVIEW_LINES)) + "\n..." + res.text_highlight + "...";
+                    res.text_highlight = res.mini_mark + "\n..." + res.text_highlight + "...";
                     res.text_highlight = res.text_highlight.down ().replace (search_term.down (), "<b>" + search_term + "</b>");
                     res.file_sheet = files.nth_data (i);
                     to_update.results.add (res);
@@ -91,15 +131,17 @@ namespace ThiefMD.Widgets {
         Mutex thread_update;
         public int running_threads;
         public bool searching = false;
-        Gtk.Grid search_results;
+        Gtk.FlowBox search_results;
         Gee.ArrayList<Sheets> searchable;
         TimedMutex one_click;
+        private string scoped_folder;
 
-        public class SearchWindow () {
+        public class SearchWindow (string local_result = "") {
             ui_update = Mutex ();
             ui_remove = Mutex ();
             thread_update = Mutex ();
             start_search = Mutex ();
+            scoped_folder = local_result;
             results = new Gee.ConcurrentList<SearchResult> ();
             displayed = new Gee.ConcurrentList<SearchDisplay> ();
             build_ui ();
@@ -109,21 +151,36 @@ namespace ThiefMD.Widgets {
         private void build_ui () {
             var settings = AppSettings.get_default ();
             headerbar = new Gtk.HeaderBar ();
-            headerbar.set_title (_("Library Search"));
+            if (scoped_folder == null || scoped_folder.chomp ().chug () == "") {
+                headerbar.set_title (_("Library Search"));
+            } else {
+                headerbar.set_title (get_base_library_path (scoped_folder).replace ("/", " / ") + _(" Search"));
+            }
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-toolbar");
             search = new Gtk.Entry ();
             search.placeholder_text = "Enter search";
 
-            search_results = new Gtk.Grid ();
-            search_results.orientation = Gtk.Orientation.VERTICAL;
+            search_results = new Gtk.FlowBox ();
+            search_results.orientation = Gtk.Orientation.HORIZONTAL;
+            search_results.max_children_per_line = 1;
+            search_results.column_spacing = 0;
+            search_results.margin = 0;
+            search_results.row_spacing = 0;
+            search_results.homogeneous = true;
+            search_results.hexpand = true;
+            search_results.set_sort_func (search_order);
+
+            header_context = search_results.get_style_context ();
+            header_context.add_class ("thief-search-results");
 
             var scroller = new Gtk.ScrolledWindow (null, null);
             scroller.hexpand = true;
             scroller.vexpand = true;
             scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
             header_context = scroller.get_style_context ();
+            header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-sheets");
             search_results.hexpand = true;
             scroller.add (search_results);
@@ -181,11 +238,17 @@ namespace ThiefMD.Widgets {
             if (!searching) {
                 if (ui_remove.trylock ()) {
                     if (ui_update.trylock ()) {
-                        while (!displayed.is_empty) {
-                            SearchDisplay dis = displayed.get (0);
-                            displayed.remove (dis);
-                            search_results.remove (dis.result);
+                        foreach (var had_it in displayed) {
+                            had_it.double_check ();
                         }
+                        for (int r = 0; r < displayed.size; r++) {
+                            var had_it = displayed.get (r);
+                            if (had_it.occurrences == 0 || had_it.search_term != active_search_term) {
+                                displayed.remove (had_it);
+                                search_results.remove (had_it);
+                            }
+                        }
+                        search_results.invalidate_sort ();
                         ui_update.unlock ();
                         searching = true;
                         create_searchers ();
@@ -219,7 +282,15 @@ namespace ThiefMD.Widgets {
 
         public void create_searchers () {
             debug ("spawning seachers");
-            searchable = ThiefApp.get_instance ().library.get_all_sheets ();
+            if (scoped_folder == null || scoped_folder.chomp ().chug () == "") {
+                searchable = ThiefApp.get_instance ().library.get_all_sheets ();
+            } else {
+                searchable = ThiefApp.get_instance ().library.get_all_sheets_for_path (scoped_folder);
+                if (searchable.size == 0) {
+                    destroy ();
+                }
+            }
+
             if (!Thread.supported ()) {
                 debug ("Thread support not available...");
                 foreach (var search in searchable) {
@@ -247,7 +318,7 @@ namespace ThiefMD.Widgets {
                     SearchDisplay dis = displayed.get (i);
                     if (dis.search_term != active_search_term) {
                         displayed.remove (dis);
-                        search_results.remove (dis.result);
+                        search_results.remove (dis);
                         i--;
                     }
                 }
@@ -269,6 +340,12 @@ namespace ThiefMD.Widgets {
             thread_update.unlock ();
         }
 
+        private int search_order (Gtk.FlowBoxChild c1, Gtk.FlowBoxChild c2) {
+            SearchDisplay sd1 = (SearchDisplay)c1.get_child ();
+            SearchDisplay sd2 = (SearchDisplay)c2.get_child ();
+            return (sd2.occurrences - sd1.occurrences);
+        }
+
         public bool update_search () {
             var settings = AppSettings.get_default ();
             if (ui_update.trylock ()) {
@@ -276,9 +353,14 @@ namespace ThiefMD.Widgets {
                     SearchResult res = results.remove_at (0);
                     if (res.search_term == active_search_term) {
                         SearchDisplay dis = new SearchDisplay ();
+                        dis.margin = 0;
                         dis.file_path = res.file_path;
                         dis.search_term = res.search_term;
-                        dis.result = new Gtk.Button ();
+                        dis.mini_mark = res.mini_mark;
+                        var header_context = dis.get_style_context ();
+                        header_context.add_class (Gtk.STYLE_CLASS_FLAT);
+                        header_context.add_class ("thief-list-sheet");
+
                         string lib_path = get_base_library_path (res.file_path);
                         if (lib_path == "") {
                             lib_path = res.file_path;
@@ -287,11 +369,11 @@ namespace ThiefMD.Widgets {
                         label.xalign = 0;
                         label.set_ellipsize (Pango.EllipsizeMode.END);
                         label.use_markup = true;
-                        dis.result.add (label);
+                        dis.add (label);
                         dis.occurrences = res.occurrences;
-                        dis.result.hexpand = true;
+                        dis.hexpand = true;
                         dis.file_sheet = res.file_sheet;
-                        dis.result.clicked.connect (() => {
+                        dis.clicked.connect (() => {
                             if (one_click.can_do_action ()) {
                                 debug ("Opening %s", dis.file_path);
                                 // any other method I try crashes everying...
@@ -301,20 +383,24 @@ namespace ThiefMD.Widgets {
                             }
                         });
 
-                        SearchDisplay? above = null;
-                        int row = 1;
+                        int row = 0;
+                        bool add = true;
                         foreach (var already in displayed) {
                             if (res.occurrences <= already.occurrences) {
-                                above = already;
                                 row++;
+                            }
+
+                            if (already.file_path == res.file_path) {
+                                add = false;
                             }
                         }
 
-                        search_results.insert_row (row);
-                        search_results.attach (dis.result, 1, row);
-                        displayed.add (dis);
-                        search_results.show_all ();
-                        debug ("added result");
+                        if (add) {
+                            search_results.insert (dis, row);
+                            displayed.add (dis);
+                            search_results.show_all ();
+                            debug ("added result");
+                        }
                     }
                 }
                 ui_update.unlock ();

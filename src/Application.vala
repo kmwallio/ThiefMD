@@ -27,7 +27,7 @@ namespace ThiefMD {
         public Gtk.ApplicationWindow main_window;
         public Headerbar toolbar;
         public Library library;
-        public Gtk.Paned sheets_pane;
+        public ThiefPane sheets_pane;
         public Gtk.Paned library_pane;
         public Gtk.ScrolledWindow library_view;
         public SearchBar search_bar;
@@ -122,7 +122,7 @@ namespace ThiefMD {
             SheetManager.init ();
             library = new Library ();
 
-            sheets_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+            sheets_pane = new ThiefPane (Gtk.Orientation.HORIZONTAL);
             library_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             library_view = new Gtk.ScrolledWindow (null, null);
             library_view.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);

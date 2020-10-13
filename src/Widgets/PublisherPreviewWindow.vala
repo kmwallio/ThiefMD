@@ -43,7 +43,6 @@ namespace ThiefMD.Widgets {
             headerbar.set_title (_("Publishing Preview"));
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
-            header_context.add_class ("thief-toolbar");
 
             var preview_type = new Gtk.ComboBoxText ();
             preview_type.append_text (_("HTML/ePUB"));

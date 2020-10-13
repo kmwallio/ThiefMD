@@ -335,6 +335,44 @@ namespace ThiefMD.Widgets {
             }
         }
 
+        public void sort_sheets_by_date (bool asc = true) {
+            if (asc) {
+                metadata.sheet_order.sort ((a, b) => {
+                    string date_a = _sheets.get (a).get_date ();
+                    string date_b = _sheets.get (b).get_date ();
+                    return GLib.strcmp (date_a, date_b);
+                });
+            } else {
+                metadata.sheet_order.sort ((a, b) => {
+                    string date_a = _sheets.get (a).get_date ();
+                    string date_b = _sheets.get (b).get_date ();
+                    return -1 * GLib.strcmp (date_a, date_b);
+                });
+            }
+
+            redraw_sheets ();
+            save_metadata_file (true);
+        }
+
+        public void sort_sheets_by_title (bool asc = true) {
+            if (asc) {
+                metadata.sheet_order.sort ((a, b) => {
+                    string title_a = _sheets.get (a).get_title ();
+                    string title_b = _sheets.get (b).get_title ();
+                    return GLib.strcmp (title_a, title_b);
+                });
+            } else {
+                metadata.sheet_order.sort ((a, b) => {
+                    string title_a = _sheets.get (a).get_title ();
+                    string title_b = _sheets.get (b).get_title ();
+                    return -1 * GLib.strcmp (title_a, title_b);
+                });
+            }
+
+            redraw_sheets ();
+            save_metadata_file (true);
+        }
+
         public void sort_sheets_by_name (bool asc = true) {
             if (asc) {
                 metadata.sheet_order.sort ((a, b) => {

@@ -348,7 +348,7 @@ namespace ThiefMD.Widgets {
                     sheet_markdown = FileManager.get_yamlless_markdown(
                         sheet_markdown,
                         0,       // Cap number of lines
-                        false,   // Remove empty lines
+                        true,   // Include empty lines
                         settings.export_include_yaml_title, // H1 title:
                         false);
 
@@ -393,6 +393,16 @@ namespace ThiefMD.Widgets {
             return all_sheets;
         }
 
+        public Gee.ArrayList<Sheets> get_all_sheets_for_path (string path) {
+            Gee.ArrayList<Sheets> all_sheets = new Gee.ArrayList<Sheets> ();
+            foreach (var p in _all_sheets) {
+                if (p._sheets.get_sheets_path ().has_prefix (path)) {
+                    all_sheets.add (p._sheets);
+                }
+            }
+            return all_sheets;
+        }
+
         //
         // Mouse Click Actions
         //
@@ -425,6 +435,19 @@ namespace ThiefMD.Widgets {
                 menu.add (menu_writing_stats);
 
                 menu.add (new Gtk.SeparatorMenuItem ());
+
+                if (_selected != null && _all_sheets.find (_selected) != null) {
+                    Gtk.MenuItem menu_search = new Gtk.MenuItem.with_label (_("Search ") + _selected._title);
+                    menu_search.activate.connect (() => {
+                        if (_selected != null && _all_sheets.find (_selected) != null) {
+                            SearchWindow project_search_window = new SearchWindow (_selected._path);
+                            project_search_window.show_all ();
+                        }
+                    });
+                    menu.add (menu_search);
+
+                    menu.add (new Gtk.SeparatorMenuItem ());
+                }
 
                 Gtk.MenuItem menu_add_item = new Gtk.MenuItem.with_label (_("Create Sub-Folder"));
                 menu_add_item.activate.connect (() => {
