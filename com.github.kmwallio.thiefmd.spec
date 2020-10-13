@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.1.0
+Version: 0.1.1
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
@@ -158,6 +158,11 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sat Oct 17 2020 kmwallio <mwallio@gmail.com> - 0.1.1
+- Improved search interface
+- Support for dragging certain files onto the editor (including CSV to Markdown table)
+- Ability to cusomize font
+- Ability to hide Headerbar
 * Sat Oct 10 2020 kmwallio <mwallio@gmail.com> - 0.1.0
 - Import DocX, ePUB, HTML, and more, just drag the file onto a library folder
 - New Export Tool, change CSS, Page Size, and more

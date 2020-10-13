@@ -46,6 +46,19 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.1.1" date="2020-10-17" urgency="low">
+      <description>
+        <p>Custom Font? Drag and Drop Editor Support for CSV's and more? Export individual sheets? Search select parts of the library? We're hoping this helps you get things done and then some.</p>
+        <ul>
+          <li>Custom Font for Editor</li>
+          <li>Search select parts of the Library and live search updates as you edit files</li>
+          <li>Drag and Drop support (with some spicy new CSV to Markdown Table support)</li>
+          <li>Hide the headerbar</li>
+          <li>I didn't outline my NaNoWriMo Novel yet</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.1-notnanoprep</url>
+    </release>
     <release version="0.1.0" date="2020-10-10" urgency="low">
       <description>
         <p>Get things in out and done with ThiefMD.</p>
