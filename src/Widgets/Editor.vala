@@ -49,6 +49,9 @@ namespace ThiefMD.Widgets {
         private bool writecheck_active;
         private bool typewriter_active;
 
+        private Gtk.TextTag focus_text;
+        private Gtk.TextTag outoffocus_text;
+
         //
         // Maintaining state
         //
@@ -129,6 +132,16 @@ namespace ThiefMD.Widgets {
                 writegood.detach ();
                 writecheck_active = false;
             }
+
+            focus_text = buffer.create_tag ("focus-text");
+            outoffocus_text = buffer.create_tag ("outoffocus-text");
+            double r, g, b;
+            UI.get_focus_color (out r, out g, out b);
+            focus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            focus_text.foreground_set = true;
+            UI.get_out_of_focus_color (out r, out g, out b);
+            outoffocus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            outoffocus_text.foreground_set = true;
 
             last_width = settings.window_width;
             last_height = settings.window_height;
@@ -740,6 +753,14 @@ namespace ThiefMD.Widgets {
             this.set_pixels_inside_wrap(settings.spacing);
             this.set_show_line_numbers (settings.show_num_lines);
 
+            double r, g, b;
+            UI.get_focus_color (out r, out g, out b);
+            focus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            focus_text.foreground_set = true;
+            UI.get_out_of_focus_color (out r, out g, out b);
+            outoffocus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            outoffocus_text.foreground_set = true;
+
             typewriter_scrolling ();
             if (!typewriter_active && settings.typewriter_scrolling) {
                 typewriter_active = true;
@@ -752,6 +773,14 @@ namespace ThiefMD.Widgets {
                 queue_draw ();
                 should_scroll = true;
                 move_typewriter_scolling ();
+            }
+
+            if (settings.focusmode_enabled) {
+                buffer.notify["cursor-position"].connect (update_focus);
+                update_focus ();
+            } else {
+                buffer.notify["cursor-position"].disconnect (update_focus);
+                remove_focus ();
             }
 
             var buffer_context = this.get_style_context ();
@@ -795,6 +824,65 @@ namespace ThiefMD.Widgets {
             }
 
             UI.load_css_scheme ();
+        }
+
+        public void remove_focus () {
+            Gtk.TextIter start, end;
+                buffer.get_bounds (out start, out end);
+                buffer.remove_tag (focus_text, start, end);
+                buffer.remove_tag (outoffocus_text, start, end);
+        }
+
+        public void update_focus () {
+            var settings = AppSettings.get_default ();
+            if (settings.focus_mode) {
+                Gtk.TextIter start, end;
+                buffer.get_bounds (out start, out end);
+                buffer.remove_tag (focus_text, start, end);
+                buffer.apply_tag (outoffocus_text, start, end);
+
+                var cursor = buffer.get_insert ();
+                buffer.get_iter_at_mark (out start, cursor);
+                end = start;
+                if (settings.focus_type == FocusType.WORD) {
+                    if (!start.starts_word ()) {
+                        start.backward_word_start ();
+                    }
+                    if (!end.ends_word ()) {
+                        end.forward_word_end ();
+                    }
+                } else if (settings.focus_type == FocusType.SENTENCE) {
+                    if (!start.starts_sentence ()) {
+                        start.backward_sentence_start ();
+                    }
+                    if (!end.ends_sentence ()) {
+                        end.forward_sentence_end ();
+                    }
+                } else if (settings.focus_type == FocusType.PARAGRAPH) {
+                    if (!start.starts_line ()) {
+                        start.backward_line ();
+                    }
+                    if (!end.ends_line ()) {
+                        end.forward_to_line_end ();
+                    }
+                }
+
+                Gtk.TextIter end2 = end;
+                while (end.get_offset () > start.get_offset () && end.get_char () != 0 && end.get_char () != ' ' && end.get_char () != '\n' && !end.ends_word () && !end.ends_line ()) {
+                    end.backward_char ();
+                }
+
+                while (end.get_offset () < buffer.text.length && end.get_char () != 0 && end.get_char () != ' ' && end.get_char () != '\n' && !end.ends_word () && !end.ends_line ()) {
+                    end.forward_char ();
+                }
+
+                while (start.get_offset () > 0 && start.get_char () != 0 && start.get_char () != ' ' && start.get_char () != '\n' && !start.starts_word () && !start.starts_line ()) {
+                    start.backward_char ();
+                }
+
+                buffer.remove_tag (outoffocus_text, start, end);
+                buffer.apply_tag (focus_text, start, end);
+            }
         }
 
         public bool move_typewriter_scolling () {

@@ -67,6 +67,7 @@ namespace ThiefMD.Widgets {
         }
 
         private Grid display_grid () {
+            var settings = AppSettings.get_default ();
             Grid grid = new Grid ();
             grid.margin = 12;
             grid.row_spacing = 12;
@@ -76,8 +77,45 @@ namespace ThiefMD.Widgets {
 
             ThiefFontSelector font_selector = new ThiefFontSelector ();
 
+            var focus_label = new Gtk.Label (_("<b>Focus:</b>"));
+            var mini_grid = new Gtk.Grid ();
+            mini_grid.orientation = Gtk.Orientation.HORIZONTAL;
+            focus_label.use_markup = true;
+            focus_label.xalign = 0;
+            var focus_selector = new Gtk.ComboBoxText ();
+            focus_selector.append_text ("None");
+            focus_selector.append_text ("Paragraph");
+            focus_selector.append_text ("Sentence");
+            focus_selector.append_text ("Word");
+
+            if (settings.focus_mode) {
+                focus_selector.set_active (settings.focus_type + 1);
+            } else {
+                focus_selector.set_active (0);
+            }
+
+            focus_selector.changed.connect (() => {
+                int option = focus_selector.get_active ();
+                if (option <= 0) {
+                    settings.focus_mode = false;
+                } else if (option == 1) {
+                    settings.focus_type = FocusType.PARAGRAPH;
+                    settings.focus_mode = true;
+                } else if (option == 2) {
+                    settings.focus_type = FocusType.SENTENCE;
+                    settings.focus_mode = true;
+                } else if (option == 3) {
+                    settings.focus_type = FocusType.WORD;
+                    settings.focus_mode = true;
+                }
+            });
+
+            mini_grid.add (focus_label);
+            mini_grid.add (focus_selector);
+
             ThemeSelector theme_selector = new ThemeSelector ();
             grid.add (font_selector);
+            grid.add (mini_grid);
             grid.add (theme_selector);
             grid.show_all ();
 

@@ -71,6 +71,13 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
+                // Focus
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.r, keycode)) {
+                        settings.focus_mode = true;
+                    }
+                }
+
                 // New Sheet
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                     if (match_keycode (Gdk.Key.n, keycode)) {

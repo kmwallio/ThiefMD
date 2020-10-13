@@ -20,6 +20,12 @@
 using ThiefMD.Controllers;
 
 namespace ThiefMD {
+    public enum FocusType {
+        PARAGRAPH = 0,
+        SENTENCE,
+        WORD,
+    }
+
     public class Constants {
         // Margin Constants
         public const int NARROW_MARGIN = 5;
@@ -130,8 +136,21 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public string font_family { get; set; }
         public int font_size { get; set; default = 12; }
 
+        // Transient settings
         public bool hide_toolbar { get; set; default = false; }
         public bool menu_active { get; set; default = false; }
+
+        public bool focusmode_enabled = false;
+        public FocusType focus_type { get; set; default = FocusType.SENTENCE; }
+        public bool focus_mode {
+            set {
+                focusmode_enabled = value;
+                changed ();
+            }
+            get {
+                return focusmode_enabled;
+            }
+        }
 
         private bool writegood_enabled = false;
         public bool writegood {
