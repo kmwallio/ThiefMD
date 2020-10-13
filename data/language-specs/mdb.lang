@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language id="mdb" name="mdb" version="2.0" _section="Markup" hidden="true">
+    <definitions>
+        <context id="code-block-vala" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```vala$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="vala:vala"/>
+            </include>
+        </context>
+
+        <context id="code-block-java" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```java$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="c:c"/>
+            </include>
+        </context>
+
+        <context id="code-block-c" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```c$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="c:c"/>
+            </include>
+        </context>
+    </definitions>
+</language>

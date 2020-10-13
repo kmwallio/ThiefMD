@@ -398,6 +398,7 @@
         <context ref="atx-header"/>
         <context ref="setext-header"/>
         <context ref="list"/>
+        <context ref="mdb:code-block-vala"/>
         <context ref="code-block"/>
         <context ref="1-backtick-code-span"/>
         <context ref="2-backticks-code-span"/>
