@@ -154,6 +154,36 @@ namespace ThiefMD.Controllers.UI {
         return false;
     }
 
+    public void get_focus_color (out double r, out double g, out double b) {
+        var settings = AppSettings.get_default ();
+        Clutter.Color focus;
+        if (current_palette == null || settings.theme_id == "thiefmd") {
+            focus = Clutter.Color.from_string ("#191919");
+        } else {
+            focus = Clutter.Color.from_string (current_palette.global.foreground);
+        }
+        r = focus.red / 255.0;
+        g = focus.green / 255.0;
+        b = focus.blue / 255.0;
+    }
+
+    public void get_out_of_focus_color (out double r, out double g, out double b) {
+        var settings = AppSettings.get_default ();
+        Clutter.Color background;
+        Clutter.Color foreground;
+        if (current_palette == null || settings.theme_id == "thiefmd") {
+            background = Clutter.Color.from_string ("#FAFAFA");
+            foreground = Clutter.Color.from_string ("#191919");
+        } else {
+            background = Clutter.Color.from_string (current_palette.global.background);
+            foreground = Clutter.Color.from_string (current_palette.global.foreground);
+        }
+        Clutter.Color out_of_focus = foreground.interpolate (background, 0.82);
+        r = out_of_focus.red / 255.0;
+        g = out_of_focus.green / 255.0;
+        b = out_of_focus.blue / 255.0;
+    }
+
     public void load_font () {
         var settings = AppSettings.get_default ();
         if (font_provider != null) {

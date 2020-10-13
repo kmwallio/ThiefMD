@@ -20,4 +20,6 @@ Things can now be dragged into the editor window. If ThiefMD thinks it knows wha
 
 You can now Sort files by their Title or Date. This information is extracted from the YAML front matter (or any close guess we can come up with).
 
+We also added a focus mode. Choose to focus on words, sentences, or paragraphs. ThiefMD dims everything but the content you're working on. With a [plenty of themes](https://themes.thiefmd.com) and Fonts to choose from, Type Writer Scrolling, Focus Mode, a minimal UI, we're hoping you can create your ideal writing environment.
+
 We know when writing your novel you have many options. Thanks for choosing ThiefMD, and be sure to let us know if there's anything we can do to make your stay more comfortable.
