@@ -155,7 +155,7 @@ Whether you know where you're looking or what you're looking for, ThiefMD will h
 
 `Ctrl+F` to search the current file.
 
-`Ctrl+Shift+F` searches your entire library.
+`Ctrl+Shift+F` searches your entire library. Want to search a specific area? Right-click on the Library Item and choose "Search Item".
 
 Get lost in your writing and find your way back to wherever you need to go, all within ThiefMD.
 

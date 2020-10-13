@@ -149,11 +149,11 @@ namespace ThiefMD.Widgets {
             var header_context = this.get_style_context ();
 
             int mid =  get_allocated_height () / 2;
-            warning ("%s: data (m: %d, %d)", widget.name, mid, y);
+            debug ("%s: data (m: %d, %d)", widget.name, mid, y);
 
             string data = (string) selection_data.get_data();
             string raw_data = data;
-            warning ("Got: %s", data);
+            debug ("Got: %s", data);
 
             if (data != null) {
                 data = data.chomp ();
@@ -167,12 +167,16 @@ namespace ThiefMD.Widgets {
 
             string ext = data.substring (data.last_index_of (".") + 1).down ().chug ().chomp ();
             string insert = "";
-            if (ext == "png" || ext == "jpeg" || ext == "jpg" || ext == "gif") {
+            if (ext == "png" || ext == "jpeg" ||
+                ext == "jpg" || ext == "gif" ||
+                ext == "svg" || ext == "bmp")
+            {
                 insert = "![](" + get_base_library_path(data) + ")\n";
-            } else if (ext == "yml" || ext == "js" ||
-                        ext == "vala" || ext == "c" ||
-                        ext == "cpp" || ext == "rb" ||
-                        ext == "pl")
+            } else if (ext == "yml" || ext == "js" || ext == "hpp" || ext == "coffee" ||
+                        ext == "vala" || ext == "c" || ext == "vapi" || ext == "ts" ||
+                        ext == "cpp" || ext == "rb" || ext == "css" ||
+                        ext == "pl" || ext == "py" || ext == "sass" ||
+                        ext == "pm" || ext == "h" || ext == "log")
             {
                 File local = File.new_for_path (data);
                 if (file.query_exists () &&
