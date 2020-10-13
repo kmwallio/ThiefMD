@@ -126,6 +126,10 @@ namespace ThiefMD.Widgets {
                         if (FileUtils.test (path, FileTest.IS_DIR)) {
                             LibPair? kid = get_item (path);
                             if (kid != null) {
+                                kid._sheets.close_active_files ();
+                                if (SheetManager._current_sheets == kid._sheets) {
+                                    SheetManager.set_sheets (null);
+                                }
                                 _all_sheets.remove (kid);
                                 remove_children (path);
                             }
