@@ -5,7 +5,7 @@ title: Thief Markdown Editor
 
 <img src="/images/thief_library.png" style="float: right; max-width: 40%;" />
 
-# <img src="/images/thiefmd_128.png" style="float: left; height: 1em; width: 1em;" /> ThiefMD, the Markdown Editor worth stealing
+# ThiefMD, the Markdown Editor worth stealing
 
 Based on Open Source Technologies, ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app). ThiefMD is based on open source code from [Quilter](https://github.com/lainsce/quilter) and [other projects](/about#credit).
 
