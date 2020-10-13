@@ -134,6 +134,93 @@ namespace ThiefMD.Widgets {
             last_height = settings.window_height;
             preview_mutex = new TimedMutex ();
             writegood_limit = new TimedMutex (1500);
+            drag_data_received.connect (on_drag_data_received);
+        }
+
+        private void on_drag_data_received (
+            Gtk.Widget widget,
+            DragContext context,
+            int x,
+            int y,
+            Gtk.SelectionData selection_data,
+            uint target_type,
+            uint time)
+        {
+            var header_context = this.get_style_context ();
+
+            int mid =  get_allocated_height () / 2;
+            warning ("%s: data (m: %d, %d)", widget.name, mid, y);
+
+            string data = (string) selection_data.get_data();
+            string raw_data = data;
+            warning ("Got: %s", data);
+
+            if (data != null) {
+                data = data.chomp ();
+            } else {
+                data = "";
+            }
+
+            if (data.has_prefix ("file://")) {
+                data = data.substring ("file://".length);
+            }
+
+            string ext = data.substring (data.last_index_of (".") + 1).down ().chug ().chomp ();
+            string insert = "";
+            if (ext == "png" || ext == "jpeg" || ext == "jpg" || ext == "gif") {
+                insert = "![](" + get_base_library_path(data) + ")\n";
+            } else if (ext == "yml" || ext == "js" ||
+                        ext == "vala" || ext == "c" ||
+                        ext == "cpp" || ext == "rb" ||
+                        ext == "pl")
+            {
+                File local = File.new_for_path (data);
+                if (file.query_exists () &&
+                    (!FileUtils.test(data, FileTest.IS_DIR)) &&
+                    (FileUtils.test(data, FileTest.IS_REGULAR)))
+                {
+                    string code_data = FileManager.get_file_contents (data);
+                    if (code_data.chug ().chomp () != "") {
+                        insert = "\n```\n";
+                        insert += code_data;
+                        insert += "```\n";
+                    }
+                }
+            } else if (ext == "pdf" || ext == "docx" || ext == "pptx" || ext == "html") {
+                insert = "[" + data.substring (data.last_index_of ("/") + 1) + "](" + get_base_library_path(data) + ")\n";
+            } else if (ext == "csv") {
+                File local = File.new_for_path (data);
+                if (file.query_exists () &&
+                    (!FileUtils.test(data, FileTest.IS_DIR)) &&
+                    (FileUtils.test(data, FileTest.IS_REGULAR)))
+                {
+                    string code_data = FileManager.get_file_contents (data);
+                    if (code_data.chug ().chomp () != "") {
+                        insert = "\n" + csv_to_md(code_data) + "\n";
+                    }
+                }
+            }
+
+            if (insert != "") {
+                Timeout.add (100, () => {
+                    int start_of_raw = buffer.cursor_position - raw_data.length;
+                    string wowzers = buffer.text.substring (start_of_raw, raw_data.length);
+                    if (wowzers == raw_data) {
+                        debug ("Found raw_data");
+                        Gtk.TextIter start, end;
+                        buffer.get_bounds (out start, out end);
+                        start.forward_chars (start_of_raw);
+                        end = start;
+                        end.forward_chars (raw_data.length);
+                        buffer.delete (ref start, ref end);
+                        buffer.insert_at_cursor (insert, insert.length);
+                    } else {
+                        debug ("Found: %s", wowzers);
+                    }
+                    return false;
+                });
+            }
+            return;
         }
 
         public signal void changed ();
