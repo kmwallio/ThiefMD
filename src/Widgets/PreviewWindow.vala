@@ -26,6 +26,7 @@ namespace ThiefMD.Widgets {
         private static PreviewWindow? instance = null;
 
         public PreviewWindow () {
+            new KeyBindings (this, false);
             build_ui ();
         }
 

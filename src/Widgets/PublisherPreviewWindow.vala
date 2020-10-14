@@ -32,6 +32,7 @@ namespace ThiefMD.Widgets {
             preview.exporting = true;
             preview.update_html_view (false, markdown);
             _markdown = markdown;
+            new KeyBindings (this, false);
             build_ui ();
         }
 

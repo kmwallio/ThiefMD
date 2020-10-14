@@ -111,7 +111,7 @@ namespace ThiefMD.Widgets {
                 style += FileManager.get_file_contents (Build.PKGDATADIR + "/styles/highlight.css");
             } else {
                 if (settings.typewriter_scrolling && override_css == null) {
-                    style += ".markdown-body{padding-top:40%;padding-bottom:40%}\n";
+                    style += "\n.markdown-body{padding-top:60%;padding-bottom:50%}\n";
                 }
             }
 
