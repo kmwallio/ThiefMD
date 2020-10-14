@@ -20,6 +20,14 @@ sudo apt-get update
 sudo apt-get install com.github.kmwallio.thiefmd
 ```
 
+## Arch User Repository
+
+[ThiefMD is in the Arch User Repository](https://aur.archlinux.org/packages/thiefmd) thanks to [Mark Wagie](https://github.com/yochananmarqos). You can follow [these instructions](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_and_upgrading_packages), use [yay](https://github.com/Jguer/yay), or use your favorite AUR helper.
+
+```bash
+yay -S thiefmd
+```
+
 ## Features
 
  * Basic library at the moment

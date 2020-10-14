@@ -23,6 +23,14 @@ sudo apt-get install com.github.kmwallio.thiefmd
 
 Builds have been tested on Ubuntu 20.04 and Pop OS 20.04. Write-Good may crash on [elementary OS 5](https://elementary.io).
 
+## Arch User Repository
+
+[ThiefMD is in the Arch User Repository](https://aur.archlinux.org/packages/thiefmd) thanks to [Mark Wagie](https://github.com/yochananmarqos). You can follow [these instructions](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_and_upgrading_packages), use [yay](https://github.com/Jguer/yay), or use your favorite AUR helper.
+
+```bash
+yay -S thiefmd
+```
+
 ## RPM?
 
 [Download the latest release](https://github.com/kmwallio/ThiefMD/releases) from GitHub.
