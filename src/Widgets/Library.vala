@@ -274,11 +274,21 @@ namespace ThiefMD.Widgets {
         }
 
         public bool file_in_library (string file_path) {
+            bool is_dir = FileUtils.test (file_path, FileTest.IS_DIR);
             foreach (LibPair p in _all_sheets)
             {
-                if (file_path.down ().has_prefix (p._path.down ()))
-                {
-                    return true;
+                if (!is_dir) {
+                    if (file_path.down ().has_prefix (p._path.down ()))
+                    {
+                        return true;
+                    }
+                } else {
+                    string lib_path = p._path.down ();
+                    lib_path = lib_path.has_suffix (Path.DIR_SEPARATOR_S) ? lib_path : lib_path + Path.DIR_SEPARATOR_S;
+                    string comp_path = file_path.has_suffix (Path.DIR_SEPARATOR_S) ? file_path.down () : file_path.down () + Path.DIR_SEPARATOR_S;
+                    if (comp_path.has_prefix (lib_path)) {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -697,8 +707,11 @@ namespace ThiefMD.Widgets {
                 }
 
                 file = dnd_get_file (selection_data, target_type);
+                debug ("Got drag data: %s", file.get_path ());
                 file_to_move = file.get_path ();
                 item_in_library = file_in_library (file_to_move);
+
+                debug ("Item in library: %s", item_in_library ? "yes" : "no");
 
                 if (item_in_library && delete_selection_data && !FileUtils.test(file_to_move, FileTest.IS_DIR))
                 {
@@ -776,7 +789,7 @@ namespace ThiefMD.Widgets {
 
                             prompt.show_all ();
                         } else {
-                            debug ("Importing file");
+                            warning ("Importing file");
                             FileManager.import_file (file.get_path (), p._sheets);
                             parse_dir (_selected._sheets, _selected._path, _selected_node);
                         }
@@ -784,7 +797,7 @@ namespace ThiefMD.Widgets {
                 }
                 else
                 {
-                    debug ("Item not found");
+                    warning ("Item not found");
                 }
             }
 
