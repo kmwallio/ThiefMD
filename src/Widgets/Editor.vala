@@ -913,8 +913,17 @@ namespace ThiefMD.Widgets {
 
                 Gtk.MenuItem menu_insert_datetime = new Gtk.MenuItem.with_label (_("Insert Datetime"));
                 menu_insert_datetime.activate.connect (() => {
+
+                    string parent_path = file.get_parent ().get_path ().down ();
+                    bool am_iso8601 = parent_path.contains ("content");
+
                     DateTime now = new DateTime.now_local ();
-                    string new_text = now.format ("%F %H:%M");
+                    string new_text = now.format ("%F %T");
+
+                    if (am_iso8601) {
+                        new_text = now.format ("%FT%T%z");
+                    }
+
                     insert_at_cursor (new_text);
                 });
 
@@ -930,14 +939,18 @@ namespace ThiefMD.Widgets {
                         }
 
                         DateTime now = new DateTime.now_local ();
-                        string current_time = now.format ("%F %H:%M");
+                        string current_time = now.format ("%F %T");
 
                         string parent_folder = file.get_parent ().get_basename ().down ();
                         string page_type = (parent_folder.contains ("post") || parent_folder.contains ("draft")) ? "post" : "page";
                         string current_title = file.get_basename ();
                         string parent_path = file.get_parent ().get_path ().down ();
-                        bool add_draftmatter = parent_path.contains ("content/post");
+                        bool add_draftmatter = parent_path.contains ("content");
                         current_title = current_title.substring (0, current_title.last_index_of ("."));
+
+                        if (add_draftmatter) {
+                            current_time = now.format ("%FT%T%z");
+                        }
 
                         // Attempt to convert the file name into a title for the post
                         try {
