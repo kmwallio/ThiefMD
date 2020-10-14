@@ -198,9 +198,9 @@ namespace ThiefMD.Widgets {
                 {
                     string code_data = FileManager.get_file_contents (data);
                     if (code_data.chug ().chomp () != "") {
-                        insert = "\n```\n";
+                        insert = "\n```" + ext + "\n";
                         insert += code_data;
-                        insert += "```\n";
+                        insert += "\n```\n";
                     }
                 }
             } else if (ext == "pdf" || ext == "docx" || ext == "pptx" || ext == "html") {

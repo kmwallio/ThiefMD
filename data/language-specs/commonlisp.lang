@@ -60,19 +60,19 @@
     -->
 
     <define-regex id="token-start" extended="true">
-     	((?&lt;=[()'"`,@#\s])|^)
+     	((?&lt;=[()'",@#\s])|^)
     </define-regex>
 
     <define-regex id="token" extended="true">
-     	(([^()'"`,#\s\\|]|\\\S|\|[^|]*\|)+)
+     	(([^()'",#\s\\|]|\\\S|\|[^|]*\|)+)
     </define-regex>
 
     <define-regex id="package" extended="true">
-     	(([^()'"`,:#\s\\|]|\\\S|\|[^|]*\|)+)
+     	(([^()'",:#\s\\|]|\\\S|\|[^|]*\|)+)
     </define-regex>
 
     <define-regex id="token-end" extended="true">
-     	(?=([()';"`,#]|$|\s))
+     	(?=([()';",#]|$|\s))
     </define-regex>
 
     <!--
@@ -204,7 +204,7 @@
 
     <context id="template-operators" style-ref="operator">
       <match extended="true">
-        (`|,@?)
+        (,@?)
       </match>
     </context>
 
@@ -272,7 +272,7 @@
 
     <context id="sharpsign-other" style-ref="operator">
       <match extended="true">
-        (\#[0-9]*[!"#$%&amp;'(,;=&gt;?@[\]^_`~{}+\-./ac-npqs-wyz])
+        (\#[0-9]*[!"#$%&amp;'(,;=&gt;?@[\]^_~{}+\-./ac-npqs-wyz])
       </match>
     </context>
 

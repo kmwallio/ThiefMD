@@ -229,8 +229,8 @@
     <!-- Treated separately, not including itself nor command-like contexts
       (see https://gitlab.gnome.org/GNOME/gtksourceview/issues/94) -->
     <context id="backtick-subshell" style-ref="subshell" class="no-spell-check">
-      <start>`</start>
-      <end>`</end>
+      <start>(\s+|[^`]|$)`</start>
+      <end>`(\s+|[^`]|$)</end>
       <include>
         <!-- Must be included first, to ensure unescaped boundaries -->
         <context ref="def:escape"/>

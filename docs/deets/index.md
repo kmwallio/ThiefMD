@@ -3,6 +3,8 @@ layout: page
 title: Details
 ---
 
+[Prefer a list](/deets/list)?
+
 ## Keyboard Shortcuts
 
 [Learn all our keyboard shortcuts](/shortcuts)

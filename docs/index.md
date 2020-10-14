@@ -30,6 +30,7 @@ Manage your <span class="pun">\*\*mark\*\*</span> without any <span class="ny">\
 ✅ Live Previews  
 ✅ Typewriter Scrolling  
 ✅ Full Screen Editing  
+✅ Focus Mode  
 ✅ Multiple Export Formats: PDF, ePub, docx, and more  
 ✅ Multiple Import Formats: ePub, docx, HTML, and more
 

@@ -333,7 +333,7 @@ namespace ThiefMD.Widgets {
             }
 
             public void build_ui () {
-                label = "\n\n\n\n<small>Stored in <a href='file://" + UserData.style_path + "'>" + UserData.style_path + "</a>.</small>";
+                label = "\n\n<small>Stored in <a href='file://" + UserData.style_path + "'>" + UserData.style_path + "</a>.</small>";
                 use_markup = true;
                 set_justify (Justification.LEFT);
                 xalign = 0;

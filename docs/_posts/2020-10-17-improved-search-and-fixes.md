@@ -18,6 +18,8 @@ The header bar can now be hidden with `Ctrl+Shift+H` to eliminate more distracti
 
 Things can now be dragged into the editor window. If ThiefMD thinks it knows what it is, it will Markdown-ify the content as best it can.
 
+Talking about dragging things into the editor, certain languages are now syntax highlighted in code blocks. Sharing some code, drag the file in and bam. It's like magic, but not (it's programming).
+
 You can now Sort files by their Title or Date. This information is extracted from the YAML front matter (or any close guess we can come up with).
 
 We also added a focus mode. Choose to focus on words, sentences, or paragraphs. ThiefMD dims everything but the content you're working on. With [plenty of themes](https://themes.thiefmd.com) and Fonts to choose from, Type Writer Scrolling, Focus Mode, a minimal UI, we're hoping you can create your ideal writing environment.

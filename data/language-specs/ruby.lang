@@ -496,8 +496,8 @@
     </context>
 
     <context id="backtick-quoted-string" style-ref="string">
-      <start>`</start>
-      <end>`</end>
+      <start>(\s+|[^`]|$)`</start>
+      <end>`(\s+|[^`]|$)</end>
       <include>
         <context ref="inside-interpolated-string"/>
       </include>

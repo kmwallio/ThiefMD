@@ -27,6 +27,8 @@ It will be used for sanity checking the style-sheet used.
 
 ---
 
+# Vala
+
 ```vala
         private bool writecheck_scheduled = false;
         private void write_good_recheck () {
@@ -72,7 +74,9 @@ I'm basically ~~stealing~~ copying and pasting examples from [https://www.markdo
 
 $$\int_{a}^{b} x^2 dx$$
 
-$$f(x)=a_0+a_2x^2$$
+$$
+f(x)=a_0+a_2x^2
+$$
 
 $$x_{1,2}=\frac{-b\pm\sqrt{b^2-4ac}}{2a}$$
 

@@ -52,8 +52,9 @@
   <style name="def:link-symbol" foreground="#B7B6B7"/>
 
   <!-- Headers -->
-  <style name="def:heading" foreground="#0C8DB1" bold="true" scale="large"/>
-  <style name="def:type" foreground="#0C8DB1" bold="true" scale="large"/>
+  <style name="markdown:header" bold="true" foreground="#0C8DB1" scale="large"/>
+  <style name="def:heading" foreground="#0C8DB1" bold="true"/>
+  <style name="def:type" foreground="#0C8DB1" bold="true"/>
   <style name="def:thematic-break" foreground="#11BCED" bold="true" scale="large"/>
 
   <!-- Noramalization -->

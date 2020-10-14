@@ -11,7 +11,7 @@ title: About
 
 It is my primary way of attempting to learn [Vala](https://wiki.gnome.org/Projects/Vala) and filling in the gap of applications I miss from [macOS](https://apple.com).
 
-ThiefMD aims to make large [Markdown](https://daringfireball.net/projects/markdown/syntax) projects manageable. I've always wanted to write a novel, and hopefully ThiefMD will help me get there.
+ThiefMD aims to make large [Markdown](https://daringfireball.net/projects/markdown/syntax) projects manageable. I've always wanted to write a novel, and thehopefully ThiefMD will help me get there.
 
 # Features
 
@@ -27,6 +27,7 @@ ThiefMD currently supports
 * Import and Conversion of Ulysses Themes to GtkSourceView Styles
   - Matching the UI to the selected theme
 * Type-Writer Scrolling
+* Focus Mode
 * Import DocX, ePUB, HTML, and more to Markdown
 
 [Explore even more features](/deets)?
@@ -73,7 +74,6 @@ Great software is built on the shoulders of giants.
 
 * Load multiple files into Editor View
 * Timed sessions with typing statistics
-* Some sort of focus mode
 * Git-Backed Projects
 
 <div class="clear"></div>

@@ -171,8 +171,8 @@
     </context>
 
     <context id="string-conversion" style-ref="string-conversion" end-at-line-end="true">
-      <start>`</start>
-      <end>`</end>
+      <start>(\s+|[^`]|$)`</start>
+      <end>`(\s+|[^`]|$)</end>
       <include>
         <context ref="python"/>
       </include>

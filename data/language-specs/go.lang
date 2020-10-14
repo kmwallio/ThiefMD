@@ -122,8 +122,8 @@
     </context>
 
     <context id="backquote-string" style-ref="string" end-at-line-end="false" class-disabled="no-spell-check">
-      <start>`</start>
-      <end>`</end>
+      <start>(\s+|[^`]|$)`</start>
+      <end>`(\s+|[^`]|$)</end>
       <include>
         <context ref="printf"/>
         <context ref="def:line-continue"/>

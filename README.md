@@ -33,6 +33,7 @@ sudo apt-get install com.github.kmwallio.thiefmd
  * Import (DocX, ePUB, HTML, rst, textile, and more...)
  * Search `Ctrl+F` for the current file, and `Ctrl+Shift+F` for the *entire* library
  * Writing Statistics
+ * Focus Mode (Word, Sentence, and Paragraph)
 
 ## Planning
 
