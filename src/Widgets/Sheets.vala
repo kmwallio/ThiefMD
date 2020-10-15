@@ -135,6 +135,9 @@ namespace ThiefMD.Widgets {
                 try {
                     _monitor = current_directory.monitor_directory (FileMonitorFlags.SEND_MOVED | FileMonitorFlags.WATCH_MOVES);
                     _monitor.changed.connect (folder_changed);
+                    destroy.connect (() => {
+                        _monitor.changed.disconnect (folder_changed);
+                    });
                 } catch (Error e) {
                     warning ("Unable to monitor for folder changes: %s", e.message);
                 }
@@ -146,8 +149,26 @@ namespace ThiefMD.Widgets {
                 event_type == FileMonitorEvent.MOVED_IN || event_type == FileMonitorEvent.MOVED_OUT ||
                 event_type == FileMonitorEvent.DELETED || event_type == FileMonitorEvent.RENAMED)
             {
-                refresh ();
+                if (FileUtils.test (file.get_path (), FileTest.IS_DIR) || (other_file != null && FileUtils.test (other_file.get_path (), FileTest.IS_DIR))) {
+                    ThiefApp.get_instance ().library.refresh_dir (this);
+                }
+
+                if (other_file != null) {
+                    warning ("(%s) %s: %s, %s\n", _sheets_dir, event_type.to_string (), file.get_path (), other_file.get_path ());
+                } else {
+                    warning ("(%s) %s: %s\n", _sheets_dir, event_type.to_string (), file.get_path ());
+                }
+
+                File my_dir = File.new_for_path (_sheets_dir);
+                if (my_dir.query_exists ()) {
+                    refresh ();
+                } else {
+                    _monitor.changed.disconnect (folder_changed);
+                    ThiefApp.get_instance ().library.remove_item (_sheets_dir);
+                }
             }
+
+            // @TODO: Folder unmount support
         }
 
         public void add_hidden_item (string directory_path) {

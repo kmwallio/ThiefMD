@@ -117,27 +117,46 @@ namespace ThiefMD.Widgets {
         }
 
         private void remove_children (string str_dir) {
-            try {
-                Dir dir = Dir.open (str_dir, 0);
-                string? file_name = null;
-                while ((file_name = dir.read_name()) != null) {
-                    if (!file_name.has_prefix(".")) {
-                        string path = Path.build_filename (str_dir, file_name);
-                        if (FileUtils.test (path, FileTest.IS_DIR)) {
-                            LibPair? kid = get_item (path);
-                            if (kid != null) {
-                                kid._sheets.close_active_files ();
-                                if (SheetManager._current_sheets == kid._sheets) {
-                                    SheetManager.set_sheets (null);
+            File temp = File.new_for_path (str_dir);
+            if (temp.query_exists ()) {
+                try {
+                    Dir dir = Dir.open (str_dir, 0);
+                    string? file_name = null;
+                    while ((file_name = dir.read_name()) != null) {
+                        if (!file_name.has_prefix(".")) {
+                            string path = Path.build_filename (str_dir, file_name);
+                            if (FileUtils.test (path, FileTest.IS_DIR)) {
+                                LibPair? kid = get_item (path);
+                                if (kid != null) {
+                                    kid._sheets.close_active_files ();
+                                    if (SheetManager._current_sheets == kid._sheets) {
+                                        SheetManager.set_sheets (null);
+                                    }
+                                    _all_sheets.remove (kid);
+                                    remove_children (path);
                                 }
-                                _all_sheets.remove (kid);
-                                remove_children (path);
                             }
                         }
                     }
+                } catch (Error e) {
+                    warning ("Could not remove children from %s cleanly: %s", str_dir, e.message);
                 }
-            } catch (Error e) {
-                warning ("Could not remove children from %s cleanly: %s", str_dir, e.message);
+            } else {
+                string rem_kids = str_dir.has_suffix (Path.DIR_SEPARATOR_S) ? str_dir : str_dir + Path.DIR_SEPARATOR_S;
+                Gee.LinkedList<LibPair> bad_kids = new Gee.LinkedList<LibPair> ();
+                foreach (var kid in _all_sheets) {
+                    if (kid._path.has_prefix (rem_kids)) {
+                        bad_kids.add (kid);
+                    }
+                }
+
+                foreach (var bad_kid in bad_kids) {
+                    bad_kid._sheets.close_active_files ();
+                    if (SheetManager._current_sheets == bad_kid._sheets) {
+                        SheetManager.set_sheets (null);
+                    }
+                    _all_sheets.remove (bad_kid);
+                }
             }
         }
 
@@ -229,7 +248,22 @@ namespace ThiefMD.Widgets {
             }
         }
 
+        public void remove_item (string path) {
+            var settings = AppSettings.get_default ();
+            LibPair? p = get_item (path);
+
+            if (p != null) {
+                remove_children (path);
+                if (p != null) {
+                    _all_sheets.remove (p);
+                    _lib_store.remove (ref p._iter);
+                }
+                settings.writing_changed ();
+            }
+        }
+
         private void parse_dir (Sheets sheet_dir, string str_dir, TreeIter iter) {
+            var settings = AppSettings.get_default ();
             try {
                 // Create child iter
                 TreeIter child;
@@ -238,7 +272,8 @@ namespace ThiefMD.Widgets {
                 foreach (var file_name in sheet_dir.metadata.folder_order) {
                     if (!file_name.has_prefix(".") && !sheet_dir.metadata.hidden_folders.contains(file_name)) {
                         string path = Path.build_filename (str_dir, file_name);
-                        if (!has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
+                        File file = File.new_for_path (path);
+                        if (file.query_exists () && !has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
                             _lib_store.append (out child, iter);
                             LibPair pair = new LibPair(path, child);
                             _all_sheets.append (pair);
@@ -246,6 +281,14 @@ namespace ThiefMD.Widgets {
                             _lib_store.set (child, 0, pair._title, 1, pair, -1);
 
                             parse_dir (pair._sheets, path, child);
+                        } else if (!file.query_exists ()) {
+                            remove_children (path);
+                            LibPair p = get_item (path);
+                            if (p != null) {
+                                _all_sheets.remove (p);
+                                _lib_store.remove (ref p._iter);
+                            }
+                            settings.writing_changed ();
                         }
                     }
                 }
