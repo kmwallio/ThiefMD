@@ -74,6 +74,10 @@ Live Preview & Export Preview
 
 Typewriter Scrolling.
 
+![](docs/images/focus_mode.png)
+
+Focus Mode
+
 ![](docs/images/write-good.png)
 
 [Write-Good](https://github.com/ThiefMD/libwritegood-vala) recommendations and highlighting.
