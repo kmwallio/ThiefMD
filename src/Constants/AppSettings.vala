@@ -141,7 +141,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public bool menu_active { get; set; default = false; }
 
         public bool focusmode_enabled = false;
-        public FocusType focus_type { get; set; default = FocusType.SENTENCE; }
+        public FocusType focus_type { get; set; }
         public bool focus_mode {
             set {
                 focusmode_enabled = value;

@@ -139,6 +139,12 @@ namespace ThiefMD.Widgets {
             UI.get_focus_color (out r, out g, out b);
             focus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
             focus_text.foreground_set = true;
+            UI.get_focus_bg_color (out r, out g, out b);
+            focus_text.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            focus_text.background_set = true;
+            // out of focus settings
+            outoffocus_text.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            outoffocus_text.background_set = true;
             UI.get_out_of_focus_color (out r, out g, out b);
             outoffocus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
             outoffocus_text.foreground_set = true;
@@ -757,6 +763,12 @@ namespace ThiefMD.Widgets {
             UI.get_focus_color (out r, out g, out b);
             focus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
             focus_text.foreground_set = true;
+            UI.get_focus_bg_color (out r, out g, out b);
+            focus_text.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            focus_text.background_set = true;
+            // out of focus settings
+            outoffocus_text.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            outoffocus_text.background_set = true;
             UI.get_out_of_focus_color (out r, out g, out b);
             outoffocus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
             outoffocus_text.foreground_set = true;
