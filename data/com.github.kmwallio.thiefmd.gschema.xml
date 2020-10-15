@@ -175,5 +175,11 @@
             <summary>Font Size to use</summary>
             <description>Font Size for editor to use</description>
         </key>
+        <key name="focus-type" type="i">
+            <default>1</default>
+            <range min="0" max="2"/>
+            <summary>Type of Focus Mode to Use</summary>
+            <description>Type of Focus Mode (Paragraph, Sentence, Word) to Use</description>
+        </key>
     </schema>
 </schemalist>
