@@ -82,6 +82,7 @@ executable(
     'src/Widgets/ThiefPane.vala',
     'src/Widgets/ThemePreview.vala',
     'src/Widgets/Thinking.vala',
+    'src/Widgets/MarkdownCheatSheet.vala',
     'src/Controllers/FileManager.vala',
     'src/Controllers/Dialogs.vala',
     'src/Controllers/SheetManager.vala',

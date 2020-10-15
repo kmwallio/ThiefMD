@@ -64,6 +64,20 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
+                // Cheat Sheet
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                    if (match_keycode (Gdk.Key.h, keycode)) {
+                        MarkdownCheatSheet cheat_sheet = new MarkdownCheatSheet ();
+                        cheat_sheet.show_all ();
+                    }
+                }
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.question, keycode)) {
+                        MarkdownCheatSheet cheat_sheet = new MarkdownCheatSheet ();
+                        cheat_sheet.show_all ();
+                    }
+                }
+
                 // Preview
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
                     if (match_keycode (Gdk.Key.p, keycode)) {
