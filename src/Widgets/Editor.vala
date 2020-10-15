@@ -191,11 +191,11 @@ namespace ThiefMD.Widgets {
                 ext == "svg" || ext == "bmp")
             {
                 insert = "![](" + get_base_library_path(data) + ")\n";
-            } else if (ext == "yml" || ext == "js" || ext == "hpp" || ext == "coffee" ||
-                        ext == "vala" || ext == "c" || ext == "vapi" || ext == "ts" ||
-                        ext == "cpp" || ext == "rb" || ext == "css" ||
-                        ext == "pl" || ext == "py" || ext == "sass" ||
-                        ext == "pm" || ext == "h" || ext == "log")
+            } else if (ext == "yml" || ext == "js" || ext == "hpp" || ext == "coffee" || ext == "sh" ||
+                        ext == "vala" || ext == "c" || ext == "vapi" || ext == "ts" || ext == "toml" ||
+                        ext == "cpp" || ext == "rb" || ext == "css" || ext == "php" || ext == "scss" || ext == "less" ||
+                        ext == "pl" || ext == "py" || ext == "sass" || ext == "json" ||
+                        ext == "pm" || ext == "h" || ext == "log" || ext == "rs")
             {
                 File local = File.new_for_path (data);
                 if (file.query_exists () &&

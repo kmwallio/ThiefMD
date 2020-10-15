@@ -153,12 +153,6 @@ namespace ThiefMD.Widgets {
                     ThiefApp.get_instance ().library.refresh_dir (this);
                 }
 
-                if (other_file != null) {
-                    warning ("(%s) %s: %s, %s\n", _sheets_dir, event_type.to_string (), file.get_path (), other_file.get_path ());
-                } else {
-                    warning ("(%s) %s: %s\n", _sheets_dir, event_type.to_string (), file.get_path ());
-                }
-
                 File my_dir = File.new_for_path (_sheets_dir);
                 if (my_dir.query_exists ()) {
                     refresh ();
