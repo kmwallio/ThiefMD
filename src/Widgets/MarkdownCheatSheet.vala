@@ -56,24 +56,24 @@ namespace ThiefMD.Widgets {
             heading.use_markup = true;
             grid.add (heading);
 
-            var sp0 = new Gtk.Label (" ");
-            grid.add (sp0);
+            //  var sp0 = new Gtk.Label (" ");
+            //  grid.add (sp0);
 
             var bold_italic_string = new Gtk.Label ("<b>**Strong**</b>\n<i>*Emphasis*</i>\n~~<s>Deleted</s>~~\n`<tt>Code</tt>`");
             bold_italic_string.use_markup = true;
             bold_italic_string.xalign = 0;
             grid.add (bold_italic_string);
 
-            var sp1 = new Gtk.Label (" ");
-            grid.add (sp1);
+            //  var sp1 = new Gtk.Label (" ");
+            //  grid.add (sp1);
 
             var url = new Gtk.Label ("[Link](<u>http://to-site.com</u>)\n<b>!</b>[Image Description](<u>/path/to/image.png</u>)");
             url.use_markup = true;
             url.xalign = 0;
             grid.add (url);
 
-            var sp2 = new Gtk.Label (" ");
-            grid.add (sp2);
+            //  var sp2 = new Gtk.Label (" ");
+            //  grid.add (sp2);
 
             var ul = new Gtk.Label ("<b>*</b> List Item 1\n<b>*</b> List Item 2");
             ul.use_markup = true;
@@ -85,24 +85,24 @@ namespace ThiefMD.Widgets {
             ol.xalign = 0;
             grid.add (ol);
 
-            var sp3 = new Gtk.Label (" ");
-            grid.add (sp3);
+            //  var sp3 = new Gtk.Label (" ");
+            //  grid.add (sp3);
 
             var blockquote = new Gtk.Label ("<b>&gt;</b> Blockquote");
             blockquote.use_markup = true;
             blockquote.xalign = 0;
             grid.add (blockquote);
 
-            var sp4 = new Gtk.Label (" ");
-            grid.add (sp4);
+            //  var sp4 = new Gtk.Label (" ");
+            //  grid.add (sp4);
 
             var code_block = new Gtk.Label ("```python\n<tt>print (\"Hello World!\")</tt>\n```");
             code_block.use_markup = true;
             code_block.xalign = 0;
             grid.add (code_block);
 
-            var sp5 = new Gtk.Label (" ");
-            grid.add (sp5);
+            //  var sp5 = new Gtk.Label (" ");
+            //  grid.add (sp5);
 
             var hr = new Gtk.Label ("<b>***</b> (Horizontal Rule)");
             hr.use_markup = true;
