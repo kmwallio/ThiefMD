@@ -109,6 +109,7 @@ namespace ThiefMD.Widgets {
         private Gee.HashMap<string, Sheet> _sheets;
         private Gtk.Box _view;
         private PreventDelayedDrop _reorderable;
+        private FileMonitor _monitor;
         Gtk.Label _empty;
 
         public Sheets (string path) {
@@ -128,6 +129,25 @@ namespace ThiefMD.Widgets {
             var header_context = this.get_style_context ();
             header_context.add_class ("thief-sheets");
             _reorderable = new PreventDelayedDrop ();
+
+            File current_directory = File.new_for_path (_sheets_dir);
+            if (current_directory.query_exists () && FileUtils.test (_sheets_dir, FileTest.IS_DIR)) {
+                try {
+                    _monitor = current_directory.monitor_directory (FileMonitorFlags.SEND_MOVED | FileMonitorFlags.WATCH_MOVES);
+                    _monitor.changed.connect (folder_changed);
+                } catch (Error e) {
+                    warning ("Unable to monitor for folder changes: %s", e.message);
+                }
+            }
+        }
+
+        public void folder_changed (File file, File? other_file, FileMonitorEvent event_type) {
+            if (event_type == FileMonitorEvent.CREATED || event_type == FileMonitorEvent.MOVED ||
+                event_type == FileMonitorEvent.MOVED_IN || event_type == FileMonitorEvent.MOVED_OUT ||
+                event_type == FileMonitorEvent.DELETED)
+            {
+                refresh ();
+            }
         }
 
         public void add_hidden_item (string directory_path) {
