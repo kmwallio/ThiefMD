@@ -144,7 +144,7 @@ namespace ThiefMD.Widgets {
         public void folder_changed (File file, File? other_file, FileMonitorEvent event_type) {
             if (event_type == FileMonitorEvent.CREATED || event_type == FileMonitorEvent.MOVED ||
                 event_type == FileMonitorEvent.MOVED_IN || event_type == FileMonitorEvent.MOVED_OUT ||
-                event_type == FileMonitorEvent.DELETED)
+                event_type == FileMonitorEvent.DELETED || event_type == FileMonitorEvent.RENAMED)
             {
                 refresh ();
             }
