@@ -333,6 +333,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("show-writing-statistics", this, "show_writing_statistics", SettingsBindFlags.DEFAULT);
             app_settings.bind ("font-size", this, "font_size", SettingsBindFlags.DEFAULT);
             app_settings.bind ("font-family", this, "font_family", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("focus-type", this, "focus_type", SettingsBindFlags.DEFAULT);
 
             app_settings.changed.connect (() => {
                 changed ();
