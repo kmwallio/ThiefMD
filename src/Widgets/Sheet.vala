@@ -62,7 +62,7 @@ namespace ThiefMD.Widgets {
             _sheet_date = "";
 
             // Default to filename
-            _label_buffer = "<b>" + sheet_path.substring(sheet_path.last_index_of("/") + 1) + "</b>";
+            _label_buffer = "<b>" + sheet_path.substring(sheet_path.last_index_of(Path.DIR_SEPARATOR_S) + 1) + "</b>";
             _label = new Gtk.Label(_label_buffer);
             _label.use_markup = true;
             _label.set_ellipsize (Pango.EllipsizeMode.END);
@@ -131,7 +131,7 @@ namespace ThiefMD.Widgets {
             if (file_contents.chomp() != "") {
                 _label_buffer = "<small>" + SheetManager.mini_mark(file_contents) + "</small>";
             } else {
-                _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of("/") + 1) + "</b>";
+                _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "</b>";
             }
             _label.set_label (_label_buffer);
             settings.writing_changed ();

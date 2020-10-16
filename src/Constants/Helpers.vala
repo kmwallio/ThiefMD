@@ -51,7 +51,7 @@ namespace ThiefMD {
                 File f = File.new_for_path (base_lib);
                 string base_chop = f.get_parent ().get_path ();
                 res = res.substring (base_chop.length);
-                if (res.has_prefix ("/")) {
+                if (res.has_prefix (Path.DIR_SEPARATOR_S)) {
                     res = res.substring (1);
                 }
             }

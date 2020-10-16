@@ -166,7 +166,7 @@ namespace ThiefMD.Widgets {
 
             if (!settings.brandless) {
                 if (settings.show_filename && settings.last_file != "") {
-                    string file_name = settings.last_file.substring(settings.last_file.last_index_of("/") + 1);
+                    string file_name = settings.last_file.substring(settings.last_file.last_index_of (Path.DIR_SEPARATOR_S) + 1);
                     the_bar.set_title ("ThiefMD");
                     File lf = File.new_for_path (settings.last_file);
                     if (lf.query_exists ()) {

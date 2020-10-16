@@ -37,7 +37,7 @@ namespace ThiefMD.Widgets {
         private void build_ui () {
             var settings = AppSettings.get_default ();
             headerbar = new Gtk.HeaderBar ();
-            headerbar.set_title (get_base_library_path (monitor_path).replace ("/", " / "));
+            headerbar.set_title (get_base_library_path (monitor_path).replace (Path.DIR_SEPARATOR_S, " " + Path.DIR_SEPARATOR_S + " "));
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-toolbar");

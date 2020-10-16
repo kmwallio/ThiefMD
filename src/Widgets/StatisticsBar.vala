@@ -102,7 +102,7 @@ namespace ThiefMD.Widgets {
             );
 
             active_file.label = (_("%s : %d words.")).printf (
-                get_base_library_path (working_on).replace ("/", " / "),
+                get_base_library_path (working_on).replace (Path.DIR_SEPARATOR_S, " " + Path.DIR_SEPARATOR_S + " "),
                 wordcount
             );
 

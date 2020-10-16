@@ -34,13 +34,13 @@ namespace ThiefMD.Widgets {
         public TreeIter _iter; // @TODO: Should be weak?
 
         public LibPair (string path, TreeIter iter) {
-            if (path.has_suffix ("/")) {
-                _path = path.substring(0, -1);
+            if (path.has_suffix (Path.DIR_SEPARATOR_S)) {
+                _path = path.substring(0, path.char_count () - 1);
             } else {
                 _path = path;
             }
             debug ("Got path : %s", _path);
-            _title = _path.substring (_path.last_index_of ("/") + 1);
+            _title = _path.substring (_path.last_index_of (Path.DIR_SEPARATOR_S) + 1);
             _sheets = new Sheets(_path);
             _iter = iter;
         }

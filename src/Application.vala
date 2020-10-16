@@ -88,7 +88,7 @@ namespace ThiefMD {
             }
 
             if (settings.last_file != "") {
-                start_dir = settings.last_file.substring(0, settings.last_file.last_index_of("/"));
+                start_dir = settings.last_file.substring(0, settings.last_file.last_index_of(Path.DIR_SEPARATOR_S));
                 debug ("Starting with %s\n", start_dir);
             }
 

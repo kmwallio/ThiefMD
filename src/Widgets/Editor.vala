@@ -210,7 +210,7 @@ namespace ThiefMD.Widgets {
                     }
                 }
             } else if (ext == "pdf" || ext == "docx" || ext == "pptx" || ext == "html") {
-                insert = "[" + data.substring (data.last_index_of ("/") + 1) + "](" + get_base_library_path(data) + ")\n";
+                insert = "[" + data.substring (data.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "](" + get_base_library_path(data) + ")\n";
             } else if (ext == "csv") {
                 File local = File.new_for_path (data);
                 if (file.query_exists () &&

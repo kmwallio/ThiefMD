@@ -9,7 +9,8 @@
   <summary>The markdown editor worth stealing.</summary>
   <description>
     <p>Keep your Markdown managed. Write epic tales, keep a journal, or finally write that book report.</p>
-    <p>ThiefMD is a Markdown Editor providing an easy way to organize your markdown documents.</p>
+    <p>ThiefMD is a Markdown Editor providing an easy way to organize, format, and compile your markdown documents.</p>
+    <p>Import from and Export to Office, ePUB, HTML, and more. ThiefMD is your one stop shop for making and managing markdown mischief.</p>
   </description>
   <developer_name>kmwallio</developer_name>
   <url type="homepage">https://thiefmd.com</url>
@@ -55,6 +56,7 @@
           <li>Drag and Drop support (with some spicy new CSV to Markdown Table support)</li>
           <li>Hide the headerbar</li>
           <li>I didn't outline my NaNoWriMo Novel yet</li>
+          <li>Bug Fixes and Improvements</li>
         </ul>
       </description>
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.1-notnanoprep</url>
