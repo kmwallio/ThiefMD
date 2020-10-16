@@ -15,9 +15,11 @@
   "folder-order" : [
     "_drafts",
     "_posts",
-    "tips",
     "about",
     "deets",
+    "_deets",
+    "tips",
+    "_tips",
     "shortcuts",
     "download",
     "opensource",

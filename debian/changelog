@@ -1,3 +1,17 @@
+com.github.kmwallio.thiefmd (0.1.1) focal; urgency=low
+
+  * Improved Results & Fixed crash in search
+  * New Markdown Cheat Sheet
+  * Improved monitoring for external file/folder changes
+  * Custom Fonts
+  * Toolbar can now be hidden
+  * Drag and Drop Code, Images, and CSV support into the editor
+  * More sorting modes
+  * Preview window can now be full screened
+  * Misc Improvements
+
+ -- kmwallio <mwallio@gmail.com>  Fri, 16 Oct 2020 10:19:14 -0700
+
 com.github.kmwallio.thiefmd (0.1.0) focal; urgency=low
 
   * Import DocX, ePUB, HTML, and more, just drag the file onto a library folder
