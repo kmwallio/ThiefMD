@@ -158,11 +158,13 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
-* Sat Oct 17 2020 kmwallio <mwallio@gmail.com> - 0.1.1
+* Fri Oct 16 2020 kmwallio <mwallio@gmail.com> - 0.1.1
 - Improved search interface
 - Support for dragging certain files onto the editor (including CSV to Markdown table)
 - Ability to cusomize font
 - Ability to hide Headerbar
+- Focus Mode
+- Misc Improvements
 * Sat Oct 10 2020 kmwallio <mwallio@gmail.com> - 0.1.0
 - Import DocX, ePUB, HTML, and more, just drag the file onto a library folder
 - New Export Tool, change CSS, Page Size, and more
