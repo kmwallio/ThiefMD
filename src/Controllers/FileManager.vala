@@ -354,7 +354,8 @@ namespace ThiefMD.Controllers.FileManager {
     }
 
     public int get_word_count (string file_path) {
-        string markdown = get_yamlless_markdown (get_file_contents (file_path), 0, true, true, false);
+        var settings = AppSettings.get_default ();
+        string markdown = get_yamlless_markdown (get_file_contents (file_path), 0, true, settings.export_include_yaml_title, false);
 
         // This is for an approximate word count, not trying to be secure or anything...
         try {
@@ -426,11 +427,16 @@ namespace ThiefMD.Controllers.FileManager {
 
             while (valid_frontmatter) {
                 next_newline = buffer.index_of_char('\n', last_newline + 1);
-                if (next_newline == -1) {
+                if (next_newline == -1 && !((buffer.length > last_newline + 1) && buffer.substring (last_newline + 1).has_prefix("---"))) {
                     valid_frontmatter = false;
                     break;
                 }
-                line = buffer[last_newline+1:next_newline];
+
+                if (next_newline == -1) {
+                    line = buffer.substring (last_newline + 1);
+                } else {
+                    line = buffer[last_newline+1:next_newline];
+                }
                 line = line.replace (ThiefProperties.THIEF_MARK_CONST, "");
                 last_newline = next_newline;
 
@@ -480,13 +486,11 @@ namespace ThiefMD.Controllers.FileManager {
         return markout.str;
     }
 
-    public string get_file_lines_yaml (string file_path, int lines, bool non_empty = true) {
+    public string get_file_lines_yaml (string file_path, int lines, bool non_empty, out string title, out string date) {
         // var lock = new FileLock ();
         var markdown = new StringBuilder ();
-
-        if (lines <= 0) {
-            return get_file_contents(file_path);
-        }
+        string temp_title = "";
+        string temp_date = "";
 
         try {
             var file = File.new_for_path (file_path);
@@ -502,7 +506,7 @@ namespace ThiefMD.Controllers.FileManager {
                 string line;
                 bool in_yaml = false;
 
-                while (((line = input.read_line (null)) != null) && (lines_read < lines)) {
+                while (((line = input.read_line (null)) != null) && (lines_read < lines || lines <= 0)) {
                     if ((!non_empty) || (line.chomp() != "")) {
                         if (line == "---") {
                             if (in_yaml) {
@@ -513,15 +517,20 @@ namespace ThiefMD.Controllers.FileManager {
                             }
                         }
                         if (!in_yaml) {
+                            if (temp_title == "" && line.has_prefix ("#") && line.index_of (" ") != -1) {
+                                temp_title = line.substring (line.index_of (" ")).chug ().chomp ();
+                            }
                             markdown.append (((lines_read == 0) ? "" :"\n") + line.chomp());
                             lines_read++;
                         } else {
                             if (headers.match (line, RegexMatchFlags.NOTEMPTY, out matches)) {
-                                if (matches.fetch (1).ascii_down() == "title") {
-                                    markdown.append (((lines_read == 0) ? "" :"\n") + "# " + matches.fetch (2).replace ("\"", ""));
+                                if (matches.fetch (1).ascii_down().chug ().chomp () == "title") {
+                                    temp_title = matches.fetch (2).replace ("\"", "").chomp ().chug ();
+                                    markdown.append (((lines_read == 0) ? "" :"\n") + "# " + temp_title);
                                     lines_read++;
-                                } else if (matches.fetch (1).ascii_down() == "date") {
-                                    markdown.append (((lines_read == 0) ? "" :"\n") + matches.fetch (2));
+                                } else if (matches.fetch (1).ascii_down().chug ().chomp ().has_prefix ("date")) {
+                                    temp_date = matches.fetch (2).replace ("\"", "").chomp ().chug ();
+                                    markdown.append (((lines_read == 0) ? "" :"\n") + temp_date);
                                     lines_read++;
                                 }
                             }
@@ -539,6 +548,9 @@ namespace ThiefMD.Controllers.FileManager {
         } catch (Error e) {
             warning ("Error: %s", e.message);
         }
+
+        title = temp_title;
+        date = temp_date;
 
         return markdown.str;
     }

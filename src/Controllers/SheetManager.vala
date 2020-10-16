@@ -58,6 +58,7 @@ namespace ThiefMD.Controllers.SheetManager {
         if (_view == null) {
             _welcome_screen = new Widgets.Editor ("");
             _view = new Gtk.ScrolledWindow (null, null);
+            _view.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
         }
 
         if (_box_view == null) {
@@ -246,10 +247,16 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     public string get_markdown () {
+        var settings = AppSettings.get_default ();
         StringBuilder builder = new StringBuilder ();
         foreach (var sp in _active_editors) {
             string text = (Sheet.areEqual(sp.sheet, _currentSheet.sheet)) ? sp.editor.active_markdown () : sp.editor.buffer.text;
-            builder.append (FileManager.get_yamlless_markdown (text, 0, true, true, false));
+            builder.append (FileManager.get_yamlless_markdown (
+                text,
+                0,
+                true,
+                settings.export_include_yaml_title,
+                false));
         }
 
         return builder.str;

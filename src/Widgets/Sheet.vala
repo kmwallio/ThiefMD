@@ -34,6 +34,8 @@ namespace ThiefMD.Widgets {
         private string _label_buffer;
         private Sheets _parent;
         private int _word_count;
+        private string _sheet_title;
+        private string _sheet_date;
 
         // Change style depending on sheet available in the editor
         public bool active_sheet {
@@ -56,9 +58,11 @@ namespace ThiefMD.Widgets {
         public Sheet (string sheet_path, Sheets parent) {
             _sheet_path = sheet_path;
             _parent = parent;
+            _sheet_title = "";
+            _sheet_date = "";
 
             // Default to filename
-            _label_buffer = "<b>" + sheet_path.substring(sheet_path.last_index_of("/") + 1) + "</b>";
+            _label_buffer = "<b>" + sheet_path.substring(sheet_path.last_index_of(Path.DIR_SEPARATOR_S) + 1) + "</b>";
             _label = new Gtk.Label(_label_buffer);
             _label.use_markup = true;
             _label.set_ellipsize (Pango.EllipsizeMode.END);
@@ -121,13 +125,13 @@ namespace ThiefMD.Widgets {
 
         public void redraw () {
             var settings = AppSettings.get_default ();
-            string file_contents = FileManager.get_file_lines_yaml (_sheet_path, Constants.SHEET_PREVIEW_LINES);
+            string file_contents = FileManager.get_file_lines_yaml (_sheet_path, Constants.SHEET_PREVIEW_LINES, true, out _sheet_title, out _sheet_date);
 
             _word_count = FileManager.get_word_count (_sheet_path);
             if (file_contents.chomp() != "") {
                 _label_buffer = "<small>" + SheetManager.mini_mark(file_contents) + "</small>";
             } else {
-                _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of("/") + 1) + "</b>";
+                _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "</b>";
             }
             _label.set_label (_label_buffer);
             settings.writing_changed ();
@@ -135,6 +139,14 @@ namespace ThiefMD.Widgets {
 
         public int get_word_count () {
             return _word_count;
+        }
+
+        public string get_title () {
+            return _sheet_title;
+        }
+
+        public string get_date () {
+            return _sheet_date;
         }
 
         //
@@ -148,21 +160,53 @@ namespace ThiefMD.Widgets {
                 Gtk.Menu menu = new Gtk.Menu ();
                 menu.attach_to_widget (this, null);
 
-                Gtk.MenuItem sort_sheets_by_name = new Gtk.MenuItem.with_label ((_("Sort by Filename Ascending")));
-                menu.add (sort_sheets_by_name);
-                sort_sheets_by_name.activate.connect (() => {
-                    _parent.sort_sheets_by_name ();
-                });
+                Gtk.MenuItem sort_sheets = new Gtk.MenuItem.with_label (_("Sort by"));
+                Gtk.Menu sort_menu = new Gtk.Menu ();
+                {
+                    Gtk.MenuItem sort_sheets_by_name = new Gtk.MenuItem.with_label (_("Sort by Filename Ascending"));
+                    sort_menu.add (sort_sheets_by_name);
+                    sort_sheets_by_name.activate.connect (() => {
+                        _parent.sort_sheets_by_name ();
+                    });
 
-                Gtk.MenuItem sort_sheets_by_name_desc = new Gtk.MenuItem.with_label ((_("Sort by Filename Descending")));
-                menu.add (sort_sheets_by_name_desc);
-                sort_sheets_by_name_desc.activate.connect (() => {
-                    _parent.sort_sheets_by_name (false);
-                });
+                    Gtk.MenuItem sort_sheets_by_name_desc = new Gtk.MenuItem.with_label (_("Sort by Filename Descending"));
+                    sort_menu.add (sort_sheets_by_name_desc);
+                    sort_sheets_by_name_desc.activate.connect (() => {
+                        _parent.sort_sheets_by_name (false);
+                    });
+
+                    sort_menu.add (new Gtk.SeparatorMenuItem ());
+                    Gtk.MenuItem sort_sheets_by_title = new Gtk.MenuItem.with_label (_("Sort by Title Ascending"));
+                    sort_menu.add (sort_sheets_by_title);
+                    sort_sheets_by_title.activate.connect (() => {
+                        _parent.sort_sheets_by_title ();
+                    });
+
+                    Gtk.MenuItem sort_sheets_by_title_desc = new Gtk.MenuItem.with_label (_("Sort by Title Descending"));
+                    sort_menu.add (sort_sheets_by_title_desc);
+                    sort_sheets_by_title_desc.activate.connect (() => {
+                        _parent.sort_sheets_by_title (false);
+                    });
+
+                    sort_menu.add (new Gtk.SeparatorMenuItem ());
+                    Gtk.MenuItem sort_sheets_by_date = new Gtk.MenuItem.with_label (_("Sort by Date Ascending"));
+                    sort_menu.add (sort_sheets_by_date);
+                    sort_sheets_by_date.activate.connect (() => {
+                        _parent.sort_sheets_by_date ();
+                    });
+
+                    Gtk.MenuItem sort_sheets_by_date_desc = new Gtk.MenuItem.with_label (_("Sort by Date Descending"));
+                    sort_menu.add (sort_sheets_by_date_desc);
+                    sort_sheets_by_date_desc.activate.connect (() => {
+                        _parent.sort_sheets_by_date (false);
+                    });
+                }
+                sort_sheets.submenu = sort_menu;
+                menu.add (sort_sheets);
 
                 menu.add (new Gtk.SeparatorMenuItem ());
 
-                Gtk.MenuItem menu_preview_sheet = new Gtk.MenuItem.with_label ((_("Preview")));
+                Gtk.MenuItem menu_preview_sheet = new Gtk.MenuItem.with_label (_("Preview"));
                 menu.add (menu_preview_sheet);
                 menu_preview_sheet.activate.connect (() => {
                     SheetManager.load_sheet (this);
@@ -170,10 +214,29 @@ namespace ThiefMD.Widgets {
                     pvw.show_all ();
                 });
 
+                Gtk.MenuItem menu_export_sheet = new Gtk.MenuItem.with_label (_("Export"));
+                menu.add (menu_export_sheet);
+                menu_export_sheet.activate.connect (() => {
+                    string preview_markdown = FileManager.get_file_contents (_sheet_path);
+                    PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown);
+                    ppw.show_all ();
+                });
+
                 menu.add (new Gtk.SeparatorMenuItem ());
 
-                Gtk.MenuItem menu_delete_sheet = new Gtk.MenuItem.with_label ((_("Move to Trash")));
-                menu.add (menu_delete_sheet);
+                //  Gtk.MenuItem menu_rename = new Gtk.MenuItem.with_label (_("Rename File"));
+                //  menu_rename.activate.connect (() => {
+
+                //  });
+                //  menu.add (menu_rename);
+
+                Gtk.MenuItem menu_danger_zone = new Gtk.MenuItem.with_label (_("Danger Zone"));
+                menu_danger_zone.set_sensitive (false);
+                menu.add (menu_danger_zone);
+
+                menu.add (new Gtk.SeparatorMenuItem ());
+
+                Gtk.MenuItem menu_delete_sheet = new Gtk.MenuItem.with_label (_("Move to Trash"));
                 menu_delete_sheet.activate.connect (() => {
                     debug ("Got remove for sheet %s", _sheet_path);
                     _parent.remove_sheet (this);
@@ -182,6 +245,7 @@ namespace ThiefMD.Widgets {
                     }
                     FileManager.move_to_trash (_sheet_path);
                 });
+                menu.add (menu_delete_sheet);
                 menu.show_all ();
                 menu.popup_at_pointer (event);
             }

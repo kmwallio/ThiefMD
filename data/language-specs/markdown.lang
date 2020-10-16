@@ -48,6 +48,7 @@
     <style id="deletion" name="Strikethrough" map-to="def:deletion"/>
     <style id="backslash-escape" name="Backslash Escape" map-to="def:special-char"/>
     <style id="line-break" name="Line Break" map-to="def:note"/>
+    <style id="comment" name="Comment" map-to="def:comment"/>
   </styles>
 
   <definitions>
@@ -68,7 +69,7 @@
     -->
     <!-- Note: line break can't be used in regex, so only underline is matched. -->
     <context id="setext-header" style-ref="header">
-      <match>^(-+|=+)[ \t]*$</match>
+      <match>^(-{3,}|=+)[ \t]*$</match>
     </context>
 
     <!-- Examples:
@@ -166,6 +167,16 @@
     <context id="3-backticks-code-span" class="no-spell-check" style-ref="code-block">
       <start>^```.*$</start>
       <end>^```$</end>
+    </context>
+
+    <context id="yaml-frontmatter" style-ref="comment" first-line-only="true">
+      <start>^---$</start>
+      <end>^---$</end>
+    </context>
+
+    <context id="toml-frontmatter" style-ref="comment" first-line-only="true">
+      <start>^\+\+\+$</start>
+      <end>^\+\+\+$</end>
     </context>
 
     <!-- Example:
@@ -381,10 +392,32 @@
 
     <context id="markdown-syntax">
       <include>
+        <context ref="yaml-frontmatter"/>
+        <context ref="toml-frontmatter"/>
+        <context ref="horizontal-rule"/>
         <context ref="atx-header"/>
         <context ref="setext-header"/>
-        <context ref="horizontal-rule"/>
         <context ref="list"/>
+        <context ref="mdb:code-block-vala"/>
+        <context ref="mdb:code-block-go"/>
+        <context ref="mdb:code-block-py"/>
+        <context ref="mdb:code-block-ruby"/>
+        <context ref="mdb:code-block-js"/>
+        <context ref="mdb:code-block-java"/>
+        <context ref="mdb:code-block-c"/>
+        <context ref="mdb:code-block-cpp"/>
+        <context ref="mdb:code-block-lisp"/>
+        <context ref="mdb:code-block-make"/>
+        <context ref="mdb:code-block-matlab"/>
+        <context ref="mdb:code-block-haskell"/>
+        <context ref="mdb:code-block-r"/>
+        <context ref="mdb:code-block-rust"/>
+        <context ref="mdb:code-block-xml"/>
+        <context ref="mdb:code-block-html"/>
+        <context ref="mdb:code-block-css"/>
+        <context ref="mdb:code-block-perl"/>
+        <context ref="mdb:code-block-bash"/>
+        <context ref="mdb:code-block-php"/>
         <context ref="code-block"/>
         <context ref="1-backtick-code-span"/>
         <context ref="2-backticks-code-span"/>

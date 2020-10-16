@@ -20,6 +20,12 @@
 using ThiefMD.Controllers;
 
 namespace ThiefMD {
+    public enum FocusType {
+        PARAGRAPH = 0,
+        SENTENCE,
+        WORD,
+    }
+
     public class Constants {
         // Margin Constants
         public const int NARROW_MARGIN = 5;
@@ -31,6 +37,16 @@ namespace ThiefMD {
 
         // Timing Constants
         public const int AUTOSAVE_TIMEOUT = 3000;
+
+        // Autohide Toolbar settings
+        // Distance mouse has to travel from last hiding time ^ 2
+        public const double MOUSE_SENSITIVITY = 225;
+        // Time in milliseconds to check if mouse still in motion
+        // After MOUSE_IN_MOTION_TIME of no motion, the headerbar will hide
+        public const int MOUSE_IN_MOTION_TIME = 1000;
+        // Frequency in time to check if the mouse is still in motion
+        // once motion is detected. Should be > MOUSE_IN_MOTION_TIME
+        public const int MOUSE_MOTION_CHECK_TIME = 2500;
 
         // Default number of sheets to keep history of
         public const int KEEP_X_SHEETS_IN_MEMORY = 10;
@@ -48,6 +64,7 @@ namespace ThiefMD {
 
         // Number of lines to preview
         public const int SHEET_PREVIEW_LINES = 3;
+        public const int SEARCH_PREVIEW_LINES = 4;
         public const int CSS_PREVIEW_WIDTH = 75;
         public const int CSS_PREVIEW_HEIGHT = 100;
 
@@ -64,6 +81,9 @@ namespace ThiefMD {
         // Reading Statistics
         public const int WORDS_PER_MINUTE = 200;
         public const int WORDS_PER_SECOND = WORDS_PER_MINUTE / 60;
+
+        // Font settings
+        public const double SIZE_1_REM_IN_PT = 12;
 
         // Arbitrary strings
         public const string FIRST_USE = """# Click on a sheet to get started
@@ -107,11 +127,30 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public double export_side_margins { get; set; }
         public double export_top_bottom_margins { get; set; }
         public bool export_include_metadata_file { get; set; }
+        public bool export_include_yaml_title { get; set; }
         public bool brandless { get; set; }
         public string preview_css { get; set; }
         public string print_css { get; set; }
         public string export_paper_size { get; set; }
         public bool show_writing_statistics { get; set; }
+        public string font_family { get; set; }
+        public int font_size { get; set; default = 12; }
+
+        // Transient settings
+        public bool hide_toolbar { get; set; default = false; }
+        public bool menu_active { get; set; default = false; }
+
+        public bool focusmode_enabled = false;
+        public FocusType focus_type { get; set; }
+        public bool focus_mode {
+            set {
+                focusmode_enabled = value;
+                changed ();
+            }
+            get {
+                return focusmode_enabled;
+            }
+        }
 
         private bool writegood_enabled = false;
         public bool writegood {
@@ -133,6 +172,22 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             }
 
             return "thiefmd";
+        }
+
+        public string get_css_font_family () {
+            if (font_family == null || font_family.chug ().chomp () == "") {
+                return "font-family: 'iA Writer Duospace'";
+            } else {
+                return "font-family: '%s'".printf (font_family.chomp ().chug ());
+            }
+        }
+
+        public int get_css_font_size () {
+            if (font_size <= 0 || font_size > 240) {
+                return (int)Constants.SIZE_1_REM_IN_PT;
+            } else {
+                return font_size;
+            }
         }
 
         public string[] library () {
@@ -271,10 +326,14 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("export-side-margins", this, "export_side_margins", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-top-bottom-margins", this, "export_top_bottom_margins", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-include-metadata-file", this, "export_include_metadata_file", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("export-include-yaml-title", this, "export_include_yaml_title", SettingsBindFlags.DEFAULT);
             app_settings.bind ("preview-css", this, "preview_css", SettingsBindFlags.DEFAULT);
             app_settings.bind ("print-css", this, "print_css", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-paper-size", this, "export_paper_size", SettingsBindFlags.DEFAULT);
             app_settings.bind ("show-writing-statistics", this, "show_writing_statistics", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("font-size", this, "font_size", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("font-family", this, "font_family", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("focus-type", this, "focus_type", SettingsBindFlags.DEFAULT);
 
             app_settings.changed.connect (() => {
                 changed ();

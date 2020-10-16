@@ -5,17 +5,20 @@ title: Shortcuts
 
 # Changing the UI
 
-* `Ctrl + ,` - Access preferences window
-
-## Full Screen
-
+* `Ctrl + ,` - Access Preferences Window
+* `Ctrl + Shift + H` - Toggle hiding the Toolbar
+* `Ctrl + Shift + R` - Toggle Focus Mode
+* `Ctrl + Shift + T` - Toggle Typewriter Scrolling
+* `Ctrl + Shift + W` - Toggle Write-Good Suggestions
+* `Ctrl + Shift + S` - Toggle Writing Statistics
 * `F11` - Toggle Full Screen
 
-## Editor Views
+# Editor Views
 
 * `Ctrl + 1` - Editor Only
 * `Ctrl + 2` - Editor and Folder View
 * `Ctrl + 3` - Editor, Folder, and Library View
+* `Ctrl + H` - Markdown Cheat Sheet
 
 # File Management
 
@@ -30,3 +33,8 @@ title: Shortcuts
 * `Ctrl + B` - **\*\*Bold\*\***
 * `Ctrl + I` - *\*Italics\**
 * `Ctrl + D` - ~~&tilde;&tilde;Strikethrough&tilde;&tilde;~~
+
+# Editing
+
+* `Ctrl + Z` - Undo
+* `Ctrl + Shift + Z` - Redo

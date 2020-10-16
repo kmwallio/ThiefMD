@@ -49,6 +49,9 @@ namespace ThiefMD.Widgets {
         private bool writecheck_active;
         private bool typewriter_active;
 
+        private Gtk.TextTag focus_text;
+        private Gtk.TextTag outoffocus_text;
+
         //
         // Maintaining state
         //
@@ -130,10 +133,117 @@ namespace ThiefMD.Widgets {
                 writecheck_active = false;
             }
 
+            focus_text = buffer.create_tag ("focus-text");
+            outoffocus_text = buffer.create_tag ("outoffocus-text");
+            double r, g, b;
+            UI.get_focus_color (out r, out g, out b);
+            focus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            focus_text.foreground_set = true;
+            UI.get_focus_bg_color (out r, out g, out b);
+            focus_text.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            focus_text.background_set = true;
+            // out of focus settings
+            outoffocus_text.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            outoffocus_text.background_set = true;
+            UI.get_out_of_focus_color (out r, out g, out b);
+            outoffocus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            outoffocus_text.foreground_set = true;
+
             last_width = settings.window_width;
             last_height = settings.window_height;
             preview_mutex = new TimedMutex ();
             writegood_limit = new TimedMutex (1500);
+            drag_data_received.connect (on_drag_data_received);
+        }
+
+        private void on_drag_data_received (
+            Gtk.Widget widget,
+            DragContext context,
+            int x,
+            int y,
+            Gtk.SelectionData selection_data,
+            uint target_type,
+            uint time)
+        {
+            var header_context = this.get_style_context ();
+
+            int mid =  get_allocated_height () / 2;
+            debug ("%s: data (m: %d, %d)", widget.name, mid, y);
+
+            string data = (string) selection_data.get_data();
+            string raw_data = data;
+            debug ("Got: %s", data);
+
+            if (data != null) {
+                data = data.chomp ();
+            } else {
+                data = "";
+            }
+
+            if (data.has_prefix ("file://")) {
+                data = data.substring ("file://".length);
+            }
+
+            string ext = data.substring (data.last_index_of (".") + 1).down ().chug ().chomp ();
+            string insert = "";
+            if (ext == "png" || ext == "jpeg" ||
+                ext == "jpg" || ext == "gif" ||
+                ext == "svg" || ext == "bmp")
+            {
+                insert = "![](" + get_base_library_path(data) + ")\n";
+            } else if (ext == "yml" || ext == "js" || ext == "hpp" || ext == "coffee" || ext == "sh" ||
+                        ext == "vala" || ext == "c" || ext == "vapi" || ext == "ts" || ext == "toml" ||
+                        ext == "cpp" || ext == "rb" || ext == "css" || ext == "php" || ext == "scss" || ext == "less" ||
+                        ext == "pl" || ext == "py" || ext == "sass" || ext == "json" ||
+                        ext == "pm" || ext == "h" || ext == "log" || ext == "rs")
+            {
+                File local = File.new_for_path (data);
+                if (file.query_exists () &&
+                    (!FileUtils.test(data, FileTest.IS_DIR)) &&
+                    (FileUtils.test(data, FileTest.IS_REGULAR)))
+                {
+                    string code_data = FileManager.get_file_contents (data);
+                    if (code_data.chug ().chomp () != "") {
+                        insert = "\n```" + ext + "\n";
+                        insert += code_data;
+                        insert += "\n```\n";
+                    }
+                }
+            } else if (ext == "pdf" || ext == "docx" || ext == "pptx" || ext == "html") {
+                insert = "[" + data.substring (data.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "](" + get_base_library_path(data) + ")\n";
+            } else if (ext == "csv") {
+                File local = File.new_for_path (data);
+                if (file.query_exists () &&
+                    (!FileUtils.test(data, FileTest.IS_DIR)) &&
+                    (FileUtils.test(data, FileTest.IS_REGULAR)))
+                {
+                    string code_data = FileManager.get_file_contents (data);
+                    if (code_data.chug ().chomp () != "") {
+                        insert = "\n" + csv_to_md(code_data) + "\n";
+                    }
+                }
+            }
+
+            if (insert != "") {
+                Timeout.add (100, () => {
+                    int start_of_raw = buffer.cursor_position - raw_data.length;
+                    string wowzers = buffer.text.substring (start_of_raw, raw_data.length);
+                    if (wowzers == raw_data) {
+                        debug ("Found raw_data");
+                        Gtk.TextIter start, end;
+                        buffer.get_bounds (out start, out end);
+                        start.forward_chars (start_of_raw);
+                        end = start;
+                        end.forward_chars (raw_data.length);
+                        buffer.delete (ref start, ref end);
+                        buffer.insert_at_cursor (insert, insert.length);
+                    } else {
+                        debug ("Found: %s", wowzers);
+                    }
+                    return false;
+                });
+            }
+            return;
         }
 
         public signal void changed ();
@@ -649,6 +759,20 @@ namespace ThiefMD.Widgets {
             this.set_pixels_inside_wrap(settings.spacing);
             this.set_show_line_numbers (settings.show_num_lines);
 
+            double r, g, b;
+            UI.get_focus_color (out r, out g, out b);
+            focus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            focus_text.foreground_set = true;
+            UI.get_focus_bg_color (out r, out g, out b);
+            focus_text.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            focus_text.background_set = true;
+            // out of focus settings
+            outoffocus_text.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            outoffocus_text.background_set = true;
+            UI.get_out_of_focus_color (out r, out g, out b);
+            outoffocus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            outoffocus_text.foreground_set = true;
+
             typewriter_scrolling ();
             if (!typewriter_active && settings.typewriter_scrolling) {
                 typewriter_active = true;
@@ -661,6 +785,14 @@ namespace ThiefMD.Widgets {
                 queue_draw ();
                 should_scroll = true;
                 move_typewriter_scolling ();
+            }
+
+            if (settings.focusmode_enabled) {
+                buffer.notify["cursor-position"].connect (update_focus);
+                update_focus ();
+            } else {
+                buffer.notify["cursor-position"].disconnect (update_focus);
+                remove_focus ();
             }
 
             var buffer_context = this.get_style_context ();
@@ -706,6 +838,65 @@ namespace ThiefMD.Widgets {
             UI.load_css_scheme ();
         }
 
+        public void remove_focus () {
+            Gtk.TextIter start, end;
+                buffer.get_bounds (out start, out end);
+                buffer.remove_tag (focus_text, start, end);
+                buffer.remove_tag (outoffocus_text, start, end);
+        }
+
+        public void update_focus () {
+            var settings = AppSettings.get_default ();
+            if (settings.focus_mode) {
+                Gtk.TextIter start, end;
+                buffer.get_bounds (out start, out end);
+                buffer.remove_tag (focus_text, start, end);
+                buffer.apply_tag (outoffocus_text, start, end);
+
+                var cursor = buffer.get_insert ();
+                buffer.get_iter_at_mark (out start, cursor);
+                end = start;
+                if (settings.focus_type == FocusType.WORD) {
+                    if (!start.starts_word ()) {
+                        start.backward_word_start ();
+                    }
+                    if (!end.ends_word ()) {
+                        end.forward_word_end ();
+                    }
+                } else if (settings.focus_type == FocusType.SENTENCE) {
+                    if (!start.starts_sentence ()) {
+                        start.backward_sentence_start ();
+                    }
+                    if (!end.ends_sentence ()) {
+                        end.forward_sentence_end ();
+                    }
+                } else if (settings.focus_type == FocusType.PARAGRAPH) {
+                    if (!start.starts_line ()) {
+                        start.backward_line ();
+                    }
+                    if (!end.ends_line ()) {
+                        end.forward_to_line_end ();
+                    }
+                }
+
+                Gtk.TextIter end2 = end;
+                while (end.get_offset () > start.get_offset () && end.get_char () != 0 && end.get_char () != ' ' && end.get_char () != '\n' && !end.ends_word () && !end.ends_line ()) {
+                    end.backward_char ();
+                }
+
+                while (end.get_offset () < buffer.text.length && end.get_char () != 0 && end.get_char () != ' ' && end.get_char () != '\n' && !end.ends_word () && !end.ends_line ()) {
+                    end.forward_char ();
+                }
+
+                while (start.get_offset () > 0 && start.get_char () != 0 && start.get_char () != ' ' && start.get_char () != '\n' && !start.starts_word () && !start.starts_line ()) {
+                    start.backward_char ();
+                }
+
+                buffer.remove_tag (outoffocus_text, start, end);
+                buffer.apply_tag (focus_text, start, end);
+            }
+        }
+
         public bool move_typewriter_scolling () {
             if (!active) {
                 return false;
@@ -734,8 +925,17 @@ namespace ThiefMD.Widgets {
 
                 Gtk.MenuItem menu_insert_datetime = new Gtk.MenuItem.with_label (_("Insert Datetime"));
                 menu_insert_datetime.activate.connect (() => {
+
+                    string parent_path = file.get_parent ().get_path ().down ();
+                    bool am_iso8601 = parent_path.contains ("content");
+
                     DateTime now = new DateTime.now_local ();
-                    string new_text = now.format ("%F %H:%M");
+                    string new_text = now.format ("%F %T");
+
+                    if (am_iso8601) {
+                        new_text = now.format ("%FT%T%z");
+                    }
+
                     insert_at_cursor (new_text);
                 });
 
@@ -751,14 +951,18 @@ namespace ThiefMD.Widgets {
                         }
 
                         DateTime now = new DateTime.now_local ();
-                        string current_time = now.format ("%F %H:%M");
+                        string current_time = now.format ("%F %T");
 
                         string parent_folder = file.get_parent ().get_basename ().down ();
                         string page_type = (parent_folder.contains ("post") || parent_folder.contains ("draft")) ? "post" : "page";
                         string current_title = file.get_basename ();
                         string parent_path = file.get_parent ().get_path ().down ();
-                        bool add_draftmatter = parent_path.contains ("content/post");
+                        bool add_draftmatter = parent_path.contains ("content");
                         current_title = current_title.substring (0, current_title.last_index_of ("."));
+
+                        if (add_draftmatter) {
+                            current_time = now.format ("%FT%T%z");
+                        }
 
                         // Attempt to convert the file name into a title for the post
                         try {

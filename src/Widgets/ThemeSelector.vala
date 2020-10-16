@@ -23,6 +23,144 @@ using Gtk;
 using Gdk;
 
 namespace ThiefMD.Widgets {
+    public class ThiefFontSelector : Gtk.Box {
+        public ThiefFontSelector () {
+            build_ui ();
+        }
+
+        public bool filter_fonts (Pango.FontFamily fam, Pango.FontFace face) {
+            return (face.describe ().get_style () == Pango.Style.NORMAL) &&
+                    (!face.get_face_name ().down ().contains ("bold") &&
+                    !face.get_face_name ().down ().contains ("italic") &&
+                    !face.get_face_name ().down ().contains ("oblique"));
+        }
+
+        public void build_ui () {
+            var settings = AppSettings.get_default ();
+            var grid = new Gtk.Grid ();
+            int other = 2;
+            int items = 0;
+            grid.orientation = Gtk.Orientation.HORIZONTAL;
+            Gee.LinkedList<string> fonts = new Gee.LinkedList<string> ();
+            Gee.LinkedList<int> font_sizes = new Gee.LinkedList<int> ();
+
+            var font_label = new Gtk.Label (_("<b>Font:</b>"));
+            font_label.xalign = 0;
+            font_label.use_markup = true;
+
+            var font_selector = new Gtk.ComboBoxText ();
+            font_selector.append_text ("iA Writer Duospace");
+            fonts.add ("iA Writer Duospace");
+            font_selector.append_text ("Courier Prime");
+            fonts.add ("Courier Prime");
+
+            if (settings.font_family != null && settings.font_family.chug ().chomp () != "" && !fonts.contains (settings.font_family)) {
+                font_selector.append_text (settings.font_family);
+                fonts.add (settings.font_family);
+                font_selector.set_active (fonts.index_of (settings.font_family));
+                other = 3;
+                items = 3;
+            } else if (fonts.contains (settings.font_family)) {
+                font_selector.set_active (fonts.index_of (settings.font_family));
+            } else {
+                font_selector.set_active (0);
+                items = 2;
+            }
+
+            var font_size_selector = new Gtk.ComboBoxText ();
+            int scale = 2;
+            for (int i = 6; i <= 72; i += scale) {
+                font_size_selector.append_text (i.to_string ());
+                font_sizes.add (i);
+                if (i >= 16) {
+                    scale = 4;
+                }
+
+                if (i >= 24) {
+                    scale = 24;
+                }
+            }
+
+            if (!font_sizes.contains (settings.font_size) && settings.font_size > 0 && settings.font_size <= 240) {
+                font_sizes.add (settings.font_size);
+                font_size_selector.set_active (font_sizes.index_of (settings.font_size));
+            } else if (font_sizes.contains (settings.font_size)) {
+                font_size_selector.set_active (font_sizes.index_of (settings.font_size));
+            } else {
+                font_size_selector.set_active (font_sizes.index_of (12));
+            }
+
+            font_selector.append_text ("Other");
+            fonts.add ("Other");
+
+            font_size_selector.changed.connect (() => {
+                int option = font_size_selector.get_active ();
+                if (option >= 0 && option < font_sizes.size) {
+                    settings.font_size = font_sizes.get (option);
+                }
+                UI.load_font ();
+            });
+
+            font_selector.changed.connect (() => {
+                int option = font_selector.get_active ();
+                if (option >= 0 && option < fonts.size && fonts.get (option) == "Other") {
+                    Gtk.FontChooserDialog font_chooser = new Gtk.FontChooserDialog (_("Font Selector"), ThiefApp.get_instance ().main_window);
+                    font_chooser.set_filter_func (filter_fonts);
+                    Pango.FontDescription fontdesc = new Pango.FontDescription ();
+                    if (settings.font_size > 0 && settings.font_size <= 240) {
+                        fontdesc.set_size (settings.font_size * Pango.SCALE);
+                    } else {
+                        fontdesc.set_size (12 * Pango.SCALE);
+                    }
+                    font_chooser.set_font_desc (fontdesc);
+
+                    int res = font_chooser.run ();
+                    if (res != Gtk.ResponseType.CANCEL) {
+                        string new_font = font_chooser.get_font_family ().get_name ();
+                        int new_font_size = font_chooser.get_font_size ();
+                        if (new_font_size > Pango.SCALE) {
+                            new_font_size /= Pango.SCALE;
+                        }
+                        debug ("Selected font size: %d", new_font_size);
+                        debug ("Setting font: %s", new_font);
+                        settings.font_family = new_font;
+                        if (!fonts.contains (new_font)) {
+                            font_selector.append_text (new_font);
+                            fonts.add (new_font);
+                        }
+                        font_selector.set_active (fonts.index_of (new_font));
+                        if (!font_sizes.contains (new_font_size)) {
+                            font_size_selector.append_text (new_font_size.to_string ());
+                            font_sizes.add (new_font_size);
+                        }
+                        settings.font_size = new_font_size;
+                        font_size_selector.set_active (font_sizes.index_of (new_font_size));
+                    } else {
+                        if (settings.font_family == null || settings.font_family == "iA Writer Douspace" || settings.font_family.chug ().chomp () == "") {
+                            font_selector.set_active (0);
+                        } else if (settings.font_family == "Courier Prime") {
+                            font_selector.set_active (1);
+                        } else {
+                            font_selector.set_active (2);
+                        }
+                    }
+                    font_chooser.destroy ();
+                } else if (option >= 0 && option < fonts.size && fonts.get (option) != "Other") {
+                    settings.font_family = fonts.get (option);
+                    debug ("Setting font to: %s", fonts.get (option));
+                }
+
+                UI.load_font ();
+            });
+
+            grid.add (font_label);
+            grid.add (font_selector);
+            grid.add (font_size_selector);
+            grid.show_all ();
+
+            add (grid);
+        }
+    }
     public class CssSelector : Gtk.Box {
         private string css_type;
         private Gtk.FlowBox app_box;
@@ -35,15 +173,12 @@ namespace ThiefMD.Widgets {
 
         public void build_ui () {
             app_box = new Gtk.FlowBox ();
+            app_box.orientation = Gtk.Orientation.HORIZONTAL;
             app_box.margin = 6;
             app_box.max_children_per_line = 3;
             app_box.homogeneous = true;
             app_box.expand = false;
-
-            var preview_box = new Gtk.ScrolledWindow (null, null);
-            preview_box.add (app_box);
-            preview_box.hexpand = true;
-            preview_box.vexpand = true;
+            app_box.hexpand = true;
 
             var none = new CssPreview ("", css_type == "print");
             var modest_splendor = new CssPreview ("modest-splendor", css_type == "print");
@@ -52,7 +187,7 @@ namespace ThiefMD.Widgets {
 
             load_css ();
 
-            add (preview_box);
+            add (app_box);
         }
 
         public void refresh () {
@@ -198,7 +333,7 @@ namespace ThiefMD.Widgets {
             }
 
             public void build_ui () {
-                label = "\n\n\n\n<small>Stored in <a href='file://" + UserData.style_path + "'>" + UserData.style_path + "</a>.</small>";
+                label = "\n\n<small>Stored in <a href='file://" + UserData.style_path + "'>" + UserData.style_path + "</a>.</small>";
                 use_markup = true;
                 set_justify (Justification.LEFT);
                 xalign = 0;

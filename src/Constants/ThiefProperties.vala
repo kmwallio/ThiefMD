@@ -30,6 +30,7 @@ namespace ThiefMD {
         public const string[] GIANTS = {
             "Original Code:\nBased on <a href='https://github.com/lainsce/quilter'>Quilter</a>\nCopyright © 2017 Lains.\n<a href='https://github.com/lainsce/quilter/blob/master/LICENSE'>GNU General Public License v3.0</a>\n",
             "Font:\n<a href='https://github.com/iaolo/iA-Fonts'>iA Writer Duospace</a>\nCopyright © 2018 Information Architects Inc.\nwith Reserved Font Name \"iA Writer\"\n<a href='https://github.com/iaolo/iA-Fonts/blob/master/iA%20Writer%20Duospace/LICENSE.md'>SIL OPEN FONT LICENSE Version 1.1</a>\n",
+            "Font:\n<a href='https://quoteunquoteapps.com/courierprime'>Courier Prime</a>\nCopyright © 2013 Quote-Unquote Apps\n<a href='https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL'>SIL OPEN FONT LICENSE Version 1.1</a>\n",
             "Preview CSS:\n<a href='https://github.com/markdowncss'>Mash up of Splendor and Modest</a>\nCopyright © 2014-2015 John Otander.\n<a href='https://github.com/markdowncss/splendor/blob/master/LICENSE'>The MIT License (MIT)</a>\n",
             "Markdown Parsing:\n<a href='http://www.pell.portland.or.us/~orc/Code/discount/'>libmarkdown2</a>\nCopyright © 2007 David Loren Parsons.\n<a href='http://www.pell.portland.or.us/~orc/Code/discount/COPYRIGHT.html'>BSD-style License</a>\n",
             "Syntax Highlighting:\n<a href='https://highlightjs.org/'>highlight.js</a>\nCopyright © 2006 Ivan Sagalaev.\n<a href='https://github.com/highlightjs/highlight.js/blob/master/LICENSE'>BSD-3-Clause License</a>\n",
@@ -82,13 +83,39 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
 [ThiefMD](https://thiefmd.com)
 """;
 
+        public const string FONT_SETTINGS = """
+      .undershoot.top, .undershoot.right, .undershoot.bottom, .undershoot.left {
+          background-image: none;
+          border: 0;
+      }
+      
+      .undershoot, .undershoottop, .undershootright, .undershootbottom, .undershootleft {
+          background-image: none;
+          border: 0;
+      }
+      
+      .small-text {
+          %s;
+          font-size: %0.2frem;
+      }
+      
+      .focus-text {
+          %s;
+          font-size: %0.2frem;
+      }
+      
+      .full-text {
+          %s;
+          font-size: %0.2frem;
+      }""";
+
         public const string DYNAMIC_CSS = """@define-color colorPrimary %s;
         @define-color colorPrimaryActive %s;
         @define-color textColorPrimary %s;
         @define-color textColorActive %s;
         @define-color textColorGlobal %s;
         
-        .thiefmd-toolbar, .thief-search-box {
+        .thief-toolbar, .thiefmd-toolbar, .thief-search-box {
             border-bottom-color: transparent;
             border-bottom-width: 1px;
             background: @colorPrimary;
@@ -133,7 +160,17 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             color: @textColorPrimary;
             box-shadow: 0 1px transparent inset;
         }
-        
+
+        .thief-search-results {
+          padding: 0;
+          margin: 0;
+        }
+
+        .thief-search-results * {
+          margin: 0px;
+          padding: 0px;
+        }
+
         .thief-list-sheet {
             background: @colorPrimary;
             border-bottom: 1px solid @textColorGlobal;
@@ -142,7 +179,10 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         }
         
         .thief-list-sheet-active,
-        .thief-search-input {
+        .thief-search-input,
+        .thief-search-results *:hover,
+        .thief-search-results *:active,
+        .thief-search-results *:hover:active {
             background: lighter(@colorPrimary);
             color: @textColorPrimary;
         }

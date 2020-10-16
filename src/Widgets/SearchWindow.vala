@@ -26,13 +26,49 @@ namespace ThiefMD.Widgets {
         public string file_path;
         public Sheet file_sheet;
         public string text_highlight;
+        public string mini_mark;
+        public int occurrences;
     }
 
-    public class SearchDisplay {
+    public class SearchDisplay : Gtk.Button {
         public string search_term;
         public string file_path;
+        public string mini_mark;
         public Sheet file_sheet;
-        public Gtk.Button result;
+        public int occurrences;
+
+        public void double_check () {
+            string contents = FileManager.get_file_contents (file_path);
+            int index = contents.down ().index_of (search_term.down ());
+            if (index != -1) {
+                string title, date;
+                mini_mark = SheetManager.mini_mark (FileManager.get_file_lines_yaml (file_path, Constants.SEARCH_PREVIEW_LINES, true, out title, out date));
+                int index2 = contents.down ().index_of (search_term.down (), mini_mark.length + 6 + ((title != "") ? title.length + 7 : 0) + ((date != "") ? date.length + 6 : 0));
+                if (index2 != -1) {
+                    index = index2;
+                }
+                int start = (index - 10) >= 0 ? (index - 10) : 0;
+                int end = (index + 50) < contents.length ? 50 : -1;
+                occurrences = contents.down ().split (search_term.down ()).length - 1;
+                string text_highlight = contents.substring (start, end);
+                text_highlight = text_highlight.replace ("\n", " ");
+                text_highlight = text_highlight.replace ("&", "&amp;");
+                text_highlight = text_highlight.replace ("<", "&lt;").replace (">", "&gt;");
+                text_highlight = mini_mark + "\n..." + text_highlight + "...";
+                text_highlight = text_highlight.down ().replace (search_term.down (), "<b>" + search_term + "</b>");
+                string lib_path = get_base_library_path (file_path);
+                if (lib_path == "") {
+                    lib_path = file_path;
+                }
+                var label = new Gtk.Label ("<b>" + lib_path + " (" + occurrences.to_string () + " matches)</b>\n" + text_highlight);
+                label.xalign = 0;
+                label.set_ellipsize (Pango.EllipsizeMode.END);
+                label.use_markup = true;
+                remove (get_child ());
+                add (label);
+                show_all ();
+            }
+        }
     }
 
     public class SearchThread {
@@ -53,69 +89,98 @@ namespace ThiefMD.Widgets {
                 string contents = FileManager.get_file_contents (files.nth_data (i).file_path ());
                 int index = contents.down ().index_of (search_term.down ());
                 if (index != -1) {
+                    SearchResult res = new SearchResult ();
+                    string title, date;
+                    res.mini_mark = SheetManager.mini_mark (FileManager.get_file_lines_yaml (files.nth_data (i).file_path (), Constants.SEARCH_PREVIEW_LINES, true, out title, out date));
+                    int index2 = contents.down ().index_of (search_term.down (), res.mini_mark.length + 6 + ((title != "") ? title.length + 7 : 0) + ((date != "") ? date.length + 6 : 0));
+                    if (index2 != -1) {
+                        index = index2;
+                    }
                     int start = (index - 10) >= 0 ? (index - 10) : 0;
                     int end = (index + 50) < contents.length ? 50 : -1;
-                    SearchResult res = new SearchResult ();
+                    res.occurrences = contents.down ().split (search_term.down ()).length - 1;
                     res.file_path = files.nth_data (i).file_path ();
                     res.search_term = search_term;
                     res.text_highlight = contents.substring (start, end);
                     res.text_highlight = res.text_highlight.replace ("\n", " ");
                     res.text_highlight = res.text_highlight.replace ("&", "&amp;");
                     res.text_highlight = res.text_highlight.replace ("<", "&lt;").replace (">", "&gt;");
-                    res.text_highlight = SheetManager.mini_mark (FileManager.get_file_lines_yaml (files.nth_data (i).file_path (), Constants.SHEET_PREVIEW_LINES)) + "\n..." + res.text_highlight + "...";
+                    res.text_highlight = res.mini_mark + "\n..." + res.text_highlight + "...";
                     res.text_highlight = res.text_highlight.down ().replace (search_term.down (), "<b>" + search_term + "</b>");
                     res.file_sheet = files.nth_data (i);
                     to_update.results.add (res);
                     res_count++;
+                    debug ("Found: %s", res.file_path + " (" + res.occurrences.to_string () + " matches)");
                 }
             }
             debug ("Thread done, %d found", res_count);
+            to_update.remove_thread ();
             return;
         }
     }
 
     public class SearchWindow : Gtk.Window {
         Gtk.HeaderBar headerbar;
-        public Gee.LinkedList<SearchResult> results;
-        Gee.LinkedList<SearchDisplay> displayed;
+        public Gee.ConcurrentList<SearchResult> results;
+        Gee.ConcurrentList<SearchDisplay> displayed;
         Gtk.Entry search;
         string active_search_term;
+        Mutex start_search;
         Mutex ui_update;
         Mutex ui_remove;
         Mutex thread_update;
+        public int running_threads;
         public bool searching = false;
-        Gtk.Grid search_results;
+        Gtk.FlowBox search_results;
         Gee.ArrayList<Sheets> searchable;
         TimedMutex one_click;
+        private string scoped_folder;
 
-        public class SearchWindow () {
+        public class SearchWindow (string local_result = "") {
             ui_update = Mutex ();
             ui_remove = Mutex ();
             thread_update = Mutex ();
-            results = new Gee.LinkedList<SearchResult> ();
-            displayed = new Gee.LinkedList<SearchDisplay> ();
+            start_search = Mutex ();
+            scoped_folder = local_result;
+            results = new Gee.ConcurrentList<SearchResult> ();
+            displayed = new Gee.ConcurrentList<SearchDisplay> ();
             build_ui ();
             one_click = new TimedMutex (750);
         }
 
         private void build_ui () {
+            var settings = AppSettings.get_default ();
             headerbar = new Gtk.HeaderBar ();
-            headerbar.set_title (_("Library Search"));
+            if (scoped_folder == null || scoped_folder.chomp ().chug () == "") {
+                headerbar.set_title (_("Library Search"));
+            } else {
+                headerbar.set_title (get_base_library_path (scoped_folder).replace (Path.DIR_SEPARATOR_S, " " + Path.DIR_SEPARATOR_S + " ") + _(" Search"));
+            }
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-toolbar");
             search = new Gtk.Entry ();
             search.placeholder_text = "Enter search";
 
-            search_results = new Gtk.Grid ();
-            search_results.orientation = Gtk.Orientation.VERTICAL;
-            searchable = ThiefApp.get_instance ().library.get_all_sheets ();
+            search_results = new Gtk.FlowBox ();
+            search_results.orientation = Gtk.Orientation.HORIZONTAL;
+            search_results.max_children_per_line = 1;
+            search_results.column_spacing = 0;
+            search_results.margin = 0;
+            search_results.row_spacing = 0;
+            search_results.homogeneous = true;
+            search_results.hexpand = true;
+            search_results.set_sort_func (search_order);
+
+            header_context = search_results.get_style_context ();
+            header_context.add_class ("thief-search-results");
 
             var scroller = new Gtk.ScrolledWindow (null, null);
             scroller.hexpand = true;
             scroller.vexpand = true;
             scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
             header_context = scroller.get_style_context ();
+            header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-sheets");
             search_results.hexpand = true;
             scroller.add (search_results);
@@ -125,7 +190,7 @@ namespace ThiefMD.Widgets {
             headerbar.pack_start (search);
             headerbar.set_show_close_button (true);
             set_titlebar (headerbar);
-            parent = ThiefApp.get_instance ().main_window;
+            transient_for = ThiefApp.get_instance ().main_window;
             destroy_with_parent = true;
 
             int w, h;
@@ -134,10 +199,66 @@ namespace ThiefMD.Widgets {
             set_default_size(w / 3, h - 50);
 
             search.activate.connect (update_terms);
+
+            var live_reload_switch = new Gtk.Switch ();
+            live_reload_switch.set_active (false);
+            live_reload_switch.tooltip_text = _("Monitor for Library changes");
+            headerbar.pack_end (live_reload_switch);
+            live_reload_switch.notify["active"].connect (() => {
+                if (live_reload_switch.active) {
+                    settings.writing_changed.connect (live_reload);
+                } else {
+                    settings.writing_changed.disconnect (live_reload);
+                }
+            });
+
+            
             delete_event.connect (() => {
                 searching = false;
+                if (live_reload_switch.active) {
+                    settings.writing_changed.disconnect (live_reload);
+                }
                 return false;
             });
+        }
+
+        public void live_reload () {
+            if (active_search_term != search.text) {
+                active_search_term = search.text;
+            }
+
+            if (active_search_term == null || active_search_term.chomp ().chug () == "") {
+                return;
+            }
+
+            if (!start_search.trylock ()) {
+                return;
+            }
+
+            if (!searching) {
+                if (ui_remove.trylock ()) {
+                    if (ui_update.trylock ()) {
+                        foreach (var had_it in displayed) {
+                            had_it.double_check ();
+                        }
+                        for (int r = 0; r < displayed.size; r++) {
+                            var had_it = displayed.get (r);
+                            if (had_it.occurrences == 0 || had_it.search_term != active_search_term) {
+                                displayed.remove (had_it);
+                                search_results.remove (had_it);
+                            }
+                        }
+                        search_results.invalidate_sort ();
+                        ui_update.unlock ();
+                        searching = true;
+                        create_searchers ();
+                        GLib.Idle.add (update_search);
+                        GLib.Idle.add (remove_search);
+                    }
+                    ui_remove.unlock ();
+                }
+            }
+            start_search.unlock ();
         }
 
         public void update_terms () {
@@ -145,28 +266,44 @@ namespace ThiefMD.Widgets {
             bool respawn = active_search_term != search.text;
             active_search_term = search.text;
 
-            if (!searching) {
-                searching = true;
+            start_search.lock ();
+            // stop all current threads
+            if (searching) {
+                searching = false;
             }
 
-            if (respawn) {
-                create_searchers ();
-                GLib.Idle.add (update_search);
-                GLib.Idle.add (remove_search);
+            while (running_threads > 0) {
+                searching = false;
             }
+            start_search.unlock ();
+
+            live_reload ();
         }
 
         public void create_searchers () {
             debug ("spawning seachers");
+            if (scoped_folder == null || scoped_folder.chomp ().chug () == "") {
+                searchable = ThiefApp.get_instance ().library.get_all_sheets ();
+            } else {
+                searchable = ThiefApp.get_instance ().library.get_all_sheets_for_path (scoped_folder);
+                if (searchable.size == 0) {
+                    destroy ();
+                }
+            }
+
             if (!Thread.supported ()) {
                 debug ("Thread support not available...");
                 foreach (var search in searchable) {
+                    if (!searching) {
+                        break;
+                    }
                     SearchThread not_a_thread = new SearchThread (active_search_term, search, this);
                     not_a_thread.search ();
                 }
             } else {
                 foreach (var search in searchable) {
                     SearchThread thread = new SearchThread (active_search_term, search, this);
+                    add_thread ();
                     var nt = new Thread<void> ("search_thread" + search.get_sheets_path (), thread.search);
                 }
             }
@@ -181,7 +318,7 @@ namespace ThiefMD.Widgets {
                     SearchDisplay dis = displayed.get (i);
                     if (dis.search_term != active_search_term) {
                         displayed.remove (dis);
-                        search_results.remove (dis.result);
+                        search_results.remove (dis);
                         i--;
                     }
                 }
@@ -191,28 +328,52 @@ namespace ThiefMD.Widgets {
             return searching;
         }
 
+        public void remove_thread () {
+            thread_update.lock ();
+            running_threads--;
+            thread_update.unlock ();
+        }
+
+        public void add_thread () {
+            thread_update.lock ();
+            running_threads++;
+            thread_update.unlock ();
+        }
+
+        private int search_order (Gtk.FlowBoxChild c1, Gtk.FlowBoxChild c2) {
+            SearchDisplay sd1 = (SearchDisplay)c1.get_child ();
+            SearchDisplay sd2 = (SearchDisplay)c2.get_child ();
+            return (sd2.occurrences - sd1.occurrences);
+        }
+
         public bool update_search () {
             var settings = AppSettings.get_default ();
             if (ui_update.trylock ()) {
                 while (!results.is_empty) {
-                    SearchResult res = results.poll ();
+                    SearchResult res = results.remove_at (0);
                     if (res.search_term == active_search_term) {
                         SearchDisplay dis = new SearchDisplay ();
+                        dis.margin = 0;
                         dis.file_path = res.file_path;
                         dis.search_term = res.search_term;
-                        dis.result = new Gtk.Button ();
+                        dis.mini_mark = res.mini_mark;
+                        var header_context = dis.get_style_context ();
+                        header_context.add_class (Gtk.STYLE_CLASS_FLAT);
+                        header_context.add_class ("thief-list-sheet");
+
                         string lib_path = get_base_library_path (res.file_path);
                         if (lib_path == "") {
                             lib_path = res.file_path;
                         }
-                        var label = new Gtk.Label ("<b>" + lib_path + "</b>\n" + res.text_highlight);
+                        var label = new Gtk.Label ("<b>" + lib_path + " (" + res.occurrences.to_string () + " matches)</b>\n" + res.text_highlight);
                         label.xalign = 0;
                         label.set_ellipsize (Pango.EllipsizeMode.END);
                         label.use_markup = true;
-                        dis.result.add (label);
-                        dis.result.hexpand = true;
+                        dis.add (label);
+                        dis.occurrences = res.occurrences;
+                        dis.hexpand = true;
                         dis.file_sheet = res.file_sheet;
-                        dis.result.clicked.connect (() => {
+                        dis.clicked.connect (() => {
                             if (one_click.can_do_action ()) {
                                 debug ("Opening %s", dis.file_path);
                                 // any other method I try crashes everying...
@@ -221,13 +382,35 @@ namespace ThiefMD.Widgets {
                                 ThiefApp.get_instance ().search_bar.search_for (dis.search_term);
                             }
                         });
-                        search_results.add (dis.result);
-                        displayed.add (dis);
-                        search_results.show_all ();
-                        debug ("added result");
+
+                        int row = 0;
+                        bool add = true;
+                        foreach (var already in displayed) {
+                            if (res.occurrences <= already.occurrences) {
+                                row++;
+                            }
+
+                            if (already.file_path == res.file_path) {
+                                add = false;
+                            }
+                        }
+
+                        if (add) {
+                            search_results.insert (dis, row);
+                            displayed.add (dis);
+                            search_results.show_all ();
+                            debug ("added result");
+                        }
                     }
                 }
                 ui_update.unlock ();
+            }
+
+            if (thread_update.trylock ()) {
+                if (running_threads == 0) {
+                    searching = false;
+                }
+                thread_update.unlock ();
             }
 
             return searching;

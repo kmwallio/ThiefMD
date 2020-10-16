@@ -553,8 +553,8 @@
       <include>
 
         <context id="_template-head" style-ref="js:template-literal" once-only="true">
-          <start>(?&lt;=`)</start>
-          <end>(?=`|\${)</end>
+          <start>\s+(?&lt;=`)</start>
+          <end>(?=`|\${)(\s+|[^`]|$)</end>
           <include>
             <context ref="js:embedded-lang-hooks"/>
             <!-- no comments here -->
@@ -597,8 +597,8 @@
 
     <!-- <Template> / <TemplateLiteral> -->
     <context id="template-literals">
-      <start>`</start>
-      <end>`</end>
+      <start>\s+`</start>
+      <end>`(\s+|[^`]|$)</end>
       <include>
         <context sub-pattern="0" where="start" style-ref="js:template-literal"/>
         <context sub-pattern="0" where="end" style-ref="js:template-literal"/>
@@ -612,8 +612,8 @@
 
     <!-- <Template> / <TemplateLiteral> -->
     <context id="choice-template-literal" end-parent="true">
-      <start>`</start>
-      <end>`</end>
+      <start>\s+`</start>
+      <end>`(\s+|[^`]|$)</end>
       <include>
         <context sub-pattern="0" where="start" style-ref="js:template-literal"/>
         <context sub-pattern="0" where="end" style-ref="js:template-literal"/>

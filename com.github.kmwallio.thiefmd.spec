@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.1.0
+Version: 0.1.1
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
@@ -153,11 +153,176 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/xslt.lang
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/yaml.lang
 /usr/share/icons/hicolor/32x32/apps/com.github.kmwallio.thiefmd.svg
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/R.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/abnf.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/actionscript.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/ada.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/ansforth94.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/asciidoc.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/asp.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/automake.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/awk.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/bennugd.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/bibtex.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/bluespec.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/boo.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/c.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/cg.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/changelog.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/chdr.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/check-language.sh
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/cmake.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/cobol.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/commonlisp.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/cpp.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/cpphdr.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/csharp.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/csv.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/cuda.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/d.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/dart.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/desktop.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/diff.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/docbook.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/docker.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/dosbatch.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/dot.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/dpatch.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/eiffel.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/erb-html.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/erb-js.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/erb.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/erlang.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/fcl.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/fish.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/forth.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/fortran.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/fsharp.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/ftl.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/gap.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/gdb-log.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/gdscript.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/genie.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/glsl.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/go.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/gradle.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/groovy.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/gtk-doc.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/gtkrc.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/haddock.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/haskell-literate.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/haskell.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/haxe.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/idl-exelis.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/idl.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/imagej.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/ini.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/j.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/jade.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/java.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/jsx.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/julia.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/kotlin.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/lang_v1_to_v2.xslt
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/less.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/lex.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/libtool.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/llvm.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/logcat.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/logtalk.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/lua.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/m4.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/makefile.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/mallard.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/matlab.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/maxima.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/mdb.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/mediawiki.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/meson.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/modelica.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/mxml.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/nemerle.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/netrexx.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/nsis.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/objc.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/objj.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/ocaml.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/ocl.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/octave.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/ooc.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/opal.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/opencl.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/pascal.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/perl.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/php.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/pig.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/pkgconfig.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/po.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/powershell.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/prolog.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/protobuf.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/puppet.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/python.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/python3.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/rpmspec.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/ruby.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/rust.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/scala.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/scheme.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/scilab.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/scss.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/sh.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/sml.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/solidity.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/sparql.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/sql.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/sweave.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/swift.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/systemverilog.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/t2t.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/tcl.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/tera.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/testv1.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/texinfo.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/thrift.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/toml.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/typescript-js-expressions.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/typescript-js-functions-classes.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/typescript-js-literals.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/typescript-js-modules.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/typescript-js-statements.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/typescript-jsx.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/typescript-type-expressions.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/typescript-type-generics.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/typescript-type-literals.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/typescript.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/ue2gsv.pl
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/update-pot.sh
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/vala.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/vbnet.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/verilog.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/vhdl.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/yacc.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/yara.lang
+"/usr/share/fonts/truetype/thiefmd/Courier Prime-Bold.ttf"
+"/usr/share/fonts/truetype/thiefmd/Courier Prime-BoldItalic.ttf"
+"/usr/share/fonts/truetype/thiefmd/Courier Prime-Italic.ttf"
+"/usr/share/fonts/truetype/thiefmd/Courier Prime-Regular.ttf"
+/usr/share/fonts/truetype/thiefmd/iAWriterDuospace-Bold.ttf
+/usr/share/fonts/truetype/thiefmd/iAWriterDuospace-BoldItalic.ttf
+/usr/share/fonts/truetype/thiefmd/iAWriterDuospace-Italic.ttf
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %changelog
+* Fri Oct 16 2020 kmwallio <mwallio@gmail.com> - 0.1.1
+- Improved search interface
+- Support for dragging certain files onto the editor (including CSV to Markdown table)
+- Ability to cusomize font
+- Ability to hide Headerbar
+- Focus Mode
+- Misc Improvements
 * Sat Oct 10 2020 kmwallio <mwallio@gmail.com> - 0.1.0
 - Import DocX, ePUB, HTML, and more, just drag the file onto a library folder
 - New Export Tool, change CSS, Page Size, and more

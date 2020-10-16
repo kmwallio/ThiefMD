@@ -25,18 +25,20 @@ using Gdk;
 namespace ThiefMD.Widgets {
     public class Preferences : Dialog {
         private Stack stack;
+        private Gtk.HeaderBar bar;
 
         public Preferences () {
             set_transient_for (ThiefApp.get_instance ().main_window);
-            resizable = false;
-            deletable = false;
+            resizable = true;
+            deletable = true;
             modal = true;
             build_ui ();
         }
 
         private void build_ui () {
+            add_headerbar ();
             this.set_border_width (20);
-            title = _("Preferences");
+            title = "";
             window_position = WindowPosition.CENTER;
 
             stack = new Stack ();
@@ -50,7 +52,8 @@ namespace ThiefMD.Widgets {
 
             Box box = new Box (Orientation.VERTICAL, 0);
 
-            box.add (switcher);
+            bar.set_custom_title (switcher);
+            // box.add (switcher);
             box.add (stack);
             this.get_content_area().add (box);
 
@@ -64,6 +67,7 @@ namespace ThiefMD.Widgets {
         }
 
         private Grid display_grid () {
+            var settings = AppSettings.get_default ();
             Grid grid = new Grid ();
             grid.margin = 12;
             grid.row_spacing = 12;
@@ -71,17 +75,62 @@ namespace ThiefMD.Widgets {
             grid.orientation = Orientation.VERTICAL;
             grid.hexpand = true;
 
+            ThiefFontSelector font_selector = new ThiefFontSelector ();
+
+            var focus_label = new Gtk.Label (_("<b>Focus:</b>"));
+            var mini_grid = new Gtk.Grid ();
+            mini_grid.orientation = Gtk.Orientation.HORIZONTAL;
+            focus_label.use_markup = true;
+            focus_label.xalign = 0;
+            var focus_selector = new Gtk.ComboBoxText ();
+            focus_selector.append_text ("None");
+            focus_selector.append_text ("Paragraph");
+            focus_selector.append_text ("Sentence");
+            focus_selector.append_text ("Word");
+
+            if (settings.focus_mode) {
+                focus_selector.set_active (settings.focus_type + 1);
+            } else {
+                focus_selector.set_active (0);
+            }
+
+            focus_selector.changed.connect (() => {
+                int option = focus_selector.get_active ();
+                if (option <= 0) {
+                    settings.focus_mode = false;
+                } else if (option == 1) {
+                    settings.focus_type = FocusType.PARAGRAPH;
+                    settings.focus_mode = true;
+                } else if (option == 2) {
+                    settings.focus_type = FocusType.SENTENCE;
+                    settings.focus_mode = true;
+                } else if (option == 3) {
+                    settings.focus_type = FocusType.WORD;
+                    settings.focus_mode = true;
+                }
+            });
+
+            mini_grid.add (focus_label);
+            mini_grid.add (focus_selector);
+
             ThemeSelector theme_selector = new ThemeSelector ();
+            grid.add (font_selector);
+            grid.add (mini_grid);
             grid.add (theme_selector);
             grid.show_all ();
 
             return grid;
         }
 
-        private Grid export_grid () {
+        private Widget export_grid () {
             var settings = AppSettings.get_default ();
+            var export_scroller = new ScrolledWindow (null, null);
+            export_scroller.hexpand = true;
+            export_scroller.vexpand = true;
+            export_scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+
             Grid grid = new Grid ();
-            grid.margin = 12;
+            grid.margin = 0;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
             grid.orientation = Orientation.VERTICAL;
@@ -104,9 +153,19 @@ namespace ThiefMD.Widgets {
                 settings.export_resolve_paths = export_resolve_paths_switch.get_active ();
             });
             export_resolve_paths_switch.tooltip_text = _("Resolve full paths to resources");
-            var export_resolve_paths_label = new Label(_("Resolve full paths to resources on export (ePub, docx required)"));
+            var export_resolve_paths_label = new Label(_("Resolve full paths to resources on export"));
             export_resolve_paths_label.xalign = 0;
             export_resolve_paths_label.hexpand = true;
+
+            var export_include_yaml_title_switch = new Switch ();
+            export_include_yaml_title_switch.set_active (settings.export_include_yaml_title);
+            export_include_yaml_title_switch.notify["active"].connect (() => {
+                settings.export_include_yaml_title = export_include_yaml_title_switch.get_active ();
+            });
+            export_include_yaml_title_switch.tooltip_text = _("Include YAML title as Heading");
+            var export_include_yaml_title_label = new Label(_("Include YAML title as H1 Heading"));
+            export_include_yaml_title_label.xalign = 0;
+            export_include_yaml_title_label.hexpand = true;
 
             var page_setup_label = new Gtk.Label (_("<b>Page Setup</b>"));
             page_setup_label.hexpand = true;
@@ -215,6 +274,10 @@ namespace ThiefMD.Widgets {
             grid.attach (export_resolve_paths_label, 2, g, 1, 1);
             g++;
 
+            grid.attach (export_include_yaml_title_switch, 1, g, 1, 1);
+            grid.attach (export_include_yaml_title_label, 2, g, 1, 1);
+            g++;
+
             grid.attach (page_setup_label, 1, g, 2, 1);
             g++;
             grid.attach (side_margin_entry, 1, g, 1, 1);
@@ -232,22 +295,23 @@ namespace ThiefMD.Widgets {
             grid.attach (paper_size, 1, g, 2, 1);
             g++;
 
-            grid.attach (print_css_label, 1, g, 2, 1);
+            grid.attach (print_css_label, 1, g, 3, 1);
             g++;
-            grid.attach (print_css_selector, 1, g, 2, 2);
+            grid.attach (print_css_selector, 1, g, 3, 2);
             g += 2;
 
-            grid.attach (css_label, 1, g, 2, 1);
+            grid.attach (css_label, 1, g, 3, 1);
             g++;
-            grid.attach (css_selector, 1, g, 2, 2);
+            grid.attach (css_selector, 1, g, 3, 2);
             g += 2;
 
-            grid.attach (add_css_button, 1, g, 2, 1);
+            grid.attach (add_css_button, 1, g, 3, 1);
             g++;
 
             grid.show_all ();
 
-            return grid;
+            export_scroller.add (grid);
+            return export_scroller;
         }
 
         private Grid editor_grid () {
@@ -296,6 +360,20 @@ namespace ThiefMD.Widgets {
             var ui_colorscheme_label = new Label(_("Match UI to Editor Theme"));
             ui_colorscheme_label.xalign = 0;
 
+            var headerbar_switch = new Switch ();
+            headerbar_switch.set_active (settings.hide_toolbar);
+            headerbar_switch.notify["active"].connect (() => {
+                settings.hide_toolbar = headerbar_switch.get_active ();
+                if (settings.hide_toolbar) {
+                    ThiefApp.get_instance ().toolbar.hide_headerbar ();
+                } else {
+                    ThiefApp.get_instance ().toolbar.show_headerbar ();
+                }
+            });
+            headerbar_switch.tooltip_text = _("Toggle Headerbar");
+            var headerbar_label = new Label(_("Enable hiding of the Headerbar"));
+            headerbar_label.xalign = 0;
+
             var ui_writing_statistics_switch = new Switch ();
             ui_writing_statistics_switch.set_active (settings.show_writing_statistics);
             ui_writing_statistics_switch.notify["active"].connect (() => {
@@ -341,6 +419,10 @@ namespace ThiefMD.Widgets {
             grid.attach (typewriter_label, 2, g_row, 2, 1);
             g_row++;
 
+            grid.attach (headerbar_switch, 1, g_row, 1, 1);
+            grid.attach (headerbar_label, 2, g_row, 2, 1);
+            g_row++;
+
             grid.attach (ui_writing_statistics_switch, 1, g_row, 1, 1);
             grid.attach (ui_writing_statistics_label, 2, g_row, 2, 1);
             g_row++;
@@ -360,6 +442,14 @@ namespace ThiefMD.Widgets {
             grid.show_all ();
 
             return grid;
+        }
+
+        public void add_headerbar () {
+            bar = new Gtk.HeaderBar ();
+            bar.set_show_close_button (true);
+            bar.set_title ("");
+
+            this.set_titlebar(bar);
         }
     }
 }

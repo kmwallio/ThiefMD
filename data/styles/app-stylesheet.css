@@ -5,7 +5,7 @@
 @define-color windowColor #2c292d;
 @define-color selectionColor #0C8DB1;
 
-.thiefmd-toolbar, .thief-search-box {
+.thief-toolbar, .thiefmd-toolbar, .thief-search-box {
     border-bottom-color: transparent;
     border-bottom-width: 1px;
     background: @colorPrimary;
@@ -56,6 +56,16 @@ actionbar,
     margin-top: 1.5rem;
 }
 
+.thief-search-results {
+  padding: 0;
+  margin: 0;
+}
+
+.thief-search-results * {
+  margin: 0px;
+  padding: 0px;
+}
+
 .thief-list-sheet {
     background: @windowColor;
     border-bottom: 1px solid @textColorPrimary;
@@ -64,7 +74,10 @@ actionbar,
 }
 
 .thief-list-sheet-active,
-.thief-search-input {
+.thief-search-input,
+.thief-search-results *:hover,
+.thief-search-results *:active,
+.thief-search-results *:hover:active {
     background: @colorPrimaryActive;
     color: @textColorActive;
 }

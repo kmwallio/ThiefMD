@@ -24,6 +24,7 @@ namespace ThiefMD.Controllers.UI {
     private bool _init = false;
     private bool _show_filename = false;
     private Gtk.CssProvider active_provider = null;
+    private Gtk.CssProvider font_provider = null;
     private Ultheme.HexColorPalette current_palette = null;
 
     //
@@ -151,6 +152,76 @@ namespace ThiefMD.Controllers.UI {
         debug ("Themes loaded");
 
         return false;
+    }
+
+    public void get_focus_bg_color (out double r, out double g, out double b) {
+        var settings = AppSettings.get_default ();
+        Clutter.Color background;
+        if (current_palette == null || settings.theme_id == "thiefmd") {
+            background = Clutter.Color.from_string ("#FAFAFA");
+        } else {
+            background = Clutter.Color.from_string (current_palette.global.background);
+        }
+        r = background.red / 255.0;
+        g = background.green / 255.0;
+        b = background.blue / 255.0;
+    }
+
+    public void get_focus_color (out double r, out double g, out double b) {
+        var settings = AppSettings.get_default ();
+        Clutter.Color focus;
+        if (current_palette == null || settings.theme_id == "thiefmd") {
+            focus = Clutter.Color.from_string ("#191919");
+        } else {
+            focus = Clutter.Color.from_string (current_palette.global.foreground);
+        }
+        r = focus.red / 255.0;
+        g = focus.green / 255.0;
+        b = focus.blue / 255.0;
+    }
+
+    public void get_out_of_focus_color (out double r, out double g, out double b) {
+        var settings = AppSettings.get_default ();
+        Clutter.Color background;
+        Clutter.Color foreground;
+        if (current_palette == null || settings.theme_id == "thiefmd") {
+            background = Clutter.Color.from_string ("#FAFAFA");
+            foreground = Clutter.Color.from_string ("#191919");
+        } else {
+            background = Clutter.Color.from_string (current_palette.global.background);
+            foreground = Clutter.Color.from_string (current_palette.global.foreground);
+        }
+        Clutter.Color out_of_focus = foreground.interpolate (background, 0.82);
+        r = out_of_focus.red / 255.0;
+        g = out_of_focus.green / 255.0;
+        b = out_of_focus.blue / 255.0;
+    }
+
+    public void load_font () {
+        var settings = AppSettings.get_default ();
+        if (font_provider != null) {
+            Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), font_provider);
+            font_provider = null;
+        }
+
+        if (settings.get_css_font_family () == "") {
+            return;
+        }
+
+        // Assuming 12pt is 1rem, scale to original CSS based on that
+        string new_font = ThiefProperties.FONT_SETTINGS.printf (
+            settings.get_css_font_family (), ((settings.get_css_font_size () / Constants.SIZE_1_REM_IN_PT) * 1.25),
+            settings.get_css_font_family (), ((settings.get_css_font_size () / Constants.SIZE_1_REM_IN_PT) * 1.35),
+            settings.get_css_font_family (), ((settings.get_css_font_size () / Constants.SIZE_1_REM_IN_PT) * 1.45)
+        );
+
+        try {
+            font_provider = new Gtk.CssProvider ();
+            font_provider.load_from_data (new_font);
+            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), font_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        } catch (Error e) {
+            warning ("Error setting font: %s", e.message);
+        }
     }
 
     public Gtk.SourceStyleSchemeManager UserSchemes () {

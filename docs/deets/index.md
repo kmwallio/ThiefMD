@@ -3,6 +3,8 @@ layout: page
 title: Details
 ---
 
+[Prefer a list](/deets/list)?
+
 ## Keyboard Shortcuts
 
 [Learn all our keyboard shortcuts](/shortcuts)
@@ -70,6 +72,22 @@ Toggle it on, or toggle it off. They're <span style="background: #20528c; color:
 Stay centered and stay focused. Type writer scrolling keeps your active line fixed, both in the editor and the preview.
 
 No longer look for where you're typing keep your eye muscles on what matters most.
+
+## Focus Mode
+
+<div class="responsive-left jonas"><img src="/images/focus_mode.png" alt="ThiefMD dimming all text except for the sentence being modified" /></div>
+
+Eliminate distractions with focus mode. Paired with [typewriter scrolling](#typewriter-scrolling), ThiefMD can help keep you focused.
+
+Don't get distracted by mark-up, other sentences, or multiple colors on the screen. Focus mode provides two colors: the background and your text.
+
+You can focus by paragraph, sentence, or word. Paragraph Focus keeps things in context. Sentence focus prevents editing and revision while you write. Word focus keeps content flowing without looking back.
+
+And yes, it works with [any theme you could throw at it](https://themes.thiefmd.com)[^if-not-file-a-bug].
+
+[^if-not-file-a-bug]: If it doesn't please [let us know](https://github.com/kmwallio/ThiefMD/issues).
+
+<div class="clear"></div>
 
 ## YAML Frontmatter
 
@@ -155,7 +173,7 @@ Whether you know where you're looking or what you're looking for, ThiefMD will h
 
 `Ctrl+F` to search the current file.
 
-`Ctrl+Shift+F` searches your entire library.
+`Ctrl+Shift+F` searches your entire library. Want to search a specific area? Right-click on the Library Item and choose "Search Item".
 
 Get lost in your writing and find your way back to wherever you need to go, all within ThiefMD.
 

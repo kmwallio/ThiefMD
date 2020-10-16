@@ -133,6 +133,10 @@
             <default>true</default>
             <summary>Convert relative paths to absolute paths</summary>
         </key>
+        <key name="export-include-yaml-title" type="b">
+            <default>true</default>
+            <summary>Include YAML title as H1 Heading in Preview and Export</summary>
+        </key>
         <key name="export-include-metadata-file" type="b">
             <default>false</default>
             <summary>First Markdown File includes author metadata</summary>
@@ -160,6 +164,22 @@
             <default>"modest-splendor"</default>
             <summary>CSS to use for Printing PDFs</summary>
             <description>CSS to use for PDF Export</description>
+        </key>
+        <key name="font-family" type="s">
+            <default>"iA Writer Duospace"</default>
+            <summary>Font Family to use</summary>
+            <description>Font Family for editor to use</description>
+        </key>
+        <key name="font-size" type="i">
+            <default>12</default>
+            <summary>Font Size to use</summary>
+            <description>Font Size for editor to use</description>
+        </key>
+        <key name="focus-type" type="i">
+            <default>1</default>
+            <range min="0" max="2"/>
+            <summary>Type of Focus Mode to Use</summary>
+            <description>Type of Focus Mode (Paragraph, Sentence, Word) to Use</description>
         </key>
     </schema>
 </schemalist>

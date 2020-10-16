@@ -60,14 +60,14 @@
       "name": "discount",
       "buildsystem": "simple",
       "build-commands": [
-        "./configure.sh --prefix=/app --enable-all-features --with-fenced-code --shared",
+        "./configure.sh --prefix=/app --enable-all-features --github-checkbox --with-fenced-code --shared",
         "sed -e 's|/sbin/ldconfig|/sbin/ldconfig -n|' -i librarian.sh",
         "make install"
       ],
       "sources": [{
         "type": "archive",
-        "url": "http://www.pell.portland.or.us/~orc/Code/discount/discount-2.2.4.tar.bz2",
-        "sha256": "74fd1e3cc2b4eacf7325d3fd89df38b589db60d5dd0f4f14a0115f7da5e230a5"
+        "url": "http://www.pell.portland.or.us/~orc/Code/discount/discount-2.2.6.tar.bz2",
+        "sha256": "ae68a4832ff8e620286304ec525c1fe8957be4d8f1e774588eb03d1c3deb74a7"
       }]
     },
     {

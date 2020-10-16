@@ -1,7 +1,8 @@
 {
   "sheet-order" : [
     "index.md",
-    "Preview.md"
+    "Preview.md",
+    "lang-check.md"
   ],
   "hidden-folders" : [
     "_site",
@@ -14,9 +15,11 @@
   "folder-order" : [
     "_drafts",
     "_posts",
-    "tips",
     "about",
     "deets",
+    "_deets",
+    "tips",
+    "_tips",
     "shortcuts",
     "download",
     "opensource",

@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.kmwallio.thiefmd', ['vala', 'c'],
-    version: '0.1.0'
+    version: '0.1.1'
 )
 
 # Application ID
@@ -79,8 +79,10 @@ executable(
     'src/Widgets/SearchBar.vala',
     'src/Widgets/StatisticsBar.vala',
     'src/Widgets/SearchWindow.vala',
+    'src/Widgets/ThiefPane.vala',
     'src/Widgets/ThemePreview.vala',
     'src/Widgets/Thinking.vala',
+    'src/Widgets/MarkdownCheatSheet.vala',
     'src/Controllers/FileManager.vala',
     'src/Controllers/Dialogs.vala',
     'src/Controllers/SheetManager.vala',

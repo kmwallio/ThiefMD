@@ -101,30 +101,35 @@ namespace Markdown
     [CCode (cprefix = "MKD_")]
     public enum DocumentFlags
     {
-        NOLINKS,
-        NOIMAGE,
-        NOPANTS,
-        NOHTML,
-        STRICT,
-        TAGTEXT,
-        NO_EXT,
-        NOEXT,
-        CDATA,
-        NOSUPERSCRIPT,
-        NORELAXED,
-        NOTABLES,
-        NOSTRIKETHROUGH,
-        TOC,
-        @1_COMPAT,
-        AUTOLINK,
-        SAFELINK,
-        NOHEADER,
-        TABSTOP,
-        NODIVQUOTE,
-        NOALPHALIST,
-        NODLIST,
-        EXTRA_FOOTNOTE,
-        NOSTYLE,
-        EMBED
+        NOLINKS = 0,    /* don't do link processing, block <a> tags  */
+        NOIMAGE,        /* don't do image processing, block <img> */
+        NOPANTS,        /* don't run smartypants() */
+        NOHTML,         /* don't allow raw html through AT ALL */
+        NORMAL_LISTITEM,/* disable github-style checkbox lists */
+        TAGTEXT,        /* process text inside an html tag */
+        NO_EXT,         /* don't allow pseudo-protocols */
+        EXPLICITLIST,   /* don't combine numbered/bulletted lists */
+        CDATA,          /* generate code for xml ![CDATA[...]] */
+        NOSUPERSCRIPT,  /* no A^B */
+        NORELAXED,      /* emphasis happens /everywhere/ */
+        NOTABLES,       /* disallow tables */
+        NOSTRIKETHROUGH,/* forbid ~~strikethrough~~ */
+        @1_COMPAT,       /* compatibility with MarkdownTest_1.0 */
+        TOC,            /* do table-of-contents processing */
+        AUTOLINK,       /* make http://foo.com link even without <>s */
+        NOHEADER,       /* don't process header blocks */
+        TABSTOP,        /* expand tabs to 4 spaces */
+        SAFELINK,       /* paranoid check for link protocol */
+        NODIVQUOTE,     /* forbid >%class% blocks */
+        NOALPHALIST,    /* forbid alphabetic lists */
+        EXTRA_FOOTNOTE, /* enable markdown extra-style footnotes */
+        NOSTYLE,        /* don't extract <style> blocks */
+        DLDISCOUNT,     /* enable discount-style definition lists */
+        DLEXTRA,        /* enable extra-style definition lists */
+        FENCEDCODE,     /* enabled fenced code blocks */
+        IDANCHOR,       /* use id= anchors for TOC links */
+        GITHUBTAGS,     /* allow dash and underscore in element names */
+        URLENCODEDANCHOR,/* urlencode non-identifier chars instead of replacing with dots */
+        LATEX           /* handle embedded LaTeX escapes */
     }
 }

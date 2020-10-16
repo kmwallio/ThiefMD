@@ -27,7 +27,7 @@ namespace ThiefMD {
         public Gtk.ApplicationWindow main_window;
         public Headerbar toolbar;
         public Library library;
-        public Gtk.Paned sheets_pane;
+        public ThiefPane sheets_pane;
         public Gtk.Paned library_pane;
         public Gtk.ScrolledWindow library_view;
         public SearchBar search_bar;
@@ -88,7 +88,7 @@ namespace ThiefMD {
             }
 
             if (settings.last_file != "") {
-                start_dir = settings.last_file.substring(0, settings.last_file.last_index_of("/"));
+                start_dir = settings.last_file.substring(0, settings.last_file.last_index_of(Path.DIR_SEPARATOR_S));
                 debug ("Starting with %s\n", start_dir);
             }
 
@@ -122,7 +122,7 @@ namespace ThiefMD {
             SheetManager.init ();
             library = new Library ();
 
-            sheets_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+            sheets_pane = new ThiefPane (Gtk.Orientation.HORIZONTAL);
             library_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             library_view = new Gtk.ScrolledWindow (null, null);
             library_view.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
@@ -137,10 +137,6 @@ namespace ThiefMD {
             sheets_pane.add1 (library_pane);
             sheets_pane.add2 (SheetManager.get_view ());
             sheets_pane.set_position (settings.view_library_width + settings.view_sheets_width);
-
-            var provider = new Gtk.CssProvider ();
-            provider.load_from_resource ("/com/github/kmwallio/thiefmd/app-main-stylesheet.css");
-            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
             main_window.set_titlebar (toolbar);
             debug ("Window (%d, %d)\n", settings.window_width, settings.window_height);
@@ -169,6 +165,7 @@ namespace ThiefMD {
             UI.set_sheets (start_sheet);
             library.set_active ();
             UI.load_user_themes ();
+            UI.load_font ();
             UI.load_css_scheme ();
 
             // Save on close

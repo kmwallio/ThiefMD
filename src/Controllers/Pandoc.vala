@@ -309,7 +309,7 @@ namespace ThiefMD.Controllers.Pandoc {
                     break;
                 }
 
-                idx = search_path.last_index_of_char ('/');
+                idx = search_path.last_index_of_char (Path.DIR_SEPARATOR);
                 if (idx != -1) {
                     search_path = search_path[0:idx];
                 } else {

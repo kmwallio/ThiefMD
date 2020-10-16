@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language id="mdb" name="mdb" version="2.0" _section="Markup" hidden="true">
+    <default-regex-options case-sensitive="false"/>
+    <definitions>
+        <context id="code-block-vala" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(vala|c#)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="vala:vala"/>
+            </include>
+        </context>
+
+        <context id="code-block-go" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(go|golang)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="go:go"/>
+            </include>
+        </context>
+
+        <context id="code-block-py" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(py|python)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="python:python"/>
+            </include>
+        </context>
+
+        <context id="code-block-ruby" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(rb|ruby)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="ruby:ruby"/>
+            </include>
+        </context>
+
+        <context id="code-block-yaml" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(yaml|yml)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="yaml:yaml"/>
+            </include>
+        </context>
+
+        <context id="code-block-js" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(js|javascript|node|nodejs|json)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="js:js"/>
+            </include>
+        </context>
+
+        <context id="code-block-java" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```java$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="java:java"/>
+            </include>
+        </context>
+
+        <context id="code-block-c" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```c$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="c:c"/>
+            </include>
+        </context>
+
+        <context id="code-block-rust" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(rust|rs)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="rust:rust"/>
+            </include>
+        </context>
+
+        <context id="code-block-cpp" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(cpp|c\+\+)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="cpp:cpp"/>
+            </include>
+        </context>
+
+        <context id="code-block-css" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```css$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="css:css"/>
+            </include>
+        </context>
+
+        <context id="code-block-lisp" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(lisp|clisp|commonlisp)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="commonlisp:commonlisp"/>
+            </include>
+        </context>
+
+        <context id="code-block-make" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(make|makefile)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="makefile:makefile"/>
+            </include>
+        </context>
+
+        <context id="code-block-matlab" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```matlab$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="matlab:matlab"/>
+            </include>
+        </context>
+
+        <context id="code-block-haskell" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(hs|haskell)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="haskell:haskell"/>
+            </include>
+        </context>
+
+        <context id="code-dollar-block-latex" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^\$\$$</start>
+            <end>^\$\$$</end>
+            <include>
+                <context ref="latex:latex"/>
+            </include>
+        </context>
+
+        <context id="code-block-latex" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(latex|latex)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="latex:latex"/>
+            </include>
+        </context>
+
+        <context id="code-block-xml" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```xml$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="xml:xml"/>
+            </include>
+        </context>
+
+        <context id="code-block-html" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```html$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="html:html"/>
+            </include>
+        </context>
+
+        <context id="code-block-r" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```r$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="r:r"/>
+            </include>
+        </context>
+
+        <context id="code-block-perl" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(pl|perl)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="python:python"/>
+            </include>
+        </context>
+
+        <context id="code-block-php" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```php$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="php:php"/>
+            </include>
+        </context>
+
+        <context id="code-block-bash" class="no-spell-check" style-ref="markdown:code-block">
+            <start>^```(bash|sh)$</start>
+            <end>^```$</end>
+            <include>
+                <context ref="sh:sh"/>
+            </include>
+        </context>
+    </definitions>
+</language>

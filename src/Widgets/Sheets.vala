@@ -109,6 +109,7 @@ namespace ThiefMD.Widgets {
         private Gee.HashMap<string, Sheet> _sheets;
         private Gtk.Box _view;
         private PreventDelayedDrop _reorderable;
+        private FileMonitor _monitor;
         Gtk.Label _empty;
 
         public Sheets (string path) {
@@ -128,6 +129,40 @@ namespace ThiefMD.Widgets {
             var header_context = this.get_style_context ();
             header_context.add_class ("thief-sheets");
             _reorderable = new PreventDelayedDrop ();
+
+            File current_directory = File.new_for_path (_sheets_dir);
+            if (current_directory.query_exists () && FileUtils.test (_sheets_dir, FileTest.IS_DIR)) {
+                try {
+                    _monitor = current_directory.monitor_directory (FileMonitorFlags.SEND_MOVED | FileMonitorFlags.WATCH_MOVES);
+                    _monitor.changed.connect (folder_changed);
+                    destroy.connect (() => {
+                        _monitor.changed.disconnect (folder_changed);
+                    });
+                } catch (Error e) {
+                    warning ("Unable to monitor for folder changes: %s", e.message);
+                }
+            }
+        }
+
+        public void folder_changed (File file, File? other_file, FileMonitorEvent event_type) {
+            if (event_type == FileMonitorEvent.CREATED || event_type == FileMonitorEvent.MOVED ||
+                event_type == FileMonitorEvent.MOVED_IN || event_type == FileMonitorEvent.MOVED_OUT ||
+                event_type == FileMonitorEvent.DELETED || event_type == FileMonitorEvent.RENAMED)
+            {
+                if (FileUtils.test (file.get_path (), FileTest.IS_DIR) || (other_file != null && FileUtils.test (other_file.get_path (), FileTest.IS_DIR))) {
+                    ThiefApp.get_instance ().library.refresh_dir (this);
+                }
+
+                File my_dir = File.new_for_path (_sheets_dir);
+                if (my_dir.query_exists ()) {
+                    refresh ();
+                } else {
+                    _monitor.changed.disconnect (folder_changed);
+                    ThiefApp.get_instance ().library.remove_item (_sheets_dir);
+                }
+            }
+
+            // @TODO: Folder unmount support
         }
 
         public void add_hidden_item (string directory_path) {
@@ -333,6 +368,44 @@ namespace ThiefMD.Widgets {
             } catch (Error e) {
                 warning (e.message);
             }
+        }
+
+        public void sort_sheets_by_date (bool asc = true) {
+            if (asc) {
+                metadata.sheet_order.sort ((a, b) => {
+                    string date_a = _sheets.get (a).get_date ();
+                    string date_b = _sheets.get (b).get_date ();
+                    return GLib.strcmp (date_a, date_b);
+                });
+            } else {
+                metadata.sheet_order.sort ((a, b) => {
+                    string date_a = _sheets.get (a).get_date ();
+                    string date_b = _sheets.get (b).get_date ();
+                    return -1 * GLib.strcmp (date_a, date_b);
+                });
+            }
+
+            redraw_sheets ();
+            save_metadata_file (true);
+        }
+
+        public void sort_sheets_by_title (bool asc = true) {
+            if (asc) {
+                metadata.sheet_order.sort ((a, b) => {
+                    string title_a = _sheets.get (a).get_title ();
+                    string title_b = _sheets.get (b).get_title ();
+                    return GLib.strcmp (title_a, title_b);
+                });
+            } else {
+                metadata.sheet_order.sort ((a, b) => {
+                    string title_a = _sheets.get (a).get_title ();
+                    string title_b = _sheets.get (b).get_title ();
+                    return -1 * GLib.strcmp (title_a, title_b);
+                });
+            }
+
+            redraw_sheets ();
+            save_metadata_file (true);
         }
 
         public void sort_sheets_by_name (bool asc = true) {

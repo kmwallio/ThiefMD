@@ -51,13 +51,73 @@ namespace ThiefMD {
                 File f = File.new_for_path (base_lib);
                 string base_chop = f.get_parent ().get_path ();
                 res = res.substring (base_chop.length);
-                if (res.has_prefix ("/")) {
+                if (res.has_prefix (Path.DIR_SEPARATOR_S)) {
                     res = res.substring (1);
                 }
             }
         }
 
         return res;
+    }
+
+    public string csv_to_md (string csv) {
+        StringBuilder b = new StringBuilder ();
+        string[] lines = csv.split ("\n");
+        int[] items = new int[lines.length];
+        for (int l = 0; l < lines.length; l++) {
+            string line = lines[l];
+            string[] values = line.split (",");
+            int j = 0;
+            for (int i = 0; i < values.length; i++) {
+                if (i == 0) {
+                    b.append ("|");
+                }
+                string value = values[i];
+                if (l == 0) {
+                    items[j] = -1;
+                }
+                value = value.chomp ().chug ();
+                if (value.has_prefix ("\"") && value.has_suffix ("\"")) {
+                    value = value.substring (1, value.length - 2);
+                    if (l == 0) {
+                        items[j] = value.length;
+                    }
+                } else if (value.has_prefix ("\"")) {
+                    string t;
+                    do  {
+                        t = values[i++];
+                        if (l == 0) {
+                            items[i] = -1;
+                        }
+                        value += t;
+                    } while (!value.has_suffix ("\"") && i < values.length);
+                    value = value.substring (1, value.length - 2);
+                }
+                b.append (value);
+                if (l > 0) {
+                    if (value.length < items[j]) {
+                        for (int r = value.length; r < items[j]; r++) {
+                            b.append (" ");
+                        }
+                    }
+                }
+                b.append ("|");
+                j++;
+            }
+            b.append ("\n");
+            if (l == 0) {
+                b.append ("|");
+                for (int k = 0; k < items.length && items[k] > 0; k++) {
+                    for (int t = 0; t < items[k]; t++) {
+                        b.append ("-");
+                    }
+                    b.append ("|");
+                }
+                b.append ("\n");
+            }
+        }
+
+        return b.str;
     }
 
     public class TimedMutex {

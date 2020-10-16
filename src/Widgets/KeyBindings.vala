@@ -24,7 +24,8 @@ using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
     public class KeyBindings { 
-        public KeyBindings (Gtk.Window window) {
+        private bool is_fullscreen = false;
+        public KeyBindings (Gtk.Window window, bool is_main = true) {
             window.key_press_event.connect ((e) => {
                 uint keycode = e.hardware_keycode;
                 var settings = AppSettings.get_default ();
@@ -37,9 +38,21 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Search
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.f, keycode)) {
                         ThiefApp.get_instance ().search_bar.toggle_search ();
+                    }
+                }
+
+                // Headerbar
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
+                    if (match_keycode (Gdk.Key.h, keycode)) {
+                        settings.hide_toolbar = !settings.hide_toolbar;
+                        if (settings.hide_toolbar) {
+                            ThiefApp.get_instance ().toolbar.hide_headerbar ();
+                        } else {
+                            ThiefApp.get_instance ().toolbar.show_headerbar ();
+                        }
                     }
                 }
 
@@ -51,37 +64,72 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
-                // Preview
+                // Cheat Sheet
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                    if (match_keycode (Gdk.Key.h, keycode)) {
+                        MarkdownCheatSheet cheat_sheet = new MarkdownCheatSheet ();
+                        cheat_sheet.show_all ();
+                    }
+                }
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.question, keycode)) {
+                        MarkdownCheatSheet cheat_sheet = new MarkdownCheatSheet ();
+                        cheat_sheet.show_all ();
+                    }
+                }
+
+                // Preview
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
                     if (match_keycode (Gdk.Key.p, keycode)) {
                         PreviewWindow pvw = PreviewWindow.get_instance ();
                         pvw.show_all ();
                     }
                 }
 
+                // Focus
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
+                    if (match_keycode (Gdk.Key.r, keycode)) {
+                        settings.focus_mode = !settings.focus_mode;
+                    }
+                }
+
+                // Type-writer scrolling
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                    if (match_keycode (Gdk.Key.t, keycode)) {
+                        settings.typewriter_scrolling = !settings.typewriter_scrolling;
+                    }
+                }
+
+                // Write-Good Suggestions
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
+                    if (match_keycode (Gdk.Key.w, keycode)) {
+                        settings.writegood = !settings.writegood;
+                    }
+                }
+
                 // New Sheet
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.n, keycode)) {
                         Widgets.Headerbar.get_instance ().make_new_sheet ();
                     }
                 }
 
                 // Bold
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.b, keycode)) {
                         SheetManager.bold ();
                     }
                 }
 
                 // Italic
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.i, keycode)) {
                         SheetManager.italic ();
                     }
                 }
 
                 // Strikethrough
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.d, keycode)) {
                         SheetManager.strikethrough ();
                     }
@@ -95,7 +143,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Toggle statistics bar
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
                     if (match_keycode (Gdk.Key.s, keycode)) {
                         ThiefApp.get_instance ().stats_bar.toggle_statistics ();
                     }
@@ -110,21 +158,23 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Undo
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.z, keycode)) {
                         SheetManager.undo ();
+                        return true;
                     }
                 }
 
                 // Redo
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
                     if (match_keycode (Gdk.Key.z, keycode)) {
                         SheetManager.redo ();
+                        return true;
                     }
                 }
 
                 // Editor Mode
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.@1, keycode)) {
                         settings.view_state = 2;
                         UI.show_view ();
@@ -132,7 +182,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Sheets + Editor Mode
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.@2, keycode)) {
                         settings.view_state = 1;
                         UI.show_view ();
@@ -140,7 +190,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Library + Sheets + Editor Mode
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.@3, keycode)) {
                         settings.view_state = 0;
                         UI.show_view ();
@@ -149,14 +199,32 @@ namespace ThiefMD.Widgets {
 
                 // Fullscreen
                 if (match_keycode (Gdk.Key.F11, keycode)) {
-                    settings.fullscreen = !settings.fullscreen;
+                    if (is_main) {
+                        settings.fullscreen = !settings.fullscreen;
+                    } else {
+                        if (!is_fullscreen) {
+                            window.fullscreen ();
+                            is_fullscreen = true;
+                            return true;
+                        } else {
+                            window.unfullscreen ();
+                            is_fullscreen = false;
+                            return true;
+                        }
+                    }
                 }
 
                 if (match_keycode (Gdk.Key.Escape, keycode)) {
-                    if (ThiefApp.get_instance ().search_bar.should_escape_search ()) {
-                        ThiefApp.get_instance ().search_bar.deactivate_search ();
-                    } else if (settings.fullscreen) {
-                        settings.fullscreen = false;
+                    if (is_main) {
+                        if (ThiefApp.get_instance ().search_bar.should_escape_search ()) {
+                            ThiefApp.get_instance ().search_bar.deactivate_search ();
+                        } else if (settings.fullscreen) {
+                            settings.fullscreen = false;
+                        }
+                    } else {
+                        window.unfullscreen ();
+                        is_fullscreen = false;
+                        return true;
                     }
                 }
 
