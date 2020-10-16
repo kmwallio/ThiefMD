@@ -304,10 +304,10 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/vhdl.lang
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/yacc.lang
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/yara.lang
-/usr/share/fonts/truetype/thiefmd/Courier Prime-Bold.ttf
-/usr/share/fonts/truetype/thiefmd/Courier Prime-BoldItalic.ttf
-/usr/share/fonts/truetype/thiefmd/Courier Prime-Italic.ttf
-/usr/share/fonts/truetype/thiefmd/Courier Prime-Regular.ttf
+"/usr/share/fonts/truetype/thiefmd/Courier Prime-Bold.ttf"
+"/usr/share/fonts/truetype/thiefmd/Courier Prime-BoldItalic.ttf"
+"/usr/share/fonts/truetype/thiefmd/Courier Prime-Italic.ttf"
+"/usr/share/fonts/truetype/thiefmd/Courier Prime-Regular.ttf"
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-Bold.ttf
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-BoldItalic.ttf
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-Italic.ttf
