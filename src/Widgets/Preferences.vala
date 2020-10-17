@@ -393,7 +393,7 @@ namespace ThiefMD.Widgets {
             brandless_switch.notify["active"].connect (() => {
                 settings.brandless = brandless_switch.get_active ();
             });
-            brandless_switch.tooltip_text = _("Hide meaningless UI elements");
+            brandless_switch.tooltip_text = _("Hide meaningless interface elements");
             var brandless_label = new Label(_("Remove ThiefMD branding"));
             brandless_label.xalign = 0;
 
