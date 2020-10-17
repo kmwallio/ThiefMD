@@ -328,7 +328,7 @@ namespace ThiefMD.Widgets {
             spellcheck_switch.notify["active"].connect (() => {
                 settings.spellcheck = spellcheck_switch.get_active ();
             });
-            spellcheck_switch.tooltip_text = _("Toggle Spellcheck");
+            spellcheck_switch.tooltip_text = _("Toggle spellcheck");
             var spellcheck_label = new Label(_("Check document spelling"));
             spellcheck_label.xalign = 0;
 
@@ -346,8 +346,8 @@ namespace ThiefMD.Widgets {
             typewriter_switch.notify["active"].connect (() => {
                 settings.typewriter_scrolling = typewriter_switch.get_active ();
             });
-            typewriter_switch.tooltip_text = _("Toggle TypeWriter scrolling");
-            var typewriter_label = new Label(_("Enable TypeWriter focus mode"));
+            typewriter_switch.tooltip_text = _("Toggle typewriter scrolling");
+            var typewriter_label = new Label(_("Enable typewriter focus mode"));
             typewriter_label.xalign = 0;
 
             var ui_colorscheme_switch = new Switch ();
@@ -371,7 +371,7 @@ namespace ThiefMD.Widgets {
                 }
             });
             headerbar_switch.tooltip_text = _("Toggle auto-hide headerbar");
-            var headerbar_label = new Label(_("Auto-hide headerbar"));
+            var headerbar_label = new Label(_("Automatically hide headerbar"));
             headerbar_label.xalign = 0;
 
             var ui_writing_statistics_switch = new Switch ();
@@ -393,7 +393,7 @@ namespace ThiefMD.Widgets {
             brandless_switch.notify["active"].connect (() => {
                 settings.brandless = brandless_switch.get_active ();
             });
-            brandless_switch.tooltip_text = _("Hide meaningless UI Elements");
+            brandless_switch.tooltip_text = _("Hide meaningless UI elements");
             var brandless_label = new Label(_("Remove ThiefMD branding"));
             brandless_label.xalign = 0;
 
