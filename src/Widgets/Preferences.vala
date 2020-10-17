@@ -338,7 +338,7 @@ namespace ThiefMD.Widgets {
                 settings.writegood = writegood_switch.get_active ();
             });
             writegood_switch.tooltip_text = _("Toggle Write-Good");
-            var writegood_label = new Label(_("Enable Write-Good assistance"));
+            var writegood_label = new Label(_("Enable Write-Good: recommendations for sentence structure"));
             writegood_label.xalign = 0;
 
             var typewriter_switch = new Switch ();
