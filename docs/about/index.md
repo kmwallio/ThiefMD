@@ -38,6 +38,7 @@ ThiefMD currently supports
 
 Great software is built on the shoulders of giants.
 
+* [Contributors who help make ThiefMD awesome](https://github.com/kmwallio/ThiefMD/graphs/contributors)
 * Code <s>stolen</s> *forked* from [Quilter](https://github.com/lainsce/quilter)
 * Fonts are [iA Writer Duospace](https://github.com/iaolo/iA-Fonts) and [Courier Prime](https://quoteunquoteapps.com/courierprime)
 * Inspired by [Ulysses](https://ulyssesapp.com)
