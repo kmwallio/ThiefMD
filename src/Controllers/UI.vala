@@ -210,9 +210,9 @@ namespace ThiefMD.Controllers.UI {
 
         // Assuming 12pt is 1rem, scale to original CSS based on that
         string new_font = ThiefProperties.FONT_SETTINGS.printf (
-            settings.get_css_font_family (), ((settings.get_css_font_size () / Constants.SIZE_1_REM_IN_PT) * 1.25),
-            settings.get_css_font_family (), ((settings.get_css_font_size () / Constants.SIZE_1_REM_IN_PT) * 1.35),
-            settings.get_css_font_family (), ((settings.get_css_font_size () / Constants.SIZE_1_REM_IN_PT) * 1.45)
+            settings.get_css_font_family (), (int)((settings.get_css_font_size ()) * 1),
+            settings.get_css_font_family (), (int)((settings.get_css_font_size ()) * 1.2),
+            settings.get_css_font_family (), (int)((settings.get_css_font_size ()) * 1.4)
         );
 
         try {
