@@ -69,7 +69,7 @@ namespace ThiefMD.Widgets {
         private Grid display_grid () {
             var settings = AppSettings.get_default ();
             Grid grid = new Grid ();
-            grid.margin = 12;
+            grid.margin = 0;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
             grid.orientation = Orientation.VERTICAL;
@@ -172,34 +172,6 @@ namespace ThiefMD.Widgets {
             page_setup_label.xalign = 0;
             page_setup_label.use_markup = true;
 
-            var side_margin_entry = new Gtk.SpinButton.with_range (0.0, 3.5, 0.05);
-            side_margin_entry.set_value (settings.export_side_margins);
-            side_margin_entry.value_changed.connect (() => {
-                double new_margin = side_margin_entry.get_value ();
-                if (new_margin >= 0.0 && new_margin <= 3.5) {
-                    settings.export_side_margins = new_margin;
-                } else {
-                    side_margin_entry.set_value (settings.export_side_margins);
-                }
-            });
-            var side_margin_label = new Label(_("Side margins in PDF in inches"));
-            side_margin_label.xalign = 0;
-            side_margin_label.hexpand = true;
-
-            var top_bottom_margin_entry = new Gtk.SpinButton.with_range (0.0, 3.5, 0.05);
-            top_bottom_margin_entry.set_value (settings.export_top_bottom_margins);
-            top_bottom_margin_entry.value_changed.connect (() => {
-                double new_margin = top_bottom_margin_entry.get_value ();
-                if (new_margin >= 0.0 && new_margin <= 3.5) {
-                    settings.export_top_bottom_margins = new_margin;
-                } else {
-                    top_bottom_margin_entry.set_value (settings.export_top_bottom_margins);
-                }
-            });
-            var top_bottom_margin_label = new Label(_("Top & Bottom margins in PDF in inches"));
-            top_bottom_margin_label.xalign = 0;
-            top_bottom_margin_label.hexpand = true;
-
             var pagebreak_folder_switch = new Switch ();
             pagebreak_folder_switch.set_active (settings.export_break_folders);
             pagebreak_folder_switch.notify["active"].connect (() => {
@@ -236,6 +208,46 @@ namespace ThiefMD.Widgets {
                     settings.export_paper_size = ThiefProperties.PAPER_SIZES_GTK_NAME[option];
                 }
             });
+
+            var side_margin_entry = new Gtk.SpinButton.with_range (0.0, 3.5, 0.05);
+            side_margin_entry.set_value (settings.export_side_margins);
+            side_margin_entry.value_changed.connect (() => {
+                double new_margin = side_margin_entry.get_value ();
+                if (new_margin >= 0.0 && new_margin <= 3.5) {
+                    settings.export_side_margins = new_margin;
+                } else {
+                    side_margin_entry.set_value (settings.export_side_margins);
+                }
+            });
+            var side_margin_label = new Label(_("Side margins in PDF in inches"));
+            side_margin_label.xalign = 0;
+            side_margin_label.hexpand = true;
+
+            var top_bottom_margin_entry = new Gtk.SpinButton.with_range (0.0, 3.5, 0.05);
+            top_bottom_margin_entry.set_value (settings.export_top_bottom_margins);
+            top_bottom_margin_entry.value_changed.connect (() => {
+                double new_margin = top_bottom_margin_entry.get_value ();
+                if (new_margin >= 0.0 && new_margin <= 3.5) {
+                    settings.export_top_bottom_margins = new_margin;
+                } else {
+                    top_bottom_margin_entry.set_value (settings.export_top_bottom_margins);
+                }
+            });
+            var top_bottom_margin_label = new Label(_("Top & Bottom margins in PDF in inches"));
+            top_bottom_margin_label.xalign = 0;
+            top_bottom_margin_label.hexpand = true;
+
+            Grid margin_grid = new Grid ();
+            margin_grid.margin = 0;
+            margin_grid.row_spacing = 12;
+            margin_grid.column_spacing = 12;
+            margin_grid.orientation = Orientation.VERTICAL;
+            margin_grid.hexpand = true;
+
+            margin_grid.attach (side_margin_entry, 0, 0, 1, 1);
+            margin_grid.attach (side_margin_label, 1, 0, 2, 1);
+            margin_grid.attach (top_bottom_margin_entry, 0, 1, 1, 1);
+            margin_grid.attach (top_bottom_margin_label, 1, 1, 2, 1);
 
             int cur_w = this.get_allocated_width ();
             var print_css_label = new Gtk.Label (_("<b>PDF Print CSS</b>"));
@@ -280,12 +292,6 @@ namespace ThiefMD.Widgets {
 
             grid.attach (page_setup_label, 1, g, 2, 1);
             g++;
-            grid.attach (side_margin_entry, 1, g, 1, 1);
-            grid.attach (side_margin_label, 2, g, 1, 1);
-            g++;
-            grid.attach (top_bottom_margin_entry, 1, g, 1, 1);
-            grid.attach (top_bottom_margin_label, 2, g, 1, 1);
-            g++;
             grid.attach (pagebreak_folder_switch, 1, g, 1, 1);
             grid.attach (pagebreak_folder_label, 2, g, 2, 1);
             g++;
@@ -294,6 +300,9 @@ namespace ThiefMD.Widgets {
             g++;
             grid.attach (paper_size, 1, g, 2, 1);
             g++;
+
+            grid.attach (margin_grid, 1, g, 3, 2);
+            g += 2;
 
             grid.attach (print_css_label, 1, g, 3, 1);
             g++;
@@ -317,7 +326,7 @@ namespace ThiefMD.Widgets {
         private Grid editor_grid () {
             var settings = AppSettings.get_default ();
             Grid grid = new Grid ();
-            grid.margin = 12;
+            grid.margin = 0;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
             grid.orientation = Orientation.VERTICAL;
