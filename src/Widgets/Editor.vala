@@ -115,6 +115,7 @@ namespace ThiefMD.Widgets {
             dynamic_margins ();
             spell = new GtkSpell.Checker ();
             writegood = new WriteGood.Checker ();
+            writegood.show_tooltip = true;
 
             if (settings.spellcheck) {
                 debug ("Spellcheck active");
