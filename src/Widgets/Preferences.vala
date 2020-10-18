@@ -328,8 +328,8 @@ namespace ThiefMD.Widgets {
             spellcheck_switch.notify["active"].connect (() => {
                 settings.spellcheck = spellcheck_switch.get_active ();
             });
-            spellcheck_switch.tooltip_text = _("Toggle Spellcheck");
-            var spellcheck_label = new Label(_("Check Spelling"));
+            spellcheck_switch.tooltip_text = _("Toggle spellcheck");
+            var spellcheck_label = new Label(_("Check document spelling"));
             spellcheck_label.xalign = 0;
 
             var writegood_switch = new Switch ();
@@ -338,7 +338,7 @@ namespace ThiefMD.Widgets {
                 settings.writegood = writegood_switch.get_active ();
             });
             writegood_switch.tooltip_text = _("Toggle Write-Good");
-            var writegood_label = new Label(_("Enable Write-Good checks, passive voice, weasel words, and more"));
+            var writegood_label = new Label(_("Enable Write-Good: recommendations for sentence structure"));
             writegood_label.xalign = 0;
 
             var typewriter_switch = new Switch ();
@@ -346,8 +346,8 @@ namespace ThiefMD.Widgets {
             typewriter_switch.notify["active"].connect (() => {
                 settings.typewriter_scrolling = typewriter_switch.get_active ();
             });
-            typewriter_switch.tooltip_text = _("Toggle Spellcheck");
-            var typewriter_label = new Label(_("Use TypeWriter Scrolling"));
+            typewriter_switch.tooltip_text = _("Toggle typewriter scrolling");
+            var typewriter_label = new Label(_("Enable typewriter focus mode"));
             typewriter_label.xalign = 0;
 
             var ui_colorscheme_switch = new Switch ();
@@ -356,8 +356,8 @@ namespace ThiefMD.Widgets {
                 settings.ui_editor_theme = ui_colorscheme_switch.get_active ();
                 UI.load_css_scheme ();
             });
-            ui_colorscheme_switch.tooltip_text = _("Toggle UI Matching");
-            var ui_colorscheme_label = new Label(_("Match UI to Editor Theme"));
+            ui_colorscheme_switch.tooltip_text = _("Toggle interface theming");
+            var ui_colorscheme_label = new Label(_("Apply theme to interface"));
             ui_colorscheme_label.xalign = 0;
 
             var headerbar_switch = new Switch ();
@@ -370,8 +370,8 @@ namespace ThiefMD.Widgets {
                     ThiefApp.get_instance ().toolbar.show_headerbar ();
                 }
             });
-            headerbar_switch.tooltip_text = _("Toggle Headerbar");
-            var headerbar_label = new Label(_("Enable hiding of the Headerbar"));
+            headerbar_switch.tooltip_text = _("Toggle auto-hide headerbar");
+            var headerbar_label = new Label(_("Automatically hide headerbar"));
             headerbar_label.xalign = 0;
 
             var ui_writing_statistics_switch = new Switch ();
@@ -384,7 +384,7 @@ namespace ThiefMD.Widgets {
                     ThiefApp.get_instance ().stats_bar.hide_statistics ();
                 }
             });
-            ui_writing_statistics_switch.tooltip_text = _("Toggle Writing Statistics");
+            ui_writing_statistics_switch.tooltip_text = _("Toggle writing statistics");
             var ui_writing_statistics_label = new Label(_("Show writing statistics"));
             ui_writing_statistics_label.xalign = 0;
 
@@ -393,8 +393,8 @@ namespace ThiefMD.Widgets {
             brandless_switch.notify["active"].connect (() => {
                 settings.brandless = brandless_switch.get_active ();
             });
-            brandless_switch.tooltip_text = _("Hide meaningless UI Elements");
-            var brandless_label = new Label(_("Go Brandless"));
+            brandless_switch.tooltip_text = _("Hide meaningless interface elements");
+            var brandless_label = new Label(_("Remove ThiefMD branding"));
             brandless_label.xalign = 0;
 
             var perserve_library_switch = new Switch ();
@@ -402,8 +402,8 @@ namespace ThiefMD.Widgets {
             perserve_library_switch.notify["active"].connect (() => {
                 settings.save_library_order = perserve_library_switch.get_active ();
             });
-            perserve_library_switch.tooltip_text = _("Toggle Save Library Order");
-            var perserve_library_label = new Label(_("Preserve Library Order"));
+            perserve_library_switch.tooltip_text = _("Toggle library order");
+            var perserve_library_label = new Label(_("Keep library order"));
             perserve_library_label.xalign = 0;
 
             int g_row = 0;
