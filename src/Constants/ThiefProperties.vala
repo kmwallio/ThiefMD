@@ -28,9 +28,10 @@ namespace ThiefMD {
         public const string VERSION = Build.VERSION;
         public const Gtk.License LICENSE_TYPE = Gtk.License.GPL_3_0;
         public const string[] GIANTS = {
+            "<a href='https://github.com/kmwallio/ThiefMD/graphs/contributors'>Contributors who help make ThiefMD awesome</a>\n",
             "Original Code:\nBased on <a href='https://github.com/lainsce/quilter'>Quilter</a>\nCopyright © 2017 Lains.\n<a href='https://github.com/lainsce/quilter/blob/master/LICENSE'>GNU General Public License v3.0</a>\n",
             "Font:\n<a href='https://github.com/iaolo/iA-Fonts'>iA Writer Duospace</a>\nCopyright © 2018 Information Architects Inc.\nwith Reserved Font Name \"iA Writer\"\n<a href='https://github.com/iaolo/iA-Fonts/blob/master/iA%20Writer%20Duospace/LICENSE.md'>SIL OPEN FONT LICENSE Version 1.1</a>\n",
-            "Font:\n<a href='https://quoteunquoteapps.com/courierprime'>Courier Prime</a>\nCopyright © 2013 Quote-Unquote Apps\n<a href='https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL'>SIL OPEN FONT LICENSE Version 1.1</a>\n",
+            "Font:\n<a href='https://quoteunquoteapps.com/courierprime'>Courier Prime</a>\nCopyright © 2013 Quote-Unquote Apps\n<a href='https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;id=OFL'>SIL OPEN FONT LICENSE Version 1.1</a>\n",
             "Preview CSS:\n<a href='https://github.com/markdowncss'>Mash up of Splendor and Modest</a>\nCopyright © 2014-2015 John Otander.\n<a href='https://github.com/markdowncss/splendor/blob/master/LICENSE'>The MIT License (MIT)</a>\n",
             "Markdown Parsing:\n<a href='http://www.pell.portland.or.us/~orc/Code/discount/'>libmarkdown2</a>\nCopyright © 2007 David Loren Parsons.\n<a href='http://www.pell.portland.or.us/~orc/Code/discount/COPYRIGHT.html'>BSD-style License</a>\n",
             "Syntax Highlighting:\n<a href='https://highlightjs.org/'>highlight.js</a>\nCopyright © 2006 Ivan Sagalaev.\n<a href='https://github.com/highlightjs/highlight.js/blob/master/LICENSE'>BSD-3-Clause License</a>\n",
