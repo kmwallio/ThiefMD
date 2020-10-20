@@ -27,6 +27,10 @@ namespace ThiefMD {
     }
 
     public class Constants {
+        public const string COLLECTION_THIEFMD = Secret.COLLECTION_DEFAULT;
+        // Default exporter
+        public const string DEFAULT_EXPORTER = "ePUB";
+
         // Margin Constants
         public const int NARROW_MARGIN = 5;
         public const int MEDIUM_MARGIN = 10;

@@ -400,7 +400,12 @@ namespace ThiefMD.Controllers.FileManager {
         return (processed_mk.chomp () != "");
     }
 
-    public string get_yamlless_markdown (string markdown, int lines, bool non_empty = true, bool include_title = true, bool include_date = true)
+    public string get_yamlless_markdown (
+        string markdown,
+        int lines,
+        bool non_empty = true,
+        bool include_title = true,
+        bool include_date = true)
     {
         string buffer = markdown;
         Regex headers = null;
@@ -486,7 +491,13 @@ namespace ThiefMD.Controllers.FileManager {
         return markout.str;
     }
 
-    public string get_file_lines_yaml (string file_path, int lines, bool non_empty, out string title, out string date) {
+    public string get_file_lines_yaml (
+        string file_path,
+        int lines,
+        bool non_empty,
+        out string title,
+        out string date)
+    {
         // var lock = new FileLock ();
         var markdown = new StringBuilder ();
         string temp_title = "";

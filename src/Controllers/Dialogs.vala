@@ -18,6 +18,36 @@
  */
 
 namespace ThiefMD.Controllers.Dialogs {
+    public File get_target_save_file_with_extension (
+        string title,
+        Gtk.FileFilter filter,
+        string ext)
+    {
+        string accept = _("_Save");
+        string cancel = _("_Cancel");
+        Gtk.FileChooserAction action = Gtk.FileChooserAction.SAVE;
+
+        var chooser = new Gtk.FileChooserNative (title, null, action, accept, cancel);
+        chooser.action = action;
+        chooser.set_do_overwrite_confirmation (true);
+
+        if (filter != null) {
+            chooser.add_filter (filter);
+        }
+
+        if (ext != "") {
+            chooser.set_current_name ("my-great-work." + ext);
+        }
+
+        File file = null;
+        if (chooser.run () == Gtk.ResponseType.ACCEPT) {
+            file = chooser.get_file ();
+        }
+
+        chooser.destroy ();
+        return file;
+    }
+
     public Gtk.FileChooserNative create_file_chooser (string title,
             Gtk.FileChooserAction action, string ext = "") {
 
