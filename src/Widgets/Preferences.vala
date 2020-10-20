@@ -162,11 +162,13 @@ namespace ThiefMD.Widgets {
                     Gtk.ResponseType.REJECT,
                     null);
 
-                dialog.response.connect (() => {
-                    grid.remove (button);
-                    ThiefApp.get_instance ().connections.remove (connection);
-                    ThiefApp.get_instance ().exporters.remove (connection.export_name);
-                    SecretSchemas.get_instance ().remove_secret ("writeas", alias, endpoint);
+                dialog.response.connect ((response_val) => {
+                    if (response_val == Gtk.ResponseType.ACCEPT) {
+                        grid.remove (button);
+                        ThiefApp.get_instance ().connections.remove (connection);
+                        ThiefApp.get_instance ().exporters.remove (connection.export_name);
+                        SecretSchemas.get_instance ().remove_secret ("writeas", alias, endpoint);
+                    }
                     dialog.destroy ();
                 });
 
