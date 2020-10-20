@@ -248,9 +248,14 @@ namespace ThiefMD.Widgets {
             Gtk.Button close = new Gtk.Button.with_label (_("Close"));
             grid.attach (close, 1, 3);
 
-            close.activate.connect (() => {
-                destroy ();
+            close.clicked.connect (() => {
+                this.destroy ();
             });
+
+            response.connect (() => {
+                this.destroy ();
+            });
+
             grid.show_all ();
             return grid;
         }
