@@ -174,13 +174,12 @@ namespace ThiefMD {
 
             // Load connections
             connections = new Gee.ConcurrentList<Connections.ConnectionBase> ();
-            SecretSchemas.get_instance ().load_secrets ();
 
             // Restore preview view
             UI.show_view ();
             UI.set_sheets (start_sheet);
             library.set_active ();
-            UI.load_user_themes ();
+            UI.load_user_themes_and_connections ();
             UI.load_font ();
             UI.load_css_scheme ();
 
