@@ -17,11 +17,286 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using ThiefMD.Controllers;
+
 namespace ThiefMD {
     errordomain ThiefError {
         FILE_NOT_FOUND,
         FILE_NOT_VALID_ARCHIVE,
         FILE_NOT_VALID_THEME
+    }
+
+    public class SecretAttr : Object {
+        public string connection_type { get; set; }
+        public string user { get; set; }
+        public string endpoint { get; set; }
+        public string secret { get; set; }
+    }
+
+    public class SecretAttributes : Object {
+        public Gee.LinkedList<SecretAttr> secrets;
+
+        public SecretAttributes () {
+            secrets = new Gee.LinkedList<SecretAttr> ();
+        }
+    }
+
+    public class SecretSchemas {
+        private static SecretSchemas instance = null;
+        public Secret.Schema writeas_secret;
+        private SecretAttributes stored_secrets;
+        private Secret.Collection collection;
+
+        public SecretSchemas () {
+            writeas_secret = new Secret.Schema (
+                "com.kmwallio.thiefmd.Writeas", Secret.SchemaFlags.NONE,
+                "endpoint", Secret.SchemaAttributeType.STRING,
+                "alias", Secret.SchemaAttributeType.STRING);
+
+            stored_secrets = new SecretAttributes ();
+        }
+
+        public static SecretSchemas get_instance () {
+            if (instance == null) {
+                instance = new SecretSchemas ();
+            }
+
+            return instance;
+        }
+
+        public async bool load_secrets () {
+            warning ("Loading secrets");
+            File secrets = File.new_for_path (UserData.connection_file);
+            bool success = false;
+            SecretAttributes attributes;
+            if (!secrets.query_exists ()) {
+                return true;
+            }
+
+            warning ("Found secrets");
+
+            try {
+                Json.Parser parser = new Json.Parser ();
+                parser.load_from_file (secrets.get_path ());
+                Json.Node data = parser.get_root ();
+                var json_obj = parser.get_root ().get_object ();
+                attributes = new SecretAttributes ();
+
+                var secrets_data = json_obj.get_array_member ("secrets");
+
+                if (secrets_data.get_length () > 0 && collection == null) {
+                    yield load_collection ();
+                }
+
+                foreach (var sec_elem in secrets_data.get_elements ()) {
+                    var s_p = sec_elem.get_object ();
+                    SecretAttr sec = new SecretAttr ();
+                    sec.connection_type = "";
+                    sec.user = "";
+                    sec.endpoint = "";
+
+                    if (s_p.has_member ("connection_type")) {
+                        sec.connection_type = s_p.get_string_member ("connection_type");
+                    }
+
+                    if (s_p.has_member ("endpoint")) {
+                        sec.endpoint = s_p.get_string_member ("endpoint");
+                    }
+
+                    if (s_p.has_member ("user")) {
+                        sec.user = s_p.get_string_member ("user");
+                    }
+
+                    if (s_p.has_member ("secret")) {
+                        sec.secret = s_p.get_string_member ("secret");
+                    }
+
+                    warning ("Found secret: %s : %s", sec.connection_type, sec.user);
+
+                    if (sec.connection_type == "writeas") {
+                        var secattr = new GLib.HashTable<string,string> (str_hash, str_equal);
+                        secattr["endpoint"] = sec.endpoint;
+                        secattr["alias"] = sec.user;
+                        warning ("Reading secret: %s : %s", sec.connection_type, sec.user);
+                        try {
+                            var password = yield Secret.password_lookupv (
+                                writeas_secret,
+                                secattr,
+                                null);
+                            if (password != null) {
+                                warning ("Got secret: %s : %s", sec.connection_type, sec.user);
+                                Connections.WriteasConnection writeas_connection = new Connections.WriteasConnection (sec.user, password, sec.endpoint);
+                                Secret.password_wipe (password);
+
+                                if (writeas_connection.connection_valid ()) {
+                                    ThiefApp.get_instance ().exporters.register ("Write.as " + sec.user, writeas_connection.exporter);
+                                    ThiefApp.get_instance ().connections.add (writeas_connection);
+                                    stored_secrets.secrets.add (sec);
+                                } else {
+                                    yield Secret.password_clearv (
+                                        writeas_secret,
+                                        secattr,
+                                        null);
+                                }
+                            } else {
+                                warning ("Could not read secret: %s : %s", sec.connection_type, sec.user);
+                            }
+                        } catch (Error e) {
+                            warning ("Error loading password: %s", e.message);
+                        }
+                    }
+                }
+            } catch (Error e) {
+                warning ("Could not load connection file: %s", e.message);
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool save_secret (string type, string alias, string url) {
+            bool success = false;
+
+            debug ("Saving secret %s : %s", type, alias);
+
+            SecretAttr new_sec = new SecretAttr ();
+            new_sec.connection_type = type;
+            new_sec.user = alias;
+            new_sec.endpoint = url;
+            stored_secrets.secrets.add (new_sec);
+
+            return serialize_secrets ();
+        }
+
+        public bool remove_secret (string type, string alias, string url) {
+            bool success = false;
+
+            SecretAttr? rem_sec = null;
+            foreach (var cur_sec in stored_secrets.secrets) {
+                if (cur_sec.endpoint == url && cur_sec.user == alias && cur_sec.connection_type == type) {
+                    rem_sec = cur_sec;
+                }
+            }
+
+            if (rem_sec != null) {
+                stored_secrets.secrets.remove (rem_sec);
+                success = true;
+                var secattr = new GLib.HashTable<string,string> (str_hash, str_equal);
+                secattr["endpoint"] = rem_sec.endpoint;
+                secattr["alias"] = rem_sec.user;
+                try {
+                    Secret.password_clearv_sync (
+                        writeas_secret,
+                        secattr);
+
+                } catch (Error e) {
+                    warning ("Failure removing from keyring: %s", e.message);
+                }
+            }
+
+            return serialize_secrets ();
+        }
+
+        private async void load_collection () {
+            if (collection == null) {
+                try {
+                    warning ("Loading service");
+                    var service = yield Secret.Service.get (Secret.ServiceFlags.LOAD_COLLECTIONS, null);
+                    warning ("Checking for existing collection");
+                    collection = yield Secret.Collection.for_alias (
+                        service,
+                        Constants.COLLECTION_THIEFMD,
+                        Secret.CollectionFlags.LOAD_ITEMS,
+                        null
+                    );
+
+                    warning ("Creating collection");
+                    if (collection == null) {
+                        warning ("Creating collection for real");
+                        collection = yield Secret.Collection.create (
+                            service,
+                            "ThiefMD",
+                            Constants.COLLECTION_THIEFMD,
+                            0,
+                            null
+                        );
+                    }
+                } catch (Error e) {
+                    warning ("Could not create link to collection: %s", e.message);
+                }
+            }
+        }
+
+        private bool serialize_secrets () {
+            File secrets = File.new_for_path (UserData.connection_file);
+            bool success = false;
+            try {
+                Json.Builder builder = new Json.Builder ();
+                builder.begin_object ();
+                builder.set_member_name ("secrets");
+                builder.begin_array ();
+                foreach (var sec in stored_secrets.secrets) {
+                    warning ("Adding secrent: %s", sec.user);
+                    builder.begin_object ();
+                    builder.set_member_name ("connection_type");
+                    builder.add_string_value (sec.connection_type);
+                    builder.set_member_name ("user");
+                    builder.add_string_value (sec.user);
+                    builder.set_member_name ("endpoint");
+                    builder.add_string_value (sec.endpoint);
+                    builder.end_object ();
+                }
+
+                builder.end_array ();
+                builder.end_object ();
+
+                if (secrets.query_exists ()) {
+                    secrets.delete ();
+                }
+                warning ("Saving to: %s", secrets.get_path ());
+
+                Json.Generator generator = new Json.Generator ();
+                Json.Node root = builder.get_root ();
+                generator.set_root (root);
+
+                warning (generator.to_data (null));
+
+                FileManager.save_file (secrets, generator.to_data (null).data);
+                success = true;
+            } catch (Error e) {
+                warning ("Could not serialize connection data: %s", e.message);
+            }
+
+            return success;
+        }
+
+        public async bool add_writeas_secret (string url, string alias, string password) {
+            var attributes = new GLib.HashTable<string,string> (str_hash, str_equal);
+            attributes["endpoint"] = url;
+            attributes["alias"] = alias;
+
+            if (collection == null) {
+                yield create_collection ();
+            }
+            warning ("Saving secret to KeyStore %s : %s", url, alias);
+
+            try {
+                yield Secret.Item.create (
+                    collection,
+                    writeas_secret,
+                    attributes,
+                    "Writeas " + alias,
+                    new Secret.Value (password, password.length, "text/plain"),
+                    Secret.ItemCreateFlags.REPLACE,
+                    null);
+
+                save_secret ("writeas", alias, url);
+            } catch (Error e) {
+                warning ("Error storing password in keystore: %s", e.message);
+            }
+
+            return true;
+        }
     }
 
     public string make_title (string text) {

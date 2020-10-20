@@ -7,3 +7,6 @@
 [submodule "src/ultheme"]
 	path = src/ultheme
 	url = https://github.com/TwiRp/ultheme-vala
+[submodule "src/writeas"]
+	path = src/writeas
+	url = https://github.com/ThiefMD/writeas-vala.git
