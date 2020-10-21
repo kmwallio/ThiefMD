@@ -91,6 +91,11 @@ namespace ThiefMD.Exporters {
                 return true;
             }
 
+            PublishedStatusWindow status = new PublishedStatusWindow (
+                publisher_instance,
+                _("Working PDF Magic"),
+                new Gtk.Label (_("Making sure your hard work looks purrfect...")));
+
             var print_operation = new WebKit.PrintOperation (publisher_instance.preview);
             var print_settings = new Gtk.PrintSettings ();
             print_settings.set_printer (_("Print to File"));
@@ -104,8 +109,15 @@ namespace ThiefMD.Exporters {
             page_setup.set_bottom_margin (settings.export_top_bottom_margins, Gtk.Unit.INCH);
             print_operation.set_print_settings (print_settings);
             print_operation.set_page_setup (page_setup);
+            print_operation.finished.connect (() => {
+                status.destroy ();
+            });
+            print_operation.failed.connect (() => {
+                status.destroy ();
+            });
             print_operation.print ();
 
+            status.run ();
             if (new_novel.query_exists ()) {
                 return true;
             } else {
