@@ -340,9 +340,11 @@ namespace ThiefMD.Controllers.Pandoc {
         } else if (url.index_of_char ('.') == -1) {
             result = url;
         } else if (FileUtils.test (url, FileTest.EXISTS)) {
-            result = url;
+            File res_file = File.new_for_path (url);
+            result = res_file.get_path ();
         } else if (FileUtils.test (file, FileTest.EXISTS)) {
-            result = file;
+            File res_file = File.new_for_path (file);
+            result = res_file.get_path ();
         } else {
             string search_path = "";
             if (path == "") {
@@ -389,51 +391,7 @@ namespace ThiefMD.Controllers.Pandoc {
 
     private string find_file (string url, string path) {
         string result = "";
-        string file = Path.build_filename (".", url);
-        if (url.index_of_char (':') != -1) {
-            result = url;
-        } else if (url.index_of_char ('.') == -1) {
-            result = url;
-        } else if (FileUtils.test (url, FileTest.EXISTS)) {
-            result = url;
-        } else if (FileUtils.test (file, FileTest.EXISTS)) {
-            result = file;
-        } else {
-            string search_path = "";
-            if (path == "") {
-                Sheet? search_sheet = SheetManager.get_sheet ();
-                search_path = (search_sheet != null) ? Path.get_dirname (search_sheet.file_path ()) : "";
-            } else {
-                search_path = path;
-            }
-            int idx = 0;
-            while (search_path != "") {
-                file = Path.build_filename (search_path, url);
-                if (FileUtils.test (file, FileTest.EXISTS)) {
-                    File tmp = File.new_for_path (file);
-                    result = tmp.get_path ();
-                    break;
-                }
-
-                // Check in static folder
-                file = Path.build_filename (search_path, "static", url);
-                if (FileUtils.test (file, FileTest.EXISTS)) {
-                    File tmp = File.new_for_path (file);
-                    result = tmp.get_path ();
-                    break;
-                }
-
-                idx = search_path.last_index_of_char (Path.DIR_SEPARATOR);
-                if (idx != -1) {
-                    search_path = search_path[0:idx];
-                } else {
-                    result = url;
-                    break;
-                }
-            }
-        }
-
-        if (result != "") {
+        if (find_file_to_upload (url, path, out result)) {
             return result;
         } else {
             return url;
