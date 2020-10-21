@@ -179,7 +179,7 @@ namespace ThiefMD.Widgets {
             DateTime disk_time;
             bool have_match = disk_matches_buffer (out disk_text, out disk_time);
 
-            warning ("Mod: %s, LFT: %s, CFT: %s", modified_time.to_string (), file_modified_time.to_string (), disk_time.to_string ());
+            debug ("Mod: %s, LFT: %s, CFT: %s", modified_time.to_string (), file_modified_time.to_string (), disk_time.to_string ());
 
             // File is different, disable save?
             if (have_match) {

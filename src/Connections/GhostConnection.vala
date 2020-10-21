@@ -27,55 +27,48 @@ using ThiefMD.Controllers;
 using ThiefMD.Exporters;
 
 namespace ThiefMD.Connections {
-    public class WriteasConnection : ConnectionBase {
-        public const string CONNECTION_TYPE = "writeas";
+    public class GhostConnection : ConnectionBase {
+        public const string CONNECTION_TYPE = "ghost";
         public override string export_name { get; protected set; }
         public override ExportBase exporter { get; protected  set; }
-        public Writeas.Client connection;
+        public Ghost.Client connection;
         private string access_token;
         private string alias;
         public string conf_endpoint;
         public string conf_alias;
+        bool authenticated = false;
 
-        public WriteasConnection (string username, string password, string endpoint = "https://write.as/api/") {
-            connection = new Writeas.Client (endpoint);
+        public GhostConnection (string username, string password, string endpoint) {
+            connection = new Ghost.Client (endpoint, username, password);
             alias = "";
             conf_endpoint = endpoint;
             conf_alias = username;
 
-            try {
-                connection.authenticate (username, password, out access_token);
-                string temp;
-                if (connection.get_authenticated_user (out temp)) {
-                    alias = temp;
-                    string label = endpoint.down ();
-                    if (label.has_prefix ("https://")) {
-                        label = endpoint.substring (8);
-                    } else if (endpoint.has_prefix ("http://")) {
-                        label = endpoint.substring (7);
-                    }
-                    if (label.has_suffix ("api/") || label.has_suffix ("api")) {
-                        label = label.substring (0, label.last_index_of ("api"));
-                    }
-                    label = label.substring (0, 1).up () + label.substring (1).down ();
-                    export_name = label + username;
-                    exporter = new WriteasExporter (connection);
+            if (connection.authenticate ()) {
+                string label = endpoint.down ();
+                if (label.has_prefix ("https://")) {
+                    label = endpoint.substring (8);
+                } else if (endpoint.has_prefix ("http://")) {
+                    label = endpoint.substring (7);
                 }
-            } catch (Error e) {
-                warning ("Could not establish connection: %s", e.message);
+                if (!label.has_suffix ("/")) {
+                    label += "/";
+                }
+                label = label.substring (0, 1).up () + label.substring (1).down ();
+                export_name = label + username;
+                exporter = new GhostExporter (connection);
+                authenticated = true;
+            } else {
+                warning ("Could not establish connection");
             }
         }
 
         public override bool connection_valid () {
-            if (connection.get_authenticated_user (out alias)) {
-                return true;
-            }
-
-            return false;
+            return authenticated;
         }
 
         public override void connection_close () {
-            connection.logout ();
+            // Void
         }
 
         public static ConnectionData? create_connection () {
@@ -87,7 +80,7 @@ namespace ThiefMD.Connections {
             grid.hexpand = true;
             grid.vexpand = true;
 
-            Gtk.Label username_label = new Gtk.Label (_("Username"));
+            Gtk.Label username_label = new Gtk.Label (_("E-mail"));
             username_label.xalign = 0;
             Gtk.Entry username_entry = new Gtk.Entry ();
 
@@ -99,7 +92,7 @@ namespace ThiefMD.Connections {
             Gtk.Label endpoint_label = new Gtk.Label (_("Endpoint"));
             endpoint_label.xalign = 0;
             Gtk.Entry endpoint_entry = new Gtk.Entry ();
-            endpoint_entry.placeholder_text = "https://write.as/api/";
+            endpoint_entry.placeholder_text = "https://my.ghost.org/";
 
             grid.attach (username_label, 1, 1, 1, 1);
             grid.attach (username_entry, 2, 1, 2, 1);
@@ -111,7 +104,7 @@ namespace ThiefMD.Connections {
             grid.show_all ();
 
             var dialog = new Gtk.Dialog.with_buttons (
-                            "New Write.as Connection",
+                            "New ghost Connection",
                             ThiefApp.get_instance ().main_window,
                             Gtk.DialogFlags.MODAL,
                             _("_Add Account"),
@@ -148,16 +141,14 @@ namespace ThiefMD.Connections {
         }
     }
 
-    private class WriteasExporter : ExportBase {
+    private class GhostExporter : ExportBase {
         public override string export_name { get; protected set; }
         public override string export_css { get; protected set; }
         private PublisherPreviewWindow publisher_instance;
-        public Writeas.Client connection;
-        private GLib.List<Writeas.Collection> collections;
-        private Gtk.ComboBoxText collection_selector;
+        public Ghost.Client connection;
 
-        public WriteasExporter (Writeas.Client connected) {
-            export_name = "Write.as";
+        public GhostExporter (Ghost.Client connected) {
+            export_name = "Ghost";
             export_css = "preview";
             connection = connected;
         }
@@ -168,108 +159,86 @@ namespace ThiefMD.Connections {
 
         public override void attach (PublisherPreviewWindow ppw) {
             publisher_instance = ppw;
-            collections = new GLib.List<Writeas.Collection> ();
-            if (connection.get_user_collections (ref collections)) {
-                if (collections.length () > 0) {
-                    collection_selector = new Gtk.ComboBoxText ();
-                    collection_selector.hexpand = true;
-
-                    foreach (var c in collections) {
-                        collection_selector.append_text (c.alias);
-                    }
-
-                    collection_selector.set_active (0);
-                    publisher_instance.headerbar.pack_end (collection_selector);
-                }
-            }
             return;
         }
 
         public override void detach () {
-            if (collections.length () > 0) {
-                collection_selector.set_active (0);
-                publisher_instance.headerbar.remove (collection_selector);
-                collection_selector = null;
-            }
             publisher_instance = null;
             return;
+        }
+
+        private bool generate_html (string raw_mk, out string processed_mk) {
+            processed_mk = raw_mk;
+            var mkd = new Markdown.Document.from_gfm_string (processed_mk.data,
+                Markdown.DocumentFlags.TOC + 
+                Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.EXTRA_FOOTNOTE + 
+                Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.DLEXTRA + 
+                Markdown.DocumentFlags.FENCEDCODE + Markdown.DocumentFlags.GITHUBTAGS + 
+                Markdown.DocumentFlags.LATEX + Markdown.DocumentFlags.URLENCODEDANCHOR + 
+                Markdown.DocumentFlags.NOSTYLE + Markdown.DocumentFlags.EXPLICITLIST);
+
+            mkd.compile (
+                Markdown.DocumentFlags.TOC + Markdown.DocumentFlags.AUTOLINK + 
+                Markdown.DocumentFlags.EXTRA_FOOTNOTE + 
+                Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.DLEXTRA +
+                Markdown.DocumentFlags.FENCEDCODE + Markdown.DocumentFlags.GITHUBTAGS +
+                Markdown.DocumentFlags.LATEX + Markdown.DocumentFlags.URLENCODEDANCHOR +
+                Markdown.DocumentFlags.EXPLICITLIST + Markdown.DocumentFlags.NOSTYLE);
+            mkd.get_document (out processed_mk);
+
+            return (processed_mk.chomp () != "");
         }
 
         public override bool export () {
             var settings = AppSettings.get_default ();
             bool non_collected_post = true;
-            bool published = true;
+            bool published = false;
             string temp;
             string title;
             string date;
-            string token = "";
+            string slug = "";
             string id = "";
-            Writeas.Collection publish_collection = null;
+            string html = "";
+
+            debug ("Exporting");
+
             string body = FileManager.get_yamlless_markdown (
                     publisher_instance.get_export_markdown (),
                     0,
                     out title,
                     out date,
                     true,
-                    false, // Override as theme will probably display?
+                    false, // Override instead of use settings as theme will display
                     false);
 
-            // Authenticated post
-            if (collections.length () > 0 && connection.get_authenticated_user (out temp)) {
-                int option = collection_selector.get_active ();
-                if (option >= 0 && option < collections.length ()) {
-                    publish_collection = collections.nth_data (option);
-                    if (connection.publish_collection_post (
-                        out token,
-                        out id,
-                        publish_collection.alias,
-                        body,
-                        title))
-                    {
-                        non_collected_post = false;
-                        published = true;
-                    }
-                }
-            }
+            debug ("Read title: %s", title);
 
-            if (non_collected_post)
-            {
-                // Unauthenticated post
-                if (connection.publish_post (
-                    out token,
+            if (generate_html (body, out html)) {
+                // Simple post
+                if (connection.create_post_simple (
+                    out slug,
                     out id,
-                    body,
-                    title))
+                    title,
+                    html))
                 {
                     published = true;
+                    debug ("Posted");
+                    Gtk.Label label = new Gtk.Label (
+                        "<b>Post URL:</b> <a href='%s'>%s</a>\nAdmin: <a href='%s'>%s</a>".printf (
+                            connection.endpoint + slug, connection.endpoint + slug,
+                            connection.endpoint + "ghost/#/editor/post/" + id, connection.endpoint + "ghost/#/editor/post/" + id));
+
+                    label.xalign = 0;
+                    label.use_markup = true;
+                    PublishedStatusWindow status = new PublishedStatusWindow (
+                        publisher_instance,
+                        (title != "") ? title + _(" Published") : _("Post Published"),
+                        label);
+
+                    status.run ();
+                } else {
+                    warning ("Hit error");
                 }
-            }
-
-            if (published) {
-                Gtk.Label label = new Gtk.Label (
-                    "<b>Post URL:</b> <a href='%s'>%s</a>\nID: %s\nToken: %s\n".printf (
-                        (non_collected_post) ? ("https://write.as/" + id) : (publish_collection.url + id),
-                        (non_collected_post) ? ("https://write.as/" + id) : (publish_collection.url + id),
-                        id,
-                        token));
-
-                Writeas.Post published_data;
-                if (connection.get_post (out published_data, id) && published_data.slug != null && published_data.slug != "") {
-                    label.set_text ("<b>Post URL:</b> <a href='%s'>%s</a>\nID: %s\nToken: %s\n".printf (
-                        (non_collected_post) ? ("https://write.as/" + id) : (publish_collection.url + published_data.slug),
-                        (non_collected_post) ? ("https://write.as/" + id) : (publish_collection.url + published_data.slug),
-                        id,
-                        token));
-                }
-
-                label.xalign = 0;
-                label.use_markup = true;
-                PublishedStatusWindow status = new PublishedStatusWindow (
-                    publisher_instance,
-                    (title != "") ? title + _(" Published") : _("Post Published"),
-                    label);
-
-                status.run ();
             }
 
             return published;

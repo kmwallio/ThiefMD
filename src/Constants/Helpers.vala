@@ -110,11 +110,19 @@ namespace ThiefMD {
                     debug ("Found secret: %s : %s", sec.connection_type, sec.user);
 
                     if (sec.connection_type == WriteasConnection.CONNECTION_TYPE) {
-                        Connections.WriteasConnection writeas_connection = new Connections.WriteasConnection (sec.user, sec.secret, sec.endpoint);
+                        WriteasConnection writeas_connection = new WriteasConnection (sec.user, sec.secret, sec.endpoint);
 
                         if (writeas_connection.connection_valid ()) {
                             ThiefApp.get_instance ().exporters.register (writeas_connection.export_name, writeas_connection.exporter);
                             ThiefApp.get_instance ().connections.add (writeas_connection);
+                            stored_secrets.secrets.add (sec);
+                        }
+                    } else if (sec.connection_type == GhostConnection.CONNECTION_TYPE) {
+                        GhostConnection ghost_connection = new GhostConnection (sec.user, sec.secret, sec.endpoint);
+
+                        if (ghost_connection.connection_valid ()) {
+                            ThiefApp.get_instance ().exporters.register (ghost_connection.export_name, ghost_connection.exporter);
+                            ThiefApp.get_instance ().connections.add (ghost_connection);
                             stored_secrets.secrets.add (sec);
                         }
                     }
@@ -205,6 +213,11 @@ namespace ThiefMD {
 
         public bool add_writeas_secret (string url, string alias, string password) {
             save_secret (WriteasConnection.CONNECTION_TYPE, alias, url, password);
+            return true;
+        }
+
+        public bool add_ghost_secret (string url, string alias, string password) {
+            save_secret (GhostConnection.CONNECTION_TYPE, alias, url, password);
             return true;
         }
     }

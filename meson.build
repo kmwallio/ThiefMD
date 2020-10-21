@@ -68,6 +68,7 @@ executable(
     'src/Controllers/Exporters.vala',
     'src/Connections/ConnectionBase.vala',
     'src/Connections/WriteasConnection.vala',
+    'src/Connections/GhostConnection.vala',
     'src/Exporters/ExportBase.vala',
     'src/Exporters/ExportDocx.vala',
     'src/Exporters/ExportEpub.vala',
@@ -106,6 +107,7 @@ executable(
     'src/writegood/src/writegood.vala',
     'src/writegood/src/en_us.vala',
     'src/writeas/src/Writeas.vala',
+    'src/ghost/src/Ghost.vala',
     asresources,
     c_args: c_args,
     dependencies: [
