@@ -33,6 +33,7 @@ namespace ThiefMD.Widgets {
         public string preview_markdown = "";
         private bool active = true;
         private DateTime modified_time;
+        private DateTime file_modified_time;
         private Mutex file_mutex;
 
         //
@@ -163,51 +164,63 @@ namespace ThiefMD.Widgets {
             drag_data_received.connect (on_drag_data_received);
 
             focus_in_event.connect ((in_event) => {
-                if (!editable) {
-                    return false;
-                }
-
-                string disk_text;
-                DateTime disk_time;
-                bool have_match = disk_matches_buffer (out disk_text, out disk_time);
-
-                // File is different, disable save?
-                if (have_match) {
-                    return false;
-                }
-                should_save = false;
-
-                // Load newer contents from disk?
-                if (modified_time.compare (disk_time) < 0) {
-                    set_text (disk_text);
-                    have_match = true;
-                }
-
-                if (!have_match) {
-                    var dialog = new Gtk.Dialog.with_buttons (
-                        "Contents changed on disk",
-                        ThiefApp.get_instance ().main_window,
-                        Gtk.DialogFlags.MODAL,
-                        _("_Load from disk"),
-                        Gtk.ResponseType.ACCEPT,
-                        _("_Keep what's in editor"),
-                        Gtk.ResponseType.REJECT,
-                        null);
-
-                    dialog.response.connect ((response_val) => {
-                        if (response_val == Gtk.ResponseType.ACCEPT) {
-                            set_text (disk_text);
-                        }
-                        dialog.destroy ();
-                    });
-
-                    if (dialog.run () == Gtk.ResponseType.ACCEPT) {
-                        set_text (disk_text);
-                    }
-                }
+                prompt_on_disk_modifications ();
 
                 return false;
             });
+        }
+
+        public bool prompt_on_disk_modifications () {
+            if (!editable) {
+                return false;
+            }
+
+            string disk_text;
+            DateTime disk_time;
+            bool have_match = disk_matches_buffer (out disk_text, out disk_time);
+
+            warning ("Mod: %s, LFT: %s, CFT: %s", modified_time.to_string (), file_modified_time.to_string (), disk_time.to_string ());
+
+            // File is different, disable save?
+            if (have_match) {
+                return false;
+            }
+            should_save = false;
+
+            // Load newer contents from disk?
+            if (modified_time.compare (disk_time) < 0) {
+                set_text (disk_text);
+                have_match = true;
+            }
+
+            if (file_modified_time.compare (disk_time) == 0 || modified_time.compare (disk_time) == 0) {
+                have_match = true;
+            }
+
+            if (!have_match) {
+                var dialog = new Gtk.Dialog.with_buttons (
+                    "Contents changed on disk",
+                    ThiefApp.get_instance ().main_window,
+                    Gtk.DialogFlags.MODAL,
+                    _("_Load from disk"),
+                    Gtk.ResponseType.ACCEPT,
+                    _("_Keep what's in editor"),
+                    Gtk.ResponseType.REJECT,
+                    null);
+
+                dialog.response.connect ((response_val) => {
+                    if (response_val == Gtk.ResponseType.ACCEPT) {
+                        set_text (disk_text);
+                    }
+                    dialog.destroy ();
+                });
+
+                if (dialog.run () == Gtk.ResponseType.ACCEPT) {
+                    set_text (disk_text);
+                }
+            }
+
+            return have_match;
         }
 
         private void on_drag_data_received (
@@ -528,6 +541,7 @@ namespace ThiefMD.Widgets {
             if (opened_filename != "" && file.query_exists () && !FileUtils.test (file.get_path (), FileTest.IS_DIR)) {
                 file_mutex.lock ();
                 FileManager.save_file (file, buffer.text.data);
+                modified_time = new DateTime.now_utc ();
                 file_mutex.unlock ();
                 return true;
             }
@@ -733,7 +747,9 @@ namespace ThiefMD.Widgets {
                 file_mutex.lock ();
                 try {
                     string text;
-                    file = File.new_for_path (file_name);
+                    FileInfo last_modified = file.query_info (FileAttribute.TIME_MODIFIED, FileQueryInfoFlags.NONE);
+                    file_modified_time = last_modified.get_modification_date_time ();
+
                     string filename = file.get_path ();
                     GLib.FileUtils.get_contents (filename, out text);
                     set_text (text, true);
