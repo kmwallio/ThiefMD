@@ -264,61 +264,60 @@ namespace ThiefMD.Widgets {
             on_text_modified ();
         }
 
-        public void disk_matches_buffer () {
+        public async void disk_matches_buffer () {
             if (!editable || !file_loaded) {
                 return;
             }
 
             if (file.query_exists ()) {
-                file.load_contents_async.begin (null, (obj, res) => {
-                    file_mutex.lock ();
-                    try {
-                        string checksum_on_close = Checksum.compute_for_string (ChecksumType.MD5, buffer.text);
-                        debug ("Checking: %s, against %s", file.get_path (), checksum_on_close);
-                        uint8[] contents;
-                        string etag_out;
-                        string disk_text;
+                file_mutex.lock ();
+                if (!file_loaded) {
+                    return;
+                }
 
-                        file.load_contents_async.end (res, out contents, out etag_out);
-                        disk_text = (string) contents;
-                        if (!file_loaded) {
-                            return;
-                        }
-                        string checksum_on_open = Checksum.compute_for_string (ChecksumType.MD5, disk_text);
-                        if (checksum_on_close != checksum_on_open) {
-                            FileInfo last_modified = file.query_info (FileAttribute.TIME_MODIFIED, FileQueryInfoFlags.NONE);
-                            DateTime disk_time = last_modified.get_modification_date_time ();
+                try {
+                    string checksum_on_close = Checksum.compute_for_string (ChecksumType.MD5, buffer.text);
+                    debug ("Checking: %s, against %s", file.get_path (), checksum_on_close);
+                    uint8[] contents;
+                    string etag_out;
+                    string disk_text;
+                    yield file.load_contents_async (null, out contents, out etag_out);
 
-                            if (modified_time.compare (disk_time) < 0) {
-                                set_text (disk_text);
-                            } else {
-                                var dialog = new Gtk.Dialog.with_buttons (
-                                    "Contents changed on disk",
-                                    ThiefApp.get_instance ().main_window,
-                                    Gtk.DialogFlags.MODAL,
-                                    _("_Load from disk"),
-                                    Gtk.ResponseType.ACCEPT,
-                                    _("_Keep what's in editor"),
-                                    Gtk.ResponseType.REJECT,
-                                    null);
-                            
-                                dialog.response.connect ((response_val) => {
-                                    if (response_val == Gtk.ResponseType.ACCEPT) {
-                                        set_text (disk_text);
-                                    }
-                                    dialog.destroy ();
-                                });
-                            
-                                if (dialog.run () == Gtk.ResponseType.ACCEPT) {
+                    disk_text = (string) contents;
+                    string checksum_on_open = Checksum.compute_for_string (ChecksumType.MD5, disk_text);
+                    if (checksum_on_close != checksum_on_open) {
+                        FileInfo last_modified = file.query_info (FileAttribute.TIME_MODIFIED, FileQueryInfoFlags.NONE);
+                        DateTime disk_time = last_modified.get_modification_date_time ();
+
+                        if (modified_time.compare (disk_time) < 0) {
+                            set_text (disk_text);
+                        } else {
+                            var dialog = new Gtk.Dialog.with_buttons (
+                                "Contents changed on disk",
+                                ThiefApp.get_instance ().main_window,
+                                Gtk.DialogFlags.MODAL,
+                                _("_Load from disk"),
+                                Gtk.ResponseType.ACCEPT,
+                                _("_Keep what's in editor"),
+                                Gtk.ResponseType.REJECT,
+                                null);
+                        
+                            dialog.response.connect ((response_val) => {
+                                if (response_val == Gtk.ResponseType.ACCEPT) {
                                     set_text (disk_text);
                                 }
+                                dialog.destroy ();
+                            });
+                        
+                            if (dialog.run () == Gtk.ResponseType.ACCEPT) {
+                                set_text (disk_text);
                             }
                         }
-                    } catch (Error e) {
-                        warning ("Error checking against disk: %s", e.message);
                     }
-                    file_mutex.unlock ();
-                });
+                } catch (Error e) {
+                    warning ("Error checking against disk: %s", e.message);
+                }
+                file_mutex.unlock ();
             }
         }
 
