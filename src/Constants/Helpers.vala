@@ -18,6 +18,7 @@
  */
 
 using ThiefMD.Controllers;
+using ThiefMD.Connections;
 
 namespace ThiefMD {
     errordomain ThiefError {
