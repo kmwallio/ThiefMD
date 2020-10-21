@@ -190,6 +190,15 @@ namespace ThiefMD.Controllers {
             }
 
             if (rem_sec != null) {
+                var attributes = new GLib.HashTable<string,string> (str_hash, str_equal);
+                attributes["type"] = rem_sec.connection_type;
+                attributes["endpoint"] = rem_sec.endpoint;
+                attributes["alias"] = rem_sec.user;
+
+                Secret.password_clearv.begin (thief_secret, attributes, null, (user_data) => {
+                    warning ("Secret removed from keyring");
+                });
+
                 stored_secrets.secrets.remove (rem_sec);
                 success = true;
             }
