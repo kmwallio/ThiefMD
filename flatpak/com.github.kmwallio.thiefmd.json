@@ -9,7 +9,6 @@
         "--share=network",
         "--filesystem=home",
         "--device=dri",
-        "--talk-name=org.freedesktop.secrets",
         "--socket=fallback-x11",
         "--socket=x11"
     ],
@@ -86,6 +85,7 @@
                 "sha256": "a3ab481ad53f5568d7ec5263fbdd3478fb320d13b5d61a92fb5cee410186bd86"
             }]
         },
+        "shared-modules/libsecret/libsecret.json",
         {
             "name": "thiefmd",
             "buildsystem": "meson",
