@@ -55,7 +55,11 @@ namespace ThiefMD.Connections {
                     label += "/";
                 }
                 label = label.substring (0, 1).up () + label.substring (1).down ();
-                export_name = label + username;
+                if (username.contains ("@")) {
+                    export_name = label + username.substring (username.index_of ("@"));
+                } else {
+                    export_name = label + username;
+                }
                 exporter = new GhostExporter (connection);
                 authenticated = true;
             } else {
