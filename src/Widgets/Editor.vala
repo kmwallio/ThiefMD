@@ -32,6 +32,7 @@ namespace ThiefMD.Widgets {
         private string opened_filename;
         public string preview_markdown = "";
         private bool active = true;
+        private DateTime modified_time;
 
         //
         // UI Items
@@ -67,6 +68,8 @@ namespace ThiefMD.Widgets {
             if (!open_file (file_path)) {
                 set_text (Constants.FIRST_USE.printf (ThiefProperties.THIEF_TIPS[Random.int_range(0, ThiefProperties.THIEF_TIPS.length)]), true);
                 editable = false;
+            } else {
+                modified_time = new DateTime.now_utc ();
             }
 
             build_menu ();
@@ -155,6 +158,53 @@ namespace ThiefMD.Widgets {
             preview_mutex = new TimedMutex ();
             writegood_limit = new TimedMutex (1500);
             drag_data_received.connect (on_drag_data_received);
+
+            focus_in_event.connect ((in_event) => {
+                if (!editable) {
+                    return false;
+                }
+                string disk_text;
+                DateTime disk_time;
+                bool should_warn = disk_matches_buffer (out disk_text, out disk_time);
+
+                // File is different, disable save?
+                if (should_warn) {
+                    should_save = false;
+                } else {
+                    return false;
+                }
+
+                // Load newer contents from disk?
+                if (modified_time.compare (disk_time) < 0) {
+                    set_text (disk_text);
+                    should_warn = false;
+                }
+
+                if (should_warn) {
+                    var dialog = new Gtk.Dialog.with_buttons (
+                        "Contents changed on disk",
+                        ThiefApp.get_instance ().main_window,
+                        Gtk.DialogFlags.MODAL,
+                        _("_Load from disk"),
+                        Gtk.ResponseType.ACCEPT,
+                        _("_Keep what's in editor"),
+                        Gtk.ResponseType.REJECT,
+                        null);
+
+                    dialog.response.connect ((response_val) => {
+                        if (response_val == Gtk.ResponseType.ACCEPT) {
+                            set_text (disk_text);
+                        }
+                        dialog.destroy ();
+                    });
+
+                    if (dialog.run () == Gtk.ResponseType.ACCEPT) {
+                        set_text (disk_text);
+                    }
+                }
+
+                return false;
+            });
         }
 
         private void on_drag_data_received (
@@ -252,6 +302,29 @@ namespace ThiefMD.Widgets {
         public void on_change_notification () {
             is_modified = true;
             on_text_modified ();
+        }
+
+        public bool disk_matches_buffer (out string disk_text, out DateTime disk_time) {
+            bool match = false;
+            try {
+                string checksum_on_close = Checksum.compute_for_string (ChecksumType.MD5, buffer.text);
+                string filename = file.get_path ();
+                debug ("Checking: %s, against %s", filename, checksum_on_close);
+                GLib.FileUtils.get_contents (filename, out disk_text);
+                string checksum_on_open = Checksum.compute_for_string (ChecksumType.MD5, disk_text);
+                if (checksum_on_close != checksum_on_open) {
+                    FileInfo last_modified = file.query_info (FileAttribute.TIME_MODIFIED, FileQueryInfoFlags.NONE);
+                    disk_time = last_modified.get_modification_date_time ();
+                    warning ("File changed on disk (%s != %s), rereading", checksum_on_open, checksum_on_close);
+                } else {
+                    debug ("File matches: %s, %s against %s", filename, checksum_on_open, checksum_on_close);
+                    match = true;
+                }
+            } catch (Error e) {
+                warning ("Could not load file from disk: %s", e.message);
+            }
+
+            return !match;
         }
 
         private int cursor_location;
@@ -453,6 +526,7 @@ namespace ThiefMD.Widgets {
             }
 
             var settings = AppSettings.get_default ();
+            modified_time = new DateTime.now_utc ();
 
             //
             // Make sure we're not swapping files
@@ -519,6 +593,7 @@ namespace ThiefMD.Widgets {
                 editable = true;
             }
 
+            modified_time = new DateTime.now_utc ();
             should_scroll = true;
 
             // Mark as we should save the file
