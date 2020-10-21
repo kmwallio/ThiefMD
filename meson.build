@@ -66,6 +66,7 @@ executable(
     'src/Controllers/UserData.vala',
     'src/Controllers/Pandoc.vala',
     'src/Controllers/Exporters.vala',
+    'src/Controllers/ConnectionManager.vala',
     'src/Connections/ConnectionBase.vala',
     'src/Connections/WriteasConnection.vala',
     'src/Connections/GhostConnection.vala',
