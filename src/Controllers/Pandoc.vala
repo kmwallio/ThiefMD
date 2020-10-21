@@ -147,124 +147,56 @@ namespace ThiefMD.Controllers.Pandoc {
         return res;
     }
 
-    public Gee.Map<string, string> file_image_map (string markdown) {
+    public Gee.Map<string, string> file_image_map (string markdown, string path = "") {
         Gee.Map<string, string> sub_files = new Gee.HashMap<string, string> ();
 
-        try {
-            Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex css_url_search = new Regex ("url\\(['\"]?(.+?)['\"]?\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+        RegexEvalCallback add_upload_paths = (match_info, result) =>
+        {
+            var url = match_info.fetch (1);
+            string abs_path = "";
+            if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
+                sub_files.set (url, abs_path);
+            }
+            return false;
+        };
+        manipulate_markdown_local_paths (markdown, path,
+            add_upload_paths,
+            add_upload_paths,
+            add_upload_paths,
+            add_upload_paths);
 
-            url_search.replace_eval (
-                markdown,
-                (ssize_t) markdown.length,
-                0,
-                RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
-                {
-                    var url = match_info.fetch (1);
-                    string abs_path = "";
-                    if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
-                        sub_files.set (url, abs_path);
-                    }
-                    return false;
-                });
-
-            src_search.replace_eval (
-                markdown,
-                (ssize_t) markdown.length,
-                0,
-                RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
-                {
-                    var url = match_info.fetch (1);
-                    string abs_path = "";
-                    if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
-                        sub_files.set (url, abs_path);
-                    }
-                    return false;
-                });
-
-            css_url_search.replace_eval (
-                markdown,
-                (ssize_t) markdown.length,
-                0,
-                RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
-                {
-                    var url = match_info.fetch (1);
-                    string abs_path = "";
-                    if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
-                        sub_files.set (url, abs_path);
-                    }
-                    return false;
-                });
-        } catch (Error e) {
-            warning ("Could not find files: %s", e.message);
-        }
-
-        return sub_files;
+            return sub_files;
     }
 
     public Gee.LinkedList<string> file_import_paths (string markdown) {
         Gee.LinkedList<string> sub_files = new Gee.LinkedList<string> ();
 
-        try {
-            Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex css_url_search = new Regex ("url\\(['\"]?(.+?)['\"]?\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-
-            url_search.replace_eval (
-                markdown,
-                (ssize_t) markdown.length,
-                0,
-                RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
-                {
-                    var url = match_info.fetch (1);
-                    if (!url.contains (":")) {
-                        sub_files.add (url);
-                    }
-                    return false;
-                });
-
-            src_search.replace_eval (
-                markdown,
-                (ssize_t) markdown.length,
-                0,
-                RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
-                {
-                    var url = match_info.fetch (1);
-                    if (!url.contains (":")) {
-                        sub_files.add (url);
-                    }
-                    return false;
-                });
-
-            css_url_search.replace_eval (
-                markdown,
-                (ssize_t) markdown.length,
-                0,
-                RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
-                {
-                    var url = match_info.fetch (1);
-                    if (!url.contains (":")) {
-                        sub_files.add (url);
-                    }
-                    return false;
-                });
-        } catch (Error e) {
-            warning ("Could not find files: %s", e.message);
-        }
+        RegexEvalCallback add_import_paths = (match_info, result) =>
+        {
+            var url = match_info.fetch (1);
+            if (!url.contains (":")) {
+                sub_files.add (url);
+            }
+            return false;
+        };
+        manipulate_markdown_local_paths (markdown, "",
+            add_import_paths,
+            add_import_paths,
+            add_import_paths,
+            add_import_paths);
 
         return sub_files;
     }
 
-    public string resolve_paths (string markdown, string path = "") {
-        string processed_mk = markdown;
+    public string manipulate_markdown_local_paths (
+        string markdown,
+        string path,
+        RegexEvalCallback markdown_img_callback,
+        RegexEvalCallback css_url_callback,
+        RegexEvalCallback src_callback,
+        RegexEvalCallback cover_callback) {
 
+        string processed_mk = markdown;
         try {
             Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
@@ -276,60 +208,68 @@ namespace ThiefMD.Controllers.Pandoc {
                 (ssize_t) processed_mk.length,
                 0,
                 RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
-                {
-                    result.append ("(");
-                    var url = match_info.fetch (1);
-                    result.append (find_file (url, path));
-                    result.append (")");
-                    return false;
-                });
+                markdown_img_callback);
 
             processed_mk = css_url_search.replace_eval (
                 processed_mk,
                 (ssize_t) processed_mk.length,
                 0,
                 RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
-                {
-                    result.append ("url(");
-                    var url = match_info.fetch (1);
-                    result.append (find_file (url, path));
-                    result.append (")");
-                    return false;
-                });
+                css_url_callback);
 
             processed_mk = src_search.replace_eval (
-                    processed_mk,
-                    (ssize_t) processed_mk.length,
-                    0,
-                    RegexMatchFlags.NOTEMPTY,
-                    (match_info, result) =>
-                    {
-                        result.append ("src=\"");
-                        var url = match_info.fetch (1);
-                        result.append (find_file (url, path));
-                        result.append ("\"");
-                        return false;
-                    });
+                processed_mk,
+                (ssize_t) processed_mk.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                src_callback);
 
             processed_mk = cover_image_search.replace_eval (
                 processed_mk,
                 (ssize_t) processed_mk.length,
                 0,
                 RegexMatchFlags.NOTEMPTY,
-                (match_info, result) =>
+                cover_callback);
+        } catch (Error e) {
+            warning ("Error generating preview: %s", e.message);
+        }
+
+        return processed_mk;
+    }
+
+    public string resolve_paths (string markdown, string path = "") {
+        return manipulate_markdown_local_paths (markdown, path,
+            (match_info, result) =>
+                {
+                    result.append ("(");
+                    var url = match_info.fetch (1);
+                    result.append (find_file (url, path));
+                    result.append (")");
+                    return false;
+                },
+            (match_info, result) =>
+                {
+                    result.append ("url(");
+                    var url = match_info.fetch (1);
+                    result.append (find_file (url, path));
+                    result.append (")");
+                    return false;
+                },
+            (match_info, result) =>
+                {
+                    result.append ("src=\"");
+                    var url = match_info.fetch (1);
+                    result.append (find_file (url, path));
+                    result.append ("\"");
+                    return false;
+                },
+            (match_info, result) =>
                 {
                     result.append ("cover-image: ");
                     var url = match_info.fetch (1);
                     result.append (find_file (url, path));
                     return false;
                 });
-        } catch (Error e) {
-            warning ("Error generating preview: %s", e.message);
-        }
-
-        return processed_mk;
     }
 
     private bool find_file_to_upload (string url, string path, out string absolute_path) {
