@@ -60,6 +60,7 @@ namespace ThiefMD.Widgets {
         public static Preview get_instance () {
             if (instance == null) {
                 instance = new Widgets.Preview ();
+                instance.exporting = false;
             }
 
             return instance;
