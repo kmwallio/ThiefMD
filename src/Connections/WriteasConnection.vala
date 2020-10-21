@@ -28,6 +28,7 @@ using ThiefMD.Exporters;
 
 namespace ThiefMD.Connections {
     public class WriteasConnection : ConnectionBase {
+        public const string CONNECTION_TYPE = "writeas";
         public override string export_name { get; protected set; }
         public override ExportBase exporter { get; protected  set; }
         public Writeas.Client connection;
@@ -127,7 +128,7 @@ namespace ThiefMD.Connections {
                 if (response_id == Gtk.ResponseType.ACCEPT) {
                     debug ("Data from callback");
                     data = new ConnectionData ();
-                    data.connection_type = "writeas";
+                    data.connection_type = CONNECTION_TYPE;
                     data.user = username_entry.text;
                     data.auth = password_entry.text;
                     data.endpoint = endpoint_entry.text;
@@ -137,7 +138,7 @@ namespace ThiefMD.Connections {
             if (dialog.run () == Gtk.ResponseType.ACCEPT) {
                 debug ("Data from block");
                 data = new ConnectionData ();
-                data.connection_type = "writeas";
+                data.connection_type = CONNECTION_TYPE;
                 data.user = username_entry.text;
                 data.auth = password_entry.text;
                 data.endpoint = endpoint_entry.text;

@@ -143,7 +143,7 @@ namespace ThiefMD.Widgets {
             string endpoint = "";
             if (connection is WriteasConnection) {
                 WriteasConnection wc = (WriteasConnection) connection;
-                type = "writeas";
+                type = WriteasConnection.CONNECTION_TYPE;
                 alias = wc.conf_alias;
                 endpoint = wc.conf_endpoint;
                 button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/writeas.png"));
@@ -167,7 +167,7 @@ namespace ThiefMD.Widgets {
                         grid.remove (button);
                         ThiefApp.get_instance ().connections.remove (connection);
                         ThiefApp.get_instance ().exporters.remove (connection.export_name);
-                        SecretSchemas.get_instance ().remove_secret ("writeas", alias, endpoint);
+                        SecretSchemas.get_instance ().remove_secret (type, alias, endpoint);
                     }
                     dialog.destroy ();
                 });
@@ -176,6 +176,7 @@ namespace ThiefMD.Widgets {
                     grid.remove (button);
                     ThiefApp.get_instance ().connections.remove (connection);
                     ThiefApp.get_instance ().exporters.remove (connection.export_name);
+                    SecretSchemas.get_instance ().remove_secret (type, alias, endpoint);
                 }
             });
 

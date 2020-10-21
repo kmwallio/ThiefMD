@@ -108,7 +108,7 @@ namespace ThiefMD {
 
                     debug ("Found secret: %s : %s", sec.connection_type, sec.user);
 
-                    if (sec.connection_type == "writeas") {
+                    if (sec.connection_type == WriteasConnection.CONNECTION_TYPE) {
                         Connections.WriteasConnection writeas_connection = new Connections.WriteasConnection (sec.user, sec.secret, sec.endpoint);
 
                         if (writeas_connection.connection_valid ()) {
@@ -203,7 +203,7 @@ namespace ThiefMD {
         }
 
         public bool add_writeas_secret (string url, string alias, string password) {
-            save_secret ("writeas", alias, url, password);
+            save_secret (WriteasConnection.CONNECTION_TYPE, alias, url, password);
             return true;
         }
     }
