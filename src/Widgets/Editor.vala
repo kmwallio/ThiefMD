@@ -33,6 +33,7 @@ namespace ThiefMD.Widgets {
         public string preview_markdown = "";
         private bool active = true;
         private DateTime modified_time;
+        private Mutex file_mutex;
 
         //
         // UI Items
@@ -64,6 +65,8 @@ namespace ThiefMD.Widgets {
         public Editor (string file_path) {
             var settings = AppSettings.get_default ();
             settings.changed.connect (update_settings);
+
+            file_mutex = Mutex ();
 
             if (!open_file (file_path)) {
                 set_text (Constants.FIRST_USE.printf (ThiefProperties.THIEF_TIPS[Random.int_range(0, ThiefProperties.THIEF_TIPS.length)]), true);
@@ -163,24 +166,24 @@ namespace ThiefMD.Widgets {
                 if (!editable) {
                     return false;
                 }
+
                 string disk_text;
                 DateTime disk_time;
-                bool should_warn = disk_matches_buffer (out disk_text, out disk_time);
+                bool have_match = disk_matches_buffer (out disk_text, out disk_time);
 
                 // File is different, disable save?
-                if (should_warn) {
-                    should_save = false;
-                } else {
+                if (have_match) {
                     return false;
                 }
+                should_save = false;
 
                 // Load newer contents from disk?
                 if (modified_time.compare (disk_time) < 0) {
                     set_text (disk_text);
-                    should_warn = false;
+                    have_match = true;
                 }
 
-                if (should_warn) {
+                if (!have_match) {
                     var dialog = new Gtk.Dialog.with_buttons (
                         "Contents changed on disk",
                         ThiefApp.get_instance ().main_window,
@@ -306,25 +309,34 @@ namespace ThiefMD.Widgets {
 
         public bool disk_matches_buffer (out string disk_text, out DateTime disk_time) {
             bool match = false;
+            
             try {
-                string checksum_on_close = Checksum.compute_for_string (ChecksumType.MD5, buffer.text);
-                string filename = file.get_path ();
-                debug ("Checking: %s, against %s", filename, checksum_on_close);
-                GLib.FileUtils.get_contents (filename, out disk_text);
-                string checksum_on_open = Checksum.compute_for_string (ChecksumType.MD5, disk_text);
-                if (checksum_on_close != checksum_on_open) {
+                if (file_mutex.trylock ()) {
                     FileInfo last_modified = file.query_info (FileAttribute.TIME_MODIFIED, FileQueryInfoFlags.NONE);
                     disk_time = last_modified.get_modification_date_time ();
-                    warning ("File changed on disk (%s != %s), rereading", checksum_on_open, checksum_on_close);
+
+                    string checksum_on_close = Checksum.compute_for_string (ChecksumType.MD5, buffer.text);
+                    string filename = file.get_path ();
+                    debug ("Checking: %s, against %s", filename, checksum_on_close);
+                    GLib.FileUtils.get_contents (filename, out disk_text);
+                    string checksum_on_open = Checksum.compute_for_string (ChecksumType.MD5, disk_text);
+                    if (checksum_on_close != checksum_on_open) {
+                        warning ("File changed on disk (%s != %s), rereading", checksum_on_open, checksum_on_close);
+                    } else {
+                        debug ("File matches: %s, %s against %s", filename, checksum_on_open, checksum_on_close);
+                        match = true;
+                    }
+
+                    file_mutex.unlock ();
                 } else {
-                    debug ("File matches: %s, %s against %s", filename, checksum_on_open, checksum_on_close);
+                    // File is loading, don't overwrite the buffer
                     match = true;
                 }
             } catch (Error e) {
                 warning ("Could not load file from disk: %s", e.message);
             }
 
-            return !match;
+            return match;
         }
 
         private int cursor_location;
@@ -514,7 +526,9 @@ namespace ThiefMD.Widgets {
 
         public bool save () throws Error {
             if (opened_filename != "" && file.query_exists () && !FileUtils.test (file.get_path (), FileTest.IS_DIR)) {
+                file_mutex.lock ();
                 FileManager.save_file (file, buffer.text.data);
+                file_mutex.unlock ();
                 return true;
             }
             return false;
@@ -700,6 +714,9 @@ namespace ThiefMD.Widgets {
         }
 
         public bool open_file (string file_name) {
+            idle_margins ();
+
+            bool res = false;
             opened_filename = file_name;
             debug ("Opening file: %s", file_name);
             file = File.new_for_path (file_name);
@@ -709,30 +726,28 @@ namespace ThiefMD.Widgets {
             // We don't want this to become active again and
             // corrupt a file.
             if (file_name == "") {
-                return false;
+                return res;
             }
 
             if (file.query_exists ()) {
+                file_mutex.lock ();
                 try {
                     string text;
                     file = File.new_for_path (file_name);
-
-                    if (file.query_exists ())
-                    {
-                        string filename = file.get_path ();
-                        GLib.FileUtils.get_contents (filename, out text);
-                        set_text (text, true);
-                        editable = true;
-                        debug ("%s opened", file_name);
-                        return true;
-                    }
+                    string filename = file.get_path ();
+                    GLib.FileUtils.get_contents (filename, out text);
+                    set_text (text, true);
+                    editable = true;
+                    debug ("%s opened", file_name);
+                    res = true;
                 } catch (Error e) {
                     warning ("Error: %s", e.message);
                     SheetManager.show_error ("Unexpected Error: " + e.message);
                 }
+                file_mutex.unlock ();
             }
 
-            return false;
+            return res;
         }
 
         public void set_text (string text, bool opening = true) {
@@ -755,6 +770,13 @@ namespace ThiefMD.Widgets {
             buffer.place_cursor (start);
         }
 
+        private void idle_margins () {
+            GLib.Idle.add (() => {
+                move_margins ();
+                return false;
+            });
+        }
+
         public void dynamic_margins () {
             if (!ThiefApp.get_instance ().ready) {
                 return;
@@ -771,6 +793,7 @@ namespace ThiefMD.Widgets {
             }
 
             move_margins ();
+            idle_margins ();
         }
 
         public void move_margins () {
