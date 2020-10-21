@@ -206,6 +206,27 @@ namespace ThiefMD.Connections {
 
             debug ("Exporting");
 
+            Gee.Map<string, string> images_to_upload = Pandoc.file_image_map (publisher_instance.get_export_markdown ());
+            Gee.HashMap<string, string> replacements = new Gee.HashMap<string, string> ();
+
+            if (images_to_upload.keys.size > 0) {
+                Thinking worker = new Thinking (_("Uploading images"), () => {
+                    foreach (var images in images_to_upload) {
+                        File img_file = File.new_for_path (images.value);
+                        if (img_file.query_exists () && !FileUtils.test (images.value, FileTest.IS_DIR)) {
+                            string upload_url;
+                            if (connection.upload_image_simple (
+                                out upload_url,
+                                img_file.get_path ()))
+                            {
+                                replacements.set (images.key, upload_url);
+                            }
+                        }
+                    }
+                });
+                worker.run ();
+            }
+
             string body = FileManager.get_yamlless_markdown (
                     publisher_instance.get_export_markdown (),
                     0,
@@ -216,6 +237,13 @@ namespace ThiefMD.Connections {
                     false);
 
             debug ("Read title: %s", title);
+
+            foreach (var replacement in replacements) {
+                body = body.replace ("(" + replacement.key, "(" + replacement.value);
+                body = body.replace ("\"" + replacement.key, "\"" + replacement.value);
+                body = body.replace ("'" + replacement.key, "'" + replacement.value);
+                warning ("Replaced %s with %s", replacement.key, replacement.value);
+            }
 
             if (generate_html (body, out html)) {
                 // Simple post

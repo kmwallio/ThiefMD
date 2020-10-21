@@ -147,6 +147,65 @@ namespace ThiefMD.Controllers.Pandoc {
         return res;
     }
 
+    public Gee.Map<string, string> file_image_map (string markdown) {
+        Gee.Map<string, string> sub_files = new Gee.HashMap<string, string> ();
+
+        try {
+            Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex css_url_search = new Regex ("url\\(['\"]?(.+?)['\"]?\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+
+            url_search.replace_eval (
+                markdown,
+                (ssize_t) markdown.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                (match_info, result) =>
+                {
+                    var url = match_info.fetch (1);
+                    string abs_path = "";
+                    if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
+                        sub_files.set (url, abs_path);
+                    }
+                    return false;
+                });
+
+            src_search.replace_eval (
+                markdown,
+                (ssize_t) markdown.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                (match_info, result) =>
+                {
+                    var url = match_info.fetch (1);
+                    string abs_path = "";
+                    if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
+                        sub_files.set (url, abs_path);
+                    }
+                    return false;
+                });
+
+            css_url_search.replace_eval (
+                markdown,
+                (ssize_t) markdown.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                (match_info, result) =>
+                {
+                    var url = match_info.fetch (1);
+                    string abs_path = "";
+                    if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
+                        sub_files.set (url, abs_path);
+                    }
+                    return false;
+                });
+        } catch (Error e) {
+            warning ("Could not find files: %s", e.message);
+        }
+
+        return sub_files;
+    }
+
     public Gee.LinkedList<string> file_import_paths (string markdown) {
         Gee.LinkedList<string> sub_files = new Gee.LinkedList<string> ();
 
@@ -271,6 +330,61 @@ namespace ThiefMD.Controllers.Pandoc {
         }
 
         return processed_mk;
+    }
+
+    private bool find_file_to_upload (string url, string path, out string absolute_path) {
+        string result = "";
+        string file = Path.build_filename (".", url);
+        if (url.index_of_char (':') != -1) {
+            result = url;
+        } else if (url.index_of_char ('.') == -1) {
+            result = url;
+        } else if (FileUtils.test (url, FileTest.EXISTS)) {
+            result = url;
+        } else if (FileUtils.test (file, FileTest.EXISTS)) {
+            result = file;
+        } else {
+            string search_path = "";
+            if (path == "") {
+                Sheet? search_sheet = SheetManager.get_sheet ();
+                search_path = (search_sheet != null) ? Path.get_dirname (search_sheet.file_path ()) : "";
+            } else {
+                search_path = path;
+            }
+            int idx = 0;
+            while (search_path != "") {
+                file = Path.build_filename (search_path, url);
+                if (FileUtils.test (file, FileTest.EXISTS)) {
+                    File tmp = File.new_for_path (file);
+                    result = tmp.get_path ();
+                    break;
+                }
+
+                // Check in static folder
+                file = Path.build_filename (search_path, "static", url);
+                if (FileUtils.test (file, FileTest.EXISTS)) {
+                    File tmp = File.new_for_path (file);
+                    result = tmp.get_path ();
+                    break;
+                }
+
+                idx = search_path.last_index_of_char (Path.DIR_SEPARATOR);
+                if (idx != -1) {
+                    search_path = search_path[0:idx];
+                } else {
+                    result = url;
+                    break;
+                }
+            }
+        }
+
+        if (result != "") {
+            absolute_path = result;
+            return true;
+        } else {
+            absolute_path = "";
+            return false;
+        }
     }
 
     private string find_file (string url, string path) {
