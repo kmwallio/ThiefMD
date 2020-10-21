@@ -47,7 +47,17 @@ namespace ThiefMD.Connections {
                 string temp;
                 if (connection.get_authenticated_user (out temp)) {
                     alias = temp;
-                    export_name = _("Writeas ") + username;
+                    string label = endpoint.down ();
+                    if (label.has_prefix ("https://")) {
+                        label = endpoint.substring (8);
+                    } else if (endpoint.has_prefix ("http://")) {
+                        label = endpoint.substring (7);
+                    }
+                    if (label.has_suffix ("api/") || label.has_suffix ("api")) {
+                        label = label.substring (0, label.last_index_of ("api"));
+                    }
+                    label = label.substring (0, 1).up () + label.substring (1).down ();
+                    export_name = label + username;
                     exporter = new WriteasExporter (connection);
                 }
             } catch (Error e) {
@@ -146,7 +156,7 @@ namespace ThiefMD.Connections {
         private Gtk.ComboBoxText collection_selector;
 
         public WriteasExporter (Writeas.Client connected) {
-            export_name = "Writeas";
+            export_name = "Write.as";
             export_css = "preview";
             connection = connected;
         }
@@ -242,8 +252,8 @@ namespace ThiefMD.Connections {
             if (published) {
                 Gtk.Label label = new Gtk.Label (
                     "<b>Post URL:</b> <a href='%s'>%s</a>\nID: %s\nToken: %s\n".printf (
-                        (non_collected_post) ? ("https://write.as/" + id) : (publish_collection.url + "/" + id),
-                        (non_collected_post) ? ("https://write.as/" + id) : (publish_collection.url + "/" + id),
+                        (non_collected_post) ? ("https://write.as/" + id) : (publish_collection.url + id),
+                        (non_collected_post) ? ("https://write.as/" + id) : (publish_collection.url + id),
                         id,
                         token));
 

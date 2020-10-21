@@ -112,7 +112,7 @@ namespace ThiefMD {
                         Connections.WriteasConnection writeas_connection = new Connections.WriteasConnection (sec.user, sec.secret, sec.endpoint);
 
                         if (writeas_connection.connection_valid ()) {
-                            ThiefApp.get_instance ().exporters.register ("Write.as " + sec.user, writeas_connection.exporter);
+                            ThiefApp.get_instance ().exporters.register (writeas_connection.export_name, writeas_connection.exporter);
                             ThiefApp.get_instance ().connections.add (writeas_connection);
                             stored_secrets.secrets.add (sec);
                         }
