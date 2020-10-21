@@ -1052,6 +1052,7 @@ namespace ThiefMD.Widgets {
                     }
 
                     insert_at_cursor (new_text);
+                    save ();
                 });
 
                 Gtk.MenuItem menu_insert_frontmatter = new Gtk.MenuItem.with_label (_("Insert YAML Frontmatter"));
@@ -1130,6 +1131,7 @@ namespace ThiefMD.Widgets {
 
                         // Move the frontmatter onscreen
                         should_scroll = true;
+                        save ();
                         move_typewriter_scolling ();
                     }
                 });

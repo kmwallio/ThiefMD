@@ -13,6 +13,11 @@ title: Tips and Tricks
 
 * [Linux Writing Tools](/tips/linux-writing-tools)
 
+## Working with Blogging Services
+
+* [Blogging with Write Freely](/tips/blogging-with-write.as)
+* [Blogging with Ghost](/tips/blogging-with-ghost)
+
 ## Static Site Generators
 
 * [Blogging with Jekyll](/tips/jekyll)

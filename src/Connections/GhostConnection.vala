@@ -146,11 +146,17 @@ namespace ThiefMD.Connections {
         public override string export_css { get; protected set; }
         private PublisherPreviewWindow publisher_instance;
         public Ghost.Client connection;
+        private Gtk.ComboBoxText publish_state;
 
         public GhostExporter (Ghost.Client connected) {
             export_name = "Ghost";
             export_css = "preview";
             connection = connected;
+
+            publish_state = new Gtk.ComboBoxText ();
+            publish_state.append_text ("Draft");
+            publish_state.append_text ("Published");
+            publish_state.set_active (0);
         }
 
         public override string update_markdown (string markdown) {
@@ -159,10 +165,12 @@ namespace ThiefMD.Connections {
 
         public override void attach (PublisherPreviewWindow ppw) {
             publisher_instance = ppw;
+            publisher_instance.headerbar.pack_end (publish_state);
             return;
         }
 
         public override void detach () {
+            publisher_instance.headerbar.remove (publish_state);
             publisher_instance = null;
             return;
         }
@@ -241,13 +249,17 @@ namespace ThiefMD.Connections {
                 warning ("Replaced %s with %s", replacement.key, replacement.value);
             }
 
+            int published_state = publish_state.get_active ();
+            bool immediately_publish = (published_state == 1);
+
             if (generate_html (body, out html)) {
                 // Simple post
                 if (connection.create_post_simple (
                     out slug,
                     out id,
                     title,
-                    html))
+                    html,
+                    immediately_publish))
                 {
                     published = true;
                     debug ("Posted");
