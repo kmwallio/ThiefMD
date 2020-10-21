@@ -120,12 +120,12 @@ namespace ThiefMD.Widgets {
             } else if (print_css != "") {
                 File css_file = File.new_for_path (Path.build_filename(UserData.css_path, preview_css,"print.css"));
                 if (css_file.query_exists ()) {
-                    style += "@media print {\n";
-                    style += FileManager.get_file_contents (css_file.get_path ());
-                    style += "}";
                     if (print_only) {
-                        style += FileManager.get_file_contents (css_file.get_path ());
+                        style += "\n" + FileManager.get_file_contents (css_file.get_path ()) + "\n";
                     }
+                    style += "\n@media print {\n";
+                    style += FileManager.get_file_contents (css_file.get_path ());
+                    style += "}\n";
                 }
             } else {
                 style += ThiefProperties.NO_CSS_CSS;
