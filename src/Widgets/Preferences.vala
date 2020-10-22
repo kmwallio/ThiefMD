@@ -68,7 +68,12 @@ namespace ThiefMD.Widgets {
             show_all ();
         }
 
-        private Grid connection_grid () {
+        private Widget connection_grid () {
+            var connection_scroller = new ScrolledWindow (null, null);
+            connection_scroller.hexpand = true;
+            connection_scroller.vexpand = true;
+            connection_scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+
             var settings = AppSettings.get_default ();
             Grid grid = new Grid ();
             grid.margin = 0;
@@ -159,7 +164,9 @@ namespace ThiefMD.Widgets {
             }
 
             grid.show_all ();
-            return grid;
+            connection_scroller.add (grid);
+            connection_scroller.show_all ();
+            return connection_scroller;
         }
 
         private Gtk.Button connection_button (ConnectionBase connection, Gtk.Grid grid) {

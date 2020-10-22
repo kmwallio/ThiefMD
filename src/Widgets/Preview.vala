@@ -60,6 +60,7 @@ namespace ThiefMD.Widgets {
         public static Preview get_instance () {
             if (instance == null) {
                 instance = new Widgets.Preview ();
+                instance.exporting = false;
             }
 
             return instance;
@@ -187,7 +188,8 @@ namespace ThiefMD.Widgets {
         private bool get_preview_markdown (string raw_mk, out string processed_mk) {
             var settings = AppSettings.get_default ();
             if (!exporting || settings.export_resolve_paths) {
-                processed_mk = Pandoc.resolve_paths (raw_mk);
+                string file_path = settings.last_file.substring(0, settings.last_file.last_index_of(Path.DIR_SEPARATOR_S));
+                processed_mk = Pandoc.resolve_paths (raw_mk, file_path);
             } else {
                 processed_mk = raw_mk;
             }

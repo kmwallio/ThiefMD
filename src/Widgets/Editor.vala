@@ -35,6 +35,8 @@ namespace ThiefMD.Widgets {
         private DateTime modified_time;
         private DateTime file_modified_time;
         private Mutex file_mutex;
+        private bool no_change_prompt = false; // Trying to prevent too much file changed prompts?
+        private TimedMutex disk_change_prompted;
 
         //
         // UI Items
@@ -68,6 +70,7 @@ namespace ThiefMD.Widgets {
             settings.changed.connect (update_settings);
 
             file_mutex = Mutex ();
+            disk_change_prompted = new TimedMutex (10000);
 
             if (!open_file (file_path)) {
                 set_text (Constants.FIRST_USE.printf (ThiefProperties.THIEF_TIPS[Random.int_range(0, ThiefProperties.THIEF_TIPS.length)]), true);
@@ -172,6 +175,10 @@ namespace ThiefMD.Widgets {
 
         public bool prompt_on_disk_modifications () {
             if (!editable) {
+                return false;
+            }
+
+            if (!disk_change_prompted.can_do_action ()) {
                 return false;
             }
 
@@ -1033,6 +1040,10 @@ namespace ThiefMD.Widgets {
                 return;
             }
 
+            bool no_change_prompt = true;
+            // Set timer so we don't prompt for file modification?
+            disk_change_prompted.can_do_action ();
+
             var settings = AppSettings.get_default ();
             this.populate_popup.connect ((source, menu) => {
                 Gtk.SeparatorMenuItem sep = new Gtk.SeparatorMenuItem ();
@@ -1051,6 +1062,8 @@ namespace ThiefMD.Widgets {
                         new_text = now.format ("%FT%T%z");
                     }
 
+                    // Set timer so we don't prompt for file modification?
+                    disk_change_prompted.can_do_action ();
                     insert_at_cursor (new_text);
                 });
 
@@ -1114,6 +1127,9 @@ namespace ThiefMD.Widgets {
                             }
                         }
                         frontmatter += "---\n";
+
+                        // Set timer so we don't prompt for file modification?
+                        disk_change_prompted.can_do_action ();
 
                         // Place the text
                         buffer.text = frontmatter + buffer.text;

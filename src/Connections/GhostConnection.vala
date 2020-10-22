@@ -55,7 +55,7 @@ namespace ThiefMD.Connections {
                     label += "/";
                 }
                 label = label.substring (0, 1).up () + label.substring (1).down ();
-                export_name = label + username;
+                export_name = label + username.substring (0, username.index_of ("@"));
                 exporter = new GhostExporter (connection);
                 authenticated = true;
             } else {
@@ -146,11 +146,17 @@ namespace ThiefMD.Connections {
         public override string export_css { get; protected set; }
         private PublisherPreviewWindow publisher_instance;
         public Ghost.Client connection;
+        private Gtk.ComboBoxText publish_state;
 
         public GhostExporter (Ghost.Client connected) {
             export_name = "Ghost";
             export_css = "preview";
             connection = connected;
+
+            publish_state = new Gtk.ComboBoxText ();
+            publish_state.append_text ("Draft");
+            publish_state.append_text ("Published");
+            publish_state.set_active (0);
         }
 
         public override string update_markdown (string markdown) {
@@ -159,10 +165,12 @@ namespace ThiefMD.Connections {
 
         public override void attach (PublisherPreviewWindow ppw) {
             publisher_instance = ppw;
+            publisher_instance.headerbar.pack_end (publish_state);
             return;
         }
 
         public override void detach () {
+            publisher_instance.headerbar.remove (publish_state);
             publisher_instance = null;
             return;
         }
@@ -202,6 +210,27 @@ namespace ThiefMD.Connections {
 
             debug ("Exporting");
 
+            Gee.Map<string, string> images_to_upload = Pandoc.file_image_map (publisher_instance.get_export_markdown ());
+            Gee.HashMap<string, string> replacements = new Gee.HashMap<string, string> ();
+
+            if (images_to_upload.keys.size > 0) {
+                Thinking worker = new Thinking (_("Uploading images"), () => {
+                    foreach (var images in images_to_upload) {
+                        File img_file = File.new_for_path (images.value);
+                        if (img_file.query_exists () && !FileUtils.test (images.value, FileTest.IS_DIR)) {
+                            string upload_url;
+                            if (connection.upload_image_simple (
+                                out upload_url,
+                                img_file.get_path ()))
+                            {
+                                replacements.set (images.key, upload_url);
+                            }
+                        }
+                    }
+                });
+                worker.run ();
+            }
+
             string body = FileManager.get_yamlless_markdown (
                     publisher_instance.get_export_markdown (),
                     0,
@@ -213,13 +242,24 @@ namespace ThiefMD.Connections {
 
             debug ("Read title: %s", title);
 
+            foreach (var replacement in replacements) {
+                body = body.replace ("(" + replacement.key, "(" + replacement.value);
+                body = body.replace ("\"" + replacement.key, "\"" + replacement.value);
+                body = body.replace ("'" + replacement.key, "'" + replacement.value);
+                warning ("Replaced %s with %s", replacement.key, replacement.value);
+            }
+
+            int published_state = publish_state.get_active ();
+            bool immediately_publish = (published_state == 1);
+
             if (generate_html (body, out html)) {
                 // Simple post
                 if (connection.create_post_simple (
                     out slug,
                     out id,
                     title,
-                    html))
+                    html,
+                    immediately_publish))
                 {
                     published = true;
                     debug ("Posted");
