@@ -207,6 +207,7 @@ namespace ThiefMD.Connections {
             string slug = "";
             string id = "";
             string html = "";
+            string featured_image = "";
 
             debug ("Exporting");
 
@@ -231,6 +232,8 @@ namespace ThiefMD.Connections {
                 worker.run ();
             }
 
+            Gee.Map<string, string> metadata = FileManager.get_yaml_kvp (publisher_instance.get_export_markdown ());
+
             string body = FileManager.get_yamlless_markdown (
                     publisher_instance.get_export_markdown (),
                     0,
@@ -240,12 +243,34 @@ namespace ThiefMD.Connections {
                     false, // Override instead of use settings as theme will display
                     false);
 
+            if (metadata.has_key ("title")) {
+                title = metadata.get ("title");
+            }
+
+            if (metadata.has_key ("cover-image")) { // Consistency for ePub cover-image
+                featured_image = metadata.get ("cover-image");
+            } else if (metadata.has_key ("feature_image")) { // What ghost API documents
+                featured_image = metadata.get ("feature_image");
+            } else if (metadata.has_key ("coverimage")) { // Misc. things I'll try and wonder why they didn't work
+                featured_image = metadata.get ("coverimage");
+            } else if (metadata.has_key ("featureimage")) {
+                featured_image = metadata.get ("featureimage");
+            } else if (metadata.has_key ("featuredimage")) {
+                featured_image = metadata.get ("featureimage");
+            } else if (metadata.has_key ("featured-image")) {
+                featured_image = metadata.get ("featureimage");
+            }
+
             debug ("Read title: %s", title);
 
             foreach (var replacement in replacements) {
                 body = body.replace ("(" + replacement.key, "(" + replacement.value);
                 body = body.replace ("\"" + replacement.key, "\"" + replacement.value);
                 body = body.replace ("'" + replacement.key, "'" + replacement.value);
+
+                if (featured_image == replacement.key) {
+                    featured_image = replacement.value;
+                }
                 warning ("Replaced %s with %s", replacement.key, replacement.value);
             }
 
@@ -259,7 +284,8 @@ namespace ThiefMD.Connections {
                     out id,
                     title,
                     html,
-                    immediately_publish))
+                    immediately_publish,
+                    featured_image.has_prefix ("http") ? featured_image : ""))
                 {
                     published = true;
                     debug ("Posted");

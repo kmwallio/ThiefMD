@@ -401,6 +401,102 @@ namespace ThiefMD.Controllers.FileManager {
         return (processed_mk.chomp () != "");
     }
 
+    public Gee.Map<string, string> get_yaml_kvp (string markdown) {
+        Gee.Map<string, string> kvps = new Gee.HashMap<string, string> ();
+        string buffer = markdown;
+
+        Regex headers = null;
+        try {
+            headers = new Regex ("^\\s*(.+)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+        } catch (Error e) {
+            warning ("Could not compile regex: %s", e.message);
+        }
+
+        if (buffer.has_prefix ("---" + ThiefProperties.THIEF_MARK_CONST)) {
+            buffer = buffer.replace (ThiefProperties.THIEF_MARK_CONST, "");
+        }
+
+        if (buffer.length > 4 && buffer[0:4] == "---\n") {
+            int i = 0;
+            int last_newline = 3;
+            int next_newline;
+            bool valid_frontmatter = true;
+            string line = "";
+
+            while (valid_frontmatter) {
+                next_newline = buffer.index_of_char('\n', last_newline + 1);
+                if (next_newline == -1 && !((buffer.length > last_newline + 1) && buffer.substring (last_newline + 1).has_prefix("---"))) {
+                    valid_frontmatter = false;
+                    break;
+                }
+
+                if (next_newline == -1) {
+                    line = buffer.substring (last_newline + 1);
+                } else {
+                    line = buffer[last_newline+1:next_newline];
+                }
+                line = line.replace (ThiefProperties.THIEF_MARK_CONST, "");
+                last_newline = next_newline;
+
+                if (line == "---") {
+                    break;
+                }
+
+                if (headers != null) {
+                    MatchInfo matches;
+                    if (headers.match (line, RegexMatchFlags.NOTEMPTY_ATSTART, out matches)) {
+                        string key = matches.fetch (1).chug ().chomp ();
+                        string value = matches.fetch (2).chug ().chomp ();
+                        if (value.has_prefix ("\"") && value.has_suffix ("\"")) {
+                            value = value.substring (1, value.length - 2);
+                        }
+
+                        if (!kvps.has_key (key)) {
+                            kvps.set (key, value);
+                        } else {
+                            if (key == matches.fetch (1)) {
+                                kvps.set (key, value);
+                            }
+                        }
+                    } else {
+                        // If it's a list or empty line, we're cool
+                        line = line.down ().chomp ();
+                        if (!line.has_prefix ("-") && line != "") {
+                            valid_frontmatter = false;
+                            break;
+                        }
+                    }
+                } else {
+                    string quick_parse = line.chomp ();
+                    int split = quick_parse.index_of (":");
+                    if (split != -1) {
+                        string match = quick_parse.substring (0, split);
+                        string key = quick_parse.substring (0, split).chug ().chomp ();
+                        string value = quick_parse.substring (quick_parse.index_of (":") + 1);
+                        if (value.has_prefix ("\"") && value.has_suffix ("\"")) {
+                            value = value.substring (1, value.length - 2);
+                        }
+                        if (!kvps.has_key (key)) {
+                            kvps.set (key, value);
+                        } else {
+                            if (key == match) {
+                                kvps.set (key, value);
+                            }
+                        }
+                    }
+                }
+
+                i++;
+            }
+
+            if (!valid_frontmatter) {
+                kvps = new Gee.HashMap<string, string> ();
+            }
+        }
+
+        return kvps;
+    }
+
     public string get_yamlless_markdown (
         string markdown,
         int lines,
