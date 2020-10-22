@@ -28,7 +28,7 @@ using ThiefMD.Exporters;
 
 namespace ThiefMD.Connections {
     public class WriteFreelyConnection : ConnectionBase {
-        public const string CONNECTION_TYPE = "writeas";
+        public const string CONNECTION_TYPE = "writefreely";
         public override string export_name { get; protected set; }
         public override ExportBase exporter { get; protected  set; }
         public Writeas.Client connection;

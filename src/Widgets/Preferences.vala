@@ -120,7 +120,7 @@ namespace ThiefMD.Widgets {
                     warning ("Connecting new writeas account: %s", data.user);
                     WriteFreelyConnection connection = new WriteFreelyConnection (data.user, data.auth, data.endpoint);
                     if (connection.connection_valid ()) {
-                        SecretSchemas.get_instance ().add_writeas_secret (data.endpoint, data.user, data.auth);
+                        SecretSchemas.get_instance ().add_writefreely_secret (data.endpoint, data.user, data.auth);
                         ThiefApp.get_instance ().connections.add (connection);
                         ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
                         grid.insert_row (1);

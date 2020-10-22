@@ -249,7 +249,7 @@ namespace ThiefMD.Controllers {
             return success;
         }
 
-        public bool add_writeas_secret (string url, string alias, string password) {
+        public bool add_writefreely_secret (string url, string alias, string password) {
             save_secret (WriteFreelyConnection.CONNECTION_TYPE, alias, url, password);
             return true;
         }
