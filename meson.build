@@ -68,7 +68,7 @@ executable(
     'src/Controllers/Exporters.vala',
     'src/Controllers/ConnectionManager.vala',
     'src/Connections/ConnectionBase.vala',
-    'src/Connections/WriteasConnection.vala',
+    'src/Connections/WriteFreelyConnection.vala',
     'src/Connections/GhostConnection.vala',
     'src/Exporters/ExportBase.vala',
     'src/Exporters/ExportDocx.vala',

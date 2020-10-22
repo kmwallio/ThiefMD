@@ -106,19 +106,19 @@ namespace ThiefMD.Widgets {
             grid.attach (add_connections, 0, g, 1, 1);
             g++;
 
-            var writeas_connection = new Gtk.Button.with_label (_("  Write Freely"));
-            writeas_connection.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/writeas.png"));
+            var writeas_connection = new Gtk.Button.with_label (_("  WriteFreely"));
+            writeas_connection.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/wf.png"));
             writeas_connection.hexpand = true;
             writeas_connection.always_show_image = true;
             writeas_connection.show_all ();
             writeas_connection.clicked.connect (() => {
-                ConnectionData? data = WriteasConnection.create_connection ();
+                ConnectionData? data = WriteFreelyConnection.create_connection ();
                 if (data != null) {
                     if (data.endpoint.chug ().chomp () == "") {
-                        data.endpoint = "https://write.as/api/";
+                        data.endpoint = "https://write.as/";
                     }
                     warning ("Connecting new writeas account: %s", data.user);
-                    WriteasConnection connection = new WriteasConnection (data.user, data.auth, data.endpoint);
+                    WriteFreelyConnection connection = new WriteFreelyConnection (data.user, data.auth, data.endpoint);
                     if (connection.connection_valid ()) {
                         SecretSchemas.get_instance ().add_writeas_secret (data.endpoint, data.user, data.auth);
                         ThiefApp.get_instance ().connections.add (connection);
@@ -174,12 +174,12 @@ namespace ThiefMD.Widgets {
             string type = "";
             string alias = "";
             string endpoint = "";
-            if (connection is WriteasConnection) {
-                WriteasConnection wc = (WriteasConnection) connection;
-                type = WriteasConnection.CONNECTION_TYPE;
+            if (connection is WriteFreelyConnection) {
+                WriteFreelyConnection wc = (WriteFreelyConnection) connection;
+                type = WriteFreelyConnection.CONNECTION_TYPE;
                 alias = wc.conf_alias;
                 endpoint = wc.conf_endpoint;
-                button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/writeas.png"));
+                button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/wf.png"));
                 button.always_show_image = true;
                 button.show_all ();
             } else if (connection is GhostConnection) {

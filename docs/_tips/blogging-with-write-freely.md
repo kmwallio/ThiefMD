@@ -1,10 +1,10 @@
 ---
 layout: page
-title: Blogging with Write Freely
+title: Blogging with WriteFreely
 thieftags: #blogging
 ---
 
-Already have a [Write Freely](https://writefreely.org) or [Write.as](https://write.as) blog? ThiefMD can publish to them!
+Already have a [WriteFreely](https://writefreely.org) or [Write.as](https://write.as) blog? ThiefMD can publish to them!
 
 Please note, automated image upload is not supported. Check out [Snap.as](https://snap.as) as a convenient way to upload and share your photos.
 
@@ -18,7 +18,7 @@ In the **Add Connection** section, click on "Write Freely". This will prompt for
 
 If everything goes well, the blog will be added to the **Current Connections** list. You can click on the blog to remove it.
 
-## Writing for Write Freely
+## Writing for WriteFreely
 
 ThiefMD supports adding a title, uploading images, and publishing the post in a "Draft" or "Published" state.
 

@@ -27,7 +27,7 @@ using ThiefMD.Controllers;
 using ThiefMD.Exporters;
 
 namespace ThiefMD.Connections {
-    public class WriteasConnection : ConnectionBase {
+    public class WriteFreelyConnection : ConnectionBase {
         public const string CONNECTION_TYPE = "writeas";
         public override string export_name { get; protected set; }
         public override ExportBase exporter { get; protected  set; }
@@ -37,11 +37,21 @@ namespace ThiefMD.Connections {
         public string conf_endpoint;
         public string conf_alias;
 
-        public WriteasConnection (string username, string password, string endpoint = "https://write.as/api/") {
-            connection = new Writeas.Client (endpoint);
-            alias = "";
+        public WriteFreelyConnection (string username, string password, string endpoint = "https://write.as/") {
             conf_endpoint = endpoint;
             conf_alias = username;
+            conf_endpoint = endpoint;
+
+            if (!(conf_endpoint.has_suffix ("api") || conf_endpoint.has_suffix ("api/"))) {
+                if (conf_endpoint.has_suffix ("/")) {
+                    conf_endpoint += "api/";
+                } else {
+                    conf_endpoint += "/api/";
+                }
+            }
+
+            connection = new Writeas.Client (conf_endpoint);
+            alias = "";
 
             try {
                 connection.authenticate (username, password, out access_token);
@@ -59,7 +69,7 @@ namespace ThiefMD.Connections {
                     }
                     label = label.substring (0, 1).up () + label.substring (1).down ();
                     export_name = label + username;
-                    exporter = new WriteasExporter (connection);
+                    exporter = new WriteFreelyExporter (connection);
                 }
             } catch (Error e) {
                 warning ("Could not establish connection: %s", e.message);
@@ -99,7 +109,7 @@ namespace ThiefMD.Connections {
             Gtk.Label endpoint_label = new Gtk.Label (_("Endpoint"));
             endpoint_label.xalign = 0;
             Gtk.Entry endpoint_entry = new Gtk.Entry ();
-            endpoint_entry.placeholder_text = "https://write.as/api/";
+            endpoint_entry.placeholder_text = "https://write.as/";
 
             grid.attach (username_label, 1, 1, 1, 1);
             grid.attach (username_entry, 2, 1, 2, 1);
@@ -148,7 +158,7 @@ namespace ThiefMD.Connections {
         }
     }
 
-    private class WriteasExporter : ExportBase {
+    private class WriteFreelyExporter : ExportBase {
         public override string export_name { get; protected set; }
         public override string export_css { get; protected set; }
         private PublisherPreviewWindow publisher_instance;
@@ -156,8 +166,8 @@ namespace ThiefMD.Connections {
         private GLib.List<Writeas.Collection> collections;
         private Gtk.ComboBoxText collection_selector;
 
-        public WriteasExporter (Writeas.Client connected) {
-            export_name = "Write.as";
+        public WriteFreelyExporter (Writeas.Client connected) {
+            export_name = "writefreely";
             export_css = "preview";
             connection = connected;
         }

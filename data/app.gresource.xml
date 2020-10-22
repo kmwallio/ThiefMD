@@ -6,7 +6,7 @@
     <gresource prefix="/com/github/kmwallio/thiefmd/icons">
         <file alias="thiefmd-symbolic.svg" compressed="false" preprocess="">icons/symbolic/com.github.kmwallio.thiefmd.svg</file>
         <file alias="thiefmd.svg" compressed="false" preprocess="">icons/128/com.github.kmwallio.thiefmd.svg</file>
-        <file alias="writeas.png" compressed="false" preprocess="">icons/connections/writeas.png</file>
+        <file alias="wf.png" compressed="false" preprocess="">icons/connections/wf.png</file>
         <file alias="ghost.png" compressed="false" preprocess="">icons/connections/ghost.png</file>
     </gresource>
 </gresources>

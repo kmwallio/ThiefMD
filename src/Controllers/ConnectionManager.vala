@@ -112,8 +112,8 @@ namespace ThiefMD.Controllers {
                             string? the_secret = Secret.password_lookup.end (async_res);
                             if (the_secret != null) {
                                 warning ("Loaded secret: %s : %s", sec.connection_type, sec.user);
-                                if (sec.connection_type == WriteasConnection.CONNECTION_TYPE) {
-                                    WriteasConnection writeas_connection = new WriteasConnection (sec.user, the_secret, sec.endpoint);
+                                if (sec.connection_type == WriteFreelyConnection.CONNECTION_TYPE) {
+                                    WriteFreelyConnection writeas_connection = new WriteFreelyConnection (sec.user, the_secret, sec.endpoint);
                                     stored_secrets.secrets.add (sec);
 
                                     if (writeas_connection.connection_valid ()) {
@@ -250,7 +250,7 @@ namespace ThiefMD.Controllers {
         }
 
         public bool add_writeas_secret (string url, string alias, string password) {
-            save_secret (WriteasConnection.CONNECTION_TYPE, alias, url, password);
+            save_secret (WriteFreelyConnection.CONNECTION_TYPE, alias, url, password);
             return true;
         }
 
