@@ -46,10 +46,7 @@ namespace ThiefMD.Controllers {
         }
 
         public bool register (string name, ExportBase exporter) {
-            if (exporters.has_key (name)) {
-                return false;
-            }
-
+            // Allow for override/update?
             exporters.set (name, exporter);
             return true;
         }

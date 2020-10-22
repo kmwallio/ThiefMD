@@ -114,20 +114,20 @@ namespace ThiefMD.Controllers {
                                 warning ("Loaded secret: %s : %s", sec.connection_type, sec.user);
                                 if (sec.connection_type == WriteFreelyConnection.CONNECTION_TYPE) {
                                     WriteFreelyConnection writeas_connection = new WriteFreelyConnection (sec.user, the_secret, sec.endpoint);
-                                    stored_secrets.secrets.add (sec);
-
                                     if (writeas_connection.connection_valid ()) {
                                         ThiefApp.get_instance ().exporters.register (writeas_connection.export_name, writeas_connection.exporter);
                                         ThiefApp.get_instance ().connections.add (writeas_connection);
                                     }
                                 } else if (sec.connection_type == GhostConnection.CONNECTION_TYPE) {
                                     GhostConnection ghost_connection = new GhostConnection (sec.user, the_secret, sec.endpoint);
-                                    stored_secrets.secrets.add (sec);
-
                                     if (ghost_connection.connection_valid ()) {
                                         ThiefApp.get_instance ().exporters.register (ghost_connection.export_name, ghost_connection.exporter);
                                         ThiefApp.get_instance ().connections.add (ghost_connection);
                                     }
+                                }
+
+                                if (!have_secret (sec.connection_type, sec.user, sec.endpoint)) {
+                                    stored_secrets.secrets.add (sec);
                                 }
                             }
                             Secret.password_wipe (the_secret);
