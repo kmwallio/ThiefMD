@@ -91,6 +91,12 @@ namespace ThiefMD.Widgets {
             grid.attach (current_connections, 0, g, 1, 1);
             g++;
 
+            var warning_label = new Gtk.Label ("<small>Passwords will not persist in Flatpak</small>");
+            warning_label.use_markup = true;
+            warning_label.xalign = 0;
+            warning_label.hexpand = true;
+            grid.attach (warning_label, 0, g, 1, 1);
+            g++;
             //  var warning_label = new Gtk.Label ("<small>Passwords will be stored in plaintext</small>");
             //  warning_label.use_markup = true;
             //  warning_label.xalign = 0;

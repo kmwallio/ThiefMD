@@ -218,12 +218,18 @@ namespace ThiefMD.Widgets {
                 dialog.response.connect ((response_val) => {
                     if (response_val == Gtk.ResponseType.ACCEPT) {
                         set_text (disk_text);
+                    } else {
+                        should_save = true;
+                        autosave ();
                     }
                     dialog.destroy ();
                 });
 
                 if (dialog.run () == Gtk.ResponseType.ACCEPT) {
                     set_text (disk_text);
+                } else {
+                    should_save = true;
+                    autosave ();
                 }
             }
 
