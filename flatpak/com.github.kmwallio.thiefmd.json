@@ -10,7 +10,7 @@
         "--filesystem=home",
         "--device=dri",
         "--socket=fallback-x11",
-        "--socket=x11"
+        "--socket=wayland"
     ],
     "cleanup": [
         "/cache",
