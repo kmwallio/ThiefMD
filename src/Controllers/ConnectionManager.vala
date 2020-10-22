@@ -171,12 +171,24 @@ namespace ThiefMD.Controllers {
                     new_sec.connection_type = type;
                     new_sec.user = alias;
                     new_sec.endpoint = url;
-                    stored_secrets.secrets.add (new_sec);
+                    if (!have_secret (new_sec.connection_type, new_sec.user, new_sec.endpoint)) {
+                        stored_secrets.secrets.add (new_sec);
+                    }
                     serialize_secrets ();
                 } else {
                     warning ("Could not save secret %s : %s", type, alias);
                 }
             });
+        }
+
+        public bool have_secret (string type, string alias, string url) {
+            foreach (var cur_sec in stored_secrets.secrets) {
+                if (cur_sec.endpoint == url && cur_sec.user == alias && cur_sec.connection_type == type) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public bool remove_secret (string type, string alias, string url) {
