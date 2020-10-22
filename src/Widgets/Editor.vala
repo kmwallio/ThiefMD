@@ -309,6 +309,7 @@ namespace ThiefMD.Widgets {
                     int start_of_raw = buffer.cursor_position - raw_data.length;
                     string wowzers = buffer.text.substring (start_of_raw, raw_data.length);
                     if (wowzers == raw_data) {
+                        disk_change_prompted.can_do_action ();
                         debug ("Found raw_data");
                         Gtk.TextIter start, end;
                         buffer.get_bounds (out start, out end);

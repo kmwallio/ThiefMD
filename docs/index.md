@@ -31,7 +31,7 @@ Manage your <span class="pun">\*\*mark\*\*</span> without any <span class="ny">\
 ✅ Typewriter Scrolling  
 ✅ Full Screen Editing  
 ✅ Focus Mode  
-✅ Multiple Export Formats: PDF, ePub, docx, and more  
+✅ Multiple Export Formats: PDF, ePub, docx, [WriteFreely](https://writefreely.org), [Ghost](https://ghost.org), and more  
 ✅ Multiple Import Formats: ePub, docx, HTML, and more
 
 If anything goes wrong, it's probably because we implemented it wrong.  We're not liable for lost files or damage to your machine!

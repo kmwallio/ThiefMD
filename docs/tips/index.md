@@ -13,6 +13,10 @@ title: Tips and Tricks
 
 * [Linux Writing Tools](/tips/linux-writing-tools)
 
+## Novel Writers
+
+* [ThiefMD for Novel Writing](/tips/novel-writing)
+
 ## Working with Blogging Services
 
 * [Blogging with Write Freely](/tips/blogging-with-write.as)
@@ -21,10 +25,6 @@ title: Tips and Tricks
 ## Static Site Generators
 
 * [Blogging with Jekyll](/tips/jekyll)
-
-## Novel Writers
-
-* [ThiefMD for Novel Writing](/tips/novel-writing)
 
 ## Tricks
 
