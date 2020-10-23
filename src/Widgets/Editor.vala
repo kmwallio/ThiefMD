@@ -204,6 +204,11 @@ namespace ThiefMD.Widgets {
                 have_match = true;
             }
 
+            // Trying to account for right-click menu changes?
+            if ((modified_time.to_unix () - file_modified_time.to_unix ()).abs () < 10) {
+                return false;
+            }
+
             if (!have_match) {
                 var dialog = new Gtk.Dialog.with_buttons (
                     "Contents changed on disk",
