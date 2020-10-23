@@ -17,6 +17,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using ThiefMD.Controllers;
+using ThiefMD.Connections;
+
 namespace ThiefMD {
     errordomain ThiefError {
         FILE_NOT_FOUND,

@@ -18,7 +18,8 @@ Build-Depends: meson,
                libclutter-1.0-dev,
                libxml2-dev,
                libarchive-dev,
-               libgee-0.8-dev
+               libgee-0.8-dev,
+               libsecret-1-dev
 Standards-Version: 4.5.0
 Homepage: https://thiefmd.com
 

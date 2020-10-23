@@ -60,6 +60,7 @@ namespace ThiefMD.Widgets {
         public static Preview get_instance () {
             if (instance == null) {
                 instance = new Widgets.Preview ();
+                instance.exporting = false;
             }
 
             return instance;
@@ -120,12 +121,12 @@ namespace ThiefMD.Widgets {
             } else if (print_css != "") {
                 File css_file = File.new_for_path (Path.build_filename(UserData.css_path, preview_css,"print.css"));
                 if (css_file.query_exists ()) {
-                    style += "@media print {\n";
-                    style += FileManager.get_file_contents (css_file.get_path ());
-                    style += "}";
                     if (print_only) {
-                        style += FileManager.get_file_contents (css_file.get_path ());
+                        style += "\n" + FileManager.get_file_contents (css_file.get_path ()) + "\n";
                     }
+                    style += "\n@media print {\n";
+                    style += FileManager.get_file_contents (css_file.get_path ());
+                    style += "}\n";
                 }
             } else {
                 style += ThiefProperties.NO_CSS_CSS;
@@ -187,13 +188,17 @@ namespace ThiefMD.Widgets {
         private bool get_preview_markdown (string raw_mk, out string processed_mk) {
             var settings = AppSettings.get_default ();
             if (!exporting || settings.export_resolve_paths) {
-                processed_mk = Pandoc.resolve_paths (raw_mk);
+                string file_path = settings.last_file.substring(0, settings.last_file.last_index_of(Path.DIR_SEPARATOR_S));
+                processed_mk = Pandoc.resolve_paths (raw_mk, file_path);
             } else {
                 processed_mk = raw_mk;
             }
+            string title, date;
             processed_mk = FileManager.get_yamlless_markdown(
                 processed_mk,
                 0,      // Cap number of lines
+                out title,
+                out date,
                 true,   // Include empty lines
                 settings.export_include_yaml_title, // H1 title:
                 false); // Include date

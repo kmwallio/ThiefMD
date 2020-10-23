@@ -8,7 +8,7 @@ These can be installed in either the user directory or system wide.
 
 ## Local Building and Running
 
-1. To build and install flatpak version, change working director to `ThiefMD\flatpak`.
+1. To build and install flatpak version, change working directory to `ThiefMD\flatpak`.
 2. Run `flatpak-builder --force-clean --user --install build-dir com.github.kmwallio.thiefmd.json`
 3. Run `flatpak run com.github.kmwallio.thiefmd`
 

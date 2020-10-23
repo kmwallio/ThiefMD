@@ -35,6 +35,8 @@ title: Feature List
   * ePUB
   * Markdown
   * LaTeX
+  * [WriteFreely](https://writefreely.org)
+  * [Ghost](https://ghost.org)
 * Import (Drag File onto Folder in Library)
   * [Office Open XML](https://en.wikipedia.org/wiki/Office_Open_XML) - file.docx
   * [OpenDocument](https://en.wikipedia.org/wiki/OpenDocument) - file.odt

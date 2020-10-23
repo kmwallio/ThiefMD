@@ -402,9 +402,12 @@ namespace ThiefMD.Widgets {
                 }
 
                 if (!metadata) {
+                    string title, date;
                     sheet_markdown = FileManager.get_yamlless_markdown(
                         sheet_markdown,
                         0,       // Cap number of lines
+                        out title,
+                        out date,
                         true,   // Include empty lines
                         settings.export_include_yaml_title, // H1 title:
                         false);
