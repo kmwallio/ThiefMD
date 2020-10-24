@@ -5,7 +5,7 @@ title: Open Source
 
 # Open Source Components
 
-We're making ThiefMD components reusable. You can find the components in at [GitHub.com/ThiefMD](https://github.com/thiefmd)
+We're making ThiefMD components reusable. You can find the components in at [GitHub.com/ThiefMD](https://github.com/thiefmd). We're also built on top of [other great open source software](/about/#credit)
 
 - [libwritegood](#libwritegood)
 - [writeas-vala](#writeas-vala)
