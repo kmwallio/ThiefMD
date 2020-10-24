@@ -121,6 +121,7 @@ gtkspell3-devel
 libarchive-devel
 libxml2-devel
 libgee-devel
+libsecret-devel
 ```
 
 ## Building
