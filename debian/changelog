@@ -1,4 +1,4 @@
-com.github.kmwallio.thiefmd (0.1.2) UNRELEASED; urgency=medium
+com.github.kmwallio.thiefmd (0.1.2) focal; urgency=low
 
   * Export to a WriteFreely instance
   * Export to a Ghost blog
