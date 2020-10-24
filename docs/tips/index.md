@@ -19,7 +19,7 @@ title: Tips and Tricks
 
 ## Working with Blogging Services
 
-* [Blogging with Write Freely](/tips/blogging-with-write.as)
+* [Blogging with WriteFreely](/tips/blogging-with-writefreely)
 * [Blogging with Ghost](/tips/blogging-with-ghost)
 
 ## Static Site Generators

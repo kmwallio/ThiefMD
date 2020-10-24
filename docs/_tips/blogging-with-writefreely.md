@@ -10,7 +10,7 @@ Please note, automated image upload is not supported. Check out [Snap.as](https:
 
 ## Adding a Connection ❤
 
-<div class="responsive-right-short marcel"><img src="/images/blogging-write.as/new-connection.png" alt="ThiefMD adding Write.as connection" /></div>
+<div class="responsive-right-short marcel"><img src="/images/blogging-writefreely/new-connection.png" alt="ThiefMD adding WriteFreely connection" /></div>
 
 In the Preferences `Ctrl+,` click on **Connections**.
 
@@ -20,7 +20,7 @@ If everything goes well, the blog will be added to the **Current Connections** l
 
 ## Writing for WriteFreely
 
-ThiefMD supports adding a title, uploading images, and publishing the post in a "Draft" or "Published" state.
+ThiefMD supports adding a title.
 
 ### Adding a Title
 
@@ -54,7 +54,7 @@ If you're a Write.as Pro user, you can upload your images to [Snap.as](https://s
 
 With this, ThiefMD will be ready to upload your images and you post through the `Export` window. Right-click on the post you want to publish, and click **Export**.
 
-![](/images/blogging-write.as/publisher-window.png)
+![](/images/blogging-writefreely/publisher-window.png)
 
 In the window, you can select `Write.as/user` as the Export Option. A Drop Down with your available collections will appear. Use this to choose where your post will appear.
 
