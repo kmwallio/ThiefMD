@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Feature List
+title: Details
 ---
 
 * Single Window Library & Editor
