@@ -8,7 +8,13 @@ Update list of new features
 
 ## Create new Package
 
+For release in PPA:
+
 `debuild -S -sa`
+
+For building locally:
+
+`debuild -us -uc`
 
 Packages will be in parent directory.
 
