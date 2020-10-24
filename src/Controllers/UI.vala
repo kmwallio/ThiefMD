@@ -76,7 +76,7 @@ namespace ThiefMD.Controllers.UI {
         user_themes.append (user_theme);
     }
 
-    public void load_user_themes () {
+    public void load_user_themes_and_connections () {
         if (user_themes != null) {
             return;
         }
@@ -85,9 +85,9 @@ namespace ThiefMD.Controllers.UI {
         user_themes = new List<Ultheme.Parser> ();
         if (!Thread.supported ()) {
             warning ("No threads available for work");
-            GLib.Idle.add (load_themes);
+            GLib.Idle.add (load_themes_and_connections);
         } else {
-            theme_worker_thread = new Thread<bool>("theme_worker_thread", load_themes);
+            theme_worker_thread = new Thread<bool>("theme_worker_thread", load_themes_and_connections);
         }
     }
 
@@ -104,7 +104,7 @@ namespace ThiefMD.Controllers.UI {
         }
     }
 
-    private bool load_themes () {
+    private bool load_themes_and_connections () {
         // Load previous added themes
         debug ("Loading themes");
         try {
@@ -150,6 +150,10 @@ namespace ThiefMD.Controllers.UI {
             warning ("Could not load themes: %s", e.message);
         }
         debug ("Themes loaded");
+
+        debug ("Loading user connections");
+        SecretSchemas.get_instance ().load_secrets ();
+        debug ("Connections loaded");
 
         return false;
     }
@@ -210,9 +214,9 @@ namespace ThiefMD.Controllers.UI {
 
         // Assuming 12pt is 1rem, scale to original CSS based on that
         string new_font = ThiefProperties.FONT_SETTINGS.printf (
-            settings.get_css_font_family (), ((settings.get_css_font_size () / Constants.SIZE_1_REM_IN_PT) * 1.25),
-            settings.get_css_font_family (), ((settings.get_css_font_size () / Constants.SIZE_1_REM_IN_PT) * 1.35),
-            settings.get_css_font_family (), ((settings.get_css_font_size () / Constants.SIZE_1_REM_IN_PT) * 1.45)
+            settings.get_css_font_family (), (int)((settings.get_css_font_size ()) * 1),
+            settings.get_css_font_family (), (int)((settings.get_css_font_size ()) * 1.2),
+            settings.get_css_font_family (), (int)((settings.get_css_font_size ()) * 1.4)
         );
 
         try {

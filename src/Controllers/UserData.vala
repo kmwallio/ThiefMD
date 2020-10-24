@@ -25,6 +25,7 @@ namespace ThiefMD.Controllers.UserData {
     public string style_path;
     public string scheme_path;
     public string css_path;
+    public string connection_file;
 
     public void create_data_directories () {
         data_path = Path.build_path (
@@ -75,6 +76,8 @@ namespace ThiefMD.Controllers.UserData {
         } catch (Error e) {
             warning ("Error: %s\n", e.message);
         }
+
+        connection_file = Path.build_filename (data_path, "connections.json");
     }
 
     public string? get_trash_folder () {

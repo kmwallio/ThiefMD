@@ -355,7 +355,8 @@ namespace ThiefMD.Controllers.FileManager {
 
     public int get_word_count (string file_path) {
         var settings = AppSettings.get_default ();
-        string markdown = get_yamlless_markdown (get_file_contents (file_path), 0, true, settings.export_include_yaml_title, false);
+        string title, date;
+        string markdown = get_yamlless_markdown (get_file_contents (file_path), 0, out title, out date, true, settings.export_include_yaml_title, false);
 
         // This is for an approximate word count, not trying to be secure or anything...
         try {
@@ -400,7 +401,110 @@ namespace ThiefMD.Controllers.FileManager {
         return (processed_mk.chomp () != "");
     }
 
-    public string get_yamlless_markdown (string markdown, int lines, bool non_empty = true, bool include_title = true, bool include_date = true)
+    public Gee.Map<string, string> get_yaml_kvp (string markdown) {
+        Gee.Map<string, string> kvps = new Gee.HashMap<string, string> ();
+        string buffer = markdown;
+
+        Regex headers = null;
+        try {
+            headers = new Regex ("^\\s*(.+)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+        } catch (Error e) {
+            warning ("Could not compile regex: %s", e.message);
+        }
+
+        if (buffer.has_prefix ("---" + ThiefProperties.THIEF_MARK_CONST)) {
+            buffer = buffer.replace (ThiefProperties.THIEF_MARK_CONST, "");
+        }
+
+        if (buffer.length > 4 && buffer[0:4] == "---\n") {
+            int i = 0;
+            int last_newline = 3;
+            int next_newline;
+            bool valid_frontmatter = true;
+            string line = "";
+
+            while (valid_frontmatter) {
+                next_newline = buffer.index_of_char('\n', last_newline + 1);
+                if (next_newline == -1 && !((buffer.length > last_newline + 1) && buffer.substring (last_newline + 1).has_prefix("---"))) {
+                    valid_frontmatter = false;
+                    break;
+                }
+
+                if (next_newline == -1) {
+                    line = buffer.substring (last_newline + 1);
+                } else {
+                    line = buffer[last_newline+1:next_newline];
+                }
+                line = line.replace (ThiefProperties.THIEF_MARK_CONST, "");
+                last_newline = next_newline;
+
+                if (line == "---") {
+                    break;
+                }
+
+                if (headers != null) {
+                    MatchInfo matches;
+                    if (headers.match (line, RegexMatchFlags.NOTEMPTY_ATSTART, out matches)) {
+                        string key = matches.fetch (1).chug ().chomp ();
+                        string value = matches.fetch (2).chug ().chomp ();
+                        if (value.has_prefix ("\"") && value.has_suffix ("\"")) {
+                            value = value.substring (1, value.length - 2);
+                        }
+
+                        if (!kvps.has_key (key)) {
+                            kvps.set (key, value);
+                        } else {
+                            if (key == matches.fetch (1)) {
+                                kvps.set (key, value);
+                            }
+                        }
+                    } else {
+                        // If it's a list or empty line, we're cool
+                        line = line.down ().chomp ();
+                        if (!line.has_prefix ("-") && line != "") {
+                            valid_frontmatter = false;
+                            break;
+                        }
+                    }
+                } else {
+                    string quick_parse = line.chomp ();
+                    int split = quick_parse.index_of (":");
+                    if (split != -1) {
+                        string match = quick_parse.substring (0, split);
+                        string key = quick_parse.substring (0, split).chug ().chomp ();
+                        string value = quick_parse.substring (quick_parse.index_of (":") + 1);
+                        if (value.has_prefix ("\"") && value.has_suffix ("\"")) {
+                            value = value.substring (1, value.length - 2);
+                        }
+                        if (!kvps.has_key (key)) {
+                            kvps.set (key, value);
+                        } else {
+                            if (key == match) {
+                                kvps.set (key, value);
+                            }
+                        }
+                    }
+                }
+
+                i++;
+            }
+
+            if (!valid_frontmatter) {
+                kvps = new Gee.HashMap<string, string> ();
+            }
+        }
+
+        return kvps;
+    }
+
+    public string get_yamlless_markdown (
+        string markdown,
+        int lines,
+        out string title,
+        out string date,
+        bool non_empty = true,
+        bool include_title = true,
+        bool include_date = true)
     {
         string buffer = markdown;
         Regex headers = null;
@@ -409,6 +513,9 @@ namespace ThiefMD.Controllers.FileManager {
         } catch (Error e) {
             warning ("Could not compile regex: %s", e.message);
         }
+
+        string temp_title = "";
+        string temp_date = "";
 
         MatchInfo matches;
         var markout = new StringBuilder ();
@@ -446,12 +553,21 @@ namespace ThiefMD.Controllers.FileManager {
 
                 if (headers != null) {
                     if (headers.match (line, RegexMatchFlags.NOTEMPTY_ATSTART, out matches)) {
-                        if (include_title && matches.fetch (1).ascii_down() == "title") {
-                            markout.append ("# " + matches.fetch (2).replace ("\"", "") + "\n");
-                            mklines++;
-                        } else if (include_date && matches.fetch (1).ascii_down() == "date") {
-                            markout.append ("## " + matches.fetch (2) + "\n");
-                            mklines++;
+                        if (matches.fetch (1).ascii_down() == "title") {
+                            temp_title = matches.fetch (2).chug ().chomp ();
+                            if (temp_title.has_prefix ("\"") && temp_title.has_suffix ("\"")) {
+                                temp_title = temp_title.substring (1, temp_title.length - 2);
+                            }
+                            if (include_title) {
+                                markout.append ("# " + temp_title + "\n");
+                                mklines++;
+                            }
+                        } else if (matches.fetch (1).ascii_down() == "date") {
+                            temp_date = matches.fetch (2).chug ().chomp ();
+                            if (include_date) {
+                                markout.append ("## " + temp_date + "\n");
+                                mklines++;
+                            }
                         }
                     } else {
                         // If it's a list or empty line, we're cool
@@ -464,9 +580,20 @@ namespace ThiefMD.Controllers.FileManager {
                 } else {
                     string quick_parse = line.chomp ();
                     if (quick_parse.has_prefix ("title")) {
-                        markout.append ("# " + quick_parse.substring (quick_parse.index_of (":") + 1));
+                        temp_title = quick_parse.substring (quick_parse.index_of (":") + 1);
+                        if (temp_title.has_prefix ("\"") && temp_title.has_suffix ("\"")) {
+                            temp_title = temp_title.substring (1, temp_title.length - 2);
+                        }
+                        if (include_title) {
+                            markout.append ("# " + temp_title);
+                            mklines++;
+                        }
                     } else if (quick_parse.has_prefix ("date")) {
-                        markout.append ("## " + quick_parse.substring (quick_parse.index_of (":") + 1));
+                        temp_date = quick_parse.substring (quick_parse.index_of (":") + 1).chug ().chomp ();
+                        if (include_date) {
+                            markout.append ("## " + temp_date);
+                            mklines++;
+                        }
                     }
                 }
 
@@ -483,10 +610,19 @@ namespace ThiefMD.Controllers.FileManager {
             markout.append (markdown);
         }
 
+        title = temp_title;
+        date = temp_date;
+
         return markout.str;
     }
 
-    public string get_file_lines_yaml (string file_path, int lines, bool non_empty, out string title, out string date) {
+    public string get_file_lines_yaml (
+        string file_path,
+        int lines,
+        bool non_empty,
+        out string title,
+        out string date)
+    {
         // var lock = new FileLock ();
         var markdown = new StringBuilder ();
         string temp_title = "";

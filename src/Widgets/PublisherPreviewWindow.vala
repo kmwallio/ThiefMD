@@ -20,12 +20,15 @@
 using ThiefMD;
 using ThiefMD.Widgets;
 using ThiefMD.Controllers;
+using ThiefMD.Exporters;
 
 namespace ThiefMD.Widgets {
     public class PublisherPreviewWindow : Gtk.Window {
-        Gtk.HeaderBar headerbar;
-        Preview preview;
+        public Gtk.HeaderBar headerbar;
+        public Preview preview;
         private string _markdown;
+        private string e_markdown;
+        private ExportBase exporter;
 
         public class PublisherPreviewWindow (string markdown) {
             preview = new Preview ();
@@ -34,6 +37,18 @@ namespace ThiefMD.Widgets {
             _markdown = markdown;
             new KeyBindings (this, false);
             build_ui ();
+        }
+
+        public string get_export_html () {
+            return preview.html;
+        }
+
+        public string get_original_markdown () {
+            return _markdown;
+        }
+
+        public string get_export_markdown () {
+            return e_markdown;
         }
 
         protected void build_ui () {
@@ -45,10 +60,21 @@ namespace ThiefMD.Widgets {
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
 
+            Gee.Set<string> exports = ThiefApp.get_instance ().exporters.get_export_list ();
+            Gee.LinkedList<string> exporters = new Gee.LinkedList<string> ();
+            foreach (var e in exports) {
+                exporters.add (e);
+            }
+
             var preview_type = new Gtk.ComboBoxText ();
-            preview_type.append_text (_("HTML/ePUB"));
-            preview_type.append_text (_("Print/PDF"));
-            preview_type.set_active (0);
+
+            foreach (var e in exporters) {
+                preview_type.append_text (e);
+            }
+            preview_type.set_active (exporters.index_of (Constants.DEFAULT_EXPORTER));
+            exporter = ThiefApp.get_instance ().exporters.get_exporter (Constants.DEFAULT_EXPORTER);
+            exporter.attach (this);
+            e_markdown = exporter.update_markdown (_markdown);
 
             var preview_css = new Gtk.ComboBoxText ();
             var preview_options = CssSelector.list_css ("preview");
@@ -78,29 +104,17 @@ namespace ThiefMD.Widgets {
                 print_css.set_active (0);
             }
 
-            var paper_size = new Gtk.ComboBoxText ();
-            paper_size.hexpand = true;
-            for (int i = 0; i < ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.length; i++) {
-                paper_size.append_text (ThiefProperties.PAPER_SIZES_FRIENDLY_NAME[i]);
-
-                if (settings.export_paper_size == ThiefProperties.PAPER_SIZES_GTK_NAME[i]) {
-                    paper_size.set_active (i);
-                }
-            }
-
-            paper_size.changed.connect (() => {
-                int option = paper_size.get_active ();
-                if (option >= 0 && option < ThiefProperties.PAPER_SIZES_GTK_NAME.length) {
-                    settings.export_paper_size = ThiefProperties.PAPER_SIZES_GTK_NAME[option];
-                }
-            });
-
             preview_css.changed.connect (() => {
                 if (preview_css.get_active () >= 0 && preview_css.get_active () < preview_options.size) {
                     string new_css = preview_options.get (preview_css.get_active ());
                     new_css = (new_css == "None") ? "" : new_css;
                     settings.preview_css = new_css;
-                    preview.update_html_view (false, _markdown);
+                    if (exporter != null) {
+                        e_markdown = exporter.update_markdown (_markdown);
+                    } else {
+                        e_markdown = _markdown;
+                    }
+                    preview.update_html_view (false, e_markdown);
                 }
             });
 
@@ -109,7 +123,12 @@ namespace ThiefMD.Widgets {
                     string new_css = print_options.get (print_css.get_active ());
                     new_css = (new_css == "None") ? "" : new_css;
                     settings.print_css = new_css;
-                    preview.update_html_view (false, _markdown);
+                    if (exporter != null) {
+                        e_markdown = exporter.update_markdown (_markdown);
+                    } else {
+                        e_markdown = _markdown;
+                    }
+                    preview.update_html_view (false, e_markdown);
                 }
             });
 
@@ -119,86 +138,44 @@ namespace ThiefMD.Widgets {
             export_button.set_image (new Gtk.Image.from_icon_name("document-export", Gtk.IconSize.LARGE_TOOLBAR));
 
             preview_type.changed.connect (() => {
-                if (preview_type.get_active () == 0) {
-                    preview.print_only = false;
-                    preview.update_html_view (false, _markdown);
-                    headerbar.remove (print_css);
-                    headerbar.remove (paper_size);
-                    headerbar.pack_start (preview_css);
-                } else {
-                    preview.print_only = true;
-                    preview.update_html_view (false, _markdown);
-                    headerbar.remove (preview_css);
-                    headerbar.pack_start (print_css);
-                    headerbar.pack_end (paper_size);
+                int option = preview_type.get_active ();
+                if (option >= 0 && option < exporters.size) {
+                    if (exporter != null) {
+                        exporter.detach ();
+                    }
+                    exporter = ThiefApp.get_instance ().exporters.get_exporter (exporters.get (option));
+
+                    if (exporter != null) {
+                        exporter.attach (this);
+                        if (exporter.export_css == "print") {
+                            preview.print_only = true;
+                            e_markdown = exporter.update_markdown (_markdown);
+                            preview.update_html_view (false, e_markdown);
+                            headerbar.remove (preview_css);
+                            headerbar.pack_start (print_css);
+                        } else {
+                            preview.print_only = false;
+                            e_markdown = exporter.update_markdown (_markdown);
+                            preview.update_html_view (false, e_markdown);
+                            headerbar.remove (print_css);
+                            headerbar.pack_start (preview_css);
+                        }
+                    }
                 }
                 headerbar.show_all ();
             });
 
 
             export_button.clicked.connect (() => {
-                File new_novel = Dialogs.display_save_dialog (preview_type.get_active () == 0);
+                if (exporter != null) {
+                    if (!exporter.export ()) {
+                        PublishedStatusWindow status = new PublishedStatusWindow (
+                            this,
+                            _("File not Exported"),
+                            new Gtk.Label (_("ThiefMD could not export the file, please try again.")));
 
-                if (new_novel == null){
-                    return;
-                }
-
-                string filename = new_novel.get_basename ().down ();
-                try {
-                    if (filename.has_suffix (".pdf")) {
-                        var print_operation = new WebKit.PrintOperation (preview);
-                        var print_settings = new Gtk.PrintSettings ();
-                        print_settings.set_printer (_("Print to File"));
-                        var page_size = new Gtk.PaperSize(settings.export_paper_size);
-                        var page_setup = new Gtk.PageSetup();
-                        print_settings[Gtk.PRINT_SETTINGS_OUTPUT_URI] = new_novel.get_uri ();
-                        page_setup.set_paper_size_and_default_margins(page_size);
-                        page_setup.set_left_margin (settings.export_side_margins, Gtk.Unit.INCH);
-                        page_setup.set_right_margin (settings.export_side_margins, Gtk.Unit.INCH);
-                        page_setup.set_top_margin (settings.export_top_bottom_margins, Gtk.Unit.INCH);
-                        page_setup.set_bottom_margin (settings.export_top_bottom_margins, Gtk.Unit.INCH);
-                        print_operation.set_print_settings (print_settings);
-                        print_operation.set_page_setup (page_setup);
-                        print_operation.print ();
-                    } else if (filename.has_suffix (".md") || filename.has_suffix (".markdown")) {
-                        if (new_novel.query_exists ()) {
-                            new_novel.delete ();
-                        }
-                        FileManager.save_file (new_novel, _markdown.data);
-                    } else if (filename.has_suffix (".html")) {
-                        if (new_novel.query_exists ()) {
-                            new_novel.delete ();
-                        }
-                        FileManager.save_file (new_novel, preview.html.data);
-                    } else if (filename.has_suffix (".mhtml")) {
-                        preview.save_to_file.begin (new_novel, WebKit.SaveMode.MHTML);
-                    } else if (filename.has_suffix (".epub")) {
-                        Pandoc.make_epub (new_novel.get_path (), _markdown);
-                    } else if (filename.has_suffix (".docx")) {
-                        Pandoc.make_docx (new_novel.get_path (), _markdown);
-                    } else if (filename.has_suffix (".tex")) {
-                        Pandoc.make_tex (new_novel.get_path (), _markdown);
-                    } else {
-                        Gtk.Dialog prompt = new Gtk.Dialog.with_buttons (
-                            "Invalid Filename",
-                            ThiefApp.get_instance ().main_window,
-                            Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                            _("Close"),
-                            Gtk.ResponseType.NO);
-                        var contentarea = prompt.get_content_area ();
-                        var label = new Gtk.Label (_("Unable to determine type of file to export.\nPlease make sure you included a valid extension"));
-                        label.xalign = 0;
-                        contentarea.add (label);
-                        contentarea.show_all ();
-
-                        prompt.response.connect (() => {
-                            prompt.destroy ();
-                        });
-
-                        prompt.run ();
+                        status.run ();
                     }
-                } catch (Error e) {
-                    warning ("Could not save file %s: %s", new_novel.get_basename (), e.message);
                 }
             });
 
@@ -228,6 +205,59 @@ namespace ThiefMD.Widgets {
             show_all ();
 
             return false;
+        }
+    }
+
+    public class PublishedStatusWindow : Gtk.Dialog {
+        private Gtk.Label message;
+
+        public PublishedStatusWindow (PublisherPreviewWindow win, string set_title, Gtk.Label body) {
+            set_transient_for (win);
+            modal = true;
+            title = set_title;
+            message = body;
+            build_ui ();
+        }
+
+        private void build_ui () {
+            window_position = Gtk.WindowPosition.CENTER;
+            this.get_content_area().add (build_message_ui ());
+            show_all ();
+        }
+
+        private Gtk.Grid build_message_ui () {
+            Gtk.Grid grid = new Gtk.Grid ();
+            grid.margin = 12;
+            grid.row_spacing = 12;
+            grid.column_spacing = 12;
+            grid.orientation = Gtk.Orientation.VERTICAL;
+            grid.hexpand = true;
+            grid.vexpand = true;
+
+            try {
+                Gtk.IconTheme icon_theme = Gtk.IconTheme.get_default();
+                var thief_icon = icon_theme.load_icon("com.github.kmwallio.thiefmd", 128, Gtk.IconLookupFlags.FORCE_SVG);
+                var icon = new Gtk.Image.from_pixbuf (thief_icon);
+                grid.attach (icon, 1, 1);
+            } catch (Error e) {
+                warning ("Could not load logo: %s", e.message);
+            }
+
+            grid.attach (message, 1, 2);
+
+            Gtk.Button close = new Gtk.Button.with_label (_("Close"));
+            grid.attach (close, 1, 3);
+
+            close.clicked.connect (() => {
+                this.destroy ();
+            });
+
+            response.connect (() => {
+                this.destroy ();
+            });
+
+            grid.show_all ();
+            return grid;
         }
     }
 }

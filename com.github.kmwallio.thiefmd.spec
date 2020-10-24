@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.1.1
+Version: 0.1.2
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
@@ -19,6 +19,7 @@ BuildRequires: pkgconfig(gee-0.8)
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(gobject-2.0)
 BuildRequires: pkgconfig(libarchive)
+BuildRequires: pkgconfig(libsecret-1)
 BuildRequires: pkgconfig(clutter-1.0)
 BuildRequires: pkgconfig(gtksourceview-3.0)
 BuildRequires: pkgconfig(gtk+-3.0)
@@ -316,6 +317,12 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Fri Oct 23 2020 kmwallio <mwallio@gmail.com> - 0.1.2
+- Export to a WriteFreely instance
+- Export to a Ghost blog
+- Font sizes are consistent with your other apps
+- Revised preferences to prevent strechted out elements
+- Write-Good now shows as tool tips
 * Fri Oct 16 2020 kmwallio <mwallio@gmail.com> - 0.1.1
 - Improved search interface
 - Support for dragging certain files onto the editor (including CSV to Markdown table)

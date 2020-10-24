@@ -47,6 +47,19 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.1.2" date="2020-10-23" urgency="low">
+      <description>
+        <p>Blog publishing support? Interface improvements? We're working on making ThiefMD more approachable and easier to use.</p>
+        <ul>
+          <li>Export to a WriteFreely instance</li>
+          <li>Export to a Ghost blog</li>
+          <li>Font sizes are consistent with your other apps</li>
+          <li>Revised preferences to prevent strechted out elements</li>
+          <li>Write-Good now shows as tool tips</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.2-sophistication</url>
+    </release>
     <release version="0.1.1" date="2020-10-16" urgency="low">
       <description>
         <p>Custom Font? Drag and Drop Editor Support for CSV's and more? Export individual sheets? Search select parts of the library? We're hoping this helps you get things done and then some.</p>

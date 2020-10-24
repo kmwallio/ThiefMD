@@ -40,7 +40,8 @@ namespace ThiefMD.Widgets {
             var grid = new Gtk.Grid ();
             int other = 2;
             int items = 0;
-            grid.orientation = Gtk.Orientation.HORIZONTAL;
+            grid.orientation = Gtk.Orientation.VERTICAL;
+            grid.hexpand = true;
             Gee.LinkedList<string> fonts = new Gee.LinkedList<string> ();
             Gee.LinkedList<int> font_sizes = new Gee.LinkedList<int> ();
 
@@ -153,9 +154,9 @@ namespace ThiefMD.Widgets {
                 UI.load_font ();
             });
 
-            grid.add (font_label);
-            grid.add (font_selector);
-            grid.add (font_size_selector);
+            grid.attach (font_label, 0, 0, 1, 1);
+            grid.attach (font_selector, 1, 0, 2, 1);
+            grid.attach (font_size_selector, 3, 0, 1, 1);
             grid.show_all ();
 
             add (grid);

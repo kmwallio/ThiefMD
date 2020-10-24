@@ -27,6 +27,10 @@ namespace ThiefMD {
     }
 
     public class Constants {
+        public const string COLLECTION_THIEFMD = Secret.COLLECTION_DEFAULT;
+        // Default exporter
+        public const string DEFAULT_EXPORTER = "ePUB";
+
         // Margin Constants
         public const int NARROW_MARGIN = 5;
         public const int MEDIUM_MARGIN = 10;
@@ -141,7 +145,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public bool menu_active { get; set; default = false; }
 
         public bool focusmode_enabled = false;
-        public FocusType focus_type { get; set; }
+        public int focus_type { get; set; }
         public bool focus_mode {
             set {
                 focusmode_enabled = value;

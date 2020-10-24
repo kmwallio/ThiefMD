@@ -1,3 +1,13 @@
+com.github.kmwallio.thiefmd (0.1.2) focal; urgency=low
+
+  * Export to a WriteFreely instance
+  * Export to a Ghost blog
+  * Font sizes are consistent with your other apps
+  * Revised preferences to prevent strechted out elements
+  * Write-Good now shows as tool tips
+
+ -- kmwallio <mwallio@gmail.com>  Fri, 23 Oct 2020 18:34:24 -0700
+
 com.github.kmwallio.thiefmd (0.1.1) focal; urgency=low
 
   * Improved Results & Fixed crash in search

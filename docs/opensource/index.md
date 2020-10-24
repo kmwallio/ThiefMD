@@ -5,16 +5,18 @@ title: Open Source
 
 # Open Source Components
 
-We're making ThiefMD components reusable. You can find the components in at [GitHub.com/ThiefMD](https://github.com/thiefmd)
+We're making ThiefMD components reusable. You can find the components in at [GitHub.com/ThiefMD](https://github.com/thiefmd). We're also built on top of [other great open source software](/about/#credit)
 
 - [libwritegood](#libwritegood)
+- [writeas-vala](#writeas-vala)
+- [ghost-vala](#ghost-vala)
 - [Theme Generator](#theme-generator)
 - [ultheme-vala](#ultheme-vala)
 - [ThiefMD](https://github.com/kmwallio/ThiefMD)
 
 ## libwritegood
 
-[libwritegood](https://github.com/ThiefMD/libwritegood-vala) is like [GtkSpell](http://gtkspell.sourceforge.net) for style. libwritegood is based on [btford/write-good](https://github.com/btford/write-good). It's easy to use, for example:
+[libwritegood](https://writegood.thiefmd.com) is like [GtkSpell](http://gtkspell.sourceforge.net) for style. libwritegood is based on [btford/write-good](https://github.com/btford/write-good). It's easy to use, for example:
 
 ```vala
 var manager = Gtk.SourceLanguageManager.get_default ();
@@ -45,6 +47,14 @@ buffer.changed.connect (() => {
     checker.recheck_all ();
 });
 ```
+
+## Writeas-vala
+
+[writeas-vala](https://github.com/ThiefMD/writeas-vala) is a [Write Freely](https://writefreely.org) client library. It can be used for submitting and managing posts on [Write.as](https://write.as) or any other Write Freely instance.
+
+## Ghost-vala
+
+[Ghost-vala](https://github.com/ThiefMD/ghost-vala) is a simple library for publishing posts to [ghost](https://ghost.org) blogs.
 
 ## Theme Generator
 

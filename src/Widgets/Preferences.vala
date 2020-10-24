@@ -21,6 +21,7 @@ using ThiefMD;
 using ThiefMD.Controllers;
 using Gtk;
 using Gdk;
+using ThiefMD.Connections;
 
 namespace ThiefMD.Widgets {
     public class Preferences : Dialog {
@@ -42,9 +43,10 @@ namespace ThiefMD.Widgets {
             window_position = WindowPosition.CENTER;
 
             stack = new Stack ();
-            stack.add_titled (editor_grid (), "Editor Preferences", _("Editor"));
-            stack.add_titled (export_grid (), "Export Preferences", _("Export"));
-            stack.add_titled (display_grid (), "Display Preferences", _("Display"));
+            stack.add_titled (editor_grid (), _("Editor Preferences"), _("Editor"));
+            stack.add_titled (export_grid (), _("Export Preferences"), _("Export"));
+            stack.add_titled (display_grid (), _("Display Preferences"), _("Display"));
+            stack.add_titled (connection_grid (), _("Connection Manager"), _("Connections"));
 
             StackSwitcher switcher = new StackSwitcher ();
             switcher.set_stack (stack);
@@ -66,10 +68,172 @@ namespace ThiefMD.Widgets {
             show_all ();
         }
 
+        private Widget connection_grid () {
+            var connection_scroller = new ScrolledWindow (null, null);
+            connection_scroller.hexpand = true;
+            connection_scroller.vexpand = true;
+            connection_scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+
+            var settings = AppSettings.get_default ();
+            Grid grid = new Grid ();
+            grid.margin = 0;
+            grid.row_spacing = 12;
+            grid.column_spacing = 12;
+            grid.orientation = Orientation.VERTICAL;
+            grid.hexpand = true;
+
+            var current_connections = new Gtk.Label ("<b>Current Connections:</b>");
+            current_connections.use_markup = true;
+            current_connections.xalign = 0;
+            current_connections.hexpand = true;
+
+            int g = 0;
+            grid.attach (current_connections, 0, g, 1, 1);
+            g++;
+
+            var warning_label = new Gtk.Label ("<small>Passwords will not persist in Flatpak</small>");
+            warning_label.use_markup = true;
+            warning_label.xalign = 0;
+            warning_label.hexpand = true;
+            grid.attach (warning_label, 0, g, 1, 1);
+            g++;
+            //  var warning_label = new Gtk.Label ("<small>Passwords will be stored in plaintext</small>");
+            //  warning_label.use_markup = true;
+            //  warning_label.xalign = 0;
+            //  warning_label.hexpand = true;
+            //  grid.attach (warning_label, 0, g, 1, 1);
+            //  g++;
+
+            var add_connections = new Gtk.Label ("<b>Add Connection:</b>");
+            add_connections.use_markup = true;
+            add_connections.xalign = 0;
+            add_connections.hexpand = true;
+
+            grid.attach (add_connections, 0, g, 1, 1);
+            g++;
+
+            var writeas_connection = new Gtk.Button.with_label (_("  WriteFreely"));
+            writeas_connection.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/wf.png"));
+            writeas_connection.hexpand = true;
+            writeas_connection.always_show_image = true;
+            writeas_connection.show_all ();
+            writeas_connection.clicked.connect (() => {
+                ConnectionData? data = WriteFreelyConnection.create_connection ();
+                if (data != null) {
+                    if (data.endpoint.chug ().chomp () == "") {
+                        data.endpoint = "https://write.as/";
+                    }
+                    warning ("Connecting new writeas account: %s", data.user);
+                    WriteFreelyConnection connection = new WriteFreelyConnection (data.user, data.auth, data.endpoint);
+                    if (connection.connection_valid ()) {
+                        SecretSchemas.get_instance ().add_writefreely_secret (data.endpoint, data.user, data.auth);
+                        ThiefApp.get_instance ().connections.add (connection);
+                        ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
+                        grid.insert_row (1);
+                        grid.attach (connection_button (connection, grid), 0, 1, 1, 1);
+                        grid.show_all ();
+                    }
+                }
+            });
+            grid.attach (writeas_connection, 0, g, 1, 1);
+            g++;
+
+            var ghost_connection = new Gtk.Button.with_label (_("  ghost"));
+            ghost_connection.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/ghost.png"));
+            ghost_connection.hexpand = true;
+            ghost_connection.always_show_image = true;
+            ghost_connection.show_all ();
+            ghost_connection.clicked.connect (() => {
+                ConnectionData? data = GhostConnection.create_connection ();
+                if (data != null) {
+                    if (data.endpoint.chug ().chomp () == "") {
+                        data.endpoint = "https://my.ghost.org/";
+                    }
+                    warning ("Connecting new ghost account: %s", data.user);
+                    GhostConnection connection = new GhostConnection (data.user, data.auth, data.endpoint);
+                    if (connection.connection_valid ()) {
+                        SecretSchemas.get_instance ().add_ghost_secret (data.endpoint, data.user, data.auth);
+                        ThiefApp.get_instance ().connections.add (connection);
+                        ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
+                        grid.insert_row (1);
+                        grid.attach (connection_button (connection, grid), 0, 1, 1, 1);
+                        grid.show_all ();
+                    }
+                }
+            });
+            grid.attach (ghost_connection, 0, g, 1, 1);
+            g++;
+
+            foreach (var c in ThiefApp.get_instance ().connections) {
+                grid.insert_row (1);
+                grid.attach (connection_button (c, grid), 0, 1, 1, 1);
+            }
+
+            grid.show_all ();
+            connection_scroller.add (grid);
+            connection_scroller.show_all ();
+            return connection_scroller;
+        }
+
+        private Gtk.Button connection_button (ConnectionBase connection, Gtk.Grid grid) {
+            Gtk.Button button = new Gtk.Button.with_label ("  " + connection.export_name);
+            string type = "";
+            string alias = "";
+            string endpoint = "";
+            if (connection is WriteFreelyConnection) {
+                WriteFreelyConnection wc = (WriteFreelyConnection) connection;
+                type = WriteFreelyConnection.CONNECTION_TYPE;
+                alias = wc.conf_alias;
+                endpoint = wc.conf_endpoint;
+                button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/wf.png"));
+                button.always_show_image = true;
+                button.show_all ();
+            } else if (connection is GhostConnection) {
+                GhostConnection gc = (GhostConnection) connection;
+                type = GhostConnection.CONNECTION_TYPE;
+                alias = gc.conf_alias;
+                endpoint = gc.conf_endpoint;
+                button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/ghost.png"));
+                button.always_show_image = true;
+                button.show_all ();
+            }
+
+            button.clicked.connect (() => {
+                var dialog = new Gtk.Dialog.with_buttons (
+                    "Remove " + connection.export_name,
+                    this,
+                    Gtk.DialogFlags.MODAL,
+                    _("_Remove"),
+                    Gtk.ResponseType.ACCEPT,
+                    _("_Keep"),
+                    Gtk.ResponseType.REJECT,
+                    null);
+
+                dialog.response.connect ((response_val) => {
+                    if (response_val == Gtk.ResponseType.ACCEPT) {
+                        grid.remove (button);
+                        ThiefApp.get_instance ().connections.remove (connection);
+                        ThiefApp.get_instance ().exporters.remove (connection.export_name);
+                        SecretSchemas.get_instance ().remove_secret (type, alias, endpoint);
+                    }
+                    dialog.destroy ();
+                });
+
+                if (dialog.run () == Gtk.ResponseType.ACCEPT) {
+                    grid.remove (button);
+                    ThiefApp.get_instance ().connections.remove (connection);
+                    ThiefApp.get_instance ().exporters.remove (connection.export_name);
+                    SecretSchemas.get_instance ().remove_secret (type, alias, endpoint);
+                }
+            });
+
+            return button;
+        }
+
         private Grid display_grid () {
             var settings = AppSettings.get_default ();
             Grid grid = new Grid ();
-            grid.margin = 12;
+            grid.margin = 0;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
             grid.orientation = Orientation.VERTICAL;
@@ -172,34 +336,6 @@ namespace ThiefMD.Widgets {
             page_setup_label.xalign = 0;
             page_setup_label.use_markup = true;
 
-            var side_margin_entry = new Gtk.SpinButton.with_range (0.0, 3.5, 0.05);
-            side_margin_entry.set_value (settings.export_side_margins);
-            side_margin_entry.value_changed.connect (() => {
-                double new_margin = side_margin_entry.get_value ();
-                if (new_margin >= 0.0 && new_margin <= 3.5) {
-                    settings.export_side_margins = new_margin;
-                } else {
-                    side_margin_entry.set_value (settings.export_side_margins);
-                }
-            });
-            var side_margin_label = new Label(_("Side margins in PDF in inches"));
-            side_margin_label.xalign = 0;
-            side_margin_label.hexpand = true;
-
-            var top_bottom_margin_entry = new Gtk.SpinButton.with_range (0.0, 3.5, 0.05);
-            top_bottom_margin_entry.set_value (settings.export_top_bottom_margins);
-            top_bottom_margin_entry.value_changed.connect (() => {
-                double new_margin = top_bottom_margin_entry.get_value ();
-                if (new_margin >= 0.0 && new_margin <= 3.5) {
-                    settings.export_top_bottom_margins = new_margin;
-                } else {
-                    top_bottom_margin_entry.set_value (settings.export_top_bottom_margins);
-                }
-            });
-            var top_bottom_margin_label = new Label(_("Top & Bottom margins in PDF in inches"));
-            top_bottom_margin_label.xalign = 0;
-            top_bottom_margin_label.hexpand = true;
-
             var pagebreak_folder_switch = new Switch ();
             pagebreak_folder_switch.set_active (settings.export_break_folders);
             pagebreak_folder_switch.notify["active"].connect (() => {
@@ -236,6 +372,46 @@ namespace ThiefMD.Widgets {
                     settings.export_paper_size = ThiefProperties.PAPER_SIZES_GTK_NAME[option];
                 }
             });
+
+            var side_margin_entry = new Gtk.SpinButton.with_range (0.0, 3.5, 0.05);
+            side_margin_entry.set_value (settings.export_side_margins);
+            side_margin_entry.value_changed.connect (() => {
+                double new_margin = side_margin_entry.get_value ();
+                if (new_margin >= 0.0 && new_margin <= 3.5) {
+                    settings.export_side_margins = new_margin;
+                } else {
+                    side_margin_entry.set_value (settings.export_side_margins);
+                }
+            });
+            var side_margin_label = new Label(_("Side margins in PDF in inches"));
+            side_margin_label.xalign = 0;
+            side_margin_label.hexpand = true;
+
+            var top_bottom_margin_entry = new Gtk.SpinButton.with_range (0.0, 3.5, 0.05);
+            top_bottom_margin_entry.set_value (settings.export_top_bottom_margins);
+            top_bottom_margin_entry.value_changed.connect (() => {
+                double new_margin = top_bottom_margin_entry.get_value ();
+                if (new_margin >= 0.0 && new_margin <= 3.5) {
+                    settings.export_top_bottom_margins = new_margin;
+                } else {
+                    top_bottom_margin_entry.set_value (settings.export_top_bottom_margins);
+                }
+            });
+            var top_bottom_margin_label = new Label(_("Top & Bottom margins in PDF in inches"));
+            top_bottom_margin_label.xalign = 0;
+            top_bottom_margin_label.hexpand = true;
+
+            Grid margin_grid = new Grid ();
+            margin_grid.margin = 0;
+            margin_grid.row_spacing = 12;
+            margin_grid.column_spacing = 12;
+            margin_grid.orientation = Orientation.VERTICAL;
+            margin_grid.hexpand = true;
+
+            margin_grid.attach (side_margin_entry, 0, 0, 1, 1);
+            margin_grid.attach (side_margin_label, 1, 0, 2, 1);
+            margin_grid.attach (top_bottom_margin_entry, 0, 1, 1, 1);
+            margin_grid.attach (top_bottom_margin_label, 1, 1, 2, 1);
 
             int cur_w = this.get_allocated_width ();
             var print_css_label = new Gtk.Label (_("<b>PDF Print CSS</b>"));
@@ -280,12 +456,6 @@ namespace ThiefMD.Widgets {
 
             grid.attach (page_setup_label, 1, g, 2, 1);
             g++;
-            grid.attach (side_margin_entry, 1, g, 1, 1);
-            grid.attach (side_margin_label, 2, g, 1, 1);
-            g++;
-            grid.attach (top_bottom_margin_entry, 1, g, 1, 1);
-            grid.attach (top_bottom_margin_label, 2, g, 1, 1);
-            g++;
             grid.attach (pagebreak_folder_switch, 1, g, 1, 1);
             grid.attach (pagebreak_folder_label, 2, g, 2, 1);
             g++;
@@ -294,6 +464,9 @@ namespace ThiefMD.Widgets {
             g++;
             grid.attach (paper_size, 1, g, 2, 1);
             g++;
+
+            grid.attach (margin_grid, 1, g, 3, 2);
+            g += 2;
 
             grid.attach (print_css_label, 1, g, 3, 1);
             g++;
@@ -317,7 +490,7 @@ namespace ThiefMD.Widgets {
         private Grid editor_grid () {
             var settings = AppSettings.get_default ();
             Grid grid = new Grid ();
-            grid.margin = 12;
+            grid.margin = 0;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
             grid.orientation = Orientation.VERTICAL;

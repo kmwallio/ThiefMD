@@ -171,7 +171,7 @@
             <description>Font Family for editor to use</description>
         </key>
         <key name="font-size" type="i">
-            <default>12</default>
+            <default>14</default>
             <summary>Font Size to use</summary>
             <description>Font Size for editor to use</description>
         </key>

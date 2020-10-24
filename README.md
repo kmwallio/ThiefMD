@@ -37,7 +37,7 @@ yay -S thiefmd
  * Sheet Management
  * Shortcut key bindings
  * Themes
- * Export (DocX, ePUB, PDF, HTML, Markdown, and more...)
+ * Export (DocX, ePUB, PDF, HTML, Markdown, [WriteFreely](https://thiefmd.com/tips/blogging-with-write-freely), [Ghost](https://thiefmd.com/tips/blogging-with-ghost), and more...)
  * Import (DocX, ePUB, HTML, rst, textile, and more...)
  * Search `Ctrl+F` for the current file, and `Ctrl+Shift+F` for the *entire* library
  * Writing Statistics
@@ -84,7 +84,7 @@ Focus Mode
 
 ## Dependencies
 
-As part of the build, [libwritegood-vala](https://github.com/ThiefMD/libwritegood-vala) and the [Ulysses Theme Parser](https://github.com/TwiRp/ultheme-vala) will be cloned and built.
+[libwritegood-vala](https://github.com/ThiefMD/libwritegood-vala), [writeas-vala](https://github.com/ThiefMD/writeas-vala), [ghost-vala](https://github.com/ThiefMD/ghost-vala) and the [Ulysses Theme Parser](https://github.com/TwiRp/ultheme-vala) are used as git sub-modules.
 
 ### Ubuntu
 
@@ -102,6 +102,7 @@ libarchive-dev
 libgtk-3-dev
 libgee-0.8-dev
 libgtksourceview-4-dev
+libsecret-1-dev
 ```
 
 ### Fedora
@@ -120,11 +121,16 @@ gtkspell3-devel
 libarchive-devel
 libxml2-devel
 libgee-devel
+libsecret-devel
 ```
 
 ## Building
 
 ```bash
+$ git clone https://github.com/kmwallio/ThiefMD.git
+$ cd ThiefMD
+$ git submodule init
+$ git submodule update --remote --recursive
 $ meson build && cd build
 $ meson configure -Dprefix=/usr
 $ ninja

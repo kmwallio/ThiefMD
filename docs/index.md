@@ -11,7 +11,7 @@ Based on Open Source Technologies, ThiefMD is a Markdown editor and file manager
 
 Static Site Generators? Novel Writing? Book reports? ThiefMD loves handling all your markdown files and compiling them to whatever format you need. [Pandoc](https://pandoc.org) runs under the hood, so if you can dream it, ThiefMD can build it.
 
-Manage your <span class="pun">\*\*mark\*\*</span> without any <span class="ny">\-down\-</span>sides. Your library is your file system. Sync using any service you choose[^no-file-sync]. Even use [Git](https://git-scm.com/) to have a file history[^no-git].
+Manage your <span class="pun">**\*\*mark\*\***</span> without any <span class="ny">_\_down\__</span>sides. Your library is your file system. Sync using any service you choose[^no-file-sync]. Even use [Git](https://git-scm.com/) to have a file history[^no-git].
 
 [^no-file-sync]: ThiefMD has no sync support built in.
 [^no-git]: ThiefMD has no built in Git support.
@@ -31,7 +31,7 @@ Manage your <span class="pun">\*\*mark\*\*</span> without any <span class="ny">\
 ✅ Typewriter Scrolling  
 ✅ Full Screen Editing  
 ✅ Focus Mode  
-✅ Multiple Export Formats: PDF, ePub, docx, and more  
+✅ Multiple Export Formats: PDF, ePub, docx, [WriteFreely](https://writefreely.org), [Ghost](https://ghost.org), and more  
 ✅ Multiple Import Formats: ePub, docx, HTML, and more
 
 If anything goes wrong, it's probably because we implemented it wrong.  We're not liable for lost files or damage to your machine!

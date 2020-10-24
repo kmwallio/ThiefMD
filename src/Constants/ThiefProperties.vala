@@ -97,17 +97,17 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
       
       .small-text {
           %s;
-          font-size: %0.2frem;
+          font-size: %dpt;
       }
       
       .focus-text {
           %s;
-          font-size: %0.2frem;
+          font-size: %dpt;
       }
       
       .full-text {
           %s;
-          font-size: %0.2frem;
+          font-size: %dpt;
       }""";
 
         public const string DYNAMIC_CSS = """@define-color colorPrimary %s;
