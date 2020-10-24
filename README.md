@@ -37,7 +37,7 @@ yay -S thiefmd
  * Sheet Management
  * Shortcut key bindings
  * Themes
- * Export (DocX, ePUB, PDF, HTML, Markdown, [WriteFreely](https://thiefmd.com/tips/blogging-with-write-freely), [Ghost](https://thiefmd.com/tips/blogging-with-ghost), and more...)
+ * Export (DocX, ePUB, PDF, HTML, Markdown, [WriteFreely](https://thiefmd.com/tips/blogging-with-writefreely), [Ghost](https://thiefmd.com/tips/blogging-with-ghost), and more...)
  * Import (DocX, ePUB, HTML, rst, textile, and more...)
  * Search `Ctrl+F` for the current file, and `Ctrl+Shift+F` for the *entire* library
  * Writing Statistics
