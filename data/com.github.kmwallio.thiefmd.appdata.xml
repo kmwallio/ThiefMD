@@ -47,11 +47,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="0.1.2" date="2020-10-30" urgency="low">
+    <release version="0.1.2" date="2020-10-23" urgency="low">
       <description>
-        <p>Polishing the interface. We're working on making ThiefMD more approachable and easier to use.</p>
+        <p>Blog publishing support? Interface improvements? We're working on making ThiefMD more approachable and easier to use.</p>
         <ul>
-          <li>Font sizes are consistent with your other apps, no more scaling</li>
+          <li>Export to a WriteFreely instance</li>
+          <li>Export to a Ghost blog</li>
+          <li>Font sizes are consistent with your other apps</li>
           <li>Revised preferences to prevent strechted out elements</li>
           <li>Write-Good now shows as tool tips</li>
         </ul>
