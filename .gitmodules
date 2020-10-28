@@ -16,3 +16,4 @@
 [submodule "data/language-specs"]
 	path = data/language-specs
 	url = https://github.com/ThiefMD/custom-gtksourceview-languages.git
+	branch = main
