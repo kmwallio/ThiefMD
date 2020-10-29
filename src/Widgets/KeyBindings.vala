@@ -110,7 +110,9 @@ namespace ThiefMD.Widgets {
                 // New Sheet
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.n, keycode)) {
-                        Widgets.Headerbar.get_instance ().make_new_sheet ();
+                        if (window is ThiefApp) {
+                            ((ThiefApp)window).toolbar.make_new_sheet ();
+                        }
                     }
                 }
 
@@ -145,7 +147,9 @@ namespace ThiefMD.Widgets {
                 // Toggle statistics bar
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
                     if (match_keycode (Gdk.Key.s, keycode)) {
-                        ThiefApp.get_instance ().stats_bar.toggle_statistics ();
+                        if (window is ThiefApp) {
+                            ((ThiefApp)window).stats_bar.toggle_statistics ();
+                        }
                     }
                 }
 
@@ -216,10 +220,12 @@ namespace ThiefMD.Widgets {
 
                 if (match_keycode (Gdk.Key.Escape, keycode)) {
                     if (is_main) {
-                        if (ThiefApp.get_instance ().search_bar.should_escape_search ()) {
-                            ThiefApp.get_instance ().search_bar.deactivate_search ();
-                        } else if (settings.fullscreen) {
-                            settings.fullscreen = false;
+                        if (window is ThiefApp) {
+                            if (((ThiefApp)window).search_bar.should_escape_search ()) {
+                                ((ThiefApp)window).search_bar.deactivate_search ();
+                            } else if (settings.fullscreen) {
+                                settings.fullscreen = false;
+                            }
                         }
                     } else {
                         window.unfullscreen ();

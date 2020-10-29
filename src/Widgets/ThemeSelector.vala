@@ -105,7 +105,7 @@ namespace ThiefMD.Widgets {
             font_selector.changed.connect (() => {
                 int option = font_selector.get_active ();
                 if (option >= 0 && option < fonts.size && fonts.get (option) == "Other") {
-                    Gtk.FontChooserDialog font_chooser = new Gtk.FontChooserDialog (_("Font Selector"), ThiefApp.get_instance ().main_window);
+                    Gtk.FontChooserDialog font_chooser = new Gtk.FontChooserDialog (_("Font Selector"), ThiefApp.get_instance ());
                     font_chooser.set_filter_func (filter_fonts);
                     Pango.FontDescription fontdesc = new Pango.FontDescription ();
                     if (settings.font_size > 0 && settings.font_size <= 240) {

@@ -796,7 +796,7 @@ namespace ThiefMD.Widgets {
                             debug ("Prompting for action");
                             Dialog prompt = new Dialog.with_buttons (
                                 "Move into Library",
-                                ThiefApp.get_instance ().main_window,
+                                ThiefApp.get_instance (),
                                 DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                 _("Copy"),
                                 Gtk.ResponseType.NO,

@@ -29,7 +29,7 @@ namespace ThiefMD.Widgets {
         private Gtk.HeaderBar bar;
 
         public Preferences () {
-            set_transient_for (ThiefApp.get_instance ().main_window);
+            set_transient_for (ThiefApp.get_instance ());
             resizable = true;
             deletable = true;
             modal = true;

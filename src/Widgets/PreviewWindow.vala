@@ -63,9 +63,9 @@ namespace ThiefMD.Widgets {
             }
             UI.update_preview ();
 
-            parent = ThiefApp.get_instance ().main_window;
+            parent = ThiefApp.get_instance ();
             destroy_with_parent = true;
-            ThiefApp.get_instance ().main_window.get_size (out w, out h);
+            ThiefApp.get_instance ().get_size (out w, out h);
             w = w - ThiefApp.get_instance ().pane_position;
             set_default_size(w, h - 150);
 

@@ -87,12 +87,12 @@ namespace ThiefMD.Widgets {
             headerbar.set_show_close_button (true);
             headerbar.pack_start (refresh);
             set_titlebar (headerbar);
-            transient_for = ThiefApp.get_instance ().main_window;
+            transient_for = ThiefApp.get_instance ();
             destroy_with_parent = true;
             add (grid);
 
             int w, h;
-            ThiefApp.get_instance ().main_window.get_size (out w, out h);
+            ThiefApp.get_instance ().get_size (out w, out h);
 
             show_all ();
 

@@ -22,17 +22,17 @@ using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
     public class Headerbar : Gtk.Revealer {
-        private Gtk.HeaderBar the_bar;
-        private static Headerbar? instance = null;
-
+        private Hdy.HeaderBar the_bar;
+        private ThiefApp _instance;
         private Gtk.Button change_view_button;
         private Gtk.Button add_library_button;
         private Gtk.MenuButton new_sheet;
         private Gtk.MenuButton menu_button;
         private NewSheet new_sheet_widget;
 
-        public Headerbar () {
-            the_bar = new Gtk.HeaderBar ();
+        public Headerbar (ThiefApp instance) {
+            the_bar = new Hdy.HeaderBar ();
+            _instance = instance;
             var header_context = the_bar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-toolbar");
@@ -52,14 +52,6 @@ namespace ThiefMD.Widgets {
 
         public void make_new_sheet () {
             new_sheet_widget.popup ();
-        }
-
-        public static Headerbar get_instance () {
-            if (instance == null) {
-                instance = new Widgets.Headerbar ();
-            }
-    
-            return instance;
         }
 
         public void toggle_headerbar () {

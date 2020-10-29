@@ -55,6 +55,7 @@ add_project_arguments(['--vapidir', join_paths(meson.current_source_dir(), 'vapi
 executable(
     meson.project_name(),
     'src/Application.vala',
+    'src/ThiefApp.vala',
     'src/Constants/AppSettings.vala',
     'src/Constants/DragAndDrop.vala',
     'src/Constants/ThiefProperties.vala',
@@ -123,6 +124,7 @@ executable(
         dependency('libarchive'),
         dependency('libxml-2.0'),
         dependency('libsecret-1'),
+        dependency('libhandy-1'),
         libmarkdown
     ],
     vala_args: [
