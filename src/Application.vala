@@ -42,6 +42,9 @@ namespace ThiefMD {
 
         public static int main (string[] args) {
             var app = new ThiefApplication ();
+            app.startup.connect (() => {
+                Hdy.init ();
+            });
             return app.run (args);
         }
     }
