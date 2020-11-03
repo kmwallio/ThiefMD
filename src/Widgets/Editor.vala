@@ -848,18 +848,25 @@ namespace ThiefMD.Widgets {
             // If ThiefMD is Full Screen, add additional padding
             p = (settings.fullscreen) ? 5 : 0;
 
-            var margins = settings.margins;
-            switch (margins) {
-                case Constants.NARROW_MARGIN:
-                    m = (int)(w * ((Constants.NARROW_MARGIN + p) / 100.0));
-                    break;
-                case Constants.WIDE_MARGIN:
-                    m = (int)(w * ((Constants.WIDE_MARGIN + p) / 100.0));
-                    break;
-                default:
-                case Constants.MEDIUM_MARGIN:
-                    m = (int)(w * ((Constants.MEDIUM_MARGIN + p) / 100.0));
-                    break;
+            // Narrow margins on smaller devices
+            if (w < 600) {
+                m = (int)(w * ((Constants.NARROW_MARGIN + p) / 100.0));
+            } else if (w < 800) {
+                m = (int)(w * ((Constants.MEDIUM_MARGIN + p) / 100.0));
+            } else {
+                var margins = settings.margins;
+                switch (margins) {
+                    case Constants.NARROW_MARGIN:
+                        m = (int)(w * ((Constants.NARROW_MARGIN + p) / 100.0));
+                        break;
+                    case Constants.WIDE_MARGIN:
+                        m = (int)(w * ((Constants.WIDE_MARGIN + p) / 100.0));
+                        break;
+                    default:
+                    case Constants.MEDIUM_MARGIN:
+                        m = (int)(w * ((Constants.MEDIUM_MARGIN + p) / 100.0));
+                        break;
+                }
             }
 
             // Update margins
