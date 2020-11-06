@@ -30,15 +30,10 @@ namespace ThiefMD.Widgets {
 
         public Preferences () {
             set_transient_for (ThiefApp.get_instance ());
-            resizable = true;
-            deletable = true;
-            modal = true;
             build_ui ();
         }
 
         private void build_ui () {
-            window_position = WindowPosition.CENTER;
-
             add (editor_grid ());
             add (export_grid ());
             add (display_grid ());
