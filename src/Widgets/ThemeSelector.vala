@@ -278,14 +278,14 @@ namespace ThiefMD.Widgets {
             app_box.orientation = Orientation.VERTICAL;
             app_box.hexpand = true;
 
-            var preview_box = new Gtk.ScrolledWindow (null, null);
-            preview_box.min_content_height = settings.window_height / 2;
             preview_items = new Gtk.FlowBox ();
             preview_items.margin = 6;
-            preview_box.add (preview_items);
-            preview_box.hexpand = true;
+            preview_items.max_children_per_line = 3;
+            preview_items.homogeneous = true;
+            preview_items.expand = false;
+            preview_items.hexpand = true;
 
-            app_box.attach (preview_box, 0, 1, 1, 3);
+            app_box.attach (preview_items, 0, 1, 1, 3);
             app_box.hexpand = true;
 
             var get_themes = new Gtk.Label (_("Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n<small>Stored in <a href='file://" + UserData.style_path + "'>" + UserData.style_path + "</a>.</small>"));
