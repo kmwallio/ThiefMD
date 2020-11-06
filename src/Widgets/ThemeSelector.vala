@@ -45,8 +45,9 @@ namespace ThiefMD.Widgets {
             Gee.LinkedList<string> fonts = new Gee.LinkedList<string> ();
             Gee.LinkedList<int> font_sizes = new Gee.LinkedList<int> ();
 
-            var font_label = new Gtk.Label (_("<b>Font:</b>"));
+            var font_label = new Gtk.Label (_("Font"));
             font_label.xalign = 0;
+            font_label.margin = 12;
             font_label.use_markup = true;
 
             var font_selector = new Gtk.ComboBoxText ();
@@ -261,7 +262,6 @@ namespace ThiefMD.Widgets {
     public class ThemeSelector : Gtk.Box {
         public Gtk.FlowBox preview_items;
         private Gtk.Grid app_box;
-        private PreviewDrop drop_box;
         public static ThemeSelector instance;
 
         public ThemeSelector () {
@@ -285,18 +285,10 @@ namespace ThiefMD.Widgets {
             preview_box.add (preview_items);
             preview_box.hexpand = true;
 
-            drop_box = new PreviewDrop ();
-            drop_box.xalign = 0;
-            drop_box.hexpand = true;
-
-            var border = new Gtk.Frame(_("Drop Style.ultheme:"));
-            border.add (drop_box);
-
-            app_box.attach (border, 0, 0, 1, 1);
             app_box.attach (preview_box, 0, 1, 1, 3);
             app_box.hexpand = true;
 
-            var get_themes = new Gtk.Label (_("Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>."));
+            var get_themes = new Gtk.Label (_("Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n<small>Stored in <a href='file://" + UserData.style_path + "'>" + UserData.style_path + "</a>.</small>"));
             get_themes.use_markup = true;
             get_themes.xalign = 0;
 
@@ -326,118 +318,6 @@ namespace ThiefMD.Widgets {
             }
 
             return false;
-        }
-
-        private class PreviewDrop : Gtk.Label {
-            public PreviewDrop () {
-                build_ui ();
-            }
-
-            public void build_ui () {
-                label = "\n\n<small>Stored in <a href='file://" + UserData.style_path + "'>" + UserData.style_path + "</a>.</small>";
-                use_markup = true;
-                set_justify (Justification.LEFT);
-                xalign = 0;
-
-                // Drag and Drop Support
-                Gtk.drag_dest_set (
-                    this,                        // widget will be drag-able
-                    DestDefaults.ALL,              // modifier that will start a drag
-                    target_list,                   // lists of target to support
-                    Gdk.DragAction.COPY            // what to do with data after dropped
-                );
-                this.drag_motion.connect(this.on_drag_motion);
-                this.drag_leave.connect(this.on_drag_leave);
-                this.drag_drop.connect(this.on_drag_drop);
-                this.drag_data_received.connect(this.on_drag_data_received);
-                show_all ();
-            }
-
-            private bool on_drag_motion (
-                Widget widget,
-                DragContext context,
-                int x,
-                int y,
-                uint time)
-            {
-                return false;
-            }
-
-            private void on_drag_leave (Widget widget, DragContext context, uint time) {
-            }
-
-            private bool on_drag_drop (
-                Widget widget,
-                DragContext context,
-                int x,
-                int y,
-                uint time)
-            {
-                var target_type = (Atom) context.list_targets().nth_data (Target.STRING);
-
-                if (!target_type.name ().ascii_up ().contains ("STRING"))
-                {
-                    target_type = (Atom) context.list_targets().nth_data (Target.URI);
-                }
-
-                // Request the data from the source.
-                Gtk.drag_get_data (
-                    widget,         // will receive 'drag_data_received' signal
-                    context,        // represents the current state of the DnD
-                    target_type,    // the target type we want
-                    time            // time stamp
-                    );
-    
-                bool is_valid_drop_site = target_type.name ().ascii_up ().contains ("STRING") || target_type.name ().ascii_up ().contains ("URI");
-    
-                return is_valid_drop_site;
-            }
-    
-            private void on_drag_data_received (
-                Widget widget,
-                DragContext context,
-                int x,
-                int y,
-                SelectionData selection_data,
-                uint target_type,
-                uint time)
-            {
-                File file = dnd_get_file (selection_data, target_type);
-                if (!file.query_exists ()) {
-                    Gtk.drag_finish (context, false, false, time);
-                    return;
-                }
-
-                if (!file.get_basename ().down ().has_suffix (".ultheme")) {
-                    Gtk.drag_finish (context, false, false, time);
-                    return;
-                }
-
-                try {
-                    File destination = File.new_for_path (Path.build_filename (UserData.style_path, file.get_basename ()));
-
-                    if (destination.query_exists ()) {
-                        // Possibly overwrite theme, but don't double draw widget
-                        file.copy (destination, FileCopyFlags.OVERWRITE);
-                        Gtk.drag_finish (context, true, false, time);
-                        return;
-                    }
-
-                    file.copy (destination, FileCopyFlags.OVERWRITE);
-                    var new_styles = new Ultheme.Parser (destination);
-                    UI.add_user_theme (new_styles);
-
-                    ThemePreview dark_preview = new ThemePreview (new_styles, true);
-                    ThemePreview light_preview = new ThemePreview (new_styles, false);
-
-                    instance.preview_items.add (dark_preview);
-                    instance.preview_items.add (light_preview);
-                    instance.show_all ();
-                } catch (Error e) {
-                    warning ("Failing generating preview: %s\n", e.message);
-                }
-                Gtk.drag_finish (context, true, false, time);
-            }
         }
     }
 }

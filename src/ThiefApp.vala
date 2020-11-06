@@ -36,6 +36,8 @@ namespace ThiefMD {
         public bool ready = false;
         private Gtk.Application app_parent;
 
+        private Hdy.Leaflet library_leaf;
+
         public ThiefApp (Gtk.Application app) {
             Object (application: app);
             _instance = this;
@@ -131,6 +133,8 @@ namespace ThiefMD {
             library_view.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
 
             library_view.add (library);
+            //  library_leaf.add (library_view);
+            //  library_leaf.show_all ();
             library_pane.add1 (library_view);
             library.expand_all ();
             Sheets start_sheet = library.get_sheets (start_dir);

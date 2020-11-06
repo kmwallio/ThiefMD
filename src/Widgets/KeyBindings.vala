@@ -157,7 +157,7 @@ namespace ThiefMD.Widgets {
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                     if (match_keycode (Gdk.Key.comma, keycode)) {
                         Preferences prf = new Preferences();
-                        prf.run();
+                        prf.show_all ();
                     }
                 }
 
