@@ -29,7 +29,6 @@ namespace ThiefMD.Widgets {
         private Gtk.HeaderBar bar;
 
         public Preferences () {
-            set_transient_for (ThiefApp.get_instance ());
             build_ui ();
         }
 
