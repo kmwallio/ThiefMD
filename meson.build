@@ -9,6 +9,10 @@ thief_app_id = 'com.github.kmwallio.thiefmd'
 # Import main lib files
 gnome = import('gnome')
 i18n = import('i18n')
+add_global_arguments(
+    '-DGETTEXT_PACKAGE="@0@"'.format (meson.project_name()),
+    language:'c'
+)
 
 # Compile the GResources for this project
 asresources = gnome.compile_resources(
@@ -41,6 +45,11 @@ c_args = [
 ]
 
 cc = meson.get_compiler('c')
+
+# Translations
+gettext_package = meson.project_name()
+localedir = get_option('prefix') / get_option('localedir')
+podir = meson.source_root() / 'po'
 
 # Find libMarkdown
 libmarkdown = dependency('libmarkdown', version: '>= 2.2.1', required: false)
@@ -139,3 +148,4 @@ meson.add_install_script('meson/post_install.py')
 
 # Add subfolders for Meson to look
 subdir('data')
+subdir('po')

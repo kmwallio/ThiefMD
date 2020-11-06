@@ -41,6 +41,7 @@ namespace ThiefMD {
         }
 
         public static int main (string[] args) {
+            Intl.setlocale (LocaleCategory.ALL, Intl.get_language_names ()[0]);
             var app = new ThiefApplication ();
             app.startup.connect (() => {
                 Hdy.init ();
