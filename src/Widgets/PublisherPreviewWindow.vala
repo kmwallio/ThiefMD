@@ -23,8 +23,8 @@ using ThiefMD.Controllers;
 using ThiefMD.Exporters;
 
 namespace ThiefMD.Widgets {
-    public class PublisherPreviewWindow : Gtk.Window {
-        public Gtk.HeaderBar headerbar;
+    public class PublisherPreviewWindow : Hdy.Window {
+        public Hdy.HeaderBar headerbar;
         public Preview preview;
         private string _markdown;
         private string e_markdown;
@@ -52,10 +52,11 @@ namespace ThiefMD.Widgets {
         }
 
         protected void build_ui () {
+            Gtk.Box vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             var settings = AppSettings.get_default ();
             int w, h, m, p;
 
-            headerbar = new Gtk.HeaderBar ();
+            headerbar = new Hdy.HeaderBar ();
             headerbar.set_title (_("Publishing Preview"));
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
@@ -184,20 +185,22 @@ namespace ThiefMD.Widgets {
 
             headerbar.pack_end (export_button);
             headerbar.set_show_close_button (true);
-            set_titlebar (headerbar);
+            vbox.add (headerbar);
 
             title = _("Publishing Preview");
 
-            ThiefApp.get_instance ().main_window.get_size (out w, out h);
-            parent = ThiefApp.get_instance ().main_window;
+            ThiefApp.get_instance ().get_size (out w, out h);
+            parent = ThiefApp.get_instance ();
             destroy_with_parent = true;
 
             w = w - ThiefApp.get_instance ().pane_position;
 
             set_default_size(w, h - 150);
 
-            add (preview);
+            vbox.add (preview);
             delete_event.connect (this.on_delete_event);
+
+            add (vbox);
         }
 
         public bool on_delete_event () {

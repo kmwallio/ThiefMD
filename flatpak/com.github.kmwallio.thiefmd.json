@@ -87,6 +87,25 @@
         },
         "shared-modules/libsecret/libsecret.json",
         {
+            "name" : "libhandy",
+            "buildsystem" : "meson",
+            "config-opts" : [
+                "-Dexamples=false",
+                "-Dprofiling=false",
+                "-Dglade_catalog=disabled",
+                "-Dintrospection=enabled",
+                "-Dtests=false",
+                "-Dvapi=true"
+            ],
+            "sources" : [
+                {
+                    "type": "archive",
+                    "url": "https://download.gnome.org/sources/libhandy/1.0/libhandy-1.0.0.tar.xz",
+                    "sha256": "a9398582f47b7d729205d6eac0c068fef35aaf249fdd57eea3724f8518d26699"
+                }
+            ]
+        },
+        {
             "name": "thiefmd",
             "buildsystem": "meson",
             "sources": [{

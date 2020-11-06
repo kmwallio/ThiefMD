@@ -79,7 +79,7 @@ namespace ThiefMD.Widgets {
             preferences_button.tooltip_text = _("Edit Preferences");
             preferences_button.clicked.connect (() => {
                 Preferences prf = new Preferences();
-                prf.run();
+                prf.show_all ();
             });
 
             var about_button = new Gtk.ModelButton ();

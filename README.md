@@ -43,6 +43,10 @@ yay -S thiefmd
  * Writing Statistics
  * Focus Mode (Word, Sentence, and Paragraph)
 
+# Translating
+
+[Poeditor](https://poeditor.com/join/project?hash=iQkE5oTIOV) can be used to help translate ThiefMD.
+
 ## Planning
 
  * Better library organization

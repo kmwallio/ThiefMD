@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.kmwallio.thiefmd', ['vala', 'c'],
-    version: '0.1.2'
+    version: '0.1.3'
 )
 
 # Application ID
@@ -9,6 +9,10 @@ thief_app_id = 'com.github.kmwallio.thiefmd'
 # Import main lib files
 gnome = import('gnome')
 i18n = import('i18n')
+add_global_arguments(
+    '-DGETTEXT_PACKAGE="@0@"'.format (meson.project_name()),
+    language:'c'
+)
 
 # Compile the GResources for this project
 asresources = gnome.compile_resources(
@@ -42,6 +46,11 @@ c_args = [
 
 cc = meson.get_compiler('c')
 
+# Translations
+gettext_package = meson.project_name()
+localedir = get_option('prefix') / get_option('localedir')
+podir = meson.source_root() / 'po'
+
 # Find libMarkdown
 libmarkdown = dependency('libmarkdown', version: '>= 2.2.1', required: false)
 if libmarkdown.found() == false
@@ -55,6 +64,7 @@ add_project_arguments(['--vapidir', join_paths(meson.current_source_dir(), 'vapi
 executable(
     meson.project_name(),
     'src/Application.vala',
+    'src/ThiefApp.vala',
     'src/Constants/AppSettings.vala',
     'src/Constants/DragAndDrop.vala',
     'src/Constants/ThiefProperties.vala',
@@ -123,6 +133,7 @@ executable(
         dependency('libarchive'),
         dependency('libxml-2.0'),
         dependency('libsecret-1'),
+        dependency('libhandy-1'),
         libmarkdown
     ],
     vala_args: [
@@ -137,3 +148,4 @@ meson.add_install_script('meson/post_install.py')
 
 # Add subfolders for Meson to look
 subdir('data')
+subdir('po')

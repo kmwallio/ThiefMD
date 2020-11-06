@@ -21,16 +21,17 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class MarkdownCheatSheet : Gtk.Window {
-        Gtk.HeaderBar headerbar;
+    public class MarkdownCheatSheet : Hdy.Window {
+        Hdy.HeaderBar headerbar;
 
         public class MarkdownCheatSheet () {
             build_ui ();
         }
 
         private void build_ui () {
+            Gtk.Box vbox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
             var settings = AppSettings.get_default ();
-            headerbar = new Gtk.HeaderBar ();
+            headerbar = new Hdy.HeaderBar ();
             headerbar.set_title ("Cheat Sheet");
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
@@ -111,13 +112,14 @@ namespace ThiefMD.Widgets {
 
 
             headerbar.set_show_close_button (true);
-            set_titlebar (headerbar);
-            transient_for = ThiefApp.get_instance ().main_window;
+            transient_for = ThiefApp.get_instance ();
             destroy_with_parent = true;
-            add (grid);
+            vbox.add (headerbar);
+            vbox.add (grid);
+            add (vbox);
 
             int w, h;
-            ThiefApp.get_instance ().main_window.get_size (out w, out h);
+            ThiefApp.get_instance ().get_size (out w, out h);
 
             show_all ();
 

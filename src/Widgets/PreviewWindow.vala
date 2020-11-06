@@ -22,7 +22,8 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class PreviewWindow : Gtk.Window {
+    public class PreviewWindow : Hdy.Window {
+        private Hdy.HeaderBar toolbar;
         private static PreviewWindow? instance = null;
 
         public PreviewWindow () {
@@ -54,6 +55,7 @@ namespace ThiefMD.Widgets {
         protected void build_ui () {
             var settings = AppSettings.get_default ();
             int w, h, m, p;
+            toolbar = new Hdy.HeaderBar ();
 
             if (settings.show_filename && settings.last_file != "") {
                 string file_name = settings.last_file.substring(settings.last_file.last_index_of (Path.DIR_SEPARATOR_S) + 1);
@@ -61,15 +63,21 @@ namespace ThiefMD.Widgets {
             } else {
                 title = "Preview";
             }
+            toolbar.title = title;
             UI.update_preview ();
 
-            parent = ThiefApp.get_instance ().main_window;
+            parent = ThiefApp.get_instance ();
             destroy_with_parent = true;
-            ThiefApp.get_instance ().main_window.get_size (out w, out h);
+            ThiefApp.get_instance ().get_size (out w, out h);
             w = w - ThiefApp.get_instance ().pane_position;
             set_default_size(w, h - 150);
 
-            add (Preview.get_instance ());
+            Gtk.Box vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+
+            toolbar.set_show_close_button (true);
+            vbox.add (toolbar);
+            vbox.add (Preview.get_instance ());
+            add (vbox);
 
             delete_event.connect (this.on_delete_event);
             instance = this;
