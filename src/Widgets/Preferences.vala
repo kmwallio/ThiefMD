@@ -24,93 +24,39 @@ using Gdk;
 using ThiefMD.Connections;
 
 namespace ThiefMD.Widgets {
-    public class Preferences : Dialog {
+    public class Preferences : Hdy.PreferencesWindow {
         private Stack stack;
         private Gtk.HeaderBar bar;
 
         public Preferences () {
-            set_transient_for (ThiefApp.get_instance ().main_window);
-            resizable = true;
-            deletable = true;
-            modal = true;
             build_ui ();
         }
 
         private void build_ui () {
-            add_headerbar ();
-            this.set_border_width (20);
-            title = "";
-            window_position = WindowPosition.CENTER;
+            add (editor_grid ());
+            add (export_grid ());
+            add (display_grid ());
+            add (connection_grid ());
 
-            stack = new Stack ();
-            stack.add_titled (editor_grid (), _("Editor Preferences"), _("Editor"));
-            stack.add_titled (export_grid (), _("Export Preferences"), _("Export"));
-            stack.add_titled (display_grid (), _("Display Preferences"), _("Display"));
-            stack.add_titled (connection_grid (), _("Connection Manager"), _("Connections"));
-
-            StackSwitcher switcher = new StackSwitcher ();
-            switcher.set_stack (stack);
-            switcher.halign = Align.CENTER;
-
-            Box box = new Box (Orientation.VERTICAL, 0);
-
-            bar.set_custom_title (switcher);
-            // box.add (switcher);
-            box.add (stack);
-            this.get_content_area().add (box);
-
-            add_button (_("Done"), Gtk.ResponseType.CLOSE);
-            response.connect (() =>
-            {
-                destroy ();
-            });
-
+            search_enabled = false;
             show_all ();
         }
 
-        private Widget connection_grid () {
+        private Hdy.PreferencesPage connection_grid () {
+            var page = new Hdy.PreferencesPage ();
             var connection_scroller = new ScrolledWindow (null, null);
             connection_scroller.hexpand = true;
             connection_scroller.vexpand = true;
             connection_scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
 
             var settings = AppSettings.get_default ();
-            Grid grid = new Grid ();
-            grid.margin = 0;
-            grid.row_spacing = 12;
-            grid.column_spacing = 12;
-            grid.orientation = Orientation.VERTICAL;
-            grid.hexpand = true;
+            Hdy.PreferencesGroup display_options = new Hdy.PreferencesGroup ();
+            display_options.title = _("Current Connections");
+            display_options.description = _("Click on a connection to remove.");
 
-            var current_connections = new Gtk.Label ("<b>Current Connections:</b>");
-            current_connections.use_markup = true;
-            current_connections.xalign = 0;
-            current_connections.hexpand = true;
-
-            int g = 0;
-            grid.attach (current_connections, 0, g, 1, 1);
-            g++;
-
-            var warning_label = new Gtk.Label ("<small>Passwords will not persist in Flatpak</small>");
-            warning_label.use_markup = true;
-            warning_label.xalign = 0;
-            warning_label.hexpand = true;
-            grid.attach (warning_label, 0, g, 1, 1);
-            g++;
-            //  var warning_label = new Gtk.Label ("<small>Passwords will be stored in plaintext</small>");
-            //  warning_label.use_markup = true;
-            //  warning_label.xalign = 0;
-            //  warning_label.hexpand = true;
-            //  grid.attach (warning_label, 0, g, 1, 1);
-            //  g++;
-
-            var add_connections = new Gtk.Label ("<b>Add Connection:</b>");
-            add_connections.use_markup = true;
-            add_connections.xalign = 0;
-            add_connections.hexpand = true;
-
-            grid.attach (add_connections, 0, g, 1, 1);
-            g++;
+            Hdy.PreferencesGroup connection_options = new Hdy.PreferencesGroup ();
+            connection_options.title = _("Add Connection");
+            connection_options.description = _("Choose your blogging software.");
 
             var writeas_connection = new Gtk.Button.with_label (_("  WriteFreely"));
             writeas_connection.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/wf.png"));
@@ -129,14 +75,11 @@ namespace ThiefMD.Widgets {
                         SecretSchemas.get_instance ().add_writefreely_secret (data.endpoint, data.user, data.auth);
                         ThiefApp.get_instance ().connections.add (connection);
                         ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
-                        grid.insert_row (1);
-                        grid.attach (connection_button (connection, grid), 0, 1, 1, 1);
-                        grid.show_all ();
+                        display_options.add (connection_button (connection, display_options));
                     }
                 }
             });
-            grid.attach (writeas_connection, 0, g, 1, 1);
-            g++;
+            connection_options.add (writeas_connection);
 
             var ghost_connection = new Gtk.Button.with_label (_("  ghost"));
             ghost_connection.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/ghost.png"));
@@ -155,27 +98,24 @@ namespace ThiefMD.Widgets {
                         SecretSchemas.get_instance ().add_ghost_secret (data.endpoint, data.user, data.auth);
                         ThiefApp.get_instance ().connections.add (connection);
                         ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
-                        grid.insert_row (1);
-                        grid.attach (connection_button (connection, grid), 0, 1, 1, 1);
-                        grid.show_all ();
+                        display_options.add (connection_button (connection, display_options));
                     }
                 }
             });
-            grid.attach (ghost_connection, 0, g, 1, 1);
-            g++;
+            connection_options.add (ghost_connection);
 
             foreach (var c in ThiefApp.get_instance ().connections) {
-                grid.insert_row (1);
-                grid.attach (connection_button (c, grid), 0, 1, 1, 1);
+                display_options.add (connection_button (c, display_options));
             }
 
-            grid.show_all ();
-            connection_scroller.add (grid);
-            connection_scroller.show_all ();
-            return connection_scroller;
+            page.add (display_options);
+            page.add (connection_options);
+            page.set_icon_name ("preferences-desktop-online-accounts-symbolic");
+            page.set_title ("Connections");
+            return page;
         }
 
-        private Gtk.Button connection_button (ConnectionBase connection, Gtk.Grid grid) {
+        private Gtk.Button connection_button (ConnectionBase connection, Hdy.PreferencesGroup grid) {
             Gtk.Button button = new Gtk.Button.with_label ("  " + connection.export_name);
             string type = "";
             string alias = "";
@@ -230,27 +170,33 @@ namespace ThiefMD.Widgets {
             return button;
         }
 
-        private Grid display_grid () {
+        private Hdy.PreferencesPage display_grid () {
             var settings = AppSettings.get_default ();
-            Grid grid = new Grid ();
-            grid.margin = 0;
-            grid.row_spacing = 12;
-            grid.column_spacing = 12;
-            grid.orientation = Orientation.VERTICAL;
-            grid.hexpand = true;
+            Hdy.PreferencesPage page = new Hdy.PreferencesPage ();
+            page.set_title ("Display");
+            page.set_icon_name ("preferences-desktop-display-symbolic");
+
+            Hdy.PreferencesGroup display_options = new Hdy.PreferencesGroup ();
+            display_options.title = "Display Options";
+            display_options.description = "Make ThiefMD feel like home.";
 
             ThiefFontSelector font_selector = new ThiefFontSelector ();
+            display_options.add (font_selector);
 
-            var focus_label = new Gtk.Label (_("<b>Focus:</b>"));
-            var mini_grid = new Gtk.Grid ();
-            mini_grid.orientation = Gtk.Orientation.HORIZONTAL;
+            var focus = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+            var focus_label = new Gtk.Label (_("Focus"));
             focus_label.use_markup = true;
             focus_label.xalign = 0;
+            focus_label.margin = 12;
             var focus_selector = new Gtk.ComboBoxText ();
-            focus_selector.append_text ("None");
-            focus_selector.append_text ("Paragraph");
-            focus_selector.append_text ("Sentence");
-            focus_selector.append_text ("Word");
+            focus_selector.append_text (_("None"));
+            focus_selector.append_text (_("Paragraph"));
+            focus_selector.append_text (_("Sentence"));
+            focus_selector.append_text (_("Word"));
+            focus.add (focus_label);
+            focus.add (focus_selector);
+
+            display_options.add (focus);
 
             if (settings.focus_mode) {
                 focus_selector.set_active (settings.focus_type + 1);
@@ -274,88 +220,147 @@ namespace ThiefMD.Widgets {
                 }
             });
 
-            mini_grid.add (focus_label);
-            mini_grid.add (focus_selector);
+            var add_theme_button = new Gtk.Button.with_label (_("Add New Theme"));
+            add_theme_button.hexpand = true;
+            display_options.add (add_theme_button);
 
             ThemeSelector theme_selector = new ThemeSelector ();
-            grid.add (font_selector);
-            grid.add (mini_grid);
-            grid.add (theme_selector);
-            grid.show_all ();
+            display_options.add (theme_selector);
 
-            return grid;
+            add_theme_button.clicked.connect (() => {
+                File new_theme = Dialogs.display_open_dialog (".ultheme");
+                if (new_theme != null && new_theme.query_exists ()) {
+                    try {
+                        File destination = File.new_for_path (Path.build_filename (UserData.style_path, new_theme.get_basename ()));
+
+                        if (destination.query_exists ()) {
+                            // Possibly overwrite theme, but don't double draw widget
+                            new_theme.copy (destination, FileCopyFlags.OVERWRITE);
+                        }
+
+                        new_theme.copy (destination, FileCopyFlags.OVERWRITE);
+                        var new_styles = new Ultheme.Parser (destination);
+                        UI.add_user_theme (new_styles);
+
+                        ThemePreview dark_preview = new ThemePreview (new_styles, true);
+                        ThemePreview light_preview = new ThemePreview (new_styles, false);
+
+                        theme_selector.preview_items.add (dark_preview);
+                        theme_selector.preview_items.add (light_preview);
+                        theme_selector.preview_items.show_all ();
+                        theme_selector.show_all ();
+                    } catch (Error e) {
+                        warning ("Failing generating preview: %s\n", e.message);
+                    }
+                }
+            });
+
+            page.add (display_options);
+
+            return page;
         }
 
-        private Widget export_grid () {
+        private Hdy.PreferencesPage export_grid () {
+            Hdy.PreferencesPage page = new Hdy.PreferencesPage ();
+            page.set_title ("Export");
+            page.set_icon_name ("preferences-system-devices-symbolic");
             var settings = AppSettings.get_default ();
-            var export_scroller = new ScrolledWindow (null, null);
-            export_scroller.hexpand = true;
-            export_scroller.vexpand = true;
-            export_scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
 
-            Grid grid = new Grid ();
-            grid.margin = 0;
-            grid.row_spacing = 12;
-            grid.column_spacing = 12;
-            grid.orientation = Orientation.VERTICAL;
-            grid.hexpand = true;
+            Hdy.PreferencesGroup editor_options = new Hdy.PreferencesGroup ();
+            editor_options.title = "Compiling Options";
+            editor_options.description = "Adjust how Markdown files are compiled together.";
 
+            var epub_metadata = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var epub_metadata_file = new Switch ();
             epub_metadata_file.set_active (settings.export_include_metadata_file);
             epub_metadata_file.notify["active"].connect (() => {
                 settings.export_include_metadata_file = epub_metadata_file.get_active ();
             });
             epub_metadata_file.tooltip_text = _("First Markdown File includes Author Metadata");
+            epub_metadata_file.margin = 12;
             var epub_metadata_file_label = new Label(_("First Markdown file includes <a href='https://pandoc.org/MANUAL.html#epub-metadata'>Author metadata</a>"));
             epub_metadata_file_label.xalign = 0;
             epub_metadata_file_label.hexpand = true;
             epub_metadata_file_label.use_markup = true;
+            epub_metadata_file_label.margin = 12;
+            epub_metadata_file_label.set_line_wrap (true);
+            epub_metadata.add (epub_metadata_file);
+            epub_metadata.add (epub_metadata_file_label);
+            editor_options.add (epub_metadata);
 
+            var export_resolve_paths = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var export_resolve_paths_switch = new Switch ();
             export_resolve_paths_switch.set_active (settings.export_resolve_paths);
             export_resolve_paths_switch.notify["active"].connect (() => {
                 settings.export_resolve_paths = export_resolve_paths_switch.get_active ();
             });
             export_resolve_paths_switch.tooltip_text = _("Resolve full paths to resources");
+            export_resolve_paths_switch.margin = 12;
             var export_resolve_paths_label = new Label(_("Resolve full paths to resources on export"));
             export_resolve_paths_label.xalign = 0;
             export_resolve_paths_label.hexpand = true;
+            export_resolve_paths_label.margin = 12;
+            export_resolve_paths_label.set_line_wrap (true);
+            export_resolve_paths.add (export_resolve_paths_switch);
+            export_resolve_paths.add (export_resolve_paths_label);
+            editor_options.add (export_resolve_paths);
 
+            var export_include_yaml = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var export_include_yaml_title_switch = new Switch ();
             export_include_yaml_title_switch.set_active (settings.export_include_yaml_title);
             export_include_yaml_title_switch.notify["active"].connect (() => {
                 settings.export_include_yaml_title = export_include_yaml_title_switch.get_active ();
             });
             export_include_yaml_title_switch.tooltip_text = _("Include YAML title as Heading");
+            export_include_yaml_title_switch.margin = 12;
             var export_include_yaml_title_label = new Label(_("Include YAML title as H1 Heading"));
             export_include_yaml_title_label.xalign = 0;
             export_include_yaml_title_label.hexpand = true;
+            export_include_yaml_title_label.margin = 12;
+            export_include_yaml_title_label.set_line_wrap (true);
+            export_include_yaml.add (export_include_yaml_title_switch);
+            export_include_yaml.add (export_include_yaml_title_label);
+            editor_options.add (export_include_yaml);
 
-            var page_setup_label = new Gtk.Label (_("<b>Page Setup</b>"));
-            page_setup_label.hexpand = true;
-            page_setup_label.xalign = 0;
-            page_setup_label.use_markup = true;
+            Hdy.PreferencesGroup page_setup = new Hdy.PreferencesGroup ();
+            page_setup.title = "Page Setup";
+            page_setup.description = "Configure PDF export options.";
 
+            var pagebreak_folder = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var pagebreak_folder_switch = new Switch ();
             pagebreak_folder_switch.set_active (settings.export_break_folders);
             pagebreak_folder_switch.notify["active"].connect (() => {
                 settings.export_break_folders = pagebreak_folder_switch.get_active ();
             });
             pagebreak_folder_switch.tooltip_text = _("Page Break between Folders");
+            pagebreak_folder_switch.margin = 12;
             var pagebreak_folder_label = new Label(_("Insert a Page Break after each folder"));
             pagebreak_folder_label.xalign = 0;
             pagebreak_folder_label.hexpand = true;
+            pagebreak_folder_label.margin = 12;
+            pagebreak_folder_label.set_line_wrap (true);
+            pagebreak_folder.add (pagebreak_folder_switch);
+            pagebreak_folder.add (pagebreak_folder_label);
+            page_setup.add (pagebreak_folder);
 
+            var pagebreak_sheet = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var pagebreak_sheet_switch = new Switch ();
             pagebreak_sheet_switch.set_active (settings.export_break_sheets);
             pagebreak_sheet_switch.notify["active"].connect (() => {
                 settings.export_break_sheets = pagebreak_sheet_switch.get_active ();
             });
             pagebreak_sheet_switch.tooltip_text = _("Page Break between Sheets");
+            pagebreak_sheet_switch.margin = 12;
             var pagebreak_sheet_label = new Label(_("Insert a Page Break after each sheet"));
             pagebreak_sheet_label.xalign = 0;
             pagebreak_sheet_label.hexpand = true;
+            pagebreak_sheet_label.margin = 12;
+            pagebreak_sheet_label.set_line_wrap (true);
+            pagebreak_sheet.add (pagebreak_sheet_switch);
+            pagebreak_sheet.add (pagebreak_sheet_label);
+            page_setup.add (pagebreak_sheet);
 
+            var paper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var paper_size = new Gtk.ComboBoxText ();
             paper_size.hexpand = true;
             for (int i = 0; i < ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.length; i++) {
@@ -372,7 +377,10 @@ namespace ThiefMD.Widgets {
                     settings.export_paper_size = ThiefProperties.PAPER_SIZES_GTK_NAME[option];
                 }
             });
+            paper.add (paper_size);
+            page_setup.add (paper);
 
+            var side_margin = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var side_margin_entry = new Gtk.SpinButton.with_range (0.0, 3.5, 0.05);
             side_margin_entry.set_value (settings.export_side_margins);
             side_margin_entry.value_changed.connect (() => {
@@ -386,7 +394,13 @@ namespace ThiefMD.Widgets {
             var side_margin_label = new Label(_("Side margins in PDF in inches"));
             side_margin_label.xalign = 0;
             side_margin_label.hexpand = true;
+            side_margin_label.margin = 12;
+            side_margin_label.set_line_wrap (true);
+            side_margin.add (side_margin_entry);
+            side_margin.add (side_margin_label);
+            page_setup.add (side_margin);
 
+            var top_bottom_margin = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var top_bottom_margin_entry = new Gtk.SpinButton.with_range (0.0, 3.5, 0.05);
             top_bottom_margin_entry.set_value (settings.export_top_bottom_margins);
             top_bottom_margin_entry.value_changed.connect (() => {
@@ -400,36 +414,32 @@ namespace ThiefMD.Widgets {
             var top_bottom_margin_label = new Label(_("Top & Bottom margins in PDF in inches"));
             top_bottom_margin_label.xalign = 0;
             top_bottom_margin_label.hexpand = true;
+            top_bottom_margin_label.margin = 12;
+            top_bottom_margin_label.set_line_wrap (true);
+            top_bottom_margin.add (top_bottom_margin_entry);
+            top_bottom_margin.add (top_bottom_margin_label);
+            page_setup.add (top_bottom_margin);
 
-            Grid margin_grid = new Grid ();
-            margin_grid.margin = 0;
-            margin_grid.row_spacing = 12;
-            margin_grid.column_spacing = 12;
-            margin_grid.orientation = Orientation.VERTICAL;
-            margin_grid.hexpand = true;
-
-            margin_grid.attach (side_margin_entry, 0, 0, 1, 1);
-            margin_grid.attach (side_margin_label, 1, 0, 2, 1);
-            margin_grid.attach (top_bottom_margin_entry, 0, 1, 1, 1);
-            margin_grid.attach (top_bottom_margin_label, 1, 1, 2, 1);
-
+            Hdy.PreferencesGroup pdf_options = new Hdy.PreferencesGroup ();
+            pdf_options.title = "PDF CSS";
+            pdf_options.description = "Choose CSS Style for PDF Export.";
             int cur_w = this.get_allocated_width ();
-            var print_css_label = new Gtk.Label (_("<b>PDF Print CSS</b>"));
-            print_css_label.hexpand = true;
-            print_css_label.xalign = 0;
-            print_css_label.use_markup = true;
+
             var print_css_selector = new CssSelector ("print");
             print_css_selector.set_size_request (cur_w, (int)(1.2 * Constants.CSS_PREVIEW_HEIGHT + 5));
+            pdf_options.add (print_css_selector);
 
-            var css_label = new Gtk.Label (_("<b>Preview and ePub CSS</b>"));
-            css_label.hexpand = true;
-            css_label.xalign = 0;
-            css_label.use_markup = true;
+            Hdy.PreferencesGroup epub_setup = new Hdy.PreferencesGroup ();
+            epub_setup.title = "ePub & HTML CSS";
+            epub_setup.description = "Choose CSS Style to use for ePub and HTML Export.";
+
             var css_selector = new CssSelector ("preview");
             css_selector.set_size_request (cur_w, (int)(1.2 * Constants.CSS_PREVIEW_HEIGHT + 5));
+            epub_setup.add (css_selector);
 
             var add_css_button = new Gtk.Button.with_label (_("Add Export Style"));
             add_css_button.hexpand = true;
+            epub_setup.add (add_css_button);
 
             add_css_button.clicked.connect (() => {
                 File new_css_pkg = Dialogs.display_open_dialog (".*");
@@ -440,99 +450,120 @@ namespace ThiefMD.Widgets {
                 }
             });
 
-            int g = 1;
-
-            grid.attach (epub_metadata_file, 1, g, 1, 1);
-            grid.attach (epub_metadata_file_label, 2, g, 1, 1);
-            g++;
-
-            grid.attach (export_resolve_paths_switch, 1, g, 1, 1);
-            grid.attach (export_resolve_paths_label, 2, g, 1, 1);
-            g++;
-
-            grid.attach (export_include_yaml_title_switch, 1, g, 1, 1);
-            grid.attach (export_include_yaml_title_label, 2, g, 1, 1);
-            g++;
-
-            grid.attach (page_setup_label, 1, g, 2, 1);
-            g++;
-            grid.attach (pagebreak_folder_switch, 1, g, 1, 1);
-            grid.attach (pagebreak_folder_label, 2, g, 2, 1);
-            g++;
-            grid.attach (pagebreak_sheet_switch, 1, g, 1, 1);
-            grid.attach (pagebreak_sheet_label, 2, g, 2, 1);
-            g++;
-            grid.attach (paper_size, 1, g, 2, 1);
-            g++;
-
-            grid.attach (margin_grid, 1, g, 3, 2);
-            g += 2;
-
-            grid.attach (print_css_label, 1, g, 3, 1);
-            g++;
-            grid.attach (print_css_selector, 1, g, 3, 2);
-            g += 2;
-
-            grid.attach (css_label, 1, g, 3, 1);
-            g++;
-            grid.attach (css_selector, 1, g, 3, 2);
-            g += 2;
-
-            grid.attach (add_css_button, 1, g, 3, 1);
-            g++;
-
-            grid.show_all ();
-
-            export_scroller.add (grid);
-            return export_scroller;
+            page.add (editor_options);
+            page.add (page_setup);
+            page.add (pdf_options);
+            page.add (epub_setup);
+            return page;
         }
 
-        private Grid editor_grid () {
+        private Hdy.PreferencesPage editor_grid () {
             var settings = AppSettings.get_default ();
-            Grid grid = new Grid ();
-            grid.margin = 0;
-            grid.row_spacing = 12;
-            grid.column_spacing = 12;
-            grid.orientation = Orientation.VERTICAL;
-            grid.hexpand = true;
+            Hdy.PreferencesPage page = new Hdy.PreferencesPage ();
+            page.set_title ("Editor");
+            page.set_icon_name ("thiefmd-symbolic");
 
+            Hdy.PreferencesGroup editor_options = new Hdy.PreferencesGroup ();
+            editor_options.title = "Editor Settings";
+            editor_options.description = "Modify the ThiefMD environment.";
+
+            Gtk.Box spellcheck = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var spellcheck_switch = new Switch ();
             spellcheck_switch.set_active (settings.spellcheck);
             spellcheck_switch.notify["active"].connect (() => {
                 settings.spellcheck = spellcheck_switch.get_active ();
             });
-            spellcheck_switch.tooltip_text = _("Toggle spellcheck");
+            spellcheck_switch.tooltip_text = _("Enable spellcheck");
+            spellcheck_switch.margin = 12;
             var spellcheck_label = new Label(_("Check document spelling"));
             spellcheck_label.xalign = 0;
+            spellcheck_label.margin = 12;
+            spellcheck_label.set_line_wrap (true);
+            spellcheck.add (spellcheck_switch);
+            spellcheck.add (spellcheck_label);
+            editor_options.add (spellcheck);
 
+            Gtk.Box writegood = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var writegood_switch = new Switch ();
             writegood_switch.set_active (settings.writegood);
             writegood_switch.notify["active"].connect (() => {
                 settings.writegood = writegood_switch.get_active ();
             });
-            writegood_switch.tooltip_text = _("Toggle Write-Good");
+            writegood_switch.tooltip_text = _("Enable Write-Good");
+            writegood_switch.hexpand = false;
+            writegood_switch.vexpand = false;
+            writegood_switch.margin = 12;
             var writegood_label = new Label(_("Enable Write-Good: recommendations for sentence structure"));
             writegood_label.xalign = 0;
+            writegood_label.margin = 12;
+            writegood_label.set_line_wrap (true);
+            writegood.add (writegood_switch);
+            writegood.add (writegood_label);
+            editor_options.add (writegood);
 
+            var typewriter = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var typewriter_switch = new Switch ();
             typewriter_switch.set_active (settings.typewriter_scrolling);
             typewriter_switch.notify["active"].connect (() => {
                 settings.typewriter_scrolling = typewriter_switch.get_active ();
             });
+            typewriter_switch.margin = 12;
             typewriter_switch.tooltip_text = _("Toggle typewriter scrolling");
             var typewriter_label = new Label(_("Enable typewriter focus mode"));
             typewriter_label.xalign = 0;
+            typewriter_label.margin = 12;
+            typewriter_label.set_line_wrap (true);
+            typewriter.add (typewriter_switch);
+            typewriter.add (typewriter_label);
+            editor_options.add (typewriter);
 
+            var ui_writing_statistics = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+            var ui_writing_statistics_switch = new Switch ();
+            ui_writing_statistics_switch.set_active (settings.show_writing_statistics);
+            ui_writing_statistics_switch.notify["active"].connect (() => {
+                settings.show_writing_statistics = ui_writing_statistics_switch.get_active ();
+                if (settings.show_writing_statistics) {
+                    ThiefApp.get_instance ().stats_bar.show_statistics ();
+                } else {
+                    ThiefApp.get_instance ().stats_bar.hide_statistics ();
+                }
+            });
+            ui_writing_statistics_switch.margin = 12;
+            ui_writing_statistics_switch.tooltip_text = _("Toggle writing statistics");
+            var ui_writing_statistics_label = new Label(_("Show writing statistics"));
+            ui_writing_statistics_label.xalign = 0;
+            ui_writing_statistics_label.margin = 12;
+            ui_writing_statistics_label.set_line_wrap (true);
+            ui_writing_statistics.add (ui_writing_statistics_switch);
+            ui_writing_statistics.add (ui_writing_statistics_label);
+            editor_options.add (ui_writing_statistics);
+
+            //
+            // More UI-ish options
+            //
+
+            Hdy.PreferencesGroup thiefmd_options = new Hdy.PreferencesGroup ();
+            thiefmd_options.title = "ThiefMD Settings";
+            thiefmd_options.description = "Modify the ThiefMD appearance.";
+
+            var ui_colorscheme = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var ui_colorscheme_switch = new Switch ();
             ui_colorscheme_switch.set_active (settings.ui_editor_theme);
             ui_colorscheme_switch.notify["active"].connect (() => {
                 settings.ui_editor_theme = ui_colorscheme_switch.get_active ();
                 UI.load_css_scheme ();
             });
+            ui_colorscheme_switch.margin = 12;
             ui_colorscheme_switch.tooltip_text = _("Toggle interface theming");
             var ui_colorscheme_label = new Label(_("Apply theme to interface"));
             ui_colorscheme_label.xalign = 0;
+            ui_colorscheme_label.margin = 12;
+            ui_colorscheme_label.set_line_wrap (true);
+            ui_colorscheme.add (ui_colorscheme_switch);
+            ui_colorscheme.add (ui_colorscheme_label);
+            thiefmd_options.add (ui_colorscheme);
 
+            var headerbar_opt = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var headerbar_switch = new Switch ();
             headerbar_switch.set_active (settings.hide_toolbar);
             headerbar_switch.notify["active"].connect (() => {
@@ -544,85 +575,50 @@ namespace ThiefMD.Widgets {
                 }
             });
             headerbar_switch.tooltip_text = _("Toggle auto-hide headerbar");
+            headerbar_switch.margin = 12;
             var headerbar_label = new Label(_("Automatically hide headerbar"));
             headerbar_label.xalign = 0;
+            headerbar_label.margin = 12;
+            headerbar_label.set_line_wrap (true);
+            headerbar_opt.add (headerbar_switch);
+            headerbar_opt.add (headerbar_label);
+            thiefmd_options.add (headerbar_opt);
 
-            var ui_writing_statistics_switch = new Switch ();
-            ui_writing_statistics_switch.set_active (settings.show_writing_statistics);
-            ui_writing_statistics_switch.notify["active"].connect (() => {
-                settings.show_writing_statistics = ui_writing_statistics_switch.get_active ();
-                if (settings.show_writing_statistics) {
-                    ThiefApp.get_instance ().stats_bar.show_statistics ();
-                } else {
-                    ThiefApp.get_instance ().stats_bar.hide_statistics ();
-                }
-            });
-            ui_writing_statistics_switch.tooltip_text = _("Toggle writing statistics");
-            var ui_writing_statistics_label = new Label(_("Show writing statistics"));
-            ui_writing_statistics_label.xalign = 0;
-
+            var brandless = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var brandless_switch = new Switch ();
             brandless_switch.set_active (settings.brandless);
             brandless_switch.notify["active"].connect (() => {
                 settings.brandless = brandless_switch.get_active ();
             });
-            brandless_switch.tooltip_text = _("Hide meaningless interface elements");
+            brandless_switch.tooltip_text = _("Hide title");
+            brandless_switch.margin = 12;
             var brandless_label = new Label(_("Remove ThiefMD branding"));
             brandless_label.xalign = 0;
+            brandless_label.margin = 12;
+            brandless_label.set_line_wrap (true);
+            brandless.add (brandless_switch);
+            brandless.add (brandless_label);
+            thiefmd_options.add (brandless);
 
+            var preserve_library = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var perserve_library_switch = new Switch ();
             perserve_library_switch.set_active (settings.save_library_order);
             perserve_library_switch.notify["active"].connect (() => {
                 settings.save_library_order = perserve_library_switch.get_active ();
             });
             perserve_library_switch.tooltip_text = _("Toggle library order");
+            perserve_library_switch.margin = 12;
             var perserve_library_label = new Label(_("Keep library order"));
             perserve_library_label.xalign = 0;
+            perserve_library_label.margin = 12;
+            perserve_library_label.set_line_wrap (true);
+            preserve_library.add (perserve_library_switch);
+            preserve_library.add (perserve_library_label);
+            thiefmd_options.add (preserve_library);
 
-            int g_row = 0;
-            grid.attach (spellcheck_switch, 1, g_row, 1, 1);
-            grid.attach (spellcheck_label, 2, g_row, 2, 1);
-            g_row++;
-
-            grid.attach (writegood_switch, 1, g_row, 1, 1);
-            grid.attach (writegood_label, 2, g_row, 2, 1);
-            g_row++;
-
-            grid.attach (typewriter_switch, 1, g_row, 1, 1);
-            grid.attach (typewriter_label, 2, g_row, 2, 1);
-            g_row++;
-
-            grid.attach (headerbar_switch, 1, g_row, 1, 1);
-            grid.attach (headerbar_label, 2, g_row, 2, 1);
-            g_row++;
-
-            grid.attach (ui_writing_statistics_switch, 1, g_row, 1, 1);
-            grid.attach (ui_writing_statistics_label, 2, g_row, 2, 1);
-            g_row++;
-
-            grid.attach (ui_colorscheme_switch, 1, g_row, 1, 1);
-            grid.attach (ui_colorscheme_label, 2, g_row, 2, 1);
-            g_row++;
-
-            grid.attach (brandless_switch, 1, g_row, 1, 1);
-            grid.attach (brandless_label, 2, g_row, 2, 1);
-            g_row++;
-
-            grid.attach (perserve_library_switch, 1, g_row, 1, 1);
-            grid.attach (perserve_library_label, 2, g_row, 2, 1);
-            g_row++;
-
-            grid.show_all ();
-
-            return grid;
-        }
-
-        public void add_headerbar () {
-            bar = new Gtk.HeaderBar ();
-            bar.set_show_close_button (true);
-            bar.set_title ("");
-
-            this.set_titlebar(bar);
+            page.add (editor_options);
+            page.add (thiefmd_options);
+            return page;
         }
     }
 }

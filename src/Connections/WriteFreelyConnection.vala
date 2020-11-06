@@ -121,8 +121,8 @@ namespace ThiefMD.Connections {
             grid.show_all ();
 
             var dialog = new Gtk.Dialog.with_buttons (
-                            "New Write.as Connection",
-                            ThiefApp.get_instance ().main_window,
+                            "New WriteFreely Connection",
+                            ThiefApp.get_instance (),
                             Gtk.DialogFlags.MODAL,
                             _("_Add Account"),
                             Gtk.ResponseType.ACCEPT,

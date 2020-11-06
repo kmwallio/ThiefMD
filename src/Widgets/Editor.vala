@@ -212,7 +212,7 @@ namespace ThiefMD.Widgets {
             if (!have_match) {
                 var dialog = new Gtk.Dialog.with_buttons (
                     "Contents changed on disk",
-                    ThiefApp.get_instance ().main_window,
+                    ThiefApp.get_instance (),
                     Gtk.DialogFlags.MODAL,
                     _("_Load from disk"),
                     Gtk.ResponseType.ACCEPT,
@@ -592,7 +592,7 @@ namespace ThiefMD.Widgets {
             // Jamming this here for now to prevent
             // reinit of spellcheck on resize
             int w, h;
-            ThiefApp.get_instance ().main_window.get_size (out w, out h);
+            ThiefApp.get_instance ().get_size (out w, out h);
             settings.window_width = w;
             settings.window_height = h;
 
@@ -818,7 +818,7 @@ namespace ThiefMD.Widgets {
             }
 
             int w, h, m, p;
-            ThiefApp.get_instance ().main_window.get_size (out w, out h);
+            ThiefApp.get_instance ().get_size (out w, out h);
 
             w = w - ThiefApp.get_instance ().pane_position;
             last_height = h;
@@ -839,7 +839,7 @@ namespace ThiefMD.Widgets {
             }
 
             int w, h, m, p;
-            ThiefApp.get_instance ().main_window.get_size (out w, out h);
+            ThiefApp.get_instance ().get_size (out w, out h);
 
             w = w - ThiefApp.get_instance ().pane_position;
             last_height = h;
@@ -848,18 +848,25 @@ namespace ThiefMD.Widgets {
             // If ThiefMD is Full Screen, add additional padding
             p = (settings.fullscreen) ? 5 : 0;
 
-            var margins = settings.margins;
-            switch (margins) {
-                case Constants.NARROW_MARGIN:
-                    m = (int)(w * ((Constants.NARROW_MARGIN + p) / 100.0));
-                    break;
-                case Constants.WIDE_MARGIN:
-                    m = (int)(w * ((Constants.WIDE_MARGIN + p) / 100.0));
-                    break;
-                default:
-                case Constants.MEDIUM_MARGIN:
-                    m = (int)(w * ((Constants.MEDIUM_MARGIN + p) / 100.0));
-                    break;
+            // Narrow margins on smaller devices
+            if (w < 600) {
+                m = (int)(w * ((Constants.NARROW_MARGIN + p) / 100.0));
+            } else if (w < 800) {
+                m = (int)(w * ((Constants.MEDIUM_MARGIN + p) / 100.0));
+            } else {
+                var margins = settings.margins;
+                switch (margins) {
+                    case Constants.NARROW_MARGIN:
+                        m = (int)(w * ((Constants.NARROW_MARGIN + p) / 100.0));
+                        break;
+                    case Constants.WIDE_MARGIN:
+                        m = (int)(w * ((Constants.WIDE_MARGIN + p) / 100.0));
+                        break;
+                    default:
+                    case Constants.MEDIUM_MARGIN:
+                        m = (int)(w * ((Constants.MEDIUM_MARGIN + p) / 100.0));
+                        break;
+                }
             }
 
             // Update margins

@@ -27,8 +27,10 @@ using Gtk;
 
 namespace ThiefMD.Widgets {
     public class ThiefPane : Paned {
-        public ThiefPane (Orientation orientation) {
+        private ThiefApp instance;
+        public ThiefPane (Orientation orientation, ThiefApp thiefapp) {
             set_orientation (orientation);
+            instance = thiefapp;
             add_events (Gdk.EventMask.POINTER_MOTION_MASK);
             still_in_motion = new TimedMutex (Constants.MOUSE_IN_MOTION_TIME);
             clear_bar = new TimedMutex (Constants.MOUSE_MOTION_CHECK_TIME);
@@ -60,8 +62,8 @@ namespace ThiefMD.Widgets {
             }
             debug ("Distance: %f", d);
 
-            if (Headerbar.get_instance ().hidden){
-                Headerbar.get_instance ().show_headerbar ();
+            if (instance.toolbar.hidden){
+                instance.toolbar.show_headerbar ();
                 if (clear_bar.can_do_action ()) {
                     Timeout.add (Constants.MOUSE_MOTION_CHECK_TIME + 100, hide_the_bar);
                 }
@@ -74,7 +76,7 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             // Check if mouse is still in motion
             if (still_in_motion.can_do_action () && settings.hide_toolbar && !settings.menu_active) {
-                Headerbar.get_instance ().hide_headerbar ();
+                instance.toolbar.hide_headerbar ();
                 mouse_x = last_x;
                 mouse_y = last_y;
                 return false;

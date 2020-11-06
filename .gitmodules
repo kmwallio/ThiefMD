@@ -13,3 +13,7 @@
 [submodule "src/ghost"]
 	path = src/ghost
 	url = https://github.com/ThiefMD/ghost-vala.git
+[submodule "data/language-specs"]
+	path = data/language-specs
+	url = https://github.com/ThiefMD/custom-gtksourceview-languages.git
+	branch = main

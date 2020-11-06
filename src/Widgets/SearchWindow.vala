@@ -119,8 +119,8 @@ namespace ThiefMD.Widgets {
         }
     }
 
-    public class SearchWindow : Gtk.Window {
-        Gtk.HeaderBar headerbar;
+    public class SearchWindow : Hdy.Window {
+        Hdy.HeaderBar headerbar;
         public Gee.ConcurrentList<SearchResult> results;
         Gee.ConcurrentList<SearchDisplay> displayed;
         Gtk.Entry search;
@@ -150,7 +150,7 @@ namespace ThiefMD.Widgets {
 
         private void build_ui () {
             var settings = AppSettings.get_default ();
-            headerbar = new Gtk.HeaderBar ();
+            headerbar = new Hdy.HeaderBar ();
             if (scoped_folder == null || scoped_folder.chomp ().chug () == "") {
                 headerbar.set_title (_("Library Search"));
             } else {
@@ -185,16 +185,18 @@ namespace ThiefMD.Widgets {
             search_results.hexpand = true;
             scroller.add (search_results);
 
-            add (scroller);
+            Gtk.Box vbox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+            vbox.add (headerbar);
+            vbox.add (scroller);
+            add(vbox);
 
             headerbar.pack_start (search);
             headerbar.set_show_close_button (true);
-            set_titlebar (headerbar);
-            transient_for = ThiefApp.get_instance ().main_window;
+            transient_for = ThiefApp.get_instance ();
             destroy_with_parent = true;
 
             int w, h;
-            ThiefApp.get_instance ().main_window.get_size (out w, out h);
+            ThiefApp.get_instance ().get_size (out w, out h);
 
             set_default_size(w / 3, h - 50);
 

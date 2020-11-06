@@ -105,7 +105,7 @@ namespace ThiefMD.Connections {
 
             var dialog = new Gtk.Dialog.with_buttons (
                             "New ghost Connection",
-                            ThiefApp.get_instance ().main_window,
+                            ThiefApp.get_instance (),
                             Gtk.DialogFlags.MODAL,
                             _("_Add Account"),
                             Gtk.ResponseType.ACCEPT,

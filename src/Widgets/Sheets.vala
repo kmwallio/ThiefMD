@@ -544,7 +544,7 @@ namespace ThiefMD.Widgets {
                 Json.Node root = Json.gobject_serialize (cereal);
                 Json.Generator generate = new Json.Generator ();
                 generate.set_root (root);
-                generate.set_pretty (false);
+                generate.set_pretty (true);
                 if (metadata_file.query_exists ()) {
                     metadata_file.delete ();
                 }

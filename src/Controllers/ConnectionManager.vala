@@ -49,8 +49,8 @@ namespace ThiefMD.Controllers {
 
         public SecretSchemas () {
             thief_secret = new Secret.Schema (
-                "com.kmwallio.thiefmd.secret", Secret.SchemaFlags.NONE,
-                "type", Secret.SchemaAttributeType.STRING,
+                "app.thiefmd.connections", Secret.SchemaFlags.NONE,
+                "connectiontype", Secret.SchemaAttributeType.STRING,
                 "endpoint", Secret.SchemaAttributeType.STRING,
                 "alias", Secret.SchemaAttributeType.STRING);
 
@@ -102,39 +102,7 @@ namespace ThiefMD.Controllers {
                     }
 
                     warning ("Found secret: %s : %s", sec.connection_type, sec.user);
-                    var attributes = new GLib.HashTable<string,string> (str_hash, str_equal);
-                    attributes["type"] = sec.connection_type;
-                    attributes["endpoint"] = sec.endpoint;
-                    attributes["alias"] = sec.user;
-
-                    Secret.password_lookupv.begin (thief_secret, attributes, null, (obj, async_res) => {
-                        try {
-                            string? the_secret = Secret.password_lookup.end (async_res);
-                            if (the_secret != null) {
-                                warning ("Loaded secret: %s : %s", sec.connection_type, sec.user);
-                                if (sec.connection_type == WriteFreelyConnection.CONNECTION_TYPE) {
-                                    WriteFreelyConnection writeas_connection = new WriteFreelyConnection (sec.user, the_secret, sec.endpoint);
-                                    if (writeas_connection.connection_valid ()) {
-                                        ThiefApp.get_instance ().exporters.register (writeas_connection.export_name, writeas_connection.exporter);
-                                        ThiefApp.get_instance ().connections.add (writeas_connection);
-                                    }
-                                } else if (sec.connection_type == GhostConnection.CONNECTION_TYPE) {
-                                    GhostConnection ghost_connection = new GhostConnection (sec.user, the_secret, sec.endpoint);
-                                    if (ghost_connection.connection_valid ()) {
-                                        ThiefApp.get_instance ().exporters.register (ghost_connection.export_name, ghost_connection.exporter);
-                                        ThiefApp.get_instance ().connections.add (ghost_connection);
-                                    }
-                                }
-
-                                if (!have_secret (sec.connection_type, sec.user, sec.endpoint)) {
-                                    stored_secrets.secrets.add (sec);
-                                }
-                            }
-                            Secret.password_wipe (the_secret);
-                        } catch (Error e) {
-                            warning ("Error loading from keyring: %s", e.message);
-                        }
-                    });
+                    load_secret (sec.user, sec.endpoint, sec.connection_type);
                 }
             } catch (Error e) {
                 warning ("Could not load connection file: %s", e.message);
@@ -144,13 +112,54 @@ namespace ThiefMD.Controllers {
             return true;
         }
 
-        public void save_secret (string type, string alias, string url, string secret) {
+        private void load_secret (string alias, string endpoint, string type) {
             var attributes = new GLib.HashTable<string,string> (str_hash, str_equal);
-            attributes["type"] = type;
+            attributes["connectiontype"] = type;
+            attributes["endpoint"] = endpoint;
+            attributes["alias"] = alias;
+
+            Secret.password_lookupv.begin (thief_secret, attributes, null, (obj, async_res) => {
+                try {
+                    string? the_secret = Secret.password_lookup.end (async_res);
+                    if (the_secret != null) {
+                        warning ("Loaded secret: %s : %s", attributes["connectiontype"], attributes["alias"]);
+                        if (attributes["connectiontype"] == WriteFreelyConnection.CONNECTION_TYPE) {
+                            WriteFreelyConnection writeas_connection = new WriteFreelyConnection (attributes["alias"], the_secret, attributes["endpoint"]);
+                            if (writeas_connection.connection_valid ()) {
+                                ThiefApp.get_instance ().exporters.register (writeas_connection.export_name, writeas_connection.exporter);
+                                ThiefApp.get_instance ().connections.add (writeas_connection);
+                            }
+                        } else if (attributes["connectiontype"] == GhostConnection.CONNECTION_TYPE) {
+                            GhostConnection ghost_connection = new GhostConnection (attributes["alias"], the_secret, attributes["endpoint"]);
+                            if (ghost_connection.connection_valid ()) {
+                                ThiefApp.get_instance ().exporters.register (ghost_connection.export_name, ghost_connection.exporter);
+                                ThiefApp.get_instance ().connections.add (ghost_connection);
+                            }
+                        }
+
+                        if (!have_secret (attributes["connectiontype"], attributes["alias"], attributes["endpoint"])) {
+                            SecretAttr new_sec = new SecretAttr ();
+                            new_sec.connection_type = attributes["connectiontype"];
+                            new_sec.user = attributes["alias"];
+                            new_sec.endpoint = attributes["endpoint"];
+                            stored_secrets.secrets.add (new_sec);
+                            serialize_secrets ();
+                        }
+                    }
+                    Secret.password_wipe (the_secret);
+                } catch (Error e) {
+                    warning ("Error loading from keyring: %s", e.message);
+                }
+            });
+        }
+
+        public void save_secret (string connection_type, string alias, string url, string secret) {
+            var attributes = new GLib.HashTable<string,string> (str_hash, str_equal);
+            attributes["connectiontype"] = connection_type;
             attributes["endpoint"] = url;
             attributes["alias"] = alias;
 
-            warning ("Saving secret %s : %s", type, alias);
+            warning ("Saving secret %s : %s", connection_type, alias);
             Secret.password_storev.begin (
                 thief_secret,
                 attributes,
@@ -166,9 +175,9 @@ namespace ThiefMD.Controllers {
                     warning ("Error with libsecret: %s", e.message);
                 }
                 if (res) {
-                    warning ("Saved secret %s : %s", type, alias);
+                    warning ("Saved secret %s : %s", connection_type, alias);
                     SecretAttr new_sec = new SecretAttr ();
-                    new_sec.connection_type = type;
+                    new_sec.connection_type = connection_type;
                     new_sec.user = alias;
                     new_sec.endpoint = url;
                     if (!have_secret (new_sec.connection_type, new_sec.user, new_sec.endpoint)) {
@@ -176,7 +185,7 @@ namespace ThiefMD.Controllers {
                     }
                     serialize_secrets ();
                 } else {
-                    warning ("Could not save secret %s : %s", type, alias);
+                    warning ("Could not save secret %s : %s", connection_type, alias);
                 }
             });
         }
@@ -203,7 +212,7 @@ namespace ThiefMD.Controllers {
 
             if (rem_sec != null) {
                 var attributes = new GLib.HashTable<string,string> (str_hash, str_equal);
-                attributes["type"] = rem_sec.connection_type;
+                attributes["connectiontype"] = rem_sec.connection_type;
                 attributes["endpoint"] = rem_sec.endpoint;
                 attributes["alias"] = rem_sec.user;
 
@@ -229,7 +238,7 @@ namespace ThiefMD.Controllers {
                 builder.set_member_name ("secrets");
                 builder.begin_array ();
                 foreach (var sec in stored_secrets.secrets) {
-                    warning ("Adding secrent: %s", sec.user);
+                    warning ("Adding secret: %s", sec.user);
                     builder.begin_object ();
                     builder.set_member_name ("connection_type");
                     builder.add_string_value (sec.connection_type);
@@ -262,12 +271,12 @@ namespace ThiefMD.Controllers {
         }
 
         public bool add_writefreely_secret (string url, string alias, string password) {
-            save_secret (WriteFreelyConnection.CONNECTION_TYPE, alias, url, password);
+            SecretSchemas.get_instance ().save_secret (WriteFreelyConnection.CONNECTION_TYPE, alias, url, password);
             return true;
         }
 
         public bool add_ghost_secret (string url, string alias, string password) {
-            save_secret (GhostConnection.CONNECTION_TYPE, alias, url, password);
+            SecretSchemas.get_instance ().save_secret (GhostConnection.CONNECTION_TYPE, alias, url, password);
             return true;
         }
     }

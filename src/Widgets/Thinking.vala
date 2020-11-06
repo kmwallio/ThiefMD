@@ -30,7 +30,7 @@ namespace ThiefMD.Widgets {
         private Mutex running;
 
         public Thinking (string set_title, ThinkingCallback callback) {
-            set_transient_for (ThiefApp.get_instance ().main_window);
+            set_transient_for (ThiefApp.get_instance ());
             resizable = false;
             deletable = false;
             modal = true;

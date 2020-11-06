@@ -90,13 +90,13 @@ namespace ThiefMD {
         public const double SIZE_1_REM_IN_PT = 12;
 
         // Arbitrary strings
-        public const string FIRST_USE = """# Click on a sheet to get started
+        public const string FIRST_USE = _("""# Click on a sheet to get started
 
 First time here?  Drag a folder into the library, or click on the Folder icon to select a folder to add.
 
 ## Thief Tip:
 
-%s""";
+%s""");
     }
 
     public class AppSettings : Object {

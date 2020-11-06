@@ -47,6 +47,18 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.1.3" date="2020-11-07" urgency="low">
+      <description>
+        <p>Oh Hdy, Hdy, Hdy, Hdy, Hdy, Hdy, Ho... ThiefMD migrates to libhandy and adds better small display support.</p>
+        <ul>
+          <li>Initial steps towards supporting mobile</li>
+          <li>Fixes some graphical issues when hiding toolbar</li>
+          <li>Toolbar now available in fullscreen, hide with `Ctrl+Shift+H`</li>
+          <li>Adding click actions to support mobile devices</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.3-ohsohandy</url>
+    </release>
     <release version="0.1.2" date="2020-10-23" urgency="low">
       <description>
         <p>Blog publishing support? Interface improvements? We're working on making ThiefMD more approachable and easier to use.</p>

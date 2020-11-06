@@ -66,7 +66,7 @@ namespace ThiefMD.Widgets {
             _lib_store = new TreeStore (2, typeof (string), typeof (LibPair));
             parse_library ();
             set_model (_lib_store);
-            insert_column_with_attributes (-1, "Library", new CellRendererText (), "text", 0, null);
+            insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
             get_selection ().changed.connect (on_selection);
             folder_popup = new NewFolder ();
             _droppable = new PreventDelayedDrop ();
@@ -796,7 +796,7 @@ namespace ThiefMD.Widgets {
                             debug ("Prompting for action");
                             Dialog prompt = new Dialog.with_buttons (
                                 "Move into Library",
-                                ThiefApp.get_instance ().main_window,
+                                ThiefApp.get_instance (),
                                 DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                 _("Copy"),
                                 Gtk.ResponseType.NO,
