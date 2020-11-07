@@ -34,13 +34,21 @@ namespace ThiefMD {
         public Controllers.Exporters exporters;
         public Gee.ConcurrentList<Connections.ConnectionBase> connections;
         public bool ready = false;
+        public bool am_mobile = false;
         private Gtk.Application app_parent;
 
         private Hdy.Leaflet library_leaf;
+        private string start_dir;
+        private Gtk.Box desktop_box;
+        private Gtk.Box mobile_box;
+        public Gtk.Stack mobile_stack;
+        private Sheets start_sheet;
+        private Mutex rebuild_ui;
 
         public ThiefApp (Gtk.Application app) {
             Object (application: app);
             _instance = this;
+            rebuild_ui = Mutex ();
             build_ui ();
         }
 
@@ -80,10 +88,90 @@ namespace ThiefMD {
             library.parse_library ();
         }
 
-        protected void build_ui () {
+        private void build_desktop () {
+            var settings = AppSettings.get_default ();
+            am_mobile = false;
+
+            if (desktop_box != null) {
+                return;
+            }
+
+            if (mobile_box != null) {
+                debug ("Deconstructing mobile UI");
+                mobile_box.remove (toolbar);
+                mobile_box.remove (mobile_stack);
+                mobile_box.remove (stats_bar);
+                mobile_stack.remove (library_pane);
+                mobile_stack.remove (SheetManager.get_view ());
+                remove (mobile_box);
+                mobile_box = null;
+            }
+
+
+            debug ("Building desktop UI");
+
+            sheets_pane.add1 (library_pane);
+            sheets_pane.add2 (SheetManager.get_view ());
+            sheets_pane.set_position (settings.view_library_width + settings.view_sheets_width);
+
+            desktop_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            desktop_box.add (toolbar);
+            desktop_box.add (sheets_pane);
+            desktop_box.add (stats_bar);
+
+            hide_titlebar_when_maximized = true;
+            is_fullscreen = settings.fullscreen;
+
+            set_default_size (settings.window_width, settings.window_height);
+            add (desktop_box);
+            show_all ();
+        }
+
+        private void build_mobile () {
+            am_mobile = true;
             var settings = AppSettings.get_default ();
 
-            string start_dir = "";
+            if (mobile_box != null) {
+                return;
+            }
+
+            if (desktop_box != null) {
+                settings.view_state = 0;
+                UI.show_view ();
+
+                debug ("Deconstructing desktop UI");
+                sheets_pane.remove (library_pane);
+                sheets_pane.remove (SheetManager.get_view ());
+
+                desktop_box.remove (toolbar);
+                desktop_box.remove (sheets_pane);
+                desktop_box.remove (stats_bar);
+
+                remove (desktop_box);
+                desktop_box = null;
+            }
+
+            debug ("Building mobile UI");
+
+            mobile_stack = new Gtk.Stack ();
+            mobile_stack.add_titled (library_pane, _("Library"), _("Library"));
+            mobile_stack.add_titled (SheetManager.get_view (), _("Editor"), _("Editor"));
+
+            mobile_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            mobile_box.add (toolbar);
+            mobile_box.add (mobile_stack);
+            mobile_box.add (stats_bar);
+
+            add (mobile_box);
+            show_all ();
+        }
+
+        protected void build_ui () {
+            var settings = AppSettings.get_default ();
+            desktop_box = null;
+            mobile_box = null;
+
+            start_dir = "";
             settings.validate_library ();
             if (settings.library_list == "") {
                 settings.last_file = "";
@@ -107,19 +195,19 @@ namespace ThiefMD {
                 debug ("Could not set icon: %s\n", e.message);
             }
 
-            // Reset UI if it seems "unusable"?
-            if (settings.view_library_width < 10) {
-                settings.view_library_width = 200;
-            }
-            if (settings.view_sheets_width < 10) {
-                settings.view_sheets_width = 200;
-            }
-            if (settings.window_height < 600) {
-                settings.window_height = 600;
-            }
-            if (settings.window_width < 800) {
-                settings.window_width = 800;
-            }
+            //  // Reset UI if it seems "unusable"?
+            //  if (settings.view_library_width < 10) {
+            //      settings.view_library_width = 200;
+            //  }
+            //  if (settings.view_sheets_width < 10) {
+            //      settings.view_sheets_width = 200;
+            //  }
+            //  if (settings.window_height < 600) {
+            //      settings.window_height = 600;
+            //  }
+            //  if (settings.window_width < 800) {
+            //      settings.window_width = 800;
+            //  }
 
             toolbar = new Headerbar (this);
             // Have to init search bar before sheet manager
@@ -135,28 +223,9 @@ namespace ThiefMD {
             library_view.add (library);
             //  library_leaf.add (library_view);
             //  library_leaf.show_all ();
-            library_pane.add1 (library_view);
             library.expand_all ();
-            Sheets start_sheet = library.get_sheets (start_dir);
-            library_pane.add2 (start_sheet);
-            library_pane.set_position (settings.view_library_width);
-            
-            sheets_pane.add1 (library_pane);
-            sheets_pane.add2 (SheetManager.get_view ());
-            sheets_pane.set_position (settings.view_library_width + settings.view_sheets_width);
-
-            debug ("Window (%d, %d)\n", settings.window_width, settings.window_height);
-
-            var vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            vbox.add (toolbar);
-            vbox.add (sheets_pane);
             stats_bar = new StatisticsBar ();
-            vbox.add (stats_bar);
-
-            set_default_size (settings.window_width, settings.window_height);
-            add (vbox);
-            hide_titlebar_when_maximized = false;
-            is_fullscreen = settings.fullscreen;
+            start_sheet = library.get_sheets (start_dir);
 
             settings.changed.connect (() => {
                 is_fullscreen = settings.fullscreen;
@@ -178,6 +247,33 @@ namespace ThiefMD {
 
             // Load connections
             connections = new Gee.ConcurrentList<Connections.ConnectionBase> ();
+
+            library_pane.add1 (library_view);
+            library_pane.add2 (start_sheet);
+            library_pane.set_position (settings.view_library_width);
+
+            if (settings.window_width >= 600) {
+                build_desktop ();
+            } else {
+                build_mobile ();
+            }
+            set_default_size (settings.window_width, settings.window_height);
+
+            size_allocate.connect (() => {
+                if (this.get_allocated_width () < 600 && !am_mobile) {
+                    if (rebuild_ui.trylock ()) {
+                        warning ("Switching to mobile");
+                        build_mobile ();
+                        rebuild_ui.unlock ();
+                    }
+                } else if (this.get_allocated_width () >= 600 && am_mobile) {
+                    if (rebuild_ui.trylock ()) {
+                        warning ("Switching to desktop");
+                        build_desktop ();
+                        rebuild_ui.unlock ();
+                    }
+                }
+            });
 
             // Restore preview view
             UI.show_view ();

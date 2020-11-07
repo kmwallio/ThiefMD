@@ -180,24 +180,42 @@ namespace ThiefMD.Widgets {
                 // Editor Mode
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.@1, keycode)) {
-                        settings.view_state = 2;
-                        UI.show_view ();
+                        if (window is ThiefApp) {
+                            if (ThiefApp.get_instance ().am_mobile) {
+                                UI.show_editor ();
+                            } else {
+                                settings.view_state = 2;
+                                UI.show_view ();
+                            }
+                        }
                     }
                 }
 
                 // Sheets + Editor Mode
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.@2, keycode)) {
-                        settings.view_state = 1;
-                        UI.show_view ();
+                        if (window is ThiefApp) {
+                            if (ThiefApp.get_instance ().am_mobile) {
+                                UI.show_library ();
+                            } else {
+                                settings.view_state = 1;
+                                UI.show_view ();
+                            }
+                        }
                     }
                 }
 
                 // Library + Sheets + Editor Mode
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.@3, keycode)) {
-                        settings.view_state = 0;
-                        UI.show_view ();
+                        if (window is ThiefApp) {
+                            if (ThiefApp.get_instance ().am_mobile) {
+                                UI.show_library ();
+                            } else {
+                                settings.view_state = 0;
+                                UI.show_view ();
+                            }
+                        }
                     }
                 }
 

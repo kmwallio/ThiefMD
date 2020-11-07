@@ -402,6 +402,22 @@ namespace ThiefMD.Controllers.UI {
     // Switching Main Window View
     //
 
+    public void show_editor () {
+        if (ThiefApp.get_instance ().am_mobile) {
+            var settings = AppSettings.get_default ();
+            ThiefApp.get_instance ().mobile_stack.set_visible_child_name (_("Editor"));
+            settings.view_state = 1;
+        }
+    }
+
+    public void show_library () {
+        if (ThiefApp.get_instance ().am_mobile) {
+            var settings = AppSettings.get_default ();
+            ThiefApp.get_instance ().mobile_stack.set_visible_child_name (_("Editor"));
+            settings.view_state = 0;
+        }
+    }
+
     // Cycle through views
     public void toggle_view () {
         var settings = AppSettings.get_default ();
@@ -416,17 +432,27 @@ namespace ThiefMD.Controllers.UI {
             return;
         }
 
-        settings.view_state = (settings.view_state + 1) % 3;
+        if (ThiefApp.get_instance ().am_mobile) {
+            settings.view_state = (settings.view_state + 1) % 2;
 
-        if (settings.view_state == 2) {
-            settings.view_sheets_width = instance.sheets_pane.get_position ();
-        } else if (settings.view_state == 1) {
-            int target_sheets = instance.sheets_pane.get_position () - instance.library_pane.get_position ();
-            settings.view_sheets_width = target_sheets;
-            settings.view_library_width = instance.library_pane.get_position ();
+            if (settings.view_state  == 0) {
+                ThiefApp.get_instance ().mobile_stack.set_visible_child_name (_("Library"));
+            } else {
+                show_editor ();
+            }
+        } else {
+            settings.view_state = (settings.view_state + 1) % 3;
+
+            if (settings.view_state == 2) {
+                settings.view_sheets_width = instance.sheets_pane.get_position ();
+            } else if (settings.view_state == 1) {
+                int target_sheets = instance.sheets_pane.get_position () - instance.library_pane.get_position ();
+                settings.view_sheets_width = target_sheets;
+                settings.view_library_width = instance.library_pane.get_position ();
+            }
+
+            show_view ();
         }
-
-        show_view ();
     }
 
     public void show_view () {
