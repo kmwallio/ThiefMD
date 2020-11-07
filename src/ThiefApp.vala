@@ -196,12 +196,12 @@ namespace ThiefMD {
             }
 
             //  // Reset UI if it seems "unusable"?
-            //  if (settings.view_library_width < 10) {
-            //      settings.view_library_width = 200;
-            //  }
-            //  if (settings.view_sheets_width < 10) {
-            //      settings.view_sheets_width = 200;
-            //  }
+            if (settings.view_library_width < 10) {
+                settings.view_library_width = 200;
+            }
+            if (settings.view_sheets_width < 10) {
+                settings.view_sheets_width = 200;
+            }
             //  if (settings.window_height < 600) {
             //      settings.window_height = 600;
             //  }
