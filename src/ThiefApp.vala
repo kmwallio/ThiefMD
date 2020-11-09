@@ -218,6 +218,7 @@ namespace ThiefMD {
             if (monitor != null) {
                 Gdk.Rectangle screen_size = monitor.get_workarea ();
                 screen_width = screen_size.width;
+                warning ("Screen (%d, %d)", screen_size.width, screen_size.height);
                 if (screen_size.width <= 600 || screen_size.height <= 600) {
                     mobile_mode = true;
                     am_mobile = true;
