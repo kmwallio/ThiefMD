@@ -220,6 +220,7 @@ namespace ThiefMD {
                 screen_width = screen_size.width;
                 if (screen_size.width <= 600 || screen_size.height <= 600) {
                     mobile_mode = true;
+                    am_mobile = true;
                 }
             }
 

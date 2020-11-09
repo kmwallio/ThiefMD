@@ -28,8 +28,10 @@ namespace ThiefMD.Widgets {
         public Gtk.ToggleButton _spellcheck_button;
         public Gtk.ToggleButton _writegood_button;
         public Gtk.ToggleButton _typewriter_button;
+        private ThiefApp _instance;
 
-        public QuickPreferences () {
+        public QuickPreferences (ThiefApp instance) {
+            _instance = instance;
             var settings = AppSettings.get_default ();
 
             _typewriter_button = new Gtk.ToggleButton.with_label ((_("Typewriter Scrolling")));
@@ -119,10 +121,10 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
-            if (ThiefApp.get_instance ().mobile_mode) {
+            if (_instance.mobile_mode) {
                 menu_grid.add (export_button);
                 menu_grid.add (search_button);
-            } else if (ThiefApp.get_instance ().am_mobile) {
+            } else if (_instance.am_mobile) {
                 menu_grid.add (export_button);
                 menu_grid.add (search_button);
             }
