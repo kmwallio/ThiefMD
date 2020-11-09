@@ -118,6 +118,7 @@ namespace ThiefMD.Widgets {
             this.has_focus = true;
             this.set_tab_width (4);
             this.set_insert_spaces_instead_of_tabs (true);
+            this.smart_backspace = true;
             Timeout.add (250, () => {
                 set_scheme (settings.get_valid_theme_id ());
                 return false;
