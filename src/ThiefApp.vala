@@ -218,7 +218,7 @@ namespace ThiefMD {
             if (monitor != null) {
                 Gdk.Rectangle screen_size = monitor.get_workarea ();
                 screen_width = screen_size.width;
-                warning ("Screen (%d, %d)", screen_size.width, screen_size.height);
+                debug ("Screen (%d, %d)", screen_size.width, screen_size.height);
                 if (screen_size.width <= 600 || screen_size.height <= 600) {
                     mobile_mode = true;
                     am_mobile = true;
@@ -282,13 +282,13 @@ namespace ThiefMD {
             size_allocate.connect (() => {
                 if (this.get_allocated_width () < 600 && !am_mobile) {
                     if (rebuild_ui.trylock ()) {
-                        warning ("Switching to mobile");
+                        debug ("Switching to mobile");
                         build_mobile ();
                         rebuild_ui.unlock ();
                     }
                 } else if (this.get_allocated_width () >= 600 && am_mobile) {
                     if (rebuild_ui.trylock ()) {
-                        warning ("Switching to desktop");
+                        debug ("Switching to desktop");
                         build_desktop ();
                         rebuild_ui.unlock ();
                     }
