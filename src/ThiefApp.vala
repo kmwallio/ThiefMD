@@ -208,12 +208,20 @@ namespace ThiefMD {
             if (settings.view_sheets_width < 10) {
                 settings.view_sheets_width = 200;
             }
-            //  if (settings.window_height < 600) {
-            //      settings.window_height = 600;
-            //  }
-            //  if (settings.window_width < 800) {
-            //      settings.window_width = 800;
-            //  }
+
+            //
+            // Get screen size to see if we should start in mobile mode
+            //
+
+            var monitor = Gdk.Display.get_default ().get_primary_monitor ();
+            int screen_width = settings.window_width;
+            if (monitor != null) {
+                Gdk.Rectangle screen_size = monitor.get_workarea ();
+                screen_width = screen_size.width;
+                if (screen_size.width <= 600 || screen_size.height <= 600) {
+                    mobile_mode = true;
+                }
+            }
 
             toolbar = new Headerbar (this);
             // Have to init search bar before sheet manager
@@ -257,20 +265,6 @@ namespace ThiefMD {
             library_pane.add1 (library_view);
             library_pane.add2 (start_sheet);
             library_pane.set_position (settings.view_library_width);
-
-            //
-            // Get screen size to see if we should start in mobile mode
-            //
-
-            var monitor = Gdk.Display.get_default ().get_primary_monitor ();
-            int screen_width = settings.window_width;
-            if (monitor != null) {
-                Gdk.Rectangle screen_size = monitor.get_workarea ();
-                screen_width = screen_size.width;
-                if (screen_size.width <= 600 || screen_size.height <= 600) {
-                    mobile_mode = true;
-                }
-            }
 
             if  (screen_width < 600) {
                 build_mobile ();
