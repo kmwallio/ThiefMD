@@ -51,6 +51,15 @@ namespace ThiefMD.Widgets {
             header_context = prev.get_style_context ();
             header_context.add_class ("thief-search-button");
             prev.set_image (new Gtk.Image.from_icon_name ("go-next-rtl-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            var close = new Gtk.ModelButton ();
+            header_context = close.get_style_context ();
+            header_context.add_class ("thief-search-button");
+            close.set_image (new Gtk.Image.from_icon_name ("window-close-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            close.clicked.connect (() => {
+                if (child_revealed) {
+                    deactivate_search ();
+                }
+            });
             header_context = box.get_style_context ();
             header_context.add_class ("thief-search-box");
 
@@ -61,6 +70,7 @@ namespace ThiefMD.Widgets {
 
             //  grid.show_all ();
             box.hexpand = true;
+            box.pack_end (close);
             box.pack_end (next);
             box.pack_end (prev);
             box.pack_end (search_text);

@@ -29,6 +29,8 @@ namespace ThiefMD.Widgets {
         public Gtk.ToggleButton _writegood_button;
         public Gtk.ToggleButton _typewriter_button;
         private ThiefApp _instance;
+        private bool am_mobile = false;
+        private Gtk.Grid menu_grid;
 
         public QuickPreferences (ThiefApp instance) {
             _instance = instance;
@@ -110,7 +112,7 @@ namespace ThiefMD.Widgets {
                 abt.run ();
             });
 
-            var menu_grid = new Gtk.Grid ();
+            menu_grid = new Gtk.Grid ();
             menu_grid.margin = 6;
             menu_grid.row_spacing = 6;
             menu_grid.column_spacing = 12;
@@ -124,9 +126,11 @@ namespace ThiefMD.Widgets {
             if (_instance.mobile_mode) {
                 menu_grid.add (export_button);
                 menu_grid.add (search_button);
+                am_mobile = true;
             } else if (_instance.am_mobile) {
                 menu_grid.add (export_button);
                 menu_grid.add (search_button);
+                am_mobile = true;
             }
             menu_grid.add (preferences_button);
             menu_grid.add (about_button);
@@ -137,11 +141,162 @@ namespace ThiefMD.Widgets {
             add (menu_grid);
         }
 
+        private void build_mobilemenu () {
+            menu_grid.remove (_typewriter_button);
+            // menu_grid.add (separator);
+            menu_grid.remove (_spellcheck_button);
+            menu_grid.remove (_writegood_button);
+            remove (menu_grid);
+
+            var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+
+            var preview_button = new Gtk.ModelButton ();
+            preview_button.text = (_("Preview"));
+            preview_button.has_tooltip = true;
+            preview_button.tooltip_text = _("Launch Preview");
+            preview_button.clicked.connect (() => {
+                PreviewWindow pvw = PreviewWindow.get_instance ();
+                pvw.show_all ();
+            });
+
+            var export_button = new Gtk.ModelButton ();
+            export_button.text = (_("Publishing Preview"));
+            export_button.has_tooltip = true;
+            export_button.tooltip_text = _("Open Export Window");
+            export_button.clicked.connect (() => {
+                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown ());
+                ppw.show_all ();
+            });
+
+            var search_button = new Gtk.ModelButton ();
+            search_button.text = (_("Search Library"));
+            search_button.has_tooltip = true;
+            search_button.tooltip_text = _("Open Search Window");
+            search_button.clicked.connect (() => {
+                UI.show_search ();
+            });
+
+            var preferences_button = new Gtk.ModelButton ();
+            preferences_button.text = (_("Preferences"));
+            preferences_button.has_tooltip = true;
+            preferences_button.tooltip_text = _("Edit Preferences");
+            preferences_button.clicked.connect (() => {
+                Preferences prf = new Preferences();
+                prf.show_all ();
+            });
+
+            var about_button = new Gtk.ModelButton ();
+            about_button.text = (_("About"));
+            about_button.has_tooltip = true;
+            about_button.tooltip_text = _("About ThiefMD");
+            about_button.clicked.connect (() => {
+                About abt = new About();
+                abt.run ();
+            });
+
+            menu_grid = new Gtk.Grid ();
+            menu_grid.margin = 6;
+            menu_grid.row_spacing = 6;
+            menu_grid.column_spacing = 12;
+            menu_grid.orientation = Gtk.Orientation.VERTICAL;
+            menu_grid.add (_typewriter_button);
+            // menu_grid.add (separator);
+            menu_grid.add (_spellcheck_button);
+            menu_grid.add (_writegood_button);
+            menu_grid.add (separator2);
+            menu_grid.add (preview_button);
+            menu_grid.add (export_button);
+            menu_grid.add (search_button);
+            am_mobile = true;
+            menu_grid.add (preferences_button);
+            menu_grid.add (about_button);
+            menu_grid.show_all ();
+            add (menu_grid);
+        }
+
+        private void build_desktopmenu () {
+            menu_grid.remove (_typewriter_button);
+            // menu_grid.add (separator);
+            menu_grid.remove (_spellcheck_button);
+            menu_grid.remove (_writegood_button);
+            remove (menu_grid);
+
+            var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+
+            var preview_button = new Gtk.ModelButton ();
+            preview_button.text = (_("Preview"));
+            preview_button.has_tooltip = true;
+            preview_button.tooltip_text = _("Launch Preview");
+            preview_button.clicked.connect (() => {
+                PreviewWindow pvw = PreviewWindow.get_instance ();
+                pvw.show_all ();
+            });
+
+            var export_button = new Gtk.ModelButton ();
+            export_button.text = (_("Publishing Preview"));
+            export_button.has_tooltip = true;
+            export_button.tooltip_text = _("Open Export Window");
+            export_button.clicked.connect (() => {
+                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown ());
+                ppw.show_all ();
+            });
+
+            var search_button = new Gtk.ModelButton ();
+            search_button.text = (_("Search Library"));
+            search_button.has_tooltip = true;
+            search_button.tooltip_text = _("Open Search Window");
+            search_button.clicked.connect (() => {
+                UI.show_search ();
+            });
+
+            var preferences_button = new Gtk.ModelButton ();
+            preferences_button.text = (_("Preferences"));
+            preferences_button.has_tooltip = true;
+            preferences_button.tooltip_text = _("Edit Preferences");
+            preferences_button.clicked.connect (() => {
+                Preferences prf = new Preferences();
+                prf.show_all ();
+            });
+
+            var about_button = new Gtk.ModelButton ();
+            about_button.text = (_("About"));
+            about_button.has_tooltip = true;
+            about_button.tooltip_text = _("About ThiefMD");
+            about_button.clicked.connect (() => {
+                About abt = new About();
+                abt.run ();
+            });
+
+            menu_grid = new Gtk.Grid ();
+            menu_grid.margin = 6;
+            menu_grid.row_spacing = 6;
+            menu_grid.column_spacing = 12;
+            menu_grid.orientation = Gtk.Orientation.VERTICAL;
+            menu_grid.add (_typewriter_button);
+            // menu_grid.add (separator);
+            menu_grid.add (_spellcheck_button);
+            menu_grid.add (_writegood_button);
+            menu_grid.add (separator2);
+            menu_grid.add (preview_button);
+            am_mobile = true;
+            menu_grid.add (preferences_button);
+            menu_grid.add (about_button);
+            menu_grid.show_all ();
+            add (menu_grid);
+            am_mobile = false;
+        }
+
         public void update_ui () {
             var settings = AppSettings.get_default ();
             _typewriter_button.set_active (settings.typewriter_scrolling);
             _spellcheck_button.set_active (settings.spellcheck);
             _writegood_button.set_active (settings.writegood);
+
+            if (_instance.am_mobile && !am_mobile) {
+                build_mobilemenu ();
+            } else if (!_instance.am_mobile && am_mobile && !_instance.mobile_mode) {
+                build_desktopmenu ();
+            }
         }
     }
 }
