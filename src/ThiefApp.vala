@@ -44,6 +44,8 @@ namespace ThiefMD {
         public Gtk.Stack mobile_stack;
         private Sheets start_sheet;
         private Mutex rebuild_ui;
+        public bool mobile_mode = false;
+        private SearchWidget mobile_search;
 
         public ThiefApp (Gtk.Application app) {
             Object (application: app);
@@ -90,7 +92,6 @@ namespace ThiefMD {
 
         private void build_desktop () {
             var settings = AppSettings.get_default ();
-            am_mobile = false;
 
             if (desktop_box != null) {
                 return;
@@ -102,12 +103,14 @@ namespace ThiefMD {
                 mobile_box.remove (mobile_stack);
                 mobile_box.remove (stats_bar);
                 mobile_stack.remove (library_pane);
+                mobile_stack.remove (mobile_search);
                 mobile_stack.remove (SheetManager.get_view ());
                 remove (mobile_box);
+                mobile_search = null;
                 mobile_box = null;
             }
 
-
+            am_mobile = false;
             debug ("Building desktop UI");
 
             sheets_pane.add1 (library_pane);
@@ -128,17 +131,16 @@ namespace ThiefMD {
         }
 
         private void build_mobile () {
-            am_mobile = true;
             var settings = AppSettings.get_default ();
 
             if (mobile_box != null) {
                 return;
             }
 
-            if (desktop_box != null) {
-                settings.view_state = 0;
-                UI.show_view ();
+            settings.view_state = 0;
+            UI.show_view ();
 
+            if (desktop_box != null) {
                 debug ("Deconstructing desktop UI");
                 sheets_pane.remove (library_pane);
                 sheets_pane.remove (SheetManager.get_view ());
@@ -151,11 +153,15 @@ namespace ThiefMD {
                 desktop_box = null;
             }
 
+            am_mobile = true;
             debug ("Building mobile UI");
+
+            mobile_search = new SearchWidget ();
 
             mobile_stack = new Gtk.Stack ();
             mobile_stack.add_titled (library_pane, _("Library"), _("Library"));
             mobile_stack.add_titled (SheetManager.get_view (), _("Editor"), _("Editor"));
+            mobile_stack.add_titled (mobile_search, _("Search"), _("Search"));
 
             mobile_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             mobile_box.add (toolbar);
@@ -252,12 +258,30 @@ namespace ThiefMD {
             library_pane.add2 (start_sheet);
             library_pane.set_position (settings.view_library_width);
 
-            if (settings.window_width >= 600) {
-                build_desktop ();
-            } else {
-                build_mobile ();
+            //
+            // Get screen size to see if we should start in mobile mode
+            //
+
+            var monitor = Gdk.Display.get_default ().get_primary_monitor ();
+            int screen_width = settings.window_width;
+            if (monitor != null) {
+                Gdk.Rectangle screen_size = monitor.get_workarea ();
+                screen_width = screen_size.width;
+                if (screen_size.width <= 600 || screen_size.height <= 600) {
+                    mobile_mode = true;
+                }
             }
-            set_default_size (settings.window_width, settings.window_height);
+
+            if  (screen_width < 600) {
+                build_mobile ();
+            } else {
+                if (settings.window_width >= 600) {
+                    build_desktop ();
+                } else {
+                    build_mobile ();
+                }
+                set_default_size (settings.window_width, settings.window_height);
+            }
 
             size_allocate.connect (() => {
                 if (this.get_allocated_width () < 600 && !am_mobile) {

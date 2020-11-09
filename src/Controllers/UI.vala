@@ -403,15 +403,26 @@ namespace ThiefMD.Controllers.UI {
     //
 
     public void show_editor () {
-        if (ThiefApp.get_instance ().am_mobile) {
+        if (ThiefApp.get_instance ().am_mobile || ThiefApp.get_instance ().mobile_mode) {
             var settings = AppSettings.get_default ();
             ThiefApp.get_instance ().mobile_stack.set_visible_child_name (_("Editor"));
             settings.view_state = 1;
         }
     }
 
+    public void show_search () {
+        if (ThiefApp.get_instance ().am_mobile || ThiefApp.get_instance ().mobile_mode) {
+            var settings = AppSettings.get_default ();
+            ThiefApp.get_instance ().mobile_stack.set_visible_child_name (_("Search"));
+            settings.view_state = 1;
+        } else {
+            SearchWindow search_window = new SearchWindow ();
+            search_window.show_all ();
+        }
+    }
+
     public void show_library () {
-        if (ThiefApp.get_instance ().am_mobile) {
+        if (ThiefApp.get_instance ().am_mobile || ThiefApp.get_instance ().mobile_mode) {
             var settings = AppSettings.get_default ();
             ThiefApp.get_instance ().mobile_stack.set_visible_child_name (_("Editor"));
             settings.view_state = 0;

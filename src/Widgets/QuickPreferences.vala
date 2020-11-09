@@ -73,6 +73,23 @@ namespace ThiefMD.Widgets {
                 pvw.show_all ();
             });
 
+            var export_button = new Gtk.ModelButton ();
+            export_button.text = (_("Publishing Preview"));
+            export_button.has_tooltip = true;
+            export_button.tooltip_text = _("Open Export Window");
+            export_button.clicked.connect (() => {
+                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown ());
+                ppw.show_all ();
+            });
+
+            var search_button = new Gtk.ModelButton ();
+            search_button.text = (_("Search Library"));
+            search_button.has_tooltip = true;
+            search_button.tooltip_text = _("Open Search Window");
+            search_button.clicked.connect (() => {
+                UI.show_search ();
+            });
+
             var preferences_button = new Gtk.ModelButton ();
             preferences_button.text = (_("Preferences"));
             preferences_button.has_tooltip = true;
@@ -102,6 +119,13 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
+            if (ThiefApp.get_instance ().mobile_mode) {
+                menu_grid.add (export_button);
+                menu_grid.add (search_button);
+            } else if (ThiefApp.get_instance ().am_mobile) {
+                menu_grid.add (export_button);
+                menu_grid.add (search_button);
+            }
             menu_grid.add (preferences_button);
             menu_grid.add (about_button);
             menu_grid.show_all ();
