@@ -1,3 +1,12 @@
+com.github.kmwallio.thiefmd (0.1.3) focal; urgency=low
+
+  * Initial steps towards supporting mobile
+  * Fixes some graphical issues when hiding toolbar
+  * Toolbar now available in fullscreen, hide with `Ctrl+Shift+H`
+  * Adding click actions to support mobile devices
+
+ -- kmwallio <mwallio@gmail.com>  Sun, 06 Dec 2020 12:28:39 -0800
+
 com.github.kmwallio.thiefmd (0.1.2) focal; urgency=low
 
   * Export to a WriteFreely instance

@@ -25,6 +25,7 @@ BuildRequires: pkgconfig(gtksourceview-3.0)
 BuildRequires: pkgconfig(gtk+-3.0)
 BuildRequires: pkgconfig(gtkspell3-3.0)
 BuildRequires: pkgconfig(webkit2gtk-4.0)
+BuildRequires: pkgconfig(libhandy-1)
 
 %description
 Keep your Markdown managed. Write epic tales, keep a journal, or finally write that book report.
@@ -312,11 +313,19 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-Bold.ttf
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-BoldItalic.ttf
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-Italic.ttf
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/README.md
+/usr/share/locale/en_GB/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
+/usr/share/locale/es/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sun Dec 06 2020 kmwallio <mwallio@gmail.com> - 0.1.3
+- Initial steps towards supporting mobile
+- Fixes some graphical issues when hiding toolbar
+- Toolbar now available in fullscreen, hide with `Ctrl+Shift+H`
+- Adding click actions to support mobile devices
 * Fri Oct 23 2020 kmwallio <mwallio@gmail.com> - 0.1.2
 - Export to a WriteFreely instance
 - Export to a Ghost blog

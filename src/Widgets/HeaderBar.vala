@@ -125,7 +125,7 @@ namespace ThiefMD.Widgets {
             menu_button.has_tooltip = true;
             menu_button.tooltip_text = (_("Settings"));
             menu_button.set_image (new Gtk.Image.from_icon_name ("open-menu-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
-            menu_button.popover = new QuickPreferences ();
+            menu_button.popover = new QuickPreferences (_instance);
             menu_button.clicked.connect (() => {
                 settings.menu_active = true;
                 menu_button.popover.hide.connect (() => {

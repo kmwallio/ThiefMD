@@ -14,9 +14,11 @@
     "vapi",
     "flatpak",
     "src",
-    "meson"
+    "meson",
+    "po"
   ],
   "folder-order" : [
-    "docs"
+    "docs",
+    "po"
   ]
 }
