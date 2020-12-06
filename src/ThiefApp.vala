@@ -64,6 +64,7 @@ namespace ThiefMD {
             }
         }
 
+        private bool toolbar_already_hidden = false;
         public bool is_fullscreen {
             get {
                 var settings = AppSettings.get_default ();
@@ -78,9 +79,16 @@ namespace ThiefMD {
 
                 if (settings.fullscreen) {
                     fullscreen ();
+                    toolbar_already_hidden = settings.hide_toolbar;
+                    toolbar.hide_headerbar ();
+                    settings.hide_toolbar = true;
                     settings.statusbar = false;
                 } else {
                     unfullscreen ();
+                    settings.hide_toolbar = toolbar_already_hidden;
+                    if (!settings.hide_toolbar) {
+                        toolbar.show_headerbar ();
+                    }
                     settings.statusbar = true;
                 }
             }
