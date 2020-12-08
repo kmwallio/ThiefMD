@@ -43,9 +43,13 @@ namespace ThiefMD.Widgets {
         private double last_x = 0;
         private double last_y = 0;
         public override bool motion_notify_event (EventMotion event ) {
+            base.motion_notify_event (event);
             var settings = AppSettings.get_default ();
             last_x = event.x_root;
             last_y = event.y_root;
+
+            instance.save_pane_position ();
+
             if (!settings.hide_toolbar) {
                 return true;
             }
