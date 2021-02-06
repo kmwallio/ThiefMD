@@ -88,6 +88,7 @@ namespace ThiefMD {
 
         // Font settings
         public const double SIZE_1_REM_IN_PT = 12;
+        public const double SINGLE_SPACING = 1.0;
 
         // Arbitrary strings
         public const string FIRST_USE = _("""# Click on a sheet to get started
@@ -139,6 +140,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public bool show_writing_statistics { get; set; }
         public string font_family { get; set; }
         public int font_size { get; set; default = 12; }
+        public double line_spacing { get; set; default = 1; }
 
         // Transient settings
         public bool hide_toolbar { get; set; default = false; }
@@ -191,6 +193,14 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
                 return (int)Constants.SIZE_1_REM_IN_PT;
             } else {
                 return font_size;
+            }
+        }
+
+        public double get_css_line_spacing () {
+            if (line_spacing <= 1 || line_spacing > 3.5) {
+                return Constants.SINGLE_SPACING;
+            } else {
+                return line_spacing;
             }
         }
 
@@ -338,6 +348,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("font-size", this, "font_size", SettingsBindFlags.DEFAULT);
             app_settings.bind ("font-family", this, "font_family", SettingsBindFlags.DEFAULT);
             app_settings.bind ("focus-type", this, "focus_type", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("line-spacing", this, "line_spacing", SettingsBindFlags.DEFAULT);
 
             app_settings.changed.connect (() => {
                 changed ();

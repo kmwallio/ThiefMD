@@ -44,11 +44,16 @@ namespace ThiefMD.Widgets {
             grid.hexpand = true;
             Gee.LinkedList<string> fonts = new Gee.LinkedList<string> ();
             Gee.LinkedList<int> font_sizes = new Gee.LinkedList<int> ();
+            Gee.LinkedList<double?> line_spacings = new Gee.LinkedList<double?> ((num1, num2) => {
+                return num1 == num2;
+            });
 
             var font_label = new Gtk.Label (_("Font"));
             font_label.xalign = 0;
             font_label.margin = 12;
             font_label.use_markup = true;
+
+            var line_label = new Gtk.Label (_("Spacing"));
 
             var font_selector = new Gtk.ComboBoxText ();
             font_selector.append_text ("iA Writer Duospace");
@@ -83,6 +88,12 @@ namespace ThiefMD.Widgets {
                 }
             }
 
+            var line_spacing_selector = new Gtk.ComboBoxText ();
+            for (double i = 1.0; i <= 3.5; i += 0.5) {
+                line_spacing_selector.append_text (i.to_string ());
+                line_spacings.add (i);
+            }
+
             if (!font_sizes.contains (settings.font_size) && settings.font_size > 0 && settings.font_size <= 240) {
                 font_sizes.add (settings.font_size);
                 font_size_selector.set_active (font_sizes.index_of (settings.font_size));
@@ -92,6 +103,15 @@ namespace ThiefMD.Widgets {
                 font_size_selector.set_active (font_sizes.index_of (12));
             }
 
+            if (!line_spacings.contains (settings.line_spacing) && settings.line_spacing >= 1.0 && settings.font_size <= 3.5) {
+                line_spacings.add (settings.line_spacing);
+                line_spacing_selector.set_active (line_spacings.index_of (settings.line_spacing));
+            } else if (line_spacings.contains (settings.line_spacing)) {
+                line_spacing_selector.set_active (line_spacings.index_of (settings.line_spacing));
+            } else {
+                line_spacing_selector.set_active (0);
+            }
+
             font_selector.append_text ("Other");
             fonts.add ("Other");
 
@@ -99,6 +119,14 @@ namespace ThiefMD.Widgets {
                 int option = font_size_selector.get_active ();
                 if (option >= 0 && option < font_sizes.size) {
                     settings.font_size = font_sizes.get (option);
+                }
+                UI.load_font ();
+            });
+
+            line_spacing_selector.changed.connect (() => {
+                int option = line_spacing_selector.get_active ();
+                if (option >= 0 && option < line_spacings.size) {
+                    settings.line_spacing = line_spacings.get (option);
                 }
                 UI.load_font ();
             });
@@ -158,6 +186,8 @@ namespace ThiefMD.Widgets {
             grid.attach (font_label, 0, 0, 1, 1);
             grid.attach (font_selector, 1, 0, 2, 1);
             grid.attach (font_size_selector, 3, 0, 1, 1);
+            grid.attach (line_label, 0, 1, 1, 1);
+            grid.attach (line_spacing_selector, 1, 1, 1, 1);
             grid.show_all ();
 
             add (grid);
