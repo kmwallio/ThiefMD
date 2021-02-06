@@ -47,6 +47,18 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.1.4" date="2021-02-07" urgency="low">
+      <description>
+        <p>New Languages and Line Spacing.</p>
+        <ul>
+          <li>Added French Translation from David Bosman</li>
+          <li>Added Slovak Translation from Marek L'ach</li>
+          <li>Added ability to increase line spacing in editor</li>
+          <li>Hope your 2021 is going well so far!</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.3-ohsohandy</url>
+    </release>
     <release version="0.1.3" date="2020-12-06" urgency="low">
       <description>
         <p>Oh Hdy, Hdy, Hdy, Hdy, Hdy, Hdy, Ho... ThiefMD migrates to libhandy and adds better small display support.</p>
