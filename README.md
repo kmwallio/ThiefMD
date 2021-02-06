@@ -47,6 +47,9 @@ yay -S thiefmd
 
 [Poeditor](https://poeditor.com/join/project?hash=iQkE5oTIOV) can be used to help translate ThiefMD.
 
+ * French Translation by [David Bosman](https://github.com/davidbosman)
+ * Slovak Translation by [Marek L'ach](https://github.com/marek-lach)
+
 ## Planning
 
  * Better library organization

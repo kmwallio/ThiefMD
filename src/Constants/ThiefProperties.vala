@@ -39,6 +39,8 @@ namespace ThiefMD {
             "XML Parsing:\n<a href='http://xmlsoft.org/'>libxml2</a>\nCopyright © 1998-2012 Daniel Veillard.\n<a href='https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/Copyright'>MIT License</a>\n",
             "Pandoc Export:\n<a href='https://pandoc.org/'>Pandoc</a>\nCopyright © 2006-2020 John MacFarlane and others\n<a href='https://github.com/jgm/pandoc/blob/master/COPYRIGHT'>GNU General Public License v2.0</a>\n",
             "libwritegood-vala based on:\n<a href='https://github.com/btford/write-good'>write-good: Naive linter for English prose</a>\nCopyright © 2014-2019 Brian Ford\n<a href='https://github.com/btford/write-good/blob/master/LICENSE'>The MIT License (MIT)</a>\n",
+            "French Translation Contributors:\n<a href='https://github.com/davidbosman'>David Bosman</a>\n",
+            "Slovak Translation Contributors:\n<a href='https://github.com/marek-lach'>Marek L'ach</a>\n",
           };
 
         public const string[] PAPER_SIZES_FRIENDLY_NAME = {
