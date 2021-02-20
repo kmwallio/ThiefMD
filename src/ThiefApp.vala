@@ -209,7 +209,7 @@ namespace ThiefMD {
                 debug ("Could not set icon: %s\n", e.message);
             }
 
-            //  // Reset UI if it seems "unusable"?
+            // Reset UI if it seems "unusable"?
             if (settings.view_library_width < 10) {
                 settings.view_library_width = 200;
             }
@@ -321,6 +321,19 @@ namespace ThiefMD {
             // Go go go!
             ready = true;
             show_all ();
+        }
+
+        public void save_pane_position () {
+            if (!mobile_mode) {
+                var settings = AppSettings.get_default ();
+                if (settings.view_library_width != library_pane.get_position ()) {
+                    settings.view_library_width = library_pane.get_position ();
+                }
+
+                if (settings.view_library_width + settings.view_sheets_width != sheets_pane.get_position ()) {
+                    settings.view_sheets_width = sheets_pane.get_position () - settings.view_library_width;
+                }
+            }
         }
     }
 }

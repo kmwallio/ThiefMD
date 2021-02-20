@@ -316,11 +316,18 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/README.md
 /usr/share/locale/en_GB/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
 /usr/share/locale/es/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
+/usr/share/locale/fr/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
+/usr/share/locale/sk/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sun Feb 07 2021 kmwallio <mwallio@gmail.com> - 0.1.4
+- Added French Translation from David Bosman
+- Added Slovak Translation from Marek L'ach
+- Added ability to increase line spacing in editor
+- Hope your 2021 is going well so far!
 * Sun Dec 06 2020 kmwallio <mwallio@gmail.com> - 0.1.3
 - Initial steps towards supporting mobile
 - Fixes some graphical issues when hiding toolbar

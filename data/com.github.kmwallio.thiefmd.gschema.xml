@@ -181,5 +181,11 @@
             <summary>Type of Focus Mode to Use</summary>
             <description>Type of Focus Mode (Paragraph, Sentence, Word) to Use</description>
         </key>
+        <key name="line-spacing" type="d">
+            <default>1.0</default>
+            <range min="1.0" max="3.5"/>
+            <summary>Font Size to use</summary>
+            <description>Font Size for editor to use</description>
+        </key>
     </schema>
 </schemalist>

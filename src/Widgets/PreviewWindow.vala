@@ -42,6 +42,7 @@ namespace ThiefMD.Widgets {
                 } else {
                     instance.title = "Preview";
                 }
+                instance.toolbar.title = instance.title;
             }
         }
 
@@ -79,8 +80,9 @@ namespace ThiefMD.Widgets {
             vbox.add (Preview.get_instance ());
             add (vbox);
 
-            delete_event.connect (this.on_delete_event);
+            delete_event.connect (this.hide_on_delete);
             instance = this;
+            settings.changed.connect (update_preview_title);
         }
 
         public bool on_delete_event () {
