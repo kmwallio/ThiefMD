@@ -47,6 +47,16 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.1.5" date="2021-03-07" urgency="low">
+      <description>
+        <p>Editor Enhancements</p>
+        <ul>
+          <li>Added a shortcut for inserting in a link</li>
+          <li>Editor enhancements for continuing lists</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.5-listmayhem</url>
+    </release>
     <release version="0.1.4" date="2021-02-07" urgency="low">
       <description>
         <p>New Languages and Line Spacing.</p>

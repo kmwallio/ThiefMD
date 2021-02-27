@@ -174,6 +174,75 @@ namespace ThiefMD.Widgets {
             });
         }
 
+        private bool on_keypress (Gdk.EventKey key) {
+            uint keycode = key.hardware_keycode;
+
+            if (match_keycode (Gdk.Key.Return, keycode) || match_keycode (Gdk.Key.Tab, keycode)) {
+                debug ("Got enter or tab key");
+                var cursor = buffer.get_insert ();
+                Gtk.TextIter start, end;
+                buffer.get_iter_at_mark (out start, cursor);
+                buffer.get_iter_at_mark (out end, cursor);
+                if (!start.starts_line ()) {
+                    while (!start.starts_line ()) {
+                        start.backward_char ();
+                    }
+                    string line_text = buffer.get_text (start, end, true);
+                    debug ("Checking '%s'", line_text);
+                    MatchInfo match_info;
+                    Regex is_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+\\.)\\s)\\s*(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+                    Regex is_partial_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+\\.))\\s+$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+                    if (is_list.match_full (line_text, line_text.length, 0, 0, out match_info)) {
+                        debug ("Is a list");
+                        if (match_info == null) {
+                            return false;
+                        }
+
+                        string list_item = match_info.fetch (1);
+                        if (match_keycode (Gdk.Key.Return, keycode)) {
+                            insert_at_cursor ("\n");
+                            insert_at_cursor (list_item);
+                        } else {
+                            if ((key.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                                int diff = end.get_offset () - start.get_offset ();
+                                buffer.place_cursor (start);
+                                insert_at_cursor ("    ");
+                                buffer.get_iter_at_mark (out start, cursor);
+                                start.forward_chars (diff);
+                                buffer.place_cursor (start);
+                            } else {
+                                return false;
+                            }
+                        }
+                        return true;
+                    } else if (is_partial_list.match_full (line_text, line_text.length, 0, 0, out match_info)) {
+                        if (match_keycode (Gdk.Key.Return, keycode)) {
+                            Gtk.TextIter doc_start, doc_end;
+                            buffer.get_bounds (out doc_start, out doc_end);
+                            while (!end.starts_line () && end.in_range(doc_start, doc_end)) {
+                                end.forward_char ();
+                            }
+                            buffer.@delete (ref start, ref end);
+                        } else {
+                            if ((key.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                                int diff = end.get_offset () - start.get_offset ();
+                                buffer.place_cursor (start);
+                                insert_at_cursor ("    ");
+                                buffer.get_iter_at_mark (out start, cursor);
+                                start.forward_chars (diff);
+                                buffer.place_cursor (start);
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public bool prompt_on_disk_modifications () {
             if (!editable) {
                 return false;
@@ -436,6 +505,8 @@ namespace ThiefMD.Widgets {
                         write_good_recheck ();
                     }
 
+                    key_press_event.connect (on_keypress);
+
                     //
                     // Register for redrawing of window for handling margins and other
                     // redrawing
@@ -467,6 +538,7 @@ namespace ThiefMD.Widgets {
                         buffer.changed.disconnect (on_change_notification);
                         size_allocate.disconnect (dynamic_margins);
                         settings.changed.disconnect (update_settings);
+                        key_press_event.disconnect (on_keypress);
                         if (settings.writegood) {
                             writecheck_active = false;
                             writegood.detach ();
