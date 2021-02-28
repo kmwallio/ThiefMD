@@ -137,6 +137,13 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
+                // Link
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
+                    if (match_keycode (Gdk.Key.k, keycode)) {
+                        SheetManager.link ();
+                    }
+                }
+
                 // Save
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                     if (match_keycode (Gdk.Key.s, keycode)) {

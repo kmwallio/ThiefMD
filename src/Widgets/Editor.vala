@@ -183,7 +183,31 @@ namespace ThiefMD.Widgets {
                 Gtk.TextIter start, end;
                 buffer.get_iter_at_mark (out start, cursor);
                 buffer.get_iter_at_mark (out end, cursor);
-                if (!start.starts_line ()) {
+                unichar end_char = end.get_char ();
+
+                // Tab to next item in link, or outside of current markup
+                if (match_keycode (Gdk.Key.Tab, keycode) && 
+                    (end_char == '*' ||
+                     end_char == ']' ||
+                     end_char == ')' ||
+                     end_char == '_'))
+                {
+                    if (end_char == ']') {
+                        while (end_char == ']' || end_char == '(') {
+                            end.forward_char ();
+                            end_char = end.get_char ();
+                        }
+                    } else {
+                        while (end_char == '*' || end_char == '_' || end_char == ')') {
+                            end.forward_char ();
+                            end_char = end.get_char ();
+                        }
+                    }
+                    buffer.place_cursor (end);
+                    return true;
+
+                // List movements
+                } else if (!start.starts_line ()) {
                     while (!start.starts_line ()) {
                         start.backward_char ();
                     }
@@ -627,6 +651,41 @@ namespace ThiefMD.Widgets {
 
         public void strikethrough () {
             insert_markup_around_cursor ("~~");
+        }
+
+        public void link () {
+            if (buffer.has_selection) {
+                Gtk.TextIter iter_start, iter_end;
+                if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
+                    string selected_text = buffer.get_text (iter_start, iter_end, true);
+                    Regex is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+                    MatchInfo match_info;
+                    if (!is_url.match_full (selected_text, selected_text.length, 0, 0, out match_info)) {
+                        buffer.insert (ref iter_start, "[", -1);
+                        if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
+                            buffer.insert (ref iter_end, "]()", -1);
+                            buffer.get_selection_bounds (out iter_start, out iter_end);
+                            iter_end.backward_chars (1);
+                            buffer.place_cursor (iter_end);
+                        }
+                    } else {
+                        buffer.insert (ref iter_start, "[](", -1);
+                        if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
+                            buffer.insert (ref iter_end, ")", -1);
+                            buffer.get_selection_bounds (out iter_start, out iter_end);
+                            iter_start.backward_chars (2);
+                            buffer.place_cursor (iter_start);
+                        }
+                    }
+                }
+            } else {
+                insert_at_cursor ("[]()");
+                var cursor = buffer.get_insert ();
+                Gtk.TextIter start;
+                buffer.get_iter_at_mark (out start, cursor);
+                start.backward_chars (3);
+                buffer.place_cursor (start);
+            }
         }
 
         public bool save () throws Error {
