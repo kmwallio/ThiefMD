@@ -56,6 +56,12 @@ namespace ThiefMD.Widgets {
 
         private Gtk.TextTag focus_text;
         private Gtk.TextTag outoffocus_text;
+        private Gtk.TextTag heading1_text;
+        private Gtk.TextTag heading2_text;
+        private Gtk.TextTag heading3_text;
+        private Gtk.TextTag heading4_text;
+        private Gtk.TextTag heading5_text;
+        private Gtk.TextTag heading6_text;
 
         //
         // Regexes
@@ -64,6 +70,7 @@ namespace ThiefMD.Widgets {
         private Regex is_partial_list;
         private Regex numerical_list;
         private Regex is_url;
+        private Regex is_heading;
 
         //
         // Maintaining state
@@ -77,10 +84,15 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             settings.changed.connect (update_settings);
 
-            is_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+(\\.|\\)))\\s)\\s*(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            is_partial_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+\\.))\\s+$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss|file)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            try {
+                is_heading = new Regex ("(#+\\s+.+?)[\\n\\R]", RegexCompileFlags.CASELESS, 0);
+                is_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+(\\.|\\)))\\s)\\s*(.+)", RegexCompileFlags.CASELESS, 0);
+                is_partial_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+\\.))\\s+$", RegexCompileFlags.CASELESS, 0);
+                numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.CASELESS, 0);
+                is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss|file)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.CASELESS, 0);
+            } catch (Error e) {
+                warning ("Could not initialize regexes: %s", e.message);
+            }
 
             file_mutex = Mutex ();
             disk_change_prompted = new TimedMutex (10000);
@@ -160,6 +172,7 @@ namespace ThiefMD.Widgets {
 
             focus_text = buffer.create_tag ("focus-text");
             outoffocus_text = buffer.create_tag ("outoffocus-text");
+
             double r, g, b;
             UI.get_focus_color (out r, out g, out b);
             focus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
@@ -173,6 +186,13 @@ namespace ThiefMD.Widgets {
             UI.get_out_of_focus_color (out r, out g, out b);
             outoffocus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
             outoffocus_text.foreground_set = true;
+
+            heading1_text = buffer.create_tag ("heading1-text");
+            heading2_text = buffer.create_tag ("heading2-text");
+            heading3_text = buffer.create_tag ("heading3-text");
+            heading4_text = buffer.create_tag ("heading4-text");
+            heading5_text = buffer.create_tag ("heading5-text");
+            heading6_text = buffer.create_tag ("heading6-text");
 
             last_width = settings.window_width;
             last_height = settings.window_height;
@@ -189,6 +209,10 @@ namespace ThiefMD.Widgets {
 
         private bool on_keypress (Gdk.EventKey key) {
             uint keycode = key.hardware_keycode;
+
+            if (is_list == null || is_partial_list == null || numerical_list == null) {
+                return false;
+            }
 
             if (match_keycode (Gdk.Key.Return, keycode) || match_keycode (Gdk.Key.Tab, keycode)) {
                 debug ("Got enter or tab key");
@@ -792,6 +816,8 @@ namespace ThiefMD.Widgets {
                 editable = true;
             }
 
+            idle_margins ();
+
             modified_time = new DateTime.now_utc ();
             should_scroll = true;
 
@@ -986,7 +1012,7 @@ namespace ThiefMD.Widgets {
         public void move_margins () {
             var settings = AppSettings.get_default ();
 
-            if (!ThiefApp.get_instance ().ready) {
+            if (!ThiefApp.get_instance ().ready || !get_realized ()) {
                 return;
             }
 
@@ -1024,6 +1050,108 @@ namespace ThiefMD.Widgets {
             // Update margins
             left_margin = m;
             right_margin = m;
+
+            // Update heading margins
+            try {
+                Gtk.TextIter start, end;
+                buffer.get_bounds (out start, out end);
+                buffer.remove_tag (heading1_text, start, end);
+                buffer.remove_tag (heading2_text, start, end);
+                buffer.remove_tag (heading3_text, start, end);
+                buffer.remove_tag (heading4_text, start, end);
+                buffer.remove_tag (heading5_text, start, end);
+                buffer.remove_tag (heading6_text, start, end);
+
+                var font_map = get_font_map ();
+                int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
+                int f_h = 0;
+                if (font_map != null) {
+                    var font_context = font_map.create_context ();
+                    var font_layout = new Pango.Layout (font_context);
+                    font_layout.set_text ("#", 1);
+                    font_layout.get_size (out f_w, out f_h);
+                    debug ("Found font char width: %d", f_w);
+                } else {
+                    //  if (get_realized ()) {
+                    //      var mock_label = new Gtk.Label (null);
+                    //      var mock_context = mock_label.get_style_context ();
+                    //      if (settings.fullscreen) {
+                    //          mock_context.add_class ("full-text");
+                    //          mock_context.remove_class ("small-text");
+                    //      } else {
+                    //          mock_context.add_class ("small-text");
+                    //          mock_context.remove_class ("full-text");
+                    //      }
+                    //      var font_desc = Pango.FontDescription.from_string (settings.get_css_font_family ());
+                    //      font_desc.set_size (f_w);
+                    //      var font_layout = mock_label.get_layout ();
+                    //      font_layout.set_font_description (font_desc);
+                    //      font_layout.set_markup ("#", 1);
+                    //      mock_label.show ();
+                    //      int t_w;
+                    //      font_layout.get_size (out t_w, out f_h);
+                    //      if (t_w != 0) {
+                    //          f_w = t_w;
+                    //      }
+                    //      mock_label.hide ();
+                    //  }
+                    debug ("Generated font char width: %d", f_w);
+                }
+
+                if (m - (f_w * 7) > 0) {
+                    heading1_text.left_margin = m - (f_w * 2);
+                    heading2_text.left_margin = m - (f_w * 3);
+                    heading3_text.left_margin = m - (f_w * 4);
+                    heading4_text.left_margin = m - (f_w * 5);
+                    heading5_text.left_margin = m - (f_w * 6);
+                    heading6_text.left_margin = m - (f_w * 7);
+                } else {
+                    heading1_text.left_margin = m;
+                    heading2_text.left_margin = m;
+                    heading3_text.left_margin = m;
+                    heading4_text.left_margin = m;
+                    heading5_text.left_margin = m;
+                    heading6_text.left_margin = m;
+                }
+
+                MatchInfo match_info;
+                string checking_copy = buffer.text;
+                if (is_heading.match_full (checking_copy, checking_copy.length, 0, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
+                    do {
+                        int start_pos, end_pos;
+                        string heading = match_info.fetch (1);
+                        bool headify = match_info.fetch_pos (1, out start_pos, out end_pos) && (heading.index_of ("\n") < 0);
+                        if (headify) {
+                            start_pos = checking_copy.slice (0, start_pos).char_count ();
+                            end_pos = checking_copy.slice (0, end_pos).char_count ();
+                            buffer.get_iter_at_offset (out start, start_pos);
+                            buffer.get_iter_at_offset (out end, end_pos);
+                            switch (heading.index_of (" ")) {
+                                case 1:
+                                    buffer.apply_tag (heading1_text, start, end);
+                                    break;
+                                case 2:
+                                    buffer.apply_tag (heading2_text, start, end);
+                                    break;
+                                case 3:
+                                    buffer.apply_tag (heading3_text, start, end);
+                                    break;
+                                case 4:
+                                    buffer.apply_tag (heading4_text, start, end);
+                                    break;
+                                case 5:
+                                    buffer.apply_tag (heading5_text, start, end);
+                                    break;
+                                case 6:
+                                    buffer.apply_tag (heading6_text, start, end);
+                                    break;
+                            }
+                        }
+                    } while (match_info.next ());
+                }
+            } catch (Error e) {
+                warning ("Could not adjust headers: %s", e.message);
+            }
 
             typewriter_scrolling ();
 
@@ -1133,9 +1261,9 @@ namespace ThiefMD.Widgets {
 
         public void remove_focus () {
             Gtk.TextIter start, end;
-                buffer.get_bounds (out start, out end);
-                buffer.remove_tag (focus_text, start, end);
-                buffer.remove_tag (outoffocus_text, start, end);
+            buffer.get_bounds (out start, out end);
+            buffer.remove_tag (focus_text, start, end);
+            buffer.remove_tag (outoffocus_text, start, end);
         }
 
         public void update_focus () {
