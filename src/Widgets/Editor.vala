@@ -1014,7 +1014,7 @@ namespace ThiefMD.Widgets {
         public void move_margins () {
             var settings = AppSettings.get_default ();
 
-            if (!ThiefApp.get_instance ().ready || !get_realized ()) {
+            if (!ThiefApp.get_instance ().ready) {
                 return;
             }
 
