@@ -1,3 +1,11 @@
+com.github.kmwallio.thiefmd (0.1.5) groovy; urgency=low
+
+  * Added a shortcut for inserting in a link
+  * Editor enhancements for continuing lists
+  * Tab will skip over select Markdown formatting so you can tab back into focus
+
+ -- kmwallio <mwallio@gmail.com>  Sun, 28 Feb 2021 10:56:06 -0800
+
 com.github.kmwallio.thiefmd (0.1.4) groovy; urgency=low
 
   * Added French Translation from David Bosman

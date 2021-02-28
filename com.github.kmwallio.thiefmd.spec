@@ -323,6 +323,10 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sun Feb 28 2021 kmwallio <mwallio@gmail.com> - 0.1.5
+- Added a shortcut for inserting in a link
+- Editor enhancements for continuing lists
+- Tab will skip over select Markdown formatting so you can tab back into focus
 * Sun Feb 07 2021 kmwallio <mwallio@gmail.com> - 0.1.4
 - Added French Translation from David Bosman
 - Added Slovak Translation from Marek L'ach
