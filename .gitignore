@@ -1,6 +1,7 @@
 build/
 .vscode
 docs/_site
+docs/.jekyll-cache
 .buildconfig
 subprojects/ultheme
 subprojects/ultheme/*
