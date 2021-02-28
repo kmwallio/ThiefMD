@@ -548,6 +548,7 @@ namespace ThiefMD.Controllers.SheetManager {
         foreach (var editor in _active_editors) {
             editor.editor.show ();
             editor.sheet.redraw ();
+            editor.editor.move_margins ();
         }
     }
 

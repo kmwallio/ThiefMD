@@ -37,6 +37,7 @@ namespace ThiefMD.Widgets {
         private Mutex file_mutex;
         private bool no_change_prompt = false; // Trying to prevent too much file changed prompts?
         private TimedMutex disk_change_prompted;
+        private TimedMutex dynamic_margin_update;
 
         //
         // UI Items
@@ -96,6 +97,7 @@ namespace ThiefMD.Widgets {
 
             file_mutex = Mutex ();
             disk_change_prompted = new TimedMutex (10000);
+            dynamic_margin_update = new TimedMutex (250);
 
             if (!open_file (file_path)) {
                 set_text (Constants.FIRST_USE.printf (ThiefProperties.THIEF_TIPS[Random.int_range(0, ThiefProperties.THIEF_TIPS.length)]), true);
@@ -1052,6 +1054,30 @@ namespace ThiefMD.Widgets {
             right_margin = m;
 
             // Update heading margins
+            if (dynamic_margin_update.can_do_action ()) {
+                update_heading_margins ();
+            } else {
+                if (!header_redraw_scheduled) {
+                    header_redraw_scheduled = true;
+                    Timeout.add (300, () => {
+                        header_redraw_scheduled = false;
+                        update_heading_margins ();
+                        return false;
+                    });
+                }
+            }
+
+            typewriter_scrolling ();
+
+            // Keep the curson in view?
+            should_scroll = true;
+            move_typewriter_scolling ();
+        }
+
+        bool header_redraw_scheduled = false;
+        private void update_heading_margins () {
+            var settings = AppSettings.get_default ();
+            int m = left_margin;
             try {
                 Gtk.TextIter start, end;
                 buffer.get_bounds (out start, out end);
@@ -1152,12 +1178,6 @@ namespace ThiefMD.Widgets {
             } catch (Error e) {
                 warning ("Could not adjust headers: %s", e.message);
             }
-
-            typewriter_scrolling ();
-
-            // Keep the curson in view?
-            should_scroll = true;
-            move_typewriter_scolling ();
         }
 
         private void typewriter_scrolling () {
