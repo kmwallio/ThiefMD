@@ -53,6 +53,7 @@
         <ul>
           <li>Added a shortcut for inserting in a link</li>
           <li>Editor enhancements for continuing lists</li>
+          <li>Tab will skip over select Markdown formatting so you can tab back into focus</li>
         </ul>
       </description>
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.5-listmayhem</url>

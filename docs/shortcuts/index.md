@@ -33,6 +33,7 @@ title: Shortcuts
 * `Ctrl + B` - **\*\*Bold\*\***
 * `Ctrl + I` - *\*Italics\**
 * `Ctrl + D` - ~~&tilde;&tilde;Strikethrough&tilde;&tilde;~~
+* `Ctrl + K` - [Link](/shortcuts/#Formatting)
 
 # Editing
 

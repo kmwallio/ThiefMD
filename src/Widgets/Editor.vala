@@ -58,6 +58,14 @@ namespace ThiefMD.Widgets {
         private Gtk.TextTag outoffocus_text;
 
         //
+        // Regexes
+        // 
+        private Regex is_list;
+        private Regex is_partial_list;
+        private Regex numerical_list;
+        private Regex is_url;
+
+        //
         // Maintaining state
         //
 
@@ -68,6 +76,11 @@ namespace ThiefMD.Widgets {
         public Editor (string file_path) {
             var settings = AppSettings.get_default ();
             settings.changed.connect (update_settings);
+
+            is_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+(\\.|\\)))\\s)\\s*(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            is_partial_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+\\.))\\s+$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss|file)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
 
             file_mutex = Mutex ();
             disk_change_prompted = new TimedMutex (10000);
@@ -190,7 +203,8 @@ namespace ThiefMD.Widgets {
                     (end_char == '*' ||
                      end_char == ']' ||
                      end_char == ')' ||
-                     end_char == '_'))
+                     end_char == '_' ||
+                     end_char == '~'))
                 {
                     if (end_char == ']') {
                         while (end_char == ']' || end_char == '(') {
@@ -198,7 +212,7 @@ namespace ThiefMD.Widgets {
                             end_char = end.get_char ();
                         }
                     } else {
-                        while (end_char == '*' || end_char == '_' || end_char == ')') {
+                        while (end_char == '~' || end_char == '*' || end_char == '_' || end_char == ')') {
                             end.forward_char ();
                             end_char = end.get_char ();
                         }
@@ -214,8 +228,6 @@ namespace ThiefMD.Widgets {
                     string line_text = buffer.get_text (start, end, true);
                     debug ("Checking '%s'", line_text);
                     MatchInfo match_info;
-                    Regex is_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+\\.)\\s)\\s*(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-                    Regex is_partial_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+\\.))\\s+$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
                     if (is_list.match_full (line_text, line_text.length, 0, 0, out match_info)) {
                         debug ("Is a list");
                         if (match_info == null) {
@@ -225,7 +237,16 @@ namespace ThiefMD.Widgets {
                         string list_item = match_info.fetch (1);
                         if (match_keycode (Gdk.Key.Return, keycode)) {
                             insert_at_cursor ("\n");
-                            insert_at_cursor (list_item);
+                            if (numerical_list.match_full (list_item, list_item.length, 0, 0, out match_info)) {
+                                string spaces = match_info.fetch (1);
+                                string close_char = match_info.fetch (3);
+                                int number = match_info.fetch (2).to_int () + 1;
+                                insert_at_cursor (spaces);
+                                insert_at_cursor (number.to_string ());
+                                insert_at_cursor (close_char);
+                            } else {
+                                insert_at_cursor (list_item);
+                            }
                         } else {
                             if ((key.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                                 int diff = end.get_offset () - start.get_offset ();
@@ -658,7 +679,6 @@ namespace ThiefMD.Widgets {
                 Gtk.TextIter iter_start, iter_end;
                 if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
                     string selected_text = buffer.get_text (iter_start, iter_end, true);
-                    Regex is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
                     MatchInfo match_info;
                     if (!is_url.match_full (selected_text, selected_text.length, 0, 0, out match_info)) {
                         buffer.insert (ref iter_start, "[", -1);
