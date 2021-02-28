@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.kmwallio.thiefmd', ['vala', 'c'],
-    version: '0.1.5'
+    version: '0.1.6'
 )
 
 # Application ID
