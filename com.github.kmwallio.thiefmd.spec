@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.1.4
+Version: 0.1.5
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
@@ -323,6 +323,10 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sun Feb 28 2021 kmwallio <mwallio@gmail.com> - 0.1.5
+- Added a shortcut for inserting in a link
+- Editor enhancements for continuing lists
+- Tab will skip over select Markdown formatting so you can tab back into focus
 * Sun Feb 07 2021 kmwallio <mwallio@gmail.com> - 0.1.4
 - Added French Translation from David Bosman
 - Added Slovak Translation from Marek L'ach

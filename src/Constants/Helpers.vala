@@ -27,6 +27,20 @@ namespace ThiefMD {
         FILE_NOT_VALID_THEME
     }
 
+    public bool match_keycode (uint keyval, uint code) {
+        Gdk.KeymapKey [] keys;
+        Gdk.Keymap keymap = Gdk.Keymap.get_for_display (Gdk.Display.get_default ());
+        if (keymap.get_entries_for_keyval (keyval, out keys)) {
+            foreach (var key in keys) {
+                if (code == key.keycode) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public string make_title (string text) {
         string current_title = text.replace ("_", " ");
         current_title = current_title.replace ("-", " ");

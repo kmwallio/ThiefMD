@@ -137,6 +137,13 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
+                // Link
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
+                    if (match_keycode (Gdk.Key.k, keycode)) {
+                        SheetManager.link ();
+                    }
+                }
+
                 // Save
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                     if (match_keycode (Gdk.Key.s, keycode)) {
@@ -254,20 +261,6 @@ namespace ThiefMD.Widgets {
 
                 return false;
             });
-        }
-
-        protected bool match_keycode (uint keyval, uint code) {
-            Gdk.KeymapKey [] keys;
-            Gdk.Keymap keymap = Gdk.Keymap.get_for_display (Gdk.Display.get_default ());
-            if (keymap.get_entries_for_keyval (keyval, out keys)) {
-                foreach (var key in keys) {
-                    if (code == key.keycode) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
     }
 }

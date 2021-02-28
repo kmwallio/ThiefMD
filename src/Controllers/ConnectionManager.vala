@@ -101,7 +101,7 @@ namespace ThiefMD.Controllers {
                         sec.user = s_p.get_string_member ("user");
                     }
 
-                    warning ("Found secret: %s : %s", sec.connection_type, sec.user);
+                    debug ("Found secret: %s : %s", sec.connection_type, sec.user);
                     load_secret (sec.user, sec.endpoint, sec.connection_type);
                 }
             } catch (Error e) {
@@ -122,7 +122,7 @@ namespace ThiefMD.Controllers {
                 try {
                     string? the_secret = Secret.password_lookup.end (async_res);
                     if (the_secret != null) {
-                        warning ("Loaded secret: %s : %s", attributes["connectiontype"], attributes["alias"]);
+                        debug ("Loaded secret: %s : %s", attributes["connectiontype"], attributes["alias"]);
                         if (attributes["connectiontype"] == WriteFreelyConnection.CONNECTION_TYPE) {
                             WriteFreelyConnection writeas_connection = new WriteFreelyConnection (attributes["alias"], the_secret, attributes["endpoint"]);
                             if (writeas_connection.connection_valid ()) {
@@ -159,7 +159,7 @@ namespace ThiefMD.Controllers {
             attributes["endpoint"] = url;
             attributes["alias"] = alias;
 
-            warning ("Saving secret %s : %s", connection_type, alias);
+            debug ("Saving secret %s : %s", connection_type, alias);
             Secret.password_storev.begin (
                 thief_secret,
                 attributes,
@@ -175,7 +175,7 @@ namespace ThiefMD.Controllers {
                     warning ("Error with libsecret: %s", e.message);
                 }
                 if (res) {
-                    warning ("Saved secret %s : %s", connection_type, alias);
+                    debug ("Saved secret %s : %s", connection_type, alias);
                     SecretAttr new_sec = new SecretAttr ();
                     new_sec.connection_type = connection_type;
                     new_sec.user = alias;
@@ -217,7 +217,7 @@ namespace ThiefMD.Controllers {
                 attributes["alias"] = rem_sec.user;
 
                 Secret.password_clearv.begin (thief_secret, attributes, null, (user_data) => {
-                    warning ("Secret removed from keyring");
+                    debug ("Secret removed from keyring");
                 });
 
                 stored_secrets.secrets.remove (rem_sec);
@@ -238,7 +238,7 @@ namespace ThiefMD.Controllers {
                 builder.set_member_name ("secrets");
                 builder.begin_array ();
                 foreach (var sec in stored_secrets.secrets) {
-                    warning ("Adding secret: %s", sec.user);
+                    debug ("Adding secret: %s", sec.user);
                     builder.begin_object ();
                     builder.set_member_name ("connection_type");
                     builder.add_string_value (sec.connection_type);

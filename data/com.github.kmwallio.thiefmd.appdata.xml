@@ -47,6 +47,17 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.1.5" date="2021-02-28" urgency="low">
+      <description>
+        <p>Editor Enhancements</p>
+        <ul>
+          <li>Added a shortcut for inserting in a link</li>
+          <li>Editor enhancements for continuing lists</li>
+          <li>Tab will skip over select Markdown formatting so you can tab back into focus</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.5-listmayhem</url>
+    </release>
     <release version="0.1.4" date="2021-02-07" urgency="low">
       <description>
         <p>New Languages and Line Spacing.</p>
@@ -57,7 +68,7 @@
           <li>Hope your 2021 is going well so far!</li>
         </ul>
       </description>
-      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.3-ohsohandy</url>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.4-welcome2021</url>
     </release>
     <release version="0.1.3" date="2020-12-06" urgency="low">
       <description>

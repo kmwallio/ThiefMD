@@ -501,6 +501,12 @@ namespace ThiefMD.Controllers.SheetManager {
         }
     }
 
+    public static void link () {
+        if (_currentSheet != null) {
+            _currentSheet.editor.link ();
+        }
+    }
+
     private static void refresh_scheme () {
         var settings = AppSettings.get_default ();
         var scheme_id = settings.get_valid_theme_id ();

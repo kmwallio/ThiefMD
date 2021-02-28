@@ -58,6 +58,14 @@ namespace ThiefMD.Widgets {
         private Gtk.TextTag outoffocus_text;
 
         //
+        // Regexes
+        // 
+        private Regex is_list;
+        private Regex is_partial_list;
+        private Regex numerical_list;
+        private Regex is_url;
+
+        //
         // Maintaining state
         //
 
@@ -68,6 +76,11 @@ namespace ThiefMD.Widgets {
         public Editor (string file_path) {
             var settings = AppSettings.get_default ();
             settings.changed.connect (update_settings);
+
+            is_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+(\\.|\\)))\\s)\\s*(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            is_partial_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+\\.))\\s+$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss|file)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
 
             file_mutex = Mutex ();
             disk_change_prompted = new TimedMutex (10000);
@@ -172,6 +185,107 @@ namespace ThiefMD.Widgets {
 
                 return false;
             });
+        }
+
+        private bool on_keypress (Gdk.EventKey key) {
+            uint keycode = key.hardware_keycode;
+
+            if (match_keycode (Gdk.Key.Return, keycode) || match_keycode (Gdk.Key.Tab, keycode)) {
+                debug ("Got enter or tab key");
+                var cursor = buffer.get_insert ();
+                Gtk.TextIter start, end;
+                buffer.get_iter_at_mark (out start, cursor);
+                buffer.get_iter_at_mark (out end, cursor);
+                unichar end_char = end.get_char ();
+
+                // Tab to next item in link, or outside of current markup
+                if (match_keycode (Gdk.Key.Tab, keycode) && 
+                    (end_char == '*' ||
+                     end_char == ']' ||
+                     end_char == ')' ||
+                     end_char == '_' ||
+                     end_char == '~'))
+                {
+                    if (end_char == ']') {
+                        while (end_char == ']' || end_char == '(') {
+                            end.forward_char ();
+                            end_char = end.get_char ();
+                        }
+                    } else {
+                        while (end_char == '~' || end_char == '*' || end_char == '_' || end_char == ')') {
+                            end.forward_char ();
+                            end_char = end.get_char ();
+                        }
+                    }
+                    buffer.place_cursor (end);
+                    return true;
+
+                // List movements
+                } else if (!start.starts_line ()) {
+                    while (!start.starts_line ()) {
+                        start.backward_char ();
+                    }
+                    string line_text = buffer.get_text (start, end, true);
+                    debug ("Checking '%s'", line_text);
+                    MatchInfo match_info;
+                    if (is_list.match_full (line_text, line_text.length, 0, 0, out match_info)) {
+                        debug ("Is a list");
+                        if (match_info == null) {
+                            return false;
+                        }
+
+                        string list_item = match_info.fetch (1);
+                        if (match_keycode (Gdk.Key.Return, keycode)) {
+                            insert_at_cursor ("\n");
+                            if (numerical_list.match_full (list_item, list_item.length, 0, 0, out match_info)) {
+                                string spaces = match_info.fetch (1);
+                                string close_char = match_info.fetch (3);
+                                int number = match_info.fetch (2).to_int () + 1;
+                                insert_at_cursor (spaces);
+                                insert_at_cursor (number.to_string ());
+                                insert_at_cursor (close_char);
+                            } else {
+                                insert_at_cursor (list_item);
+                            }
+                        } else {
+                            if ((key.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                                int diff = end.get_offset () - start.get_offset ();
+                                buffer.place_cursor (start);
+                                insert_at_cursor ("    ");
+                                buffer.get_iter_at_mark (out start, cursor);
+                                start.forward_chars (diff);
+                                buffer.place_cursor (start);
+                            } else {
+                                return false;
+                            }
+                        }
+                        return true;
+                    } else if (is_partial_list.match_full (line_text, line_text.length, 0, 0, out match_info)) {
+                        if (match_keycode (Gdk.Key.Return, keycode)) {
+                            Gtk.TextIter doc_start, doc_end;
+                            buffer.get_bounds (out doc_start, out doc_end);
+                            while (!end.starts_line () && end.in_range(doc_start, doc_end)) {
+                                end.forward_char ();
+                            }
+                            buffer.@delete (ref start, ref end);
+                        } else {
+                            if ((key.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                                int diff = end.get_offset () - start.get_offset ();
+                                buffer.place_cursor (start);
+                                insert_at_cursor ("    ");
+                                buffer.get_iter_at_mark (out start, cursor);
+                                start.forward_chars (diff);
+                                buffer.place_cursor (start);
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
 
         public bool prompt_on_disk_modifications () {
@@ -436,6 +550,8 @@ namespace ThiefMD.Widgets {
                         write_good_recheck ();
                     }
 
+                    key_press_event.connect (on_keypress);
+
                     //
                     // Register for redrawing of window for handling margins and other
                     // redrawing
@@ -467,6 +583,7 @@ namespace ThiefMD.Widgets {
                         buffer.changed.disconnect (on_change_notification);
                         size_allocate.disconnect (dynamic_margins);
                         settings.changed.disconnect (update_settings);
+                        key_press_event.disconnect (on_keypress);
                         if (settings.writegood) {
                             writecheck_active = false;
                             writegood.detach ();
@@ -555,6 +672,40 @@ namespace ThiefMD.Widgets {
 
         public void strikethrough () {
             insert_markup_around_cursor ("~~");
+        }
+
+        public void link () {
+            if (buffer.has_selection) {
+                Gtk.TextIter iter_start, iter_end;
+                if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
+                    string selected_text = buffer.get_text (iter_start, iter_end, true);
+                    MatchInfo match_info;
+                    if (!is_url.match_full (selected_text, selected_text.length, 0, 0, out match_info)) {
+                        buffer.insert (ref iter_start, "[", -1);
+                        if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
+                            buffer.insert (ref iter_end, "]()", -1);
+                            buffer.get_selection_bounds (out iter_start, out iter_end);
+                            iter_end.backward_chars (1);
+                            buffer.place_cursor (iter_end);
+                        }
+                    } else {
+                        buffer.insert (ref iter_start, "[](", -1);
+                        if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
+                            buffer.insert (ref iter_end, ")", -1);
+                            buffer.get_selection_bounds (out iter_start, out iter_end);
+                            iter_start.backward_chars (2);
+                            buffer.place_cursor (iter_start);
+                        }
+                    }
+                }
+            } else {
+                insert_at_cursor ("[]()");
+                var cursor = buffer.get_insert ();
+                Gtk.TextIter start;
+                buffer.get_iter_at_mark (out start, cursor);
+                start.backward_chars (3);
+                buffer.place_cursor (start);
+            }
         }
 
         public bool save () throws Error {
