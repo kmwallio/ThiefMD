@@ -63,6 +63,7 @@ namespace ThiefMD.Widgets {
         private Gtk.TextTag heading4_text;
         private Gtk.TextTag heading5_text;
         private Gtk.TextTag heading6_text;
+        private Gtk.TextTag code_block;
 
         //
         // Regexes
@@ -72,6 +73,7 @@ namespace ThiefMD.Widgets {
         private Regex numerical_list;
         private Regex is_url;
         private Regex is_heading;
+        private Regex is_codeblock;
 
         //
         // Maintaining state
@@ -86,11 +88,12 @@ namespace ThiefMD.Widgets {
             settings.changed.connect (update_settings);
 
             try {
-                is_heading = new Regex ("(#+\\s+.+?)[\\n\\R]", RegexCompileFlags.CASELESS, 0);
+                is_heading = new Regex ("(#+\\s+[^\\R]+?)[\\n\\R]", RegexCompileFlags.CASELESS, 0);
                 is_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+(\\.|\\)))\\s)\\s*(.+)", RegexCompileFlags.CASELESS, 0);
                 is_partial_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+\\.))\\s+$", RegexCompileFlags.CASELESS, 0);
                 numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.CASELESS, 0);
                 is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss|file)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.CASELESS, 0);
+                is_codeblock = new Regex ("(```[a-zA-Z]*[\\n\\R]((.*?)[\\n\\R])*?```[\\n\\R])", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             } catch (Error e) {
                 warning ("Could not initialize regexes: %s", e.message);
             }
@@ -195,6 +198,7 @@ namespace ThiefMD.Widgets {
             heading4_text = buffer.create_tag ("heading4-text");
             heading5_text = buffer.create_tag ("heading5-text");
             heading6_text = buffer.create_tag ("heading6-text");
+            code_block = buffer.create_tag ("code-block");
 
             last_width = settings.window_width;
             last_height = settings.window_height;
@@ -1087,6 +1091,7 @@ namespace ThiefMD.Widgets {
                 buffer.remove_tag (heading4_text, start, end);
                 buffer.remove_tag (heading5_text, start, end);
                 buffer.remove_tag (heading6_text, start, end);
+                buffer.remove_tag (code_block, start, end);
 
                 var font_map = get_font_map ();
                 int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
@@ -1142,6 +1147,27 @@ namespace ThiefMD.Widgets {
 
                 MatchInfo match_info;
                 string checking_copy = buffer.text;
+                // Tag code blocks as such (regex hits issues on large text)
+                int block_occurrences = checking_copy.down ().split ("\n```").length - 1;
+                if (block_occurrences % 2 == 0) {
+                    int offset = checking_copy.index_of ("\n```");
+                    while (offset > 0) {
+                        int next_offset = checking_copy.index_of ("\n```", offset + 1);
+                        if (next_offset > 0) {
+                            int start_pos, end_pos;
+                            start_pos = checking_copy.slice (0, offset).char_count ();
+                            end_pos = checking_copy.slice (0, next_offset).char_count ();
+                            buffer.get_iter_at_offset (out start, start_pos);
+                            buffer.get_iter_at_offset (out end, end_pos);
+                            buffer.apply_tag (code_block, start, end);
+                            offset = checking_copy.index_of ("\n```", next_offset + 1);
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
+                // Tag headings and make sure they're not in code blocks
                 if (is_heading.match_full (checking_copy, checking_copy.length, 0, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
                     do {
                         int start_pos, end_pos;
@@ -1152,6 +1178,9 @@ namespace ThiefMD.Widgets {
                             end_pos = checking_copy.slice (0, end_pos).char_count ();
                             buffer.get_iter_at_offset (out start, start_pos);
                             buffer.get_iter_at_offset (out end, end_pos);
+                            if (start.has_tag (code_block) || end.has_tag (code_block)) {
+                                continue;
+                            }
                             switch (heading.index_of (" ")) {
                                 case 1:
                                     buffer.apply_tag (heading1_text, start, end);
