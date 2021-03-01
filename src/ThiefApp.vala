@@ -35,9 +35,7 @@ namespace ThiefMD {
         public Gee.ConcurrentList<Connections.ConnectionBase> connections;
         public bool ready = false;
         public bool am_mobile = false;
-        private Gtk.Application app_parent;
 
-        private Hdy.Leaflet library_leaf;
         private string start_dir;
         private Gtk.Box desktop_box;
         private Gtk.Box mobile_box;

@@ -25,9 +25,6 @@ using ThiefMD.Connections;
 
 namespace ThiefMD.Widgets {
     public class Preferences : Hdy.PreferencesWindow {
-        private Stack stack;
-        private Gtk.HeaderBar bar;
-
         public Preferences () {
             build_ui ();
         }
@@ -49,7 +46,6 @@ namespace ThiefMD.Widgets {
             connection_scroller.vexpand = true;
             connection_scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
 
-            var settings = AppSettings.get_default ();
             Hdy.PreferencesGroup display_options = new Hdy.PreferencesGroup ();
             display_options.title = _("Current Connections");
             display_options.description = _("Click on a connection to remove.");

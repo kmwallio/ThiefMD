@@ -44,7 +44,6 @@ namespace ThiefMD.Controllers {
         private static SecretSchemas instance = null;
         public Secret.Schema thief_secret;
         private SecretAttributes stored_secrets;
-        private Secret.Collection collection;
         private Mutex save_secrets;
 
         public SecretSchemas () {
@@ -69,7 +68,6 @@ namespace ThiefMD.Controllers {
         public bool load_secrets () {
             debug ("Loading collections");
             File secrets = File.new_for_path (UserData.connection_file);
-            bool success = false;
             if (!secrets.query_exists ()) {
                 return true;
             }
@@ -77,7 +75,6 @@ namespace ThiefMD.Controllers {
             try {
                 Json.Parser parser = new Json.Parser ();
                 parser.load_from_file (secrets.get_path ());
-                Json.Node data = parser.get_root ();
                 var json_obj = parser.get_root ().get_object ();
 
                 var secrets_data = json_obj.get_array_member ("secrets");

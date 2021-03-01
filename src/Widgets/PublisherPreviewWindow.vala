@@ -54,7 +54,7 @@ namespace ThiefMD.Widgets {
         protected void build_ui () {
             Gtk.Box vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             var settings = AppSettings.get_default ();
-            int w, h, m, p;
+            int w, h;
 
             headerbar = new Hdy.HeaderBar ();
             headerbar.set_title (_("Publishing Preview"));

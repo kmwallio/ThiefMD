@@ -258,59 +258,63 @@ namespace ThiefMD.Widgets {
                     string line_text = buffer.get_text (start, end, true);
                     debug ("Checking '%s'", line_text);
                     MatchInfo match_info;
-                    if (is_list.match_full (line_text, line_text.length, 0, 0, out match_info)) {
-                        debug ("Is a list");
-                        if (match_info == null) {
-                            return false;
-                        }
+                    try {
+                        if (is_list.match_full (line_text, line_text.length, 0, 0, out match_info)) {
+                            debug ("Is a list");
+                            if (match_info == null) {
+                                return false;
+                            }
 
-                        string list_item = match_info.fetch (1);
-                        if (match_keycode (Gdk.Key.Return, keycode)) {
-                            insert_at_cursor ("\n");
-                            if (numerical_list.match_full (list_item, list_item.length, 0, 0, out match_info)) {
-                                string spaces = match_info.fetch (1);
-                                string close_char = match_info.fetch (3);
-                                int number = match_info.fetch (2).to_int () + 1;
-                                insert_at_cursor (spaces);
-                                insert_at_cursor (number.to_string ());
-                                insert_at_cursor (close_char);
+                            string list_item = match_info.fetch (1);
+                            if (match_keycode (Gdk.Key.Return, keycode)) {
+                                insert_at_cursor ("\n");
+                                if (numerical_list.match_full (list_item, list_item.length, 0, 0, out match_info)) {
+                                    string spaces = match_info.fetch (1);
+                                    string close_char = match_info.fetch (3);
+                                    int number = int.parse (match_info.fetch (2)) + 1;
+                                    insert_at_cursor (spaces);
+                                    insert_at_cursor (number.to_string ());
+                                    insert_at_cursor (close_char);
+                                } else {
+                                    insert_at_cursor (list_item);
+                                }
                             } else {
-                                insert_at_cursor (list_item);
+                                if ((key.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                                    int diff = end.get_offset () - start.get_offset ();
+                                    buffer.place_cursor (start);
+                                    insert_at_cursor ("    ");
+                                    buffer.get_iter_at_mark (out start, cursor);
+                                    start.forward_chars (diff);
+                                    buffer.place_cursor (start);
+                                } else {
+                                    return false;
+                                }
                             }
-                        } else {
-                            if ((key.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
-                                int diff = end.get_offset () - start.get_offset ();
-                                buffer.place_cursor (start);
-                                insert_at_cursor ("    ");
-                                buffer.get_iter_at_mark (out start, cursor);
-                                start.forward_chars (diff);
-                                buffer.place_cursor (start);
+                            return true;
+                        } else if (is_partial_list.match_full (line_text, line_text.length, 0, 0, out match_info)) {
+                            if (match_keycode (Gdk.Key.Return, keycode)) {
+                                Gtk.TextIter doc_start, doc_end;
+                                buffer.get_bounds (out doc_start, out doc_end);
+                                while (!end.starts_line () && end.in_range(doc_start, doc_end)) {
+                                    end.forward_char ();
+                                }
+                                buffer.@delete (ref start, ref end);
                             } else {
-                                return false;
+                                if ((key.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                                    int diff = end.get_offset () - start.get_offset ();
+                                    buffer.place_cursor (start);
+                                    insert_at_cursor ("    ");
+                                    buffer.get_iter_at_mark (out start, cursor);
+                                    start.forward_chars (diff);
+                                    buffer.place_cursor (start);
+                                    return true;
+                                } else {
+                                    return false;
+                                }
                             }
                         }
-                        return true;
-                    } else if (is_partial_list.match_full (line_text, line_text.length, 0, 0, out match_info)) {
-                        if (match_keycode (Gdk.Key.Return, keycode)) {
-                            Gtk.TextIter doc_start, doc_end;
-                            buffer.get_bounds (out doc_start, out doc_end);
-                            while (!end.starts_line () && end.in_range(doc_start, doc_end)) {
-                                end.forward_char ();
-                            }
-                            buffer.@delete (ref start, ref end);
-                        } else {
-                            if ((key.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
-                                int diff = end.get_offset () - start.get_offset ();
-                                buffer.place_cursor (start);
-                                insert_at_cursor ("    ");
-                                buffer.get_iter_at_mark (out start, cursor);
-                                start.forward_chars (diff);
-                                buffer.place_cursor (start);
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        }
+                    } catch (Error e) {
+                        warning ("Error parsing key presses: %s", e.message);
                     }
                 }
             }
@@ -395,8 +399,6 @@ namespace ThiefMD.Widgets {
             uint target_type,
             uint time)
         {
-            var header_context = this.get_style_context ();
-
             int mid =  get_allocated_height () / 2;
             debug ("%s: data (m: %d, %d)", widget.name, mid, y);
 
@@ -427,7 +429,6 @@ namespace ThiefMD.Widgets {
                         ext == "pl" || ext == "py" || ext == "sass" || ext == "json" ||
                         ext == "pm" || ext == "h" || ext == "log" || ext == "rs")
             {
-                File local = File.new_for_path (data);
                 if (file.query_exists () &&
                     (!FileUtils.test(data, FileTest.IS_DIR)) &&
                     (FileUtils.test(data, FileTest.IS_REGULAR)))
@@ -442,7 +443,6 @@ namespace ThiefMD.Widgets {
             } else if (ext == "pdf" || ext == "docx" || ext == "pptx" || ext == "html") {
                 insert = "[" + data.substring (data.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "](" + get_base_library_path(data) + ")\n";
             } else if (ext == "csv") {
-                File local = File.new_for_path (data);
                 if (file.query_exists () &&
                     (!FileUtils.test(data, FileTest.IS_DIR)) &&
                     (FileUtils.test(data, FileTest.IS_REGULAR)))
@@ -710,22 +710,26 @@ namespace ThiefMD.Widgets {
                 if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
                     string selected_text = buffer.get_text (iter_start, iter_end, true);
                     MatchInfo match_info;
-                    if (!is_url.match_full (selected_text, selected_text.length, 0, 0, out match_info)) {
-                        buffer.insert (ref iter_start, "[", -1);
-                        if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
-                            buffer.insert (ref iter_end, "]()", -1);
-                            buffer.get_selection_bounds (out iter_start, out iter_end);
-                            iter_end.backward_chars (1);
-                            buffer.place_cursor (iter_end);
+                    try {
+                        if (!is_url.match_full (selected_text, selected_text.length, 0, 0, out match_info)) {
+                            buffer.insert (ref iter_start, "[", -1);
+                            if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
+                                buffer.insert (ref iter_end, "]()", -1);
+                                buffer.get_selection_bounds (out iter_start, out iter_end);
+                                iter_end.backward_chars (1);
+                                buffer.place_cursor (iter_end);
+                            }
+                        } else {
+                            buffer.insert (ref iter_start, "[](", -1);
+                            if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
+                                buffer.insert (ref iter_end, ")", -1);
+                                buffer.get_selection_bounds (out iter_start, out iter_end);
+                                iter_start.backward_chars (2);
+                                buffer.place_cursor (iter_start);
+                            }
                         }
-                    } else {
-                        buffer.insert (ref iter_start, "[](", -1);
-                        if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
-                            buffer.insert (ref iter_end, ")", -1);
-                            buffer.get_selection_bounds (out iter_start, out iter_end);
-                            iter_start.backward_chars (2);
-                            buffer.place_cursor (iter_start);
-                        }
+                    } catch (Error e) {
+                        warning ("Could not determine URL status, hit exception: %s", e.message);
                     }
                 }
             } else {
@@ -1001,7 +1005,7 @@ namespace ThiefMD.Widgets {
                 return;
             }
 
-            int w, h, m, p;
+            int w, h;
             ThiefApp.get_instance ().get_size (out w, out h);
 
             w = w - ThiefApp.get_instance ().pane_position;
@@ -1349,7 +1353,6 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
-                Gtk.TextIter end2 = end;
                 while (end.get_offset () > start.get_offset () && end.get_char () != 0 && end.get_char () != ' ' && end.get_char () != '\n' && !end.ends_word () && !end.ends_line ()) {
                     end.backward_char ();
                 }

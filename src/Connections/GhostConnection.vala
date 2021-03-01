@@ -32,7 +32,6 @@ namespace ThiefMD.Connections {
         public override string export_name { get; protected set; }
         public override ExportBase exporter { get; protected  set; }
         public Ghost.Client connection;
-        private string access_token;
         private string alias;
         public string conf_endpoint;
         public string conf_alias;
@@ -198,10 +197,7 @@ namespace ThiefMD.Connections {
         }
 
         public override bool export () {
-            var settings = AppSettings.get_default ();
-            bool non_collected_post = true;
             bool published = false;
-            string temp;
             string title;
             string date;
             string slug = "";

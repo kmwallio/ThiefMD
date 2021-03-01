@@ -105,6 +105,7 @@ namespace ThiefMD.Controllers.FileManager {
         bool case_insensitive = true,
         bool match_as_suffix = true)
     {
+        place_file_at = "";
         foreach (string hay in haystack) {
             if (hay == needle) {
                 place_file_at = hay;
@@ -289,6 +290,7 @@ namespace ThiefMD.Controllers.FileManager {
             settings.last_file = filename;
             file_opened = true;
         } else {
+            editor = null;
             warning ("File does not exist\n");
         }
     }
@@ -393,7 +395,6 @@ namespace ThiefMD.Controllers.FileManager {
     }
 
     public bool get_parsed_markdown (string raw_mk, out string processed_mk) {
-        var settings = AppSettings.get_default ();
         var mkd = new Markdown.Document.from_gfm_string (raw_mk.data, 0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x04000000 + 0x00400000 + 0x10000000 + 0x40000000);
         mkd.compile (0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x00400000 + 0x04000000 + 0x40000000 + 0x10000000);
         mkd.get_document (out processed_mk);
@@ -635,7 +636,7 @@ namespace ThiefMD.Controllers.FileManager {
 
             if (file.query_exists ()) {
                 string filename = file.get_path ();
-                debug ("Reading %s\n", filename);
+                debug ("Reading %s", filename);
 
                 var input = new DataInputStream (file.read ());
                 int lines_read = 0;
@@ -818,10 +819,10 @@ namespace ThiefMD.Controllers.FileManager {
         }
 
         if (tries == 15) {
-            warning ("*** Broke out ***\n");
+            warning ("*** Broke out ***");
         }
 
-        debug ("*** Lock acq\n");
+        debug ("*** Lock acq");
 
         disable_save = true;
     }
@@ -829,6 +830,6 @@ namespace ThiefMD.Controllers.FileManager {
     public static void release_lock () {
         disable_save = false;
 
-        debug ("*** Lock rel\n");
+        debug ("*** Lock rel");
     }
 }

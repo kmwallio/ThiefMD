@@ -206,7 +206,6 @@ namespace ThiefMD.Connections {
         }
 
         public override bool export () {
-            var settings = AppSettings.get_default ();
             bool non_collected_post = true;
             bool published = true;
             string temp;
