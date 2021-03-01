@@ -110,6 +110,7 @@ libgtk-3-dev
 libgee-0.8-dev
 libgtksourceview-4-dev
 libsecret-1-dev
+libhandy-1-dev
 ```
 
 ### Fedora
@@ -129,6 +130,7 @@ libarchive-devel
 libxml2-devel
 libgee-devel
 libsecret-devel
+libhandy1-devel
 ```
 
 ## Building
