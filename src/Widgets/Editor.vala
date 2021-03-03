@@ -57,12 +57,7 @@ namespace ThiefMD.Widgets {
 
         private Gtk.TextTag focus_text;
         private Gtk.TextTag outoffocus_text;
-        private Gtk.TextTag heading1_text;
-        private Gtk.TextTag heading2_text;
-        private Gtk.TextTag heading3_text;
-        private Gtk.TextTag heading4_text;
-        private Gtk.TextTag heading5_text;
-        private Gtk.TextTag heading6_text;
+        private Gtk.TextTag[] heading_text;
         private Gtk.TextTag code_block;
 
         //
@@ -192,12 +187,11 @@ namespace ThiefMD.Widgets {
             outoffocus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
             outoffocus_text.foreground_set = true;
 
-            heading1_text = buffer.create_tag ("heading1-text");
-            heading2_text = buffer.create_tag ("heading2-text");
-            heading3_text = buffer.create_tag ("heading3-text");
-            heading4_text = buffer.create_tag ("heading4-text");
-            heading5_text = buffer.create_tag ("heading5-text");
-            heading6_text = buffer.create_tag ("heading6-text");
+            heading_text = new Gtk.TextTag[6];
+            for (int h = 0; h < 6; h++) {
+                heading_text[h] = buffer.create_tag ("heading%d-text".printf (h + 1));
+            }
+
             code_block = buffer.create_tag ("code-block");
 
             last_width = settings.window_width;
@@ -1061,19 +1055,7 @@ namespace ThiefMD.Widgets {
             left_margin = m;
             right_margin = m;
 
-            // Update heading margins
-            if (dynamic_margin_update.can_do_action ()) {
-                update_heading_margins ();
-            } else {
-                if (!header_redraw_scheduled) {
-                    header_redraw_scheduled = true;
-                    Timeout.add (300, () => {
-                        header_redraw_scheduled = false;
-                        update_heading_margins ();
-                        return false;
-                    });
-                }
-            }
+            update_heading_margins ();
 
             typewriter_scrolling ();
 
@@ -1084,69 +1066,79 @@ namespace ThiefMD.Widgets {
 
         bool header_redraw_scheduled = false;
         private void update_heading_margins () {
+            bool try_later = false;
+            // Update heading margins
+            if (UI.moving ()) {
+                try_later = true;
+            } else if (!dynamic_margin_update.can_do_action ()) {
+                try_later = true;
+            }
+
+            if (try_later) {
+                if (!header_redraw_scheduled) {
+                    header_redraw_scheduled = true;
+                    Timeout.add (350, () => {
+                        header_redraw_scheduled = false;
+                        update_heading_margins ();
+                        return false;
+                    });
+                }
+                return;
+            }
+
             var settings = AppSettings.get_default ();
             int m = left_margin;
             try {
                 Gtk.TextIter start, end;
                 buffer.get_bounds (out start, out end);
-                buffer.remove_tag (heading1_text, start, end);
-                buffer.remove_tag (heading2_text, start, end);
-                buffer.remove_tag (heading3_text, start, end);
-                buffer.remove_tag (heading4_text, start, end);
-                buffer.remove_tag (heading5_text, start, end);
-                buffer.remove_tag (heading6_text, start, end);
+                for (int h = 0; h < 6; h++) {
+                    buffer.remove_tag (heading_text[h], start, end);
+                }
                 buffer.remove_tag (code_block, start, end);
 
-                var font_map = get_font_map ();
                 int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
-                int f_h = 0;
-                if (font_map != null) {
-                    var font_context = font_map.create_context ();
-                    var font_layout = new Pango.Layout (font_context);
-                    font_layout.set_text ("#", 1);
-                    font_layout.get_size (out f_w, out f_h);
-                    debug ("Found font char width: %d", f_w);
-                } else {
-                    //  if (get_realized ()) {
-                    //      var mock_label = new Gtk.Label (null);
-                    //      var mock_context = mock_label.get_style_context ();
-                    //      if (settings.fullscreen) {
-                    //          mock_context.add_class ("full-text");
-                    //          mock_context.remove_class ("small-text");
-                    //      } else {
-                    //          mock_context.add_class ("small-text");
-                    //          mock_context.remove_class ("full-text");
-                    //      }
-                    //      var font_desc = Pango.FontDescription.from_string (settings.get_css_font_family ());
-                    //      font_desc.set_size (f_w);
-                    //      var font_layout = mock_label.get_layout ();
-                    //      font_layout.set_font_description (font_desc);
-                    //      font_layout.set_markup ("#", 1);
-                    //      mock_label.show ();
-                    //      int t_w;
-                    //      font_layout.get_size (out t_w, out f_h);
-                    //      if (t_w != 0) {
-                    //          f_w = t_w;
-                    //      }
-                    //      mock_label.hide ();
-                    //  }
-                    debug ("Generated font char width: %d", f_w);
-                }
+                int hashtag_w = f_w;
+                int space_w = f_w;
+                int avg_w;
 
-                if (m - (f_w * 7) > 0) {
-                    heading1_text.left_margin = m - (f_w * 2);
-                    heading2_text.left_margin = m - (f_w * 3);
-                    heading3_text.left_margin = m - (f_w * 4);
-                    heading4_text.left_margin = m - (f_w * 5);
-                    heading5_text.left_margin = m - (f_w * 6);
-                    heading6_text.left_margin = m - (f_w * 7);
-                } else {
-                    heading1_text.left_margin = m;
-                    heading2_text.left_margin = m;
-                    heading3_text.left_margin = m;
-                    heading4_text.left_margin = m;
-                    heading5_text.left_margin = m;
-                    heading6_text.left_margin = m;
+                if (get_realized ()) {
+                    var font_desc = new Pango.FontDescription ();
+                    font_desc.set_family (settings.get_css_font_family ());
+                    font_desc.set_size ((int)(f_w * Pango.SCALE * Pango.Scale.LARGE));
+                    var font_context = get_pango_context ();
+                    var font_layout = new Pango.Layout (font_context);
+                    font_layout.set_font_description (font_desc);
+                    font_layout.set_text ("#", 1);
+                    font_layout.get_pixel_size (out hashtag_w, out avg_w);
+                    font_layout.set_text (" ", 1);
+                    font_layout.get_pixel_size (out space_w, out avg_w);
+                    if (space_w + hashtag_w <= 0) {
+                        hashtag_w = f_w;
+                        space_w = f_w;
+                    }
+                    avg_w = (int)((hashtag_w + space_w) / 2.0);
+                    warning ("Hashtag: %d, Space: %d, AvgChar: %d", hashtag_w, space_w, avg_w);
+                    if (m - ((hashtag_w * 6) + space_w) <= 0) {
+                        heading_text[0].left_margin = m;
+                        heading_text[1].left_margin = m;
+                        heading_text[2].left_margin = m;
+                        heading_text[3].left_margin = m;
+                        heading_text[4].left_margin = m;
+                        heading_text[5].left_margin = m;
+                    } else {
+                        //  heading_text[0].left_margin = m - ((hashtag_w * 1) + space_w);
+                        //  heading_text[1].left_margin = m - ((hashtag_w * 2) + space_w);
+                        //  heading_text[2].left_margin = m - ((hashtag_w * 3) + space_w);
+                        //  heading_text[3].left_margin = m - ((hashtag_w * 4) + space_w);
+                        //  heading_text[4].left_margin = m - ((hashtag_w * 5) + space_w);
+                        //  heading_text[5].left_margin = m - ((hashtag_w * 6) + space_w);
+                        heading_text[0].left_margin = m - (avg_w * 2);
+                        heading_text[1].left_margin = m - (avg_w * 3);
+                        heading_text[2].left_margin = m - (avg_w * 4);
+                        heading_text[3].left_margin = m - (avg_w * 5);
+                        heading_text[4].left_margin = m - (avg_w * 6);
+                        heading_text[5].left_margin = m - (avg_w * 7);
+                    }
                 }
 
                 MatchInfo match_info;
@@ -1185,25 +1177,9 @@ namespace ThiefMD.Widgets {
                             if (start.has_tag (code_block) || end.has_tag (code_block)) {
                                 continue;
                             }
-                            switch (heading.index_of (" ")) {
-                                case 1:
-                                    buffer.apply_tag (heading1_text, start, end);
-                                    break;
-                                case 2:
-                                    buffer.apply_tag (heading2_text, start, end);
-                                    break;
-                                case 3:
-                                    buffer.apply_tag (heading3_text, start, end);
-                                    break;
-                                case 4:
-                                    buffer.apply_tag (heading4_text, start, end);
-                                    break;
-                                case 5:
-                                    buffer.apply_tag (heading5_text, start, end);
-                                    break;
-                                case 6:
-                                    buffer.apply_tag (heading6_text, start, end);
-                                    break;
+                            int heading_depth = heading.index_of (" ") - 1;
+                            if (heading_depth >= 0 && heading_depth < 6) {
+                                buffer.apply_tag (heading_text[heading_depth], start, end);
                             }
                         }
                     } while (match_info.next ());
@@ -1289,6 +1265,10 @@ namespace ThiefMD.Widgets {
                 writecheck_active = true;
                 writegood.attach (this);
                 write_good_recheck ();
+            }
+
+            if (!header_redraw_scheduled) {
+                update_heading_margins ();
             }
         }
 

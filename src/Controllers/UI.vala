@@ -526,7 +526,6 @@ namespace ThiefMD.Controllers.UI {
 
         debug ("Hiding library (%d)\n", instance.library_pane.get_position ());
         if (instance.library_pane.get_position () > 0 || instance.sheets_pane.get_position () <= 0) {
-            _moving.moving = false;
             int target_sheets = 0;
             if (instance.library_pane.get_position () > 0) {
                 target_sheets = instance.sheets_pane.get_position () - instance.library_pane.get_position ();
@@ -588,7 +587,9 @@ namespace ThiefMD.Controllers.UI {
             return;
         }
 
-        _moving.moving = true;
+        if (!_moving.start_move ()) {
+            return;
+        }
 
         _hop_sheets = (int)((sheet_pane - instance.sheets_pane.get_position ()) / Constants.ANIMATION_FRAMES);
         _hop_library = (int)((library_pane - instance.library_pane.get_position ()) / Constants.ANIMATION_FRAMES);
@@ -605,7 +606,6 @@ namespace ThiefMD.Controllers.UI {
 
             if (!_moving.moving) {
                 // debug ("No longer moving\n");
-                _moving.moving = false;
                 return false;
             }
 
@@ -635,8 +635,9 @@ namespace ThiefMD.Controllers.UI {
 
             // debug ("Sheets done: %s, Library done: %s\n", sheet_done ? "yes" : "no", lib_done ? "yes" : "no");
 
-            _moving.moving = !lib_done || !sheet_done;
-            if (!moving ()) {
+            bool still_moving = !lib_done || !sheet_done;
+            if (!still_moving) {
+                _moving.stop_move ();
                 _moving.movement_done ();
                 SheetManager.redraw ();
             }
@@ -649,15 +650,37 @@ namespace ThiefMD.Controllers.UI {
         public bool moving;
         private MovementCallback handler;
         public signal void movement_done ();
+        Mutex move_lock;
 
         public Movement () {
             moving = false;
             handler = do_nothing;
+            move_lock = new Mutex ();
 
             movement_done.connect (() => {
                 handler ();
                 handler = do_nothing;
             });
+        }
+
+        public bool stop_move () {
+            move_lock.lock ();
+            moving = false;
+            move_lock.unlock ();
+            return true;
+        }
+
+        public bool start_move () {
+            bool movable = false;
+            if (move_lock.trylock ()) {
+                if (!moving) {
+                    moving = true;
+                    movable = true;
+                }
+                move_lock.unlock ();
+            }
+
+            return movable;
         }
 
         public void do_nothing () {
