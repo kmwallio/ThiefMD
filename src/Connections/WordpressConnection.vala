@@ -50,6 +50,9 @@ namespace ThiefMD.Connections {
                 } else if (endpoint.has_prefix ("http://")) {
                     label = endpoint.substring (7);
                 }
+                if (label.has_suffix (".php")) {
+                    label = endpoint.substring (0, endpoint.last_index_of_char('/'));
+                }
                 if (!label.has_suffix ("/")) {
                     label += "/";
                 }

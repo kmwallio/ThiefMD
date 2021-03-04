@@ -152,8 +152,11 @@ namespace ThiefMD.Controllers.UI {
         debug ("Themes loaded");
 
         debug ("Loading user connections");
-        SecretSchemas.get_instance ().load_secrets ();
-        debug ("Connections loaded");
+        GLib.Idle.add (() => {
+            SecretSchemas.get_instance ().load_secrets ();
+            debug ("Connections loaded");
+            return false;
+        }, GLib.Priority.LOW);
 
         return false;
     }
