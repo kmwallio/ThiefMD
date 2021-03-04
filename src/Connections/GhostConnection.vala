@@ -70,7 +70,7 @@ namespace ThiefMD.Connections {
             // Void
         }
 
-        public static ConnectionData? create_connection () {
+        public static ConnectionData? create_connection (Gtk.Window? parent) {
             Gtk.Grid grid = new Gtk.Grid ();
             grid.margin = 12;
             grid.row_spacing = 12;
@@ -104,7 +104,7 @@ namespace ThiefMD.Connections {
 
             var dialog = new Gtk.Dialog.with_buttons (
                             "New ghost Connection",
-                            ThiefApp.get_instance (),
+                            (parent != null) ? parent : ThiefApp.get_instance (),
                             Gtk.DialogFlags.MODAL,
                             _("_Add Account"),
                             Gtk.ResponseType.ACCEPT,

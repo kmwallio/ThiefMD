@@ -44,4 +44,57 @@ namespace ThiefMD.Connections {
         public abstract bool connection_valid ();
         public abstract void connection_close ();
     }
+
+    public class ConnectionError : Gtk.Dialog {
+        private Gtk.Label message;
+
+        public ConnectionError (Gtk.Window? win, string set_title, Gtk.Label body) {
+            set_transient_for (win);
+            modal = true;
+            title = set_title;
+            message = body;
+            build_ui ();
+        }
+
+        private void build_ui () {
+            window_position = Gtk.WindowPosition.CENTER;
+            this.get_content_area().add (build_message_ui ());
+            show_all ();
+        }
+
+        private Gtk.Grid build_message_ui () {
+            Gtk.Grid grid = new Gtk.Grid ();
+            grid.margin = 12;
+            grid.row_spacing = 12;
+            grid.column_spacing = 12;
+            grid.orientation = Gtk.Orientation.VERTICAL;
+            grid.hexpand = true;
+            grid.vexpand = true;
+
+            try {
+                Gtk.IconTheme icon_theme = Gtk.IconTheme.get_default();
+                var thief_icon = icon_theme.load_icon("com.github.kmwallio.thiefmd", 128, Gtk.IconLookupFlags.FORCE_SVG);
+                var icon = new Gtk.Image.from_pixbuf (thief_icon);
+                grid.attach (icon, 1, 1);
+            } catch (Error e) {
+                warning ("Could not load logo: %s", e.message);
+            }
+
+            grid.attach (message, 1, 2);
+
+            Gtk.Button close = new Gtk.Button.with_label (_("Close"));
+            grid.attach (close, 1, 3);
+
+            close.clicked.connect (() => {
+                this.destroy ();
+            });
+
+            response.connect (() => {
+                this.destroy ();
+            });
+
+            grid.show_all ();
+            return grid;
+        }
+    }
 }

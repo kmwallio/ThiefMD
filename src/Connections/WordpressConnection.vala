@@ -70,7 +70,7 @@ namespace ThiefMD.Connections {
             // Void
         }
 
-        public static ConnectionData? create_connection () {
+        public static ConnectionData? create_connection (Gtk.Window? parent = null) {
             Gtk.Grid grid = new Gtk.Grid ();
             grid.margin = 12;
             grid.row_spacing = 12;
@@ -104,7 +104,7 @@ namespace ThiefMD.Connections {
 
             var dialog = new Gtk.Dialog.with_buttons (
                             "New Wordpress Connection",
-                            ThiefApp.get_instance (),
+                            (parent != null) ? parent : ThiefApp.get_instance (),
                             Gtk.DialogFlags.MODAL,
                             _("_Add Account"),
                             Gtk.ResponseType.ACCEPT,
@@ -286,7 +286,8 @@ namespace ThiefMD.Connections {
                     debug ("Posted");
                     Gtk.Label label = new Gtk.Label (
                         "<b>Post URL:</b> <a href='%s'>%s</a>".printf (
-                            connection.endpoint.replace ("/xmlrpc.php", "") + "/?p=" + id, connection.endpoint.replace ("/xmlrpc.php", "") + "/?p=" + id));
+                            connection.endpoint.substring (0, connection.endpoint.last_index_of_char  ('/')) + "/?p=" + id,
+                            connection.endpoint.substring (0, connection.endpoint.last_index_of_char  ('/')) + "/?p=" + id));
 
                     label.xalign = 0;
                     label.use_markup = true;

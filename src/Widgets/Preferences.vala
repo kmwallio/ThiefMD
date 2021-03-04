@@ -60,7 +60,7 @@ namespace ThiefMD.Widgets {
             writeas_connection.always_show_image = true;
             writeas_connection.show_all ();
             writeas_connection.clicked.connect (() => {
-                ConnectionData? data = WriteFreelyConnection.create_connection ();
+                ConnectionData? data = WriteFreelyConnection.create_connection (this);
                 if (data != null) {
                     if (data.endpoint.chug ().chomp () == "") {
                         data.endpoint = "https://write.as/";
@@ -72,6 +72,17 @@ namespace ThiefMD.Widgets {
                         ThiefApp.get_instance ().connections.add (connection);
                         ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
                         display_options.add (connection_button (connection, display_options));
+                    } else {
+                        Gtk.Label label = new Gtk.Label (
+                            "<b>Could not connect:</b> Please visit <a href='https://thiefmd.com/help/write-freely'>https://thiefmd.com/help/write-freely</a> for help troubleshooting.");
+    
+                        label.xalign = 0;
+                        label.use_markup = true;
+                        ConnectionError status = new ConnectionError (
+                            this,
+                            (title != "") ? title + _(" Published") : _("Post Published"),
+                            label);
+                        status.run ();
                     }
                 }
             });
@@ -83,7 +94,7 @@ namespace ThiefMD.Widgets {
             ghost_connection.always_show_image = true;
             ghost_connection.show_all ();
             ghost_connection.clicked.connect (() => {
-                ConnectionData? data = GhostConnection.create_connection ();
+                ConnectionData? data = GhostConnection.create_connection (this);
                 if (data != null) {
                     if (data.endpoint.chug ().chomp () == "") {
                         data.endpoint = "https://my.ghost.org/";
@@ -95,6 +106,17 @@ namespace ThiefMD.Widgets {
                         ThiefApp.get_instance ().connections.add (connection);
                         ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
                         display_options.add (connection_button (connection, display_options));
+                    } else {
+                        Gtk.Label label = new Gtk.Label (
+                            "<b>Could not connect:</b> Please visit <a href='https://thiefmd.com/help/ghost'>https://thiefmd.com/help/ghost</a> for help troubleshooting.");
+    
+                        label.xalign = 0;
+                        label.use_markup = true;
+                        ConnectionError status = new ConnectionError (
+                            this,
+                            (title != "") ? title + _(" Published") : _("Post Published"),
+                            label);
+                        status.run ();
                     }
                 }
             });
@@ -106,7 +128,7 @@ namespace ThiefMD.Widgets {
             wordpress_connection.always_show_image = true;
             wordpress_connection.show_all ();
             wordpress_connection.clicked.connect (() => {
-                ConnectionData? data = WordpressConnection.create_connection ();
+                ConnectionData? data = WordpressConnection.create_connection (this);
                 if (data != null) {
                     if (data.endpoint.chug ().chomp () == "") {
                         data.endpoint = "https://my.wordpress.org/";
@@ -118,6 +140,17 @@ namespace ThiefMD.Widgets {
                         ThiefApp.get_instance ().connections.add (connection);
                         ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
                         display_options.add (connection_button (connection, display_options));
+                    } else {
+                        Gtk.Label label = new Gtk.Label (
+                            "<b>Could not connect:</b> Please visit <a href='https://thiefmd.com/help/wordpress'>https://thiefmd.com/help/wordpress</a> for help troubleshooting.");
+    
+                        label.xalign = 0;
+                        label.use_markup = true;
+                        ConnectionError status = new ConnectionError (
+                            this,
+                            (title != "") ? title + _(" Published") : _("Post Published"),
+                            label);
+                        status.run ();
                     }
                 }
             });

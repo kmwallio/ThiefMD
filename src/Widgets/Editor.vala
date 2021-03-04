@@ -83,7 +83,7 @@ namespace ThiefMD.Widgets {
             settings.changed.connect (update_settings);
 
             try {
-                is_heading = new Regex ("(#+\\s[^\\n\\r]+?)[\\n\\R]", RegexCompileFlags.CASELESS, 0);
+                is_heading = new Regex ("(#+\\s[^\\n\\r]+?)[\\n\\R]", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF | RegexCompileFlags.CASELESS, 0);
                 is_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+(\\.|\\)))\\s)\\s*(.+)", RegexCompileFlags.CASELESS, 0);
                 is_partial_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+\\.))\\s+$", RegexCompileFlags.CASELESS, 0);
                 numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.CASELESS, 0);
