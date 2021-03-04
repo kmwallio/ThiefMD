@@ -10,6 +10,7 @@ We're making ThiefMD components reusable. You can find the components in at [Git
 - [libwritegood](#libwritegood)
 - [writeas-vala](#writeas-vala)
 - [ghost-vala](#ghost-vala)
+- [wordpress-vala](#wordpress-vala)
 - [Theme Generator](#theme-generator)
 - [ultheme-vala](#ultheme-vala)
 - [ThiefMD](https://github.com/kmwallio/ThiefMD)
@@ -55,6 +56,10 @@ buffer.changed.connect (() => {
 ## Ghost-vala
 
 [Ghost-vala](https://github.com/ThiefMD/ghost-vala) is a simple library for publishing posts to [ghost](https://ghost.org) blogs.
+
+## Wordpress-vala
+
+[Wordpress-vala](https://github.com/ThiefMD/wordpress-vala) is a simple library for publishing posts to [Wordpress](https://wordpress.org) blogs. It contains some workarounds and retries for some common issues.
 
 ## Theme Generator
 

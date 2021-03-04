@@ -10,3 +10,6 @@ collections:
   deets:
     output: true
     permalink: /:collection/:path/
+  help:
+    output: true
+    permalink: /:collection/:path/
