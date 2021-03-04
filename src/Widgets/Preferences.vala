@@ -100,6 +100,29 @@ namespace ThiefMD.Widgets {
             });
             connection_options.add (ghost_connection);
 
+            var wordpress_connection = new Gtk.Button.with_label (_("  wordpress"));
+            wordpress_connection.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/wordpress.png"));
+            wordpress_connection.hexpand = true;
+            wordpress_connection.always_show_image = true;
+            wordpress_connection.show_all ();
+            wordpress_connection.clicked.connect (() => {
+                ConnectionData? data = WordpressConnection.create_connection ();
+                if (data != null) {
+                    if (data.endpoint.chug ().chomp () == "") {
+                        data.endpoint = "https://my.wordpress.org/";
+                    }
+                    warning ("Connecting new wordpress account: %s", data.user);
+                    WordpressConnection connection = new WordpressConnection (data.user, data.auth, data.endpoint);
+                    if (connection.connection_valid ()) {
+                        SecretSchemas.get_instance ().add_wordpress_secret (data.endpoint, data.user, data.auth);
+                        ThiefApp.get_instance ().connections.add (connection);
+                        ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
+                        display_options.add (connection_button (connection, display_options));
+                    }
+                }
+            });
+            connection_options.add (wordpress_connection);
+
             foreach (var c in ThiefApp.get_instance ().connections) {
                 display_options.add (connection_button (c, display_options));
             }
@@ -130,6 +153,14 @@ namespace ThiefMD.Widgets {
                 alias = gc.conf_alias;
                 endpoint = gc.conf_endpoint;
                 button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/ghost.png"));
+                button.always_show_image = true;
+                button.show_all ();
+            } else if (connection is WordpressConnection) {
+                WordpressConnection gc = (WordpressConnection) connection;
+                type = WordpressConnection.CONNECTION_TYPE;
+                alias = gc.conf_alias;
+                endpoint = gc.conf_endpoint;
+                button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/wordpress.png"));
                 button.always_show_image = true;
                 button.show_all ();
             }

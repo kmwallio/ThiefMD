@@ -1117,7 +1117,7 @@ namespace ThiefMD.Widgets {
                         space_w = f_w;
                     }
                     avg_w = (int)((hashtag_w + space_w) / 2.0);
-                    warning ("Hashtag: %d, Space: %d, AvgChar: %d", hashtag_w, space_w, avg_w);
+                    debug ("Hashtag: %d, Space: %d, AvgChar: %d", hashtag_w, space_w, avg_w);
                     if (m - ((hashtag_w * 6) + space_w) <= 0) {
                         heading_text[0].left_margin = m;
                         heading_text[1].left_margin = m;

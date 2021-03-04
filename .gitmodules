@@ -17,3 +17,6 @@
 	path = data/language-specs
 	url = https://github.com/ThiefMD/custom-gtksourceview-languages.git
 	branch = main
+[submodule "src/wordpress"]
+	path = src/wordpress
+	url = https://github.com/ThiefMD/wordpress-vala.git

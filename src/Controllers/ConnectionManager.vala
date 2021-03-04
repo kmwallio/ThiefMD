@@ -132,6 +132,12 @@ namespace ThiefMD.Controllers {
                                 ThiefApp.get_instance ().exporters.register (ghost_connection.export_name, ghost_connection.exporter);
                                 ThiefApp.get_instance ().connections.add (ghost_connection);
                             }
+                        } else if (attributes["connectiontype"] == WordpressConnection.CONNECTION_TYPE) {
+                            WordpressConnection wordpress_connection = new WordpressConnection (attributes["alias"], the_secret, attributes["endpoint"]);
+                            if (wordpress_connection.connection_valid ()) {
+                                ThiefApp.get_instance ().exporters.register (wordpress_connection.export_name, wordpress_connection.exporter);
+                                ThiefApp.get_instance ().connections.add (wordpress_connection);
+                            }
                         }
 
                         if (!have_secret (attributes["connectiontype"], attributes["alias"], attributes["endpoint"])) {
@@ -274,6 +280,11 @@ namespace ThiefMD.Controllers {
 
         public bool add_ghost_secret (string url, string alias, string password) {
             SecretSchemas.get_instance ().save_secret (GhostConnection.CONNECTION_TYPE, alias, url, password);
+            return true;
+        }
+
+        public bool add_wordpress_secret (string url, string alias, string password) {
+            SecretSchemas.get_instance ().save_secret (WordpressConnection.CONNECTION_TYPE, alias, url, password);
             return true;
         }
     }

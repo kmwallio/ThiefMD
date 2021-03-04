@@ -80,6 +80,7 @@ executable(
     'src/Connections/ConnectionBase.vala',
     'src/Connections/WriteFreelyConnection.vala',
     'src/Connections/GhostConnection.vala',
+    'src/Connections/WordpressConnection.vala',
     'src/Exporters/ExportBase.vala',
     'src/Exporters/ExportDocx.vala',
     'src/Exporters/ExportEpub.vala',
@@ -119,6 +120,7 @@ executable(
     'src/writegood/src/en_us.vala',
     'src/writeas/src/Writeas.vala',
     'src/ghost/src/Ghost.vala',
+    'src/wordpress/src/Wordpress.vala',
     asresources,
     c_args: c_args,
     dependencies: [
