@@ -323,6 +323,10 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sat Mar 06 2021 kmwallio <mwallio@gmail.com> - 0.1.6
+- Wordpress Export is now available, just add a Connection
+- Recessed headers
+- Small tweaks and improvements have been made to speed up the UI
 * Sun Feb 28 2021 kmwallio <mwallio@gmail.com> - 0.1.5
 - Added a shortcut for inserting in a link
 - Editor enhancements for continuing lists

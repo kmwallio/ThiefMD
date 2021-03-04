@@ -8,8 +8,8 @@
   <launchable type="desktop-id">com.github.kmwallio.thiefmd.desktop</launchable>
   <summary>The markdown editor worth stealing.</summary>
   <description>
-    <p>Keep your Markdown managed. Write epic tales, keep a journal, or finally write that book report.</p>
-    <p>ThiefMD is a Markdown Editor providing an easy way to organize, format, and compile your markdown documents.</p>
+    <p>Keep your Markdown managed. Write epic tales, a novel, keep a journal, or finally write that book report.</p>
+    <p>ThiefMD is a Markdown Editor providing an easy way to organize, format, and compile your markdown documents. When you're ready to Publish, go to ePub, PDF, Office, Ghost, Wordpress, Write-Freely, or more.</p>
     <p>Import from and Export to Office, ePUB, HTML, and more. ThiefMD is your one stop shop for making and managing markdown mischief.</p>
   </description>
   <developer_name>kmwallio</developer_name>
@@ -27,6 +27,8 @@
     <keyword>markdown</keyword>
     <keyword>editor</keyword>
     <keyword>writing</keyword>
+    <keyword>novel</keyword>
+    <keyword>book</keyword>
   </keywords>
   <screenshots>
     <screenshot type="default">
@@ -47,6 +49,17 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.1.6" date="2021-03-06" urgency="low">
+      <description>
+        <p>Finess and Wordpress</p>
+        <ul>
+          <li>Wordpress Export is now available, just add a Connection</li>
+          <li>Recessed headers don't just look great, they help you visually identify important parts of your document</li>
+          <li>Small tweaks and improvements have been made to speed up the UI</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.6-finess</url>
+    </release>
     <release version="0.1.5" date="2021-02-28" urgency="low">
       <description>
         <p>Editor Enhancements</p>
