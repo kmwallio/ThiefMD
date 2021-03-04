@@ -20,3 +20,4 @@
 [submodule "src/wordpress"]
 	path = src/wordpress
 	url = https://github.com/ThiefMD/wordpress-vala.git
+	branch = main
