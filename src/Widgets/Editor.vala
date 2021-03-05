@@ -1213,6 +1213,8 @@ namespace ThiefMD.Widgets {
             UI.get_focus_color (out r, out g, out b);
             focus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
             focus_text.foreground_set = true;
+            focus_text.underline = Pango.Underline.NONE;
+            focus_text.underline_set = true;
             UI.get_focus_bg_color (out r, out g, out b);
             focus_text.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
             focus_text.background_set = true;
@@ -1222,6 +1224,8 @@ namespace ThiefMD.Widgets {
             UI.get_out_of_focus_color (out r, out g, out b);
             outoffocus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
             outoffocus_text.foreground_set = true;
+            outoffocus_text.underline = Pango.Underline.NONE;
+            outoffocus_text.underline_set = true;
 
             typewriter_scrolling ();
             if (!typewriter_active && settings.typewriter_scrolling) {
