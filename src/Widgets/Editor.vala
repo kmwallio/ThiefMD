@@ -1191,8 +1191,8 @@ namespace ThiefMD.Widgets {
                         int next_offset = checking_copy.index_of ("\n```", offset + 1);
                         if (next_offset > 0) {
                             int start_pos, end_pos;
-                            start_pos = checking_copy.slice (0, offset).char_count ();
-                            end_pos = checking_copy.slice (0, next_offset + 4).char_count ();
+                            start_pos = checking_copy.char_count ((ssize_t) offset);
+                            end_pos = checking_copy.char_count ((ssize_t)(next_offset + 4));
                             buffer.get_iter_at_offset (out start, start_pos);
                             buffer.get_iter_at_offset (out end, end_pos);
                             buffer.apply_tag (code_block, start, end);
@@ -1210,8 +1210,8 @@ namespace ThiefMD.Widgets {
                         string heading = match_info.fetch (1);
                         bool headify = match_info.fetch_pos (1, out start_pos, out end_pos) && (heading.index_of ("\n") < 0);
                         if (headify) {
-                            start_pos = checking_copy.slice (0, start_pos).char_count ();
-                            end_pos = checking_copy.slice (0, end_pos).char_count ();
+                            start_pos = checking_copy.char_count ((ssize_t) start_pos);
+                            end_pos = checking_copy.char_count ((ssize_t) end_pos);
                             buffer.get_iter_at_offset (out start, start_pos);
                             buffer.get_iter_at_offset (out end, end_pos);
                             if (start.has_tag (code_block) || end.has_tag (code_block)) {
@@ -1235,15 +1235,13 @@ namespace ThiefMD.Widgets {
                             int start_link_pos, end_link_pos;
                             int start_url_pos, end_url_pos;
                             int start_full_pos, end_full_pos;
-                            string link = match_info.fetch (1);
-                            string url = match_info.fetch (2);
                             //  warning ("Link Found, Text: %s, URL: %s", link, url);
                             bool linkify = match_info.fetch_pos (1, out start_link_pos, out end_link_pos);
                             bool urlify = match_info.fetch_pos (2, out start_url_pos, out end_url_pos);
                             bool full_found = match_info.fetch_pos (0, out start_full_pos, out end_full_pos);
                             if (linkify && urlify && full_found) {
-                                start_full_pos = checking_copy.slice (0, start_full_pos).char_count ();
-                                end_full_pos = checking_copy.slice (0, end_full_pos).char_count ();
+                                start_full_pos = checking_copy.char_count ((ssize_t)start_full_pos);
+                                end_full_pos = checking_copy.char_count ((ssize_t)end_full_pos);
                                 //
                                 // Don't hide active link's where the cursor is present
                                 //
@@ -1257,8 +1255,8 @@ namespace ThiefMD.Widgets {
                                 //
                                 // Link Text [Text]
                                 //
-                                start_link_pos = checking_copy.slice (0, start_link_pos).char_count ();
-                                end_link_pos = checking_copy.slice (0, end_link_pos).char_count ();
+                                start_link_pos = checking_copy.char_count ((ssize_t) start_link_pos);
+                                end_link_pos = checking_copy.char_count ((ssize_t) end_link_pos);
                                 buffer.get_iter_at_offset (out start, start_link_pos);
                                 buffer.get_iter_at_offset (out end, end_link_pos);
                                 if (start.has_tag (code_block) || end.has_tag (code_block)) {
@@ -1269,8 +1267,8 @@ namespace ThiefMD.Widgets {
                                 //
                                 // Link URL (https://thiefmd.com)
                                 //
-                                start_url_pos = checking_copy.slice (0, start_url_pos).char_count ();
-                                end_url_pos = checking_copy.slice (0, end_url_pos).char_count ();
+                                start_url_pos = checking_copy.char_count ((ssize_t) start_url_pos);
+                                end_url_pos = checking_copy.char_count ((ssize_t) end_url_pos);
                                 buffer.get_iter_at_offset (out start, start_url_pos);
                                 buffer.get_iter_at_offset (out end, end_url_pos);
                                 if (start.has_tag (code_block) || end.has_tag (code_block)) {
