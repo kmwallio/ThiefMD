@@ -19,6 +19,14 @@ If `/xmlrpc.php` exists on your site, but you still can't connect, try to check 
 
 Sometimes, renaming the file or creating a symlink to `xmlrpc.php` with a different name will fix the issue. Don't worry, ThiefMD will be able to connect to the new file. We recommend renaming the file to `restrpc.php`. In the Connection window, you can specify `https://my-wordpress.blog/restrpc.php`
 
+### Disable mod_security
+
+On [DreamHost](https://dreamhost.com), you can disable mod_security by going into Manage Domains, clicking Edit, and choosing to disable **Extra Web Security?**.
+
+Disabling mod\_security can open up your site to DDoS attacks, SQL Injections, Brute Force attacks, and other preventable common issues. We recommend trying the other workarounds listed.
+
+Disabling mod\_security may improve XML-RPC reliability. mod\_security limits the amount of data being sent though XML-RPC. Disabling it can allow for larger photo uploads.
+
 ### Other issue?
 
 Please check your error and access logs.
@@ -38,6 +46,14 @@ Also, please try running `com.github.kmwallio.thiefmd` from the terminal. Attemp
 Check your PHP's file upload size limit and make sure it's larger than the image your uploading.
 
 The Web Server running may also impose file upload limits.
+
+### Disable mod_security
+
+On [DreamHost](https://dreamhost.com), you can disable mod_security by going into Manage Domains, clicking Edit, and choosing to disable **Extra Web Security?**.
+
+Disabling mod\_security can open up your site to DDoS attacks, SQL Injections, Brute Force attacks, and other preventable common issues. We recommend trying the other workarounds listed.
+
+Disabling mod\_security may improve XML-RPC reliability. 
 
 ### Other issue?
 
