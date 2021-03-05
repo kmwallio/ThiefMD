@@ -1245,7 +1245,7 @@ namespace ThiefMD.Widgets {
                                 start_full_pos = checking_copy.slice (0, start_full_pos).char_count ();
                                 end_full_pos = checking_copy.slice (0, end_full_pos).char_count ();
                                 //
-                                // Don't hide the active link
+                                // Don't hide active link's where the cursor is present
                                 //
                                 buffer.get_iter_at_offset (out start, start_full_pos);
                                 buffer.get_iter_at_offset (out end, end_full_pos);
