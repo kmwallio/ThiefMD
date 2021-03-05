@@ -13,7 +13,7 @@ ThiefMD communicates with Wordpress through [XML-RPC](https://codex.wordpress.or
 
 Certain plug-ins may disable XML-RPC, and some automated installations remove the file.
 
-### /xmlrpc.php exists
+### If /xmlrpc.php exists
 
 If `/xmlrpc.php` exists on your site, but you still can't connect, try to check your site's error logs.
 
