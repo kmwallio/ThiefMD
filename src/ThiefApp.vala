@@ -63,6 +63,7 @@ namespace ThiefMD {
         }
 
         private bool toolbar_already_hidden = false;
+        private bool am_fullscreen = false;
         public bool is_fullscreen {
             get {
                 var settings = AppSettings.get_default ();
@@ -70,24 +71,25 @@ namespace ThiefMD {
             }
             set {
                 var settings = AppSettings.get_default ();
-                settings.fullscreen = value;
+                if (am_fullscreen != value){
+                    am_fullscreen = value;
+                    var toolbar_context = toolbar.get_style_context ();
+                    toolbar_context.add_class("thiefmd-toolbar");
 
-                var toolbar_context = toolbar.get_style_context ();
-                toolbar_context.add_class("thiefmd-toolbar");
-
-                if (settings.fullscreen) {
-                    fullscreen ();
-                    toolbar_already_hidden = settings.hide_toolbar;
-                    toolbar.hide_headerbar ();
-                    settings.hide_toolbar = true;
-                    settings.statusbar = false;
-                } else {
-                    unfullscreen ();
-                    settings.hide_toolbar = toolbar_already_hidden;
-                    if (!settings.hide_toolbar) {
-                        toolbar.show_headerbar ();
+                    if (settings.fullscreen) {
+                        fullscreen ();
+                        toolbar_already_hidden = settings.hide_toolbar;
+                        settings.hide_toolbar = true;
+                        toolbar.hide_headerbar ();
+                        settings.statusbar = false;
+                    } else {
+                        unfullscreen ();
+                        settings.hide_toolbar = toolbar_already_hidden;
+                        if (!settings.hide_toolbar) {
+                            toolbar.show_headerbar ();
+                        }
+                        settings.statusbar = true;
                     }
-                    settings.statusbar = true;
                 }
             }
         }

@@ -112,7 +112,7 @@ namespace ThiefMD.Controllers.SheetManager {
         _search_context = new Gtk.SourceSearchContext (_search_sheet.editor.buffer, _search_settings);
         _search_context.set_highlight (true);
 
-        ThiefApp.get_instance ().search_bar.set_match_count (_search_sheet.editor.buffer.text.down ().split (text.down ()).length - 1);
+        ThiefApp.get_instance ().search_bar.set_match_count (_search_sheet.editor.get_buffer_text ().down ().split (text.down ()).length - 1);
     }
 
     public void search_next () {
@@ -250,7 +250,7 @@ namespace ThiefMD.Controllers.SheetManager {
         var settings = AppSettings.get_default ();
         StringBuilder builder = new StringBuilder ();
         foreach (var sp in _active_editors) {
-            string text = (Sheet.areEqual(sp.sheet, _currentSheet.sheet)) ? sp.editor.active_markdown () : sp.editor.buffer.text;
+            string text = (Sheet.areEqual(sp.sheet, _currentSheet.sheet)) ? sp.editor.active_markdown () : sp.editor.get_buffer_text ();
             string title, date;
             builder.append (FileManager.get_yamlless_markdown (
                 text,

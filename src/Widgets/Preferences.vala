@@ -676,6 +676,22 @@ namespace ThiefMD.Widgets {
             preserve_library.add (perserve_library_label);
             thiefmd_options.add (preserve_library);
 
+            var experimental_mode = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+            var experimental_mode_switch = new Switch ();
+            experimental_mode_switch.set_active (settings.experimental);
+            experimental_mode_switch.notify["active"].connect (() => {
+                settings.experimental = experimental_mode_switch.get_active ();
+            });
+            experimental_mode_switch.tooltip_text = _("Toggle experimental features");
+            experimental_mode_switch.margin = 12;
+            var experimental_mode_label = new Label(_("Enable experimental features"));
+            experimental_mode_label.xalign = 0;
+            experimental_mode_label.margin = 12;
+            experimental_mode_label.set_line_wrap (true);
+            experimental_mode.add (experimental_mode_switch);
+            experimental_mode.add (experimental_mode_label);
+            thiefmd_options.add (experimental_mode);
+
             page.add (editor_options);
             page.add (thiefmd_options);
             return page;

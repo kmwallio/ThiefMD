@@ -187,6 +187,19 @@ namespace ThiefMD.Controllers.UI {
         b = focus.blue / 255.0;
     }
 
+    public void get_codeblock_bg_color (out double r, out double g, out double b) {
+        var settings = AppSettings.get_default ();
+        Clutter.Color code_bg;
+        if (current_palette == null || settings.theme_id == "thiefmd") {
+            code_bg = Clutter.Color.from_string ("#FAFAFA");
+        } else {
+            code_bg = Clutter.Color.from_string (current_palette.code_block.background);
+        }
+        r = code_bg.red / 255.0;
+        g = code_bg.green / 255.0;
+        b = code_bg.blue / 255.0;
+    }
+
     public void get_out_of_focus_color (out double r, out double g, out double b) {
         var settings = AppSettings.get_default ();
         Clutter.Color background;

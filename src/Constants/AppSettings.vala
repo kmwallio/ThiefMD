@@ -143,15 +143,41 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public double line_spacing { get; set; default = 1; }
 
         // Transient settings
-        public bool hide_toolbar { get; set; default = false; }
+        private bool hiding_toolbar { get; set; default = false; }
+        public bool hide_toolbar {
+            set {
+                if (value != hiding_toolbar) {
+                    hiding_toolbar = value;
+                    changed ();
+                }
+            }
+            get {
+                return hiding_toolbar;
+            }
+        }
         public bool menu_active { get; set; default = false; }
 
-        public bool focusmode_enabled = false;
+        private bool experimental_mode = false;
+        public bool experimental {
+            set {
+                if (value != experimental_mode) {
+                    experimental_mode = value;
+                    changed ();
+                }
+            }
+            get {
+                return experimental_mode;
+            }
+        }
+
+        private bool focusmode_enabled = false;
         public int focus_type { get; set; }
         public bool focus_mode {
             set {
-                focusmode_enabled = value;
-                changed ();
+                if (value != focusmode_enabled) {
+                    focusmode_enabled = value;
+                    changed ();
+                }
             }
             get {
                 return focusmode_enabled;
@@ -161,8 +187,10 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         private bool writegood_enabled = false;
         public bool writegood {
             set {
-                writegood_enabled = value;
-                changed ();
+                if (value != writegood_enabled) {
+                    writegood_enabled = value;
+                    changed ();
+                }
             }
             get {
                 return writegood_enabled;
