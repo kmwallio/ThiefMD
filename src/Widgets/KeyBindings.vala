@@ -160,6 +160,20 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
+                // Toggle Dark/Light theme
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
+                    if (match_keycode (Gdk.Key.l, keycode)) {
+                        if (window is ThiefApp) {
+                            if (settings.theme_id != "thiefmd") {
+                                settings.dark_mode = !settings.dark_mode;
+                                settings.theme_id = settings.theme_id.substring (0, settings.theme_id.last_index_of_char ('-')) +  ((settings.dark_mode) ? "-dark" : "-light");
+                                UI.load_css_scheme ();
+                                SheetManager.refresh_scheme ();
+                            }
+                        }
+                    }
+                }
+
                 // Preferences
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                     if (match_keycode (Gdk.Key.comma, keycode)) {
