@@ -203,7 +203,6 @@ namespace ThiefMD.Connections {
             bool published = false;
             string title;
             string date;
-            string slug = "";
             string id = "";
             string html = "";
             string featured_image = "";
@@ -224,6 +223,8 @@ namespace ThiefMD.Connections {
                                 img_file.get_path ()))
                             {
                                 replacements.set (images.key, upload_url);
+                            } else {
+                                warning ("Could not upload image");
                             }
                         }
                     }
