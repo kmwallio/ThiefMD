@@ -187,5 +187,10 @@
             <summary>Font Size to use</summary>
             <description>Font Size for editor to use</description>
         </key>
+        <key name="experimental" type="b">
+            <default>false</default>
+            <summary>Experimental Mode</summary>
+            <description>Enable new features that may impact performance or reliability</description>
+        </key>
     </schema>
 </schemalist>

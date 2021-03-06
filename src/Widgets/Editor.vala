@@ -1232,7 +1232,6 @@ namespace ThiefMD.Widgets {
                         Gtk.TextIter cursor_location;
                         var cursor = buffer.get_insert ();
                         buffer.get_iter_at_mark (out cursor_location, cursor);
-                        warning ("Cursor at: %d", cursor_location.get_offset ());
                         do {
                             int start_link_pos, end_link_pos;
                             int start_url_pos, end_url_pos;
@@ -1266,7 +1265,7 @@ namespace ThiefMD.Widgets {
                                 }
                                 buffer.apply_tag (markdown_link, start, end);
 
-                                if (!UI.show_link_brackets ()) {
+                                if (!UI.show_link_brackets () && !settings.focus_mode) {
                                     //
                                     // Starting [
                                     //

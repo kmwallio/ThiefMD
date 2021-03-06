@@ -144,6 +144,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public string font_family { get; set; }
         public int font_size { get; set; default = 12; }
         public double line_spacing { get; set; default = 1; }
+        public bool experimental { get; set; }
 
         // Transient settings
         private bool hiding_toolbar { get; set; default = false; }
@@ -159,19 +160,6 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             }
         }
         public bool menu_active { get; set; default = false; }
-
-        private bool experimental_mode = false;
-        public bool experimental {
-            set {
-                if (value != experimental_mode) {
-                    experimental_mode = value;
-                    changed ();
-                }
-            }
-            get {
-                return experimental_mode;
-            }
-        }
 
         private bool focusmode_enabled = false;
         public int focus_type { get; set; }
@@ -380,6 +368,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("font-family", this, "font_family", SettingsBindFlags.DEFAULT);
             app_settings.bind ("focus-type", this, "focus_type", SettingsBindFlags.DEFAULT);
             app_settings.bind ("line-spacing", this, "line_spacing", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("experimental", this, "experimental", SettingsBindFlags.DEFAULT);
 
             app_settings.changed.connect (() => {
                 changed ();
