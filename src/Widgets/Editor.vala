@@ -92,7 +92,7 @@ namespace ThiefMD.Widgets {
                 numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.CASELESS, 0);
                 is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss|file)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.CASELESS, 0);
                 is_codeblock = new Regex ("(```[a-zA-Z]*[\\n\\R]((.*?)[\\n\\R])*?```[\\n\\R])", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-                is_markdown_url = new Regex ("\\[([^\\[]+?)\\](\\([^\\)]+?\\))", RegexCompileFlags.CASELESS, 0);
+                is_markdown_url = new Regex ("\\[([^\\[]+?)\\](\\([^\\)\\n]+?\\))", RegexCompileFlags.CASELESS, 0);
             } catch (Error e) {
                 warning ("Could not initialize regexes: %s", e.message);
             }
@@ -1263,6 +1263,26 @@ namespace ThiefMD.Widgets {
                                     continue;
                                 }
                                 buffer.apply_tag (markdown_link, start, end);
+
+                                if (!UI.show_link_brackets ()) {
+                                    //
+                                    // Starting [
+                                    //
+                                    buffer.get_iter_at_offset (out start, start_link_pos);
+                                    buffer.get_iter_at_offset (out end, start_link_pos);
+                                    start.backward_chars (2);
+                                    if (start.get_char () != '!') {
+                                        start.forward_char ();
+                                        buffer.apply_tag (markdown_url, start, end);
+                                        //
+                                        // Closing ]
+                                        //
+                                        buffer.get_iter_at_offset (out start, end_link_pos);
+                                        buffer.get_iter_at_offset (out end, end_link_pos);
+                                        end.forward_char ();
+                                        buffer.apply_tag (markdown_url, start, end);
+                                    }
+                                }
 
                                 //
                                 // Link URL (https://thiefmd.com)

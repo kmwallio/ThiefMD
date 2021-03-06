@@ -161,6 +161,37 @@ namespace ThiefMD.Controllers.UI {
         return false;
     }
 
+    public bool show_link_brackets () {
+        var settings = AppSettings.get_default ();
+        if (current_palette == null || settings.theme_id == "thiefmd") {
+            return false;
+        } else {
+            return (current_palette.global.foreground == current_palette.link.foreground) &&
+                    (current_palette.global.background == current_palette.link.background);
+            //  Clutter.Color text_color = Clutter.Color.from_string (current_palette.global.foreground);
+            //  Clutter.Color link_color = Clutter.Color.from_string (current_palette.link.foreground);
+            //  float m1, lum1, lum2, m2;
+            //  text_color.to_hls (out m1, out lum1, out m2);
+            //  link_color.to_hls (out m1, out lum2, out m2);
+            //  m1 = float.max (lum1, lum2);
+            //  m2 = float.min (lum1, lum2);
+
+            //  // Make sure contrast ratio differentiates links from normal text
+            //  if (((m1 + 0.05) / (m2 + 0.05)) > Constants.MINIMUM_CONTRAST_RATIO) {
+            //      return false;
+            //  } else {
+            //      text_color = Clutter.Color.from_string (current_palette.global.background);
+            //      link_color = Clutter.Color.from_string (current_palette.link.background);
+            //      text_color.to_hls (out m1, out lum1, out m2);
+            //      link_color.to_hls (out m1, out lum2, out m2);
+            //      m1 = float.max (lum1, lum2);
+            //      m2 = float.min (lum1, lum2);
+
+            //      return ((m1 + 0.05) / (m2 + 0.05)) < Constants.MINIMUM_CONTRAST_RATIO;
+            //  }
+        }
+    }
+
     public void get_focus_bg_color (out double r, out double g, out double b) {
         var settings = AppSettings.get_default ();
         Clutter.Color background;

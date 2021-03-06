@@ -46,7 +46,7 @@ namespace ThiefMD.Widgets {
 
                 // Experimental Mode
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
-                    if (match_keycode (Gdk.Key.y, keycode)) {
+                    if (match_keycode (Gdk.Key.m, keycode)) {
                         settings.experimental = !settings.experimental;
                     }
                 }

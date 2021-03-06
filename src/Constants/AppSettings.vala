@@ -90,6 +90,9 @@ namespace ThiefMD {
         public const double SIZE_1_REM_IN_PT = 12;
         public const double SINGLE_SPACING = 1.0;
 
+        // Visual Settings
+        public const double MINIMUM_CONTRAST_RATIO = 1.2;
+
         // Arbitrary strings
         public const string FIRST_USE = _("""# Click on a sheet to get started
 
