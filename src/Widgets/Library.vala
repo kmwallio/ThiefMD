@@ -509,6 +509,14 @@ namespace ThiefMD.Widgets {
                     menu.add (new Gtk.SeparatorMenuItem ());
                 }
 
+                Gtk.MenuItem menu_open_item = new Gtk.MenuItem.with_label (_("Open in File Manager"));
+                menu_open_item.activate.connect (() => {
+                    if (_selected != null && _all_sheets.find (_selected) != null) {
+                        AppInfo.launch_default_for_uri ("file://%s".printf (_selected._path), null);
+                    }
+                });
+                menu.add (menu_open_item);
+
                 Gtk.MenuItem menu_add_item = new Gtk.MenuItem.with_label (_("Create Sub-Folder"));
                 menu_add_item.activate.connect (() => {
                     if (_selected != null && _all_sheets.find (_selected) != null) {
