@@ -91,7 +91,7 @@ namespace ThiefMD.Widgets {
             version_label.hexpand = true;
             grid.attach (version_label, 1, 3);
             //  website = ThiefProperties.URL;
-            var website_label = new Gtk.Label ("<a href='" + ThiefProperties.URL + "'>" + ThiefProperties.URL + "</a>");
+            var website_label = new Gtk.Label ("<a href='" + ThiefProperties.URL + "'>" + ThiefProperties.URL + "</a> - <a href='https://github.com/kmwallio/ThiefMD/discussions'>Feedback</a>");
             website_label.hexpand = true;
             website_label.use_markup = true;
             grid.attach (website_label, 1, 5);
