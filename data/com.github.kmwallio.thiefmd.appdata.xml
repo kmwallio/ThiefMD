@@ -53,13 +53,14 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="0.1.6" date="2021-03-06" urgency="low">
+    <release version="0.1.6" date="2021-03-05" urgency="low">
       <description>
         <p>Finess and Wordpress</p>
         <ul>
           <li>Wordpress Export is now available, just add a Connection</li>
           <li>Recessed headers don't just look great, they help you visually identify important parts of your document</li>
           <li>Small tweaks and improvements have been made to speed up the UI</li>
+          <li>New Experimental Mode for hiding links in the markdown editor</li>
         </ul>
       </description>
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.6-finess</url>
