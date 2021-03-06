@@ -371,7 +371,7 @@ namespace ThiefMD.Widgets {
                 return false;
             }
 
-            if (!have_match) {
+            if (!have_match && !no_change_prompt) {
                 var dialog = new Gtk.Dialog.with_buttons (
                     "Contents changed on disk",
                     ThiefApp.get_instance (),
@@ -398,6 +398,8 @@ namespace ThiefMD.Widgets {
                     should_save = true;
                     autosave ();
                 }
+            } else {
+                no_change_prompt = false;
             }
 
             return have_match;
@@ -1510,17 +1512,28 @@ namespace ThiefMD.Widgets {
             return settings.typewriter_scrolling;
         }
 
+        private bool please_no_spell_prompt = false;
         private void build_menu () {
             if (file == null) {
                 return;
             }
 
-            bool no_change_prompt = true;
             // Set timer so we don't prompt for file modification?
             disk_change_prompted.can_do_action ();
 
             var settings = AppSettings.get_default ();
             this.populate_popup.connect ((source, menu) => {
+                no_change_prompt = true;
+                if (!please_no_spell_prompt) {
+                    please_no_spell_prompt = true;
+                    Timeout.add (10000, () => {
+                        if (no_change_prompt) {
+                            no_change_prompt = false;
+                        }
+                        please_no_spell_prompt = false;
+                        return false;
+                    });
+                }
                 Gtk.SeparatorMenuItem sep = new Gtk.SeparatorMenuItem ();
                 menu.add (sep);
 
