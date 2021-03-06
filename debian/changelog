@@ -1,3 +1,12 @@
+com.github.kmwallio.thiefmd (0.1.6) groovy; urgency=low
+
+  * Wordpress Export is now available, just add a Connection
+  * Recessed headers
+  * Small tweaks and improvements have been made to speed up the UI
+  * Experimental mode to hide markdown links in the editor
+
+ -- kmwallio <mwallio@gmail.com>  Fri, 05 Mar 2021 18:35:45 -0800
+
 com.github.kmwallio.thiefmd (0.1.5) groovy; urgency=low
 
   * Added a shortcut for inserting in a link
