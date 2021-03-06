@@ -273,7 +273,14 @@ namespace ThiefMD.Controllers.SheetManager {
     Mutex loading_sheets;
     public void set_sheets (Sheets? sheets) {
         _current_sheets = sheets;
+        _current_sheets.update_sheet_indicators ();
         UI.set_sheets (sheets);
+    }
+
+    public void redraw_sheets () {
+        if (_current_sheets != null) {
+            _current_sheets.update_sheet_indicators ();
+        }
     }
 
     private bool preload_sheets () {

@@ -154,6 +154,21 @@ namespace ThiefMD.Controllers.Dialogs {
                 filter1.add_pattern ("*.md");
                 filter1.add_pattern ("*.markdown");
                 chooser.add_filter (filter1);
+            } else {
+                if (ext.index_of (";") > 0) {
+                    string[] extensions = ext.split (";");
+                    var filter1 = new Gtk.FileFilter ();
+                    filter1.set_filter_name (_("Supported files"));
+                    foreach (unowned string extension in extensions) {
+                        filter1.add_pattern (extension);
+                    }
+                    chooser.add_filter (filter1);
+                } else {
+                    var filter1 = new Gtk.FileFilter ();
+                    filter1.set_filter_name (_("%s files").printf (ext));
+                    filter1.add_pattern (ext);
+                    chooser.add_filter (filter1);
+                }
             }
 
             var filter = new Gtk.FileFilter ();

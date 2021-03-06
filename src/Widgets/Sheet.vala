@@ -30,6 +30,8 @@ namespace ThiefMD.Widgets {
      */
     public class Sheet : Gtk.ToggleButton {
         private string _sheet_path;
+        private Gtk.Grid _button_grid;
+        private Gtk.Separator _button_separator;
         private Gtk.Label _label;
         private string _label_buffer;
         private Sheets _parent;
@@ -46,6 +48,7 @@ namespace ThiefMD.Widgets {
                 } else {
                     header_context.remove_class ("thief-list-sheet-active");
                 }
+                redraw ();
                 active = value;
             }
 
@@ -56,6 +59,7 @@ namespace ThiefMD.Widgets {
         }
 
         public Sheet (string sheet_path, Sheets parent) {
+            var settings = AppSettings.get_default ();
             _sheet_path = sheet_path;
             _parent = parent;
             _sheet_title = "";
@@ -67,7 +71,17 @@ namespace ThiefMD.Widgets {
             _label.use_markup = true;
             _label.set_ellipsize (Pango.EllipsizeMode.END);
             _label.xalign = 0;
-            add(_label);
+            _button_grid = new Gtk.Grid ();
+            _button_grid.orientation = Gtk.Orientation.VERTICAL;
+            _button_grid.hexpand = true;
+            _button_grid.attach (_label, 0, 0);
+            _button_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+            _button_separator.hexpand = true;
+            if (!settings.ui_editor_theme) {
+                _button_grid.attach (_button_separator, 0, 1);
+            }
+            _button_grid.show_all ();
+            add (_button_grid);
 
             var header_context = this.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
@@ -134,6 +148,13 @@ namespace ThiefMD.Widgets {
                 _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "</b>";
             }
             _label.set_label (_label_buffer);
+
+            if (!settings.ui_editor_theme && !active && _button_separator.parent == null) {
+                _button_grid.attach (_button_separator, 0, 1);
+            } else if (active || settings.ui_editor_theme && _button_separator.parent != null) {
+                _button_grid.remove (_button_separator);
+            }
+
             settings.writing_changed ();
         }
 

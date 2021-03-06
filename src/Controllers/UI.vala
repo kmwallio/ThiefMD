@@ -315,6 +315,8 @@ namespace ThiefMD.Controllers.UI {
             ThiefApp.get_instance ().stats_bar.show_statistics ();
         }
 
+        SheetManager.redraw_sheets ();
+
         // Attempt to wait for app instance to be ready.
         if (!set_scheme) {
             Timeout.add (50, () => {

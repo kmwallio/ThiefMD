@@ -288,7 +288,7 @@ namespace ThiefMD.Widgets {
             display_options.add (theme_selector);
 
             add_theme_button.clicked.connect (() => {
-                File new_theme = Dialogs.display_open_dialog (".ultheme");
+                File new_theme = Dialogs.display_open_dialog ("*.ultheme");
                 if (new_theme != null && new_theme.query_exists ()) {
                     try {
                         File destination = File.new_for_path (Path.build_filename (UserData.style_path, new_theme.get_basename ()));
@@ -502,7 +502,7 @@ namespace ThiefMD.Widgets {
             epub_setup.add (add_css_button);
 
             add_css_button.clicked.connect (() => {
-                File new_css_pkg = Dialogs.display_open_dialog (".*");
+                File new_css_pkg = Dialogs.display_open_dialog ();
                 if (new_css_pkg != null && new_css_pkg.query_exists ()) {
                     FileManager.load_css_pkg (new_css_pkg);
                     print_css_selector.refresh ();
