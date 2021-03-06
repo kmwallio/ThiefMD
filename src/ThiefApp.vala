@@ -73,8 +73,6 @@ namespace ThiefMD {
                 var settings = AppSettings.get_default ();
                 if (am_fullscreen != value){
                     am_fullscreen = value;
-                    var toolbar_context = toolbar.get_style_context ();
-                    toolbar_context.add_class("thiefmd-toolbar");
 
                     if (settings.fullscreen) {
                         fullscreen ();
@@ -286,6 +284,9 @@ namespace ThiefMD {
                 }
                 set_default_size (settings.window_width, settings.window_height);
             }
+
+            var toolbar_context = toolbar.get_style_context ();
+            toolbar_context.add_class("thiefmd-toolbar");
 
             size_allocate.connect (() => {
                 if (this.get_allocated_width () < 600 && !am_mobile) {
