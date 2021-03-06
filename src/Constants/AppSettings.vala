@@ -90,6 +90,9 @@ namespace ThiefMD {
         public const double SIZE_1_REM_IN_PT = 12;
         public const double SINGLE_SPACING = 1.0;
 
+        // Visual Settings
+        public const double MINIMUM_CONTRAST_RATIO = 1.2;
+
         // Arbitrary strings
         public const string FIRST_USE = _("""# Click on a sheet to get started
 
@@ -141,17 +144,31 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public string font_family { get; set; }
         public int font_size { get; set; default = 12; }
         public double line_spacing { get; set; default = 1; }
+        public bool experimental { get; set; }
 
         // Transient settings
-        public bool hide_toolbar { get; set; default = false; }
+        private bool hiding_toolbar { get; set; default = false; }
+        public bool hide_toolbar {
+            set {
+                if (value != hiding_toolbar) {
+                    hiding_toolbar = value;
+                    changed ();
+                }
+            }
+            get {
+                return hiding_toolbar;
+            }
+        }
         public bool menu_active { get; set; default = false; }
 
-        public bool focusmode_enabled = false;
+        private bool focusmode_enabled = false;
         public int focus_type { get; set; }
         public bool focus_mode {
             set {
-                focusmode_enabled = value;
-                changed ();
+                if (value != focusmode_enabled) {
+                    focusmode_enabled = value;
+                    changed ();
+                }
             }
             get {
                 return focusmode_enabled;
@@ -161,8 +178,10 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         private bool writegood_enabled = false;
         public bool writegood {
             set {
-                writegood_enabled = value;
-                changed ();
+                if (value != writegood_enabled) {
+                    writegood_enabled = value;
+                    changed ();
+                }
             }
             get {
                 return writegood_enabled;
@@ -349,6 +368,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("font-family", this, "font_family", SettingsBindFlags.DEFAULT);
             app_settings.bind ("focus-type", this, "focus_type", SettingsBindFlags.DEFAULT);
             app_settings.bind ("line-spacing", this, "line_spacing", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("experimental", this, "experimental", SettingsBindFlags.DEFAULT);
 
             app_settings.changed.connect (() => {
                 changed ();

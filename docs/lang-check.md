@@ -3,6 +3,7 @@ File for checking languages and making sure they don't break markdown formatting
 # Python
 
 ```python
+# comment goes here
 friends = ['john', 'pat', 'gary', 'michael']
 for i, name in enumerate(friends):
     print ("iteration {iteration} is {name}".format(iteration=i, name=name))

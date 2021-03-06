@@ -25,7 +25,6 @@ using Gdk;
 namespace ThiefMD.Widgets {
     public delegate void ThinkingCallback ();
     public class Thinking : Gtk.Dialog {
-        private Gtk.Stack stack;
         private ThinkingCallback work = null;
         private Mutex running;
 

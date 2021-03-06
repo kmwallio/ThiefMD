@@ -30,7 +30,6 @@ namespace ThiefMD.Widgets {
 
         private void build_ui () {
             Gtk.Box vbox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            var settings = AppSettings.get_default ();
             headerbar = new Hdy.HeaderBar ();
             headerbar.set_title ("Cheat Sheet");
             var header_context = headerbar.get_style_context ();

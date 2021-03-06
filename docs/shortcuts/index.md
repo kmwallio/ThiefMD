@@ -11,6 +11,7 @@ title: Shortcuts
 * `Ctrl + Shift + T` - Toggle Typewriter Scrolling
 * `Ctrl + Shift + W` - Toggle Write-Good Suggestions
 * `Ctrl + Shift + S` - Toggle Writing Statistics
+* `Ctrl + Shift + L` - Toggle Light / Dark Theme
 * `F11` - Toggle Full Screen
 
 # Editor Views

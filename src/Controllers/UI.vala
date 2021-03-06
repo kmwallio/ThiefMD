@@ -152,10 +152,44 @@ namespace ThiefMD.Controllers.UI {
         debug ("Themes loaded");
 
         debug ("Loading user connections");
-        SecretSchemas.get_instance ().load_secrets ();
-        debug ("Connections loaded");
+        GLib.Idle.add (() => {
+            SecretSchemas.get_instance ().load_secrets ();
+            debug ("Connections loaded");
+            return false;
+        }, GLib.Priority.LOW);
 
         return false;
+    }
+
+    public bool show_link_brackets () {
+        var settings = AppSettings.get_default ();
+        if (current_palette == null || settings.theme_id == "thiefmd") {
+            return false;
+        } else {
+            return (current_palette.global.foreground == current_palette.link.foreground) &&
+                    (current_palette.global.background == current_palette.link.background);
+            //  Clutter.Color text_color = Clutter.Color.from_string (current_palette.global.foreground);
+            //  Clutter.Color link_color = Clutter.Color.from_string (current_palette.link.foreground);
+            //  float m1, lum1, lum2, m2;
+            //  text_color.to_hls (out m1, out lum1, out m2);
+            //  link_color.to_hls (out m1, out lum2, out m2);
+            //  m1 = float.max (lum1, lum2);
+            //  m2 = float.min (lum1, lum2);
+
+            //  // Make sure contrast ratio differentiates links from normal text
+            //  if (((m1 + 0.05) / (m2 + 0.05)) > Constants.MINIMUM_CONTRAST_RATIO) {
+            //      return false;
+            //  } else {
+            //      text_color = Clutter.Color.from_string (current_palette.global.background);
+            //      link_color = Clutter.Color.from_string (current_palette.link.background);
+            //      text_color.to_hls (out m1, out lum1, out m2);
+            //      link_color.to_hls (out m1, out lum2, out m2);
+            //      m1 = float.max (lum1, lum2);
+            //      m2 = float.min (lum1, lum2);
+
+            //      return ((m1 + 0.05) / (m2 + 0.05)) < Constants.MINIMUM_CONTRAST_RATIO;
+            //  }
+        }
     }
 
     public void get_focus_bg_color (out double r, out double g, out double b) {
@@ -182,6 +216,19 @@ namespace ThiefMD.Controllers.UI {
         r = focus.red / 255.0;
         g = focus.green / 255.0;
         b = focus.blue / 255.0;
+    }
+
+    public void get_codeblock_bg_color (out double r, out double g, out double b) {
+        var settings = AppSettings.get_default ();
+        Clutter.Color code_bg;
+        if (current_palette == null || settings.theme_id == "thiefmd") {
+            code_bg = Clutter.Color.from_string ("#FAFAFA");
+        } else {
+            code_bg = Clutter.Color.from_string (current_palette.code_block.background);
+        }
+        r = code_bg.red / 255.0;
+        g = code_bg.green / 255.0;
+        b = code_bg.blue / 255.0;
     }
 
     public void get_out_of_focus_color (out double r, out double g, out double b) {
@@ -526,7 +573,6 @@ namespace ThiefMD.Controllers.UI {
 
         debug ("Hiding library (%d)\n", instance.library_pane.get_position ());
         if (instance.library_pane.get_position () > 0 || instance.sheets_pane.get_position () <= 0) {
-            _moving.moving = false;
             int target_sheets = 0;
             if (instance.library_pane.get_position () > 0) {
                 target_sheets = instance.sheets_pane.get_position () - instance.library_pane.get_position ();
@@ -588,7 +634,9 @@ namespace ThiefMD.Controllers.UI {
             return;
         }
 
-        _moving.moving = true;
+        if (!_moving.start_move ()) {
+            return;
+        }
 
         _hop_sheets = (int)((sheet_pane - instance.sheets_pane.get_position ()) / Constants.ANIMATION_FRAMES);
         _hop_library = (int)((library_pane - instance.library_pane.get_position ()) / Constants.ANIMATION_FRAMES);
@@ -605,7 +653,6 @@ namespace ThiefMD.Controllers.UI {
 
             if (!_moving.moving) {
                 // debug ("No longer moving\n");
-                _moving.moving = false;
                 return false;
             }
 
@@ -635,8 +682,9 @@ namespace ThiefMD.Controllers.UI {
 
             // debug ("Sheets done: %s, Library done: %s\n", sheet_done ? "yes" : "no", lib_done ? "yes" : "no");
 
-            _moving.moving = !lib_done || !sheet_done;
-            if (!moving ()) {
+            bool still_moving = !lib_done || !sheet_done;
+            if (!still_moving) {
+                _moving.stop_move ();
                 _moving.movement_done ();
                 SheetManager.redraw ();
             }
@@ -649,15 +697,37 @@ namespace ThiefMD.Controllers.UI {
         public bool moving;
         private MovementCallback handler;
         public signal void movement_done ();
+        Mutex move_lock;
 
         public Movement () {
             moving = false;
             handler = do_nothing;
+            move_lock = new Mutex ();
 
             movement_done.connect (() => {
                 handler ();
                 handler = do_nothing;
             });
+        }
+
+        public bool stop_move () {
+            move_lock.lock ();
+            moving = false;
+            move_lock.unlock ();
+            return true;
+        }
+
+        public bool start_move () {
+            bool movable = false;
+            if (move_lock.trylock ()) {
+                if (!moving) {
+                    moving = true;
+                    movable = true;
+                }
+                move_lock.unlock ();
+            }
+
+            return movable;
         }
 
         public void do_nothing () {

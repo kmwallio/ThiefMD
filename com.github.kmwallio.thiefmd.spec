@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.1.5
+Version: 0.1.6
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
@@ -323,6 +323,11 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Fri Mar 05 2021 kmwallio <mwallio@gmail.com> - 0.1.6
+- Wordpress Export is now available, just add a Connection
+- Recessed headers
+- Small tweaks and improvements have been made to speed up the UI
+- Experimental mode to hide markdown links in the editor
 * Sun Feb 28 2021 kmwallio <mwallio@gmail.com> - 0.1.5
 - Added a shortcut for inserting in a link
 - Editor enhancements for continuing lists

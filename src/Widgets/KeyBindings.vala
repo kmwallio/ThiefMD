@@ -44,6 +44,13 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
+                // Experimental Mode
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
+                    if (match_keycode (Gdk.Key.m, keycode)) {
+                        settings.experimental = !settings.experimental;
+                    }
+                }
+
                 // Headerbar
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
                     if (match_keycode (Gdk.Key.h, keycode)) {
@@ -156,6 +163,20 @@ namespace ThiefMD.Widgets {
                     if (match_keycode (Gdk.Key.s, keycode)) {
                         if (window is ThiefApp) {
                             ((ThiefApp)window).stats_bar.toggle_statistics ();
+                        }
+                    }
+                }
+
+                // Toggle Dark/Light theme
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
+                    if (match_keycode (Gdk.Key.l, keycode)) {
+                        if (window is ThiefApp) {
+                            if (settings.theme_id != "thiefmd") {
+                                settings.dark_mode = !settings.dark_mode;
+                                settings.theme_id = settings.theme_id.substring (0, settings.theme_id.last_index_of_char ('-')) +  ((settings.dark_mode) ? "-dark" : "-light");
+                                UI.load_css_scheme ();
+                                SheetManager.refresh_scheme ();
+                            }
                         }
                     }
                 }

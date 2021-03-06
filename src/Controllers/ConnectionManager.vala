@@ -44,7 +44,6 @@ namespace ThiefMD.Controllers {
         private static SecretSchemas instance = null;
         public Secret.Schema thief_secret;
         private SecretAttributes stored_secrets;
-        private Secret.Collection collection;
         private Mutex save_secrets;
 
         public SecretSchemas () {
@@ -69,7 +68,6 @@ namespace ThiefMD.Controllers {
         public bool load_secrets () {
             debug ("Loading collections");
             File secrets = File.new_for_path (UserData.connection_file);
-            bool success = false;
             if (!secrets.query_exists ()) {
                 return true;
             }
@@ -77,7 +75,6 @@ namespace ThiefMD.Controllers {
             try {
                 Json.Parser parser = new Json.Parser ();
                 parser.load_from_file (secrets.get_path ());
-                Json.Node data = parser.get_root ();
                 var json_obj = parser.get_root ().get_object ();
 
                 var secrets_data = json_obj.get_array_member ("secrets");
@@ -134,6 +131,12 @@ namespace ThiefMD.Controllers {
                             if (ghost_connection.connection_valid ()) {
                                 ThiefApp.get_instance ().exporters.register (ghost_connection.export_name, ghost_connection.exporter);
                                 ThiefApp.get_instance ().connections.add (ghost_connection);
+                            }
+                        } else if (attributes["connectiontype"] == WordpressConnection.CONNECTION_TYPE) {
+                            WordpressConnection wordpress_connection = new WordpressConnection (attributes["alias"], the_secret, attributes["endpoint"]);
+                            if (wordpress_connection.connection_valid ()) {
+                                ThiefApp.get_instance ().exporters.register (wordpress_connection.export_name, wordpress_connection.exporter);
+                                ThiefApp.get_instance ().connections.add (wordpress_connection);
                             }
                         }
 
@@ -277,6 +280,11 @@ namespace ThiefMD.Controllers {
 
         public bool add_ghost_secret (string url, string alias, string password) {
             SecretSchemas.get_instance ().save_secret (GhostConnection.CONNECTION_TYPE, alias, url, password);
+            return true;
+        }
+
+        public bool add_wordpress_secret (string url, string alias, string password) {
+            SecretSchemas.get_instance ().save_secret (WordpressConnection.CONNECTION_TYPE, alias, url, password);
             return true;
         }
     }

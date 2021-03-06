@@ -300,7 +300,6 @@ namespace ThiefMD.Widgets {
         }
 
         public void build_ui () {
-            var settings = AppSettings.get_default ();
             app_box = new Gtk.Grid ();
             app_box.margin = 12;
             app_box.row_spacing = 12;

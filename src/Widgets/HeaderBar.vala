@@ -64,8 +64,11 @@ namespace ThiefMD.Widgets {
         }
 
         public void hide_headerbar () {
-            if (child_revealed) {
-                set_reveal_child (false);
+            var settings = AppSettings.get_default ();
+            if (settings.hide_toolbar) {
+                if (child_revealed) {
+                    set_reveal_child (false);
+                }
             }
         }
 
@@ -173,6 +176,10 @@ namespace ThiefMD.Widgets {
             } else {
                 the_bar.set_title ("");
                 the_bar.set_subtitle ("");
+            }
+
+            if (!settings.hide_toolbar) {
+                show_headerbar ();
             }
         }
     }

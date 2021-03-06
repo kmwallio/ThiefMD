@@ -55,7 +55,7 @@ namespace ThiefMD.Widgets {
 
         protected void build_ui () {
             var settings = AppSettings.get_default ();
-            int w, h, m, p;
+            int w, h;
             toolbar = new Hdy.HeaderBar ();
 
             if (settings.show_filename && settings.last_file != "") {

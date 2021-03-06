@@ -8,5 +8,6 @@
         <file alias="thiefmd.svg" compressed="false" preprocess="">icons/128/com.github.kmwallio.thiefmd.svg</file>
         <file alias="wf.png" compressed="false" preprocess="">icons/connections/wf.png</file>
         <file alias="ghost.png" compressed="false" preprocess="">icons/connections/ghost.png</file>
+        <file alias="wordpress.png" compressed="false" preprocess="">icons/connections/wordpress.png</file>
     </gresource>
 </gresources>

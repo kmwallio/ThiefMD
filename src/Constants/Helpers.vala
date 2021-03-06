@@ -153,17 +153,18 @@ namespace ThiefMD {
         }
 
         public bool can_do_action () {
-            bool res = can_action;
-            debug ("%s do action", res ? "CAN" : "CANNOT");
+            bool res = false;
 
-            if (can_action) {
-                debug ("Acquiring lock");
-                droptex.lock ();
-                debug ("Lock acquired");
-                can_action = false;
-                Timeout.add (delay, clear_action);
+            if (droptex.trylock ()) {
+                if (can_action) {
+                    res = true;
+                    can_action = false;
+                    Timeout.add (delay, clear_action);
+                }
                 droptex.unlock ();
             }
+
+            debug ("%s do action", res ? "CAN" : "CANNOT");
             return res;
         }
 

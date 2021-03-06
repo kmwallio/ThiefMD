@@ -243,7 +243,6 @@ namespace ThiefMD.Widgets {
         }
 
         public bool update_search () {
-            var settings = AppSettings.get_default ();
             if (ui_update.trylock ()) {
                 while (!results.is_empty) {
                     SearchResult res = results.remove_at (0);
@@ -384,7 +383,6 @@ namespace ThiefMD.Widgets {
         }
 
         private void build_ui () {
-            var settings = AppSettings.get_default ();
             headerbar = new Hdy.SearchBar ();
             headerbar.connect_entry (searcher.search);
             headerbar.set_show_close_button (false);

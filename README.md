@@ -37,7 +37,7 @@ yay -S thiefmd
  * Sheet Management
  * Shortcut key bindings
  * Themes
- * Export (DocX, ePUB, PDF, HTML, Markdown, [WriteFreely](https://thiefmd.com/tips/blogging-with-writefreely), [Ghost](https://thiefmd.com/tips/blogging-with-ghost), and more...)
+ * Export (DocX, ePUB, PDF, HTML, Markdown, [WriteFreely](https://thiefmd.com/tips/blogging-with-writefreely), [Ghost](https://thiefmd.com/tips/blogging-with-ghost), Wordpress, and more...)
  * Import (DocX, ePUB, HTML, rst, textile, and more...)
  * Search `Ctrl+F` for the current file, and `Ctrl+Shift+F` for the *entire* library
  * Writing Statistics
@@ -91,7 +91,7 @@ Focus Mode
 
 ## Dependencies
 
-[libwritegood-vala](https://github.com/ThiefMD/libwritegood-vala), [writeas-vala](https://github.com/ThiefMD/writeas-vala), [ghost-vala](https://github.com/ThiefMD/ghost-vala) and the [Ulysses Theme Parser](https://github.com/TwiRp/ultheme-vala) are used as git sub-modules.
+[libwritegood-vala](https://github.com/ThiefMD/libwritegood-vala), [writeas-vala](https://github.com/ThiefMD/writeas-vala), [ghost-vala](https://github.com/ThiefMD/ghost-vala), [wordpress-vala](https://github.com/ThiefMD/wordpress-vala) and the [Ulysses Theme Parser](https://github.com/TwiRp/ultheme-vala) are used as git sub-modules.
 
 ### Ubuntu
 
@@ -110,6 +110,7 @@ libgtk-3-dev
 libgee-0.8-dev
 libgtksourceview-4-dev
 libsecret-1-dev
+libhandy-1-dev
 ```
 
 ### Fedora
@@ -129,6 +130,7 @@ libarchive-devel
 libxml2-devel
 libgee-devel
 libsecret-devel
+libhandy1-devel
 ```
 
 ## Building

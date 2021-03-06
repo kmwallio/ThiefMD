@@ -27,18 +27,18 @@ using ThiefMD.Controllers;
 using ThiefMD.Exporters;
 
 namespace ThiefMD.Connections {
-    public class GhostConnection : ConnectionBase {
-        public const string CONNECTION_TYPE = "ghost";
+    public class WordpressConnection : ConnectionBase {
+        public const string CONNECTION_TYPE = "wordpress";
         public override string export_name { get; protected set; }
         public override ExportBase exporter { get; protected  set; }
-        public Ghost.Client connection;
+        public Wordpress.Client connection;
         private string alias;
         public string conf_endpoint;
         public string conf_alias;
         bool authenticated = false;
 
-        public GhostConnection (string username, string password, string endpoint) {
-            connection = new Ghost.Client (endpoint, username, password);
+        public WordpressConnection (string username, string password, string endpoint) {
+            connection = new Wordpress.Client (endpoint, username, password);
             alias = "";
             conf_endpoint = endpoint;
             conf_alias = username;
@@ -50,12 +50,15 @@ namespace ThiefMD.Connections {
                 } else if (endpoint.has_prefix ("http://")) {
                     label = endpoint.substring (7);
                 }
+                if (label.has_suffix (".php")) {
+                    label = endpoint.substring (0, endpoint.last_index_of_char('/'));
+                }
                 if (!label.has_suffix ("/")) {
                     label += "/";
                 }
                 label = label.substring (0, 1).up () + label.substring (1).down ();
-                export_name = label + username.substring (0, username.index_of ("@"));
-                exporter = new GhostExporter (connection);
+                export_name = label + username;
+                exporter = new WordpressExporter (connection);
                 authenticated = true;
             } else {
                 warning ("Could not establish connection");
@@ -70,7 +73,7 @@ namespace ThiefMD.Connections {
             // Void
         }
 
-        public static ConnectionData? create_connection (Gtk.Window? parent) {
+        public static ConnectionData? create_connection (Gtk.Window? parent = null) {
             Gtk.Grid grid = new Gtk.Grid ();
             grid.margin = 12;
             grid.row_spacing = 12;
@@ -79,7 +82,7 @@ namespace ThiefMD.Connections {
             grid.hexpand = true;
             grid.vexpand = true;
 
-            Gtk.Label username_label = new Gtk.Label (_("E-mail"));
+            Gtk.Label username_label = new Gtk.Label (_("Username"));
             username_label.xalign = 0;
             Gtk.Entry username_entry = new Gtk.Entry ();
 
@@ -91,7 +94,7 @@ namespace ThiefMD.Connections {
             Gtk.Label endpoint_label = new Gtk.Label (_("Endpoint"));
             endpoint_label.xalign = 0;
             Gtk.Entry endpoint_entry = new Gtk.Entry ();
-            endpoint_entry.placeholder_text = "https://my.ghost.org/";
+            endpoint_entry.placeholder_text = "https://my.wordpress.org/";
 
             grid.attach (username_label, 1, 1, 1, 1);
             grid.attach (username_entry, 2, 1, 2, 1);
@@ -103,7 +106,7 @@ namespace ThiefMD.Connections {
             grid.show_all ();
 
             var dialog = new Gtk.Dialog.with_buttons (
-                            "New ghost Connection",
+                            "New Wordpress Connection",
                             (parent != null) ? parent : ThiefApp.get_instance (),
                             Gtk.DialogFlags.MODAL,
                             _("_Add Account"),
@@ -140,15 +143,15 @@ namespace ThiefMD.Connections {
         }
     }
 
-    private class GhostExporter : ExportBase {
+    private class WordpressExporter : ExportBase {
         public override string export_name { get; protected set; }
         public override string export_css { get; protected set; }
         private PublisherPreviewWindow publisher_instance;
-        public Ghost.Client connection;
+        public Wordpress.Client connection;
         private Gtk.ComboBoxText publish_state;
 
-        public GhostExporter (Ghost.Client connected) {
-            export_name = "Ghost";
+        public WordpressExporter (Wordpress.Client connected) {
+            export_name = "Wordpress";
             export_css = "preview";
             connection = connected;
 
@@ -200,7 +203,6 @@ namespace ThiefMD.Connections {
             bool published = false;
             string title;
             string date;
-            string slug = "";
             string id = "";
             string html = "";
             string featured_image = "";
@@ -221,6 +223,8 @@ namespace ThiefMD.Connections {
                                 img_file.get_path ()))
                             {
                                 replacements.set (images.key, upload_url);
+                            } else {
+                                warning ("Could not upload image");
                             }
                         }
                     }
@@ -276,7 +280,6 @@ namespace ThiefMD.Connections {
             if (generate_html (body, out html)) {
                 // Simple post
                 if (connection.create_post_simple (
-                    out slug,
                     out id,
                     title,
                     html,
@@ -286,9 +289,9 @@ namespace ThiefMD.Connections {
                     published = true;
                     debug ("Posted");
                     Gtk.Label label = new Gtk.Label (
-                        "<b>Post URL:</b> <a href='%s'>%s</a>\nAdmin: <a href='%s'>%s</a>".printf (
-                            connection.endpoint + slug, connection.endpoint + slug,
-                            connection.endpoint + "ghost/#/editor/post/" + id, connection.endpoint + "ghost/#/editor/post/" + id));
+                        "<b>Post URL:</b> <a href='%s'>%s</a>".printf (
+                            connection.endpoint.substring (0, connection.endpoint.last_index_of_char  ('/')) + "/?p=" + id,
+                            connection.endpoint.substring (0, connection.endpoint.last_index_of_char  ('/')) + "/?p=" + id));
 
                     label.xalign = 0;
                     label.use_markup = true;

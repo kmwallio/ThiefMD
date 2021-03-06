@@ -25,9 +25,6 @@ using ThiefMD.Connections;
 
 namespace ThiefMD.Widgets {
     public class Preferences : Hdy.PreferencesWindow {
-        private Stack stack;
-        private Gtk.HeaderBar bar;
-
         public Preferences () {
             build_ui ();
         }
@@ -49,7 +46,6 @@ namespace ThiefMD.Widgets {
             connection_scroller.vexpand = true;
             connection_scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
 
-            var settings = AppSettings.get_default ();
             Hdy.PreferencesGroup display_options = new Hdy.PreferencesGroup ();
             display_options.title = _("Current Connections");
             display_options.description = _("Click on a connection to remove.");
@@ -64,7 +60,7 @@ namespace ThiefMD.Widgets {
             writeas_connection.always_show_image = true;
             writeas_connection.show_all ();
             writeas_connection.clicked.connect (() => {
-                ConnectionData? data = WriteFreelyConnection.create_connection ();
+                ConnectionData? data = WriteFreelyConnection.create_connection (this);
                 if (data != null) {
                     if (data.endpoint.chug ().chomp () == "") {
                         data.endpoint = "https://write.as/";
@@ -76,6 +72,17 @@ namespace ThiefMD.Widgets {
                         ThiefApp.get_instance ().connections.add (connection);
                         ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
                         display_options.add (connection_button (connection, display_options));
+                    } else {
+                        Gtk.Label label = new Gtk.Label (
+                            "<b>Could not connect:</b> Please visit <a href='https://thiefmd.com/help/write-freely'>https://thiefmd.com/help/write-freely</a> for help troubleshooting.");
+    
+                        label.xalign = 0;
+                        label.use_markup = true;
+                        ConnectionError status = new ConnectionError (
+                            this,
+                            (title != "") ? title + _(" Published") : _("Post Published"),
+                            label);
+                        status.run ();
                     }
                 }
             });
@@ -87,7 +94,7 @@ namespace ThiefMD.Widgets {
             ghost_connection.always_show_image = true;
             ghost_connection.show_all ();
             ghost_connection.clicked.connect (() => {
-                ConnectionData? data = GhostConnection.create_connection ();
+                ConnectionData? data = GhostConnection.create_connection (this);
                 if (data != null) {
                     if (data.endpoint.chug ().chomp () == "") {
                         data.endpoint = "https://my.ghost.org/";
@@ -99,10 +106,55 @@ namespace ThiefMD.Widgets {
                         ThiefApp.get_instance ().connections.add (connection);
                         ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
                         display_options.add (connection_button (connection, display_options));
+                    } else {
+                        Gtk.Label label = new Gtk.Label (
+                            "<b>Could not connect:</b> Please visit <a href='https://thiefmd.com/help/ghost'>https://thiefmd.com/help/ghost</a> for help troubleshooting.");
+    
+                        label.xalign = 0;
+                        label.use_markup = true;
+                        ConnectionError status = new ConnectionError (
+                            this,
+                            (title != "") ? title + _(" Published") : _("Post Published"),
+                            label);
+                        status.run ();
                     }
                 }
             });
             connection_options.add (ghost_connection);
+
+            var wordpress_connection = new Gtk.Button.with_label (_("  wordpress"));
+            wordpress_connection.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/wordpress.png"));
+            wordpress_connection.hexpand = true;
+            wordpress_connection.always_show_image = true;
+            wordpress_connection.show_all ();
+            wordpress_connection.clicked.connect (() => {
+                ConnectionData? data = WordpressConnection.create_connection (this);
+                if (data != null) {
+                    if (data.endpoint.chug ().chomp () == "") {
+                        data.endpoint = "https://my.wordpress.org/";
+                    }
+                    warning ("Connecting new wordpress account: %s", data.user);
+                    WordpressConnection connection = new WordpressConnection (data.user, data.auth, data.endpoint);
+                    if (connection.connection_valid ()) {
+                        SecretSchemas.get_instance ().add_wordpress_secret (data.endpoint, data.user, data.auth);
+                        ThiefApp.get_instance ().connections.add (connection);
+                        ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
+                        display_options.add (connection_button (connection, display_options));
+                    } else {
+                        Gtk.Label label = new Gtk.Label (
+                            "<b>Could not connect:</b> Please visit <a href='https://thiefmd.com/help/wordpress'>https://thiefmd.com/help/wordpress</a> for help troubleshooting.");
+    
+                        label.xalign = 0;
+                        label.use_markup = true;
+                        ConnectionError status = new ConnectionError (
+                            this,
+                            (title != "") ? title + _(" Published") : _("Post Published"),
+                            label);
+                        status.run ();
+                    }
+                }
+            });
+            connection_options.add (wordpress_connection);
 
             foreach (var c in ThiefApp.get_instance ().connections) {
                 display_options.add (connection_button (c, display_options));
@@ -134,6 +186,14 @@ namespace ThiefMD.Widgets {
                 alias = gc.conf_alias;
                 endpoint = gc.conf_endpoint;
                 button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/ghost.png"));
+                button.always_show_image = true;
+                button.show_all ();
+            } else if (connection is WordpressConnection) {
+                WordpressConnection gc = (WordpressConnection) connection;
+                type = WordpressConnection.CONNECTION_TYPE;
+                alias = gc.conf_alias;
+                endpoint = gc.conf_endpoint;
+                button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/wordpress.png"));
                 button.always_show_image = true;
                 button.show_all ();
             }
@@ -615,6 +675,22 @@ namespace ThiefMD.Widgets {
             preserve_library.add (perserve_library_switch);
             preserve_library.add (perserve_library_label);
             thiefmd_options.add (preserve_library);
+
+            var experimental_mode = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+            var experimental_mode_switch = new Switch ();
+            experimental_mode_switch.set_active (settings.experimental);
+            experimental_mode_switch.notify["active"].connect (() => {
+                settings.experimental = experimental_mode_switch.get_active ();
+            });
+            experimental_mode_switch.tooltip_text = _("Toggle experimental features");
+            experimental_mode_switch.margin = 12;
+            var experimental_mode_label = new Label(_("Enable experimental features"));
+            experimental_mode_label.xalign = 0;
+            experimental_mode_label.margin = 12;
+            experimental_mode_label.set_line_wrap (true);
+            experimental_mode.add (experimental_mode_switch);
+            experimental_mode.add (experimental_mode_label);
+            thiefmd_options.add (experimental_mode);
 
             page.add (editor_options);
             page.add (thiefmd_options);

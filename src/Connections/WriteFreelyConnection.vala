@@ -88,7 +88,7 @@ namespace ThiefMD.Connections {
             connection.logout ();
         }
 
-        public static ConnectionData? create_connection () {
+        public static ConnectionData? create_connection (Gtk.Window? parent) {
             Gtk.Grid grid = new Gtk.Grid ();
             grid.margin = 12;
             grid.row_spacing = 12;
@@ -122,7 +122,7 @@ namespace ThiefMD.Connections {
 
             var dialog = new Gtk.Dialog.with_buttons (
                             "New WriteFreely Connection",
-                            ThiefApp.get_instance (),
+                            (parent != null) ? parent : ThiefApp.get_instance (),
                             Gtk.DialogFlags.MODAL,
                             _("_Add Account"),
                             Gtk.ResponseType.ACCEPT,
@@ -206,7 +206,6 @@ namespace ThiefMD.Connections {
         }
 
         public override bool export () {
-            var settings = AppSettings.get_default ();
             bool non_collected_post = true;
             bool published = true;
             string temp;
