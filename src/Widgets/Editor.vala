@@ -51,7 +51,7 @@ namespace ThiefMD.Widgets {
         public Gtk.TextTag highlight_tag;
         private int last_width = 0;
         private int last_height = 0;
-        private bool spellcheck_active;
+        private bool spellcheck_active = false;
         private bool writecheck_active;
         private bool typewriter_active;
 
@@ -92,7 +92,7 @@ namespace ThiefMD.Widgets {
                 numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.CASELESS, 0);
                 is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss|file)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.CASELESS, 0);
                 is_codeblock = new Regex ("(```[a-zA-Z]*[\\n\\R]((.*?)[\\n\\R])*?```[\\n\\R])", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-                is_markdown_url = new Regex ("(?<text_group>\\[(?>[^\\[\\]]+|(?&text_group))*\\])(?:\\((?<url>\\S*?)(?:[ ]\"(?<title>(?:[^\"]|(?<=\\\\)\")*?)\")?\\))", RegexCompileFlags.CASELESS, 0);
+                is_markdown_url = new Regex ("(?<text_group>\\[(?>[^\\[\\]]+|(?&text_group))+\\])(?:\\((?<url>\\S+?)(?:[ ]\"(?<title>(?:[^\"]|(?<=\\\\)\")*?)\")?\\))", RegexCompileFlags.CASELESS, 0);
             } catch (Error e) {
                 warning ("Could not initialize regexes: %s", e.message);
             }
@@ -158,27 +158,10 @@ namespace ThiefMD.Widgets {
                 set_scheme (settings.get_valid_theme_id ());
                 return false;
             });
-            dynamic_margins ();
+
             spell = new GtkSpell.Checker ();
             writegood = new WriteGood.Checker ();
             writegood.show_tooltip = true;
-
-            if (settings.spellcheck) {
-                debug ("Spellcheck active");
-                spell.attach (this);
-                spellcheck_active = true;
-            } else {
-                debug ("Spellcheck inactive");
-                spellcheck_active = false;
-            }
-
-            if (settings.writegood) {
-                writegood.attach (this);
-                writecheck_active = true;
-            } else {
-                writegood.detach ();
-                writecheck_active = false;
-            }
 
             focus_text = buffer.create_tag ("focus-text");
             outoffocus_text = buffer.create_tag ("outoffocus-text");
@@ -597,6 +580,11 @@ namespace ThiefMD.Widgets {
                         write_good_recheck ();
                     }
 
+                    if (settings.spellcheck) {
+                        spell.attach (this);
+                        spellcheck_active = true;
+                    }
+
                     key_press_event.connect (on_keypress);
 
                     //
@@ -616,9 +604,6 @@ namespace ThiefMD.Widgets {
                     if (active != value) {
                         cursor_location = buffer.cursor_position;
                         debug ("Cursor saved at: %d", cursor_location);
-                        if (settings.spellcheck) {
-                            spell.detach ();
-                        }
 
                         preview_markdown = "";
                         try {
@@ -627,13 +612,19 @@ namespace ThiefMD.Widgets {
                             warning ("Unable to save file " + file.get_basename () + ": " + e.message);
                             SheetManager.show_error ("Unable to save file " + file.get_basename () + ": " + e.message);
                         }
+
                         buffer.changed.disconnect (on_change_notification);
                         size_allocate.disconnect (dynamic_margins);
                         settings.changed.disconnect (update_settings);
                         key_press_event.disconnect (on_keypress);
+
                         if (settings.writegood) {
                             writecheck_active = false;
                             writegood.detach ();
+                        }
+
+                        if (settings.spellcheck) {
+                            spell.detach ();
                         }
                     }
                     editable = false;
@@ -1101,10 +1092,16 @@ namespace ThiefMD.Widgets {
                 } else if (cursor_at_interesting_location) {
                     update_heading_margins ();
                     Gtk.TextIter before, after;
+                    Gtk.TextIter bound_start, bound_end;
+                    buffer.get_bounds (out bound_start, out bound_end);
                     buffer.get_iter_at_mark (out before, cursor);
                     buffer.get_iter_at_mark (out after, cursor);
-                    before.backward_line();
-                    after.forward_line ();
+                    if (!before.backward_line()) {
+                        before = bound_start;
+                    }
+                    if (!after.forward_line ()) {
+                        after = bound_end;
+                    }
                     string sample_text = buffer.get_text (before, after, true);
                     // Keep interesting location if we're potentially in something we can remove a link to.
                     if (!is_markdown_url.match (sample_text, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF)) {
@@ -1264,6 +1261,8 @@ namespace ThiefMD.Widgets {
                 }
 
                 if (settings.experimental) {
+                    Gtk.TextIter bound_start, bound_end;
+                    buffer.get_bounds (out bound_start, out bound_end);
                     bool check_selection = buffer.get_has_selection ();
                     Gtk.TextIter? select_start = null, select_end = null;
                     if (check_selection) {
@@ -1274,6 +1273,7 @@ namespace ThiefMD.Widgets {
                         var cursor = buffer.get_insert ();
                         buffer.get_iter_at_mark (out cursor_location, cursor);
                         do {
+                            buffer.get_bounds (out bound_start, out bound_end);
                             int start_link_pos, end_link_pos;
                             int start_url_pos, end_url_pos;
                             int start_full_pos, end_full_pos;
@@ -1300,15 +1300,23 @@ namespace ThiefMD.Widgets {
                                     }
                                 }
 
-                                start.backward_line ();
-                                buffer.get_iter_at_offset (out end, start_full_pos);
-                                string sanity_check = buffer.get_text (start, end, true);
-                                if (sanity_check.index_of_char ('`') >= 0) {
-                                    buffer.get_iter_at_offset (out end, end_full_pos);
-                                    end.forward_line ();
-                                    buffer.get_iter_at_offset (out start, end_full_pos);
-                                    sanity_check = buffer.get_text (start, end, true);
-                                    if (sanity_check.index_of_char ('`') >= 0) {
+                                // Check if we're in inline code
+                                if (start.backward_line ()) {
+                                    buffer.get_iter_at_offset (out end, start_full_pos);
+                                    if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
+                                        string sanity_check = buffer.get_text (start, end, true);
+                                        if (sanity_check.index_of_char ('`') >= 0) {
+                                            buffer.get_iter_at_offset (out end, end_full_pos);
+                                            if (end.forward_line ()) {
+                                                buffer.get_iter_at_offset (out start, end_full_pos);
+                                                sanity_check = buffer.get_text (start, end, true);
+                                                if (sanity_check.index_of_char ('`') >= 0) {
+                                                    continue;
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        // Bail, our calculations are now out of range
                                         continue;
                                     }
                                 }
@@ -1323,7 +1331,12 @@ namespace ThiefMD.Widgets {
                                 if (start.has_tag (code_block) || end.has_tag (code_block)) {
                                     continue;
                                 }
-                                buffer.apply_tag (markdown_link, start, end);
+                                if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
+                                    buffer.apply_tag (markdown_link, start, end);
+                                } else  {
+                                    // Bail, our calculations are now out of range
+                                    continue;
+                                }
 
                                 if (!UI.show_link_brackets () && !settings.focus_mode) {
                                     //
@@ -1333,16 +1346,21 @@ namespace ThiefMD.Widgets {
                                     buffer.get_iter_at_offset (out end, start_link_pos);
                                     start.backward_chars (1);
                                     end.forward_char ();
-                                    if (start.get_char () != '!') {
-                                        start.forward_char ();
-                                        buffer.apply_tag (markdown_url, start, end);
-                                        //
-                                        // Closing ]
-                                        //
-                                        buffer.get_iter_at_offset (out start, end_link_pos);
-                                        buffer.get_iter_at_offset (out end, end_link_pos);
-                                        start.backward_char ();
-                                        buffer.apply_tag (markdown_url, start, end);
+                                    if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
+                                        if (start.get_char () != '!') {
+                                            start.forward_char ();
+                                            buffer.apply_tag (markdown_url, start, end);
+                                            //
+                                            // Closing ]
+                                            //
+                                            buffer.get_iter_at_offset (out start, end_link_pos);
+                                            buffer.get_iter_at_offset (out end, end_link_pos);
+                                            start.backward_char ();
+                                            buffer.apply_tag (markdown_url, start, end);
+                                        }
+                                    } else  {
+                                        // Bail, our calculations are now out of range
+                                        continue;
                                     }
                                 }
 
@@ -1356,7 +1374,12 @@ namespace ThiefMD.Widgets {
                                 if (start.has_tag (code_block) || end.has_tag (code_block)) {
                                     continue;
                                 }
-                                buffer.apply_tag (markdown_url, start, end);
+                                if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
+                                    buffer.apply_tag (markdown_url, start, end);
+                                } else  {
+                                    // Bail, our calculations are now out of range
+                                    continue;
+                                }
                             }
                         } while (match_info.next ());
                     }
