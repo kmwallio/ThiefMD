@@ -709,7 +709,6 @@ namespace ThiefMD.Widgets {
                         iter_end.backward_chars (markup.length);
                         buffer.select_range (iter_start, iter_end);
                         markup_inserted_around_selection = true;
-                        warning ("Setting markup bool");
                     }
                 }
             }
