@@ -303,7 +303,7 @@ namespace ThiefMD.Controllers.UI {
                     set_css_scheme (palette);
                     set_scheme = true;
                 } catch (Error e) {
-                    warning ("Could not load previous style (%s): %s", settings.custom_theme, e.message);
+                    debug ("Could not load previous style (%s): %s", settings.custom_theme, e.message);
                 }
             }
         } else {
