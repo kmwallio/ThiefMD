@@ -55,6 +55,7 @@ yay -S thiefmd
  * Better library organization
  * Enhanced Export Tooling
  * Screenwriting Support
+ * Project Notes
 
 ## Resources
 
