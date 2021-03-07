@@ -223,12 +223,14 @@ namespace ThiefMD.Controllers.SheetManager {
         // Clear the view
         _view.hide ();
         if (show_welcome) {
+            _welcome_screen.am_active = false;
             _view.remove (_welcome_screen);
         }
 
         // Load the view
         if (_active_editors.size == 0) {
             show_welcome = true;
+            _welcome_screen.am_active = true;
             _view.add (_welcome_screen);
         } else {
             foreach (var editor in _active_editors) {
