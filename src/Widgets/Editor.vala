@@ -1277,7 +1277,7 @@ namespace ThiefMD.Widgets {
                             int start_link_pos, end_link_pos;
                             int start_url_pos, end_url_pos;
                             int start_full_pos, end_full_pos;
-                            warning ("Link Found, Text: %s, URL: %s", match_info.fetch (1), match_info.fetch (2));
+                            //  warning ("Link Found, Text: %s, URL: %s", match_info.fetch (1), match_info.fetch (2));
                             bool linkify = match_info.fetch_pos (1, out start_link_pos, out end_link_pos);
                             bool urlify = match_info.fetch_pos (2, out start_url_pos, out end_url_pos);
                             bool full_found = match_info.fetch_pos (0, out start_full_pos, out end_full_pos);
