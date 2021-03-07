@@ -53,7 +53,8 @@ yay -S thiefmd
 ## Planning
 
  * Better library organization
- * Dedicated Markdown Editor
+ * Enhanced Export Tooling
+ * Screenwriting Support
 
 ## Resources
 
