@@ -1078,7 +1078,7 @@ namespace ThiefMD.Widgets {
             left_margin = m;
             right_margin = m;
 
-            update_heading_margins ();
+            update_heading_margins (UI.moving ());
 
             typewriter_scrolling ();
 
@@ -1087,8 +1087,35 @@ namespace ThiefMD.Widgets {
             move_typewriter_scolling ();
         }
 
+        private bool cursor_at_interesting_location = false;
+        private void cursor_update_heading_margins () {
+            var settings = AppSettings.get_default ();
+
+            if (settings.experimental) {
+                var cursor = buffer.get_insert ();
+                Gtk.TextIter cursor_location;
+                buffer.get_iter_at_mark (out cursor_location, cursor);
+                if (cursor_location.has_tag (markdown_link) || cursor_location.has_tag (markdown_url)) {
+                    update_heading_margins ();
+                    cursor_at_interesting_location = true;
+                } else if (cursor_at_interesting_location) {
+                    update_heading_margins ();
+                    Gtk.TextIter before, after;
+                    buffer.get_iter_at_mark (out before, cursor);
+                    buffer.get_iter_at_mark (out after, cursor);
+                    before.backward_line();
+                    after.forward_line ();
+                    string sample_text = buffer.get_text (before, after, true);
+                    // Keep interesting location if we're potentially in something we can remove a link to.
+                    if (!is_markdown_url.match (sample_text, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF)) {
+                        cursor_at_interesting_location = false;
+                    }
+                }
+            }
+        }
+
         bool header_redraw_scheduled = false;
-        private void update_heading_margins () {
+        private void update_heading_margins (bool skip_links = false) {
             bool try_later = false;
             // Update heading margins
             if (UI.moving ()) {
@@ -1134,8 +1161,10 @@ namespace ThiefMD.Widgets {
                     buffer.remove_tag (heading_text[h], start, end);
                 }
                 buffer.remove_tag (code_block, start, end);
-                buffer.remove_tag (markdown_link, start, end);
-                buffer.remove_tag (markdown_url, start, end);
+                if (!skip_links) {
+                    buffer.remove_tag (markdown_link, start, end);
+                    buffer.remove_tag (markdown_url, start, end);
+                }
 
                 int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
                 int hashtag_w = f_w;
@@ -1225,6 +1254,13 @@ namespace ThiefMD.Widgets {
                             }
                         }
                     } while (match_info.next ());
+                }
+
+                //
+                // Skip high CPU stuff when skippable
+                //
+                if (skip_links) {
+                    return;
                 }
 
                 if (settings.experimental) {
@@ -1403,9 +1439,9 @@ namespace ThiefMD.Widgets {
             }
 
             if (settings.experimental) {
-                buffer.notify["cursor-position"].connect (update_heading_margins);
+                buffer.notify["cursor-position"].connect (cursor_update_heading_margins);
             } else {
-                buffer.notify["cursor-position"].connect (update_heading_margins);
+                buffer.notify["cursor-position"].connect (cursor_update_heading_margins);
             }
 
             if (!header_redraw_scheduled) {
