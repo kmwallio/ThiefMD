@@ -80,6 +80,7 @@ namespace ThiefMD.Widgets {
         public bool is_modified { get; set; default = false; }
         private bool should_scroll { get; set; default = false; }
         private bool should_save { get; set; default = false; }
+        private bool markup_inserted_around_selection = false;
 
         public Editor (string file_path) {
             var settings = AppSettings.get_default ();
@@ -211,21 +212,33 @@ namespace ThiefMD.Widgets {
 
         private bool on_keypress (Gdk.EventKey key) {
             uint keycode = key.hardware_keycode;
+            bool skip_request = false;
 
             if (is_list == null || is_partial_list == null || numerical_list == null) {
                 return false;
             }
 
-            if (match_keycode (Gdk.Key.Return, keycode) || match_keycode (Gdk.Key.Tab, keycode)) {
-                debug ("Got enter or tab key");
+            // Move outside of selection if we just inserted formatting and get a right -> key from the user
+            if (match_keycode (Gdk.Key.Right, keycode) && markup_inserted_around_selection && buffer.has_selection) {
+                skip_request = true;
+            }
+
+            markup_inserted_around_selection = false;
+
+            if (match_keycode (Gdk.Key.Return, keycode) || match_keycode (Gdk.Key.Tab, keycode) || skip_request) {
+                debug ("Got enter or tab key or skip request");
                 var cursor = buffer.get_insert ();
                 Gtk.TextIter start, end;
-                buffer.get_iter_at_mark (out start, cursor);
-                buffer.get_iter_at_mark (out end, cursor);
+                if (!skip_request) {
+                    buffer.get_iter_at_mark (out start, cursor);
+                    buffer.get_iter_at_mark (out end, cursor);
+                } else {
+                    buffer.get_selection_bounds (out start, out end);
+                }
                 unichar end_char = end.get_char ();
 
                 // Tab to next item in link, or outside of current markup
-                if (match_keycode (Gdk.Key.Tab, keycode) && 
+                if ((skip_request || match_keycode (Gdk.Key.Tab, keycode)) && 
                     (end_char == '*' ||
                      end_char == ']' ||
                      end_char == ')' ||
@@ -695,6 +708,8 @@ namespace ThiefMD.Widgets {
                         buffer.get_selection_bounds (out iter_start, out iter_end);
                         iter_end.backward_chars (markup.length);
                         buffer.select_range (iter_start, iter_end);
+                        markup_inserted_around_selection = true;
+                        warning ("Setting markup bool");
                     }
                 }
             }
