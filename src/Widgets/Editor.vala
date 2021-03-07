@@ -92,7 +92,7 @@ namespace ThiefMD.Widgets {
                 numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.CASELESS, 0);
                 is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss|file)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.CASELESS, 0);
                 is_codeblock = new Regex ("(```[a-zA-Z]*[\\n\\R]((.*?)[\\n\\R])*?```[\\n\\R])", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-                is_markdown_url = new Regex ("\\[([^\\[]+?)\\](\\([^\\)\\n]+?\\))", RegexCompileFlags.CASELESS, 0);
+                is_markdown_url = new Regex ("(?<text_group>\\[(?>[^\\[\\]]+|(?&text_group))*\\])(?:\\((?<url>\\S*?)(?:[ ]\"(?<title>(?:[^\"]|(?<=\\\\)\")*?)\")?\\))", RegexCompileFlags.CASELESS, 0);
             } catch (Error e) {
                 warning ("Could not initialize regexes: %s", e.message);
             }
@@ -1095,7 +1095,7 @@ namespace ThiefMD.Widgets {
                 var cursor = buffer.get_insert ();
                 Gtk.TextIter cursor_location;
                 buffer.get_iter_at_mark (out cursor_location, cursor);
-                if (cursor_location.has_tag (markdown_link) || cursor_location.has_tag (markdown_url)) {
+                if (cursor_location.has_tag (markdown_link) || cursor_location.has_tag (markdown_url) || buffer.has_selection) {
                     update_heading_margins ();
                     cursor_at_interesting_location = true;
                 } else if (cursor_at_interesting_location) {
@@ -1264,6 +1264,11 @@ namespace ThiefMD.Widgets {
                 }
 
                 if (settings.experimental) {
+                    bool check_selection = buffer.get_has_selection ();
+                    Gtk.TextIter? select_start = null, select_end = null;
+                    if (check_selection) {
+                        buffer.get_selection_bounds (out select_start, out select_end);
+                    }
                     if (is_markdown_url.match_full (checking_copy, checking_copy.length, 0, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
                         Gtk.TextIter cursor_location;
                         var cursor = buffer.get_insert ();
@@ -1272,7 +1277,7 @@ namespace ThiefMD.Widgets {
                             int start_link_pos, end_link_pos;
                             int start_url_pos, end_url_pos;
                             int start_full_pos, end_full_pos;
-                            //  warning ("Link Found, Text: %s, URL: %s", link, url);
+                            warning ("Link Found, Text: %s, URL: %s", match_info.fetch (1), match_info.fetch (2));
                             bool linkify = match_info.fetch_pos (1, out start_link_pos, out end_link_pos);
                             bool urlify = match_info.fetch_pos (2, out start_url_pos, out end_url_pos);
                             bool full_found = match_info.fetch_pos (0, out start_full_pos, out end_full_pos);
@@ -1287,6 +1292,25 @@ namespace ThiefMD.Widgets {
 
                                 if (cursor_location.in_range (start, end)) {
                                     continue;
+                                }
+
+                                if (check_selection) {
+                                    if (start.in_range (select_start, select_end) || end.in_range (select_start, select_end)) {
+                                        continue;
+                                    }
+                                }
+
+                                start.backward_line ();
+                                buffer.get_iter_at_offset (out end, start_full_pos);
+                                string sanity_check = buffer.get_text (start, end, true);
+                                if (sanity_check.index_of_char ('`') >= 0) {
+                                    buffer.get_iter_at_offset (out end, end_full_pos);
+                                    end.forward_line ();
+                                    buffer.get_iter_at_offset (out start, end_full_pos);
+                                    sanity_check = buffer.get_text (start, end, true);
+                                    if (sanity_check.index_of_char ('`') >= 0) {
+                                        continue;
+                                    }
                                 }
 
                                 //
@@ -1307,7 +1331,8 @@ namespace ThiefMD.Widgets {
                                     //
                                     buffer.get_iter_at_offset (out start, start_link_pos);
                                     buffer.get_iter_at_offset (out end, start_link_pos);
-                                    start.backward_chars (2);
+                                    start.backward_chars (1);
+                                    end.forward_char ();
                                     if (start.get_char () != '!') {
                                         start.forward_char ();
                                         buffer.apply_tag (markdown_url, start, end);
@@ -1316,7 +1341,7 @@ namespace ThiefMD.Widgets {
                                         //
                                         buffer.get_iter_at_offset (out start, end_link_pos);
                                         buffer.get_iter_at_offset (out end, end_link_pos);
-                                        end.forward_char ();
+                                        start.backward_char ();
                                         buffer.apply_tag (markdown_url, start, end);
                                     }
                                 }
@@ -1325,9 +1350,9 @@ namespace ThiefMD.Widgets {
                                 // Link URL (https://thiefmd.com)
                                 //
                                 start_url_pos = checking_copy.char_count ((ssize_t) start_url_pos);
-                                end_url_pos = checking_copy.char_count ((ssize_t) end_url_pos);
                                 buffer.get_iter_at_offset (out start, start_url_pos);
-                                buffer.get_iter_at_offset (out end, end_url_pos);
+                                start.backward_char ();
+                                buffer.get_iter_at_offset (out end, end_full_pos);
                                 if (start.has_tag (code_block) || end.has_tag (code_block)) {
                                     continue;
                                 }
