@@ -26,16 +26,15 @@ namespace ThiefMD.Controllers.FileManager {
     public void import_file (string file_path, Sheets parent) {
         File import_f = File.new_for_path (file_path);
         string ext = file_path.substring (file_path.last_index_of (".") + 1).down ();
+        string match_ext = ext;
         warning ("Importing (%s): %s", ext, import_f.get_path ());
 
-        if (ext.length >= 3) {
-            ext = "*." + ext + ";";
-            warning (ext);
-            warning ("%d", ThiefProperties.SUPPORTED_IMPORT_FILES.index_of (ext));
+        if (match_ext.length >= 3) {
+            match_ext = "*." + match_ext + ";";
         }
 
         // Supported import file extensions
-        if (ThiefProperties.SUPPORTED_IMPORT_FILES.index_of (ext) >= 0) {
+        if (ThiefProperties.SUPPORTED_IMPORT_FILES.index_of (match_ext) >= 0) {
             Thinking worker = new Thinking (_("Importing File"), () => {
                 string dest_name = import_f.get_basename ();
                 dest_name = dest_name.substring (0, dest_name.last_index_of ("."));
