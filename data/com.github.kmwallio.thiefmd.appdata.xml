@@ -16,6 +16,7 @@
   <url type="homepage">https://thiefmd.com</url>
   <url type="bugtracker">https://github.com/kmwallio/thiefmd/issues</url>
   <url type="help">https://thiefmd.com/deets</url>
+  <url type="donation">https://github.com/sponsors/kmwallio</url>
   <content_rating type="oars-1.1">
     <content_attribute id="language-humor">mild</content_attribute>
   </content_rating>
