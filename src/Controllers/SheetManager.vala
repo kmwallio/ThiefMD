@@ -587,15 +587,15 @@ namespace ThiefMD.Controllers.SheetManager {
             clean.editor.am_active = false;
             clean.sheet = null;
             if (_editor_pool.size < Constants.EDITOR_POOL_SIZE) {
-                clean.editor.open_file ("");
-                _editor_pool.add (clean.editor);
-            } else {
-                clean.editor.clean ();
-                clean.editor = null;
-                clean.sheet.active_sheet = false;
-                clean.sheet = null;
-                clean = null;
+                Widgets.Editor new_editor = new Widgets.Editor ("");
+                new_editor.am_active = false;
+                _editor_pool.add (new_editor);
             }
+            clean.editor.clean ();
+            clean.editor = null;
+            clean.sheet.active_sheet = false;
+            clean.sheet = null;
+            clean = null;
         }
     }
 
