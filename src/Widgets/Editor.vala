@@ -35,6 +35,7 @@ namespace ThiefMD.Widgets {
         private DateTime modified_time;
         private DateTime file_modified_time;
         private Mutex file_mutex;
+        private Mutex invisitex;
         private bool no_change_prompt = false; // Trying to prevent too much file changed prompts?
         private TimedMutex disk_change_prompted;
         private TimedMutex dynamic_margin_update;
@@ -99,6 +100,7 @@ namespace ThiefMD.Widgets {
             }
 
             file_mutex = Mutex ();
+            invisitex = Mutex ();
             disk_change_prompted = new TimedMutex (10000);
             dynamic_margin_update = new TimedMutex (250);
 
@@ -1167,15 +1169,15 @@ namespace ThiefMD.Widgets {
 
             int m = left_margin;
             try {
-                Gtk.TextIter start, end;
-                buffer.get_bounds (out start, out end);
+                Gtk.TextIter bound_start, bound_end, start, end;
+                buffer.get_bounds (out bound_start, out bound_end);
                 for (int h = 0; h < 6; h++) {
-                    buffer.remove_tag (heading_text[h], start, end);
+                    buffer.remove_tag (heading_text[h], bound_start, bound_end);
                 }
-                buffer.remove_tag (code_block, start, end);
+                buffer.remove_tag (code_block, bound_start, bound_end);
                 if (!skip_links) {
-                    buffer.remove_tag (markdown_link, start, end);
-                    buffer.remove_tag (markdown_url, start, end);
+                    buffer.remove_tag (markdown_link, bound_start, bound_end);
+                    buffer.remove_tag (markdown_url, bound_start, bound_end);
                 }
 
                 int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
@@ -1238,7 +1240,12 @@ namespace ThiefMD.Widgets {
                             end_pos = checking_copy.char_count ((ssize_t)(next_offset + 4));
                             buffer.get_iter_at_offset (out start, start_pos);
                             buffer.get_iter_at_offset (out end, end_pos);
-                            buffer.apply_tag (code_block, start, end);
+                            buffer.get_bounds (out bound_start, out bound_end);
+                            if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
+                                buffer.apply_tag (code_block, start, end);
+                            } else {
+                                return;
+                            }
                             offset = checking_copy.index_of ("\n```", next_offset + 1);
                         } else {
                             break;
@@ -1257,12 +1264,17 @@ namespace ThiefMD.Widgets {
                             end_pos = checking_copy.char_count ((ssize_t) end_pos);
                             buffer.get_iter_at_offset (out start, start_pos);
                             buffer.get_iter_at_offset (out end, end_pos);
+                            buffer.get_bounds (out bound_start, out bound_end);
                             if (start.has_tag (code_block) || end.has_tag (code_block)) {
                                 continue;
                             }
                             int heading_depth = heading.index_of (" ") - 1;
                             if (heading_depth >= 0 && heading_depth < 6) {
-                                buffer.apply_tag (heading_text[heading_depth], start, end);
+                                if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
+                                    buffer.apply_tag (heading_text[heading_depth], start, end);
+                                } else {
+                                    return;
+                                }
                             }
                         }
                     } while (match_info.next ());
@@ -1275,133 +1287,146 @@ namespace ThiefMD.Widgets {
                     if (skip_links) {
                         return;
                     }
-                    Gtk.TextIter bound_start, bound_end;
-                    buffer.get_bounds (out bound_start, out bound_end);
-                    bool check_selection = buffer.get_has_selection ();
-                    Gtk.TextIter? select_start = null, select_end = null;
-                    if (check_selection) {
-                        buffer.get_selection_bounds (out select_start, out select_end);
+                    if (invisitex.trylock ()) {
+                        hide_links (checking_copy);
+                        invisitex.unlock ();
                     }
-                    if (is_markdown_url.match_full (checking_copy, checking_copy.length, 0, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
-                        Gtk.TextIter cursor_location;
-                        var cursor = buffer.get_insert ();
-                        buffer.get_iter_at_mark (out cursor_location, cursor);
-                        do {
-                            buffer.get_bounds (out bound_start, out bound_end);
-                            int start_link_pos, end_link_pos;
-                            int start_url_pos, end_url_pos;
-                            int start_full_pos, end_full_pos;
-                            //  warning ("Link Found, Text: %s, URL: %s", match_info.fetch (1), match_info.fetch (2));
-                            bool linkify = match_info.fetch_pos (1, out start_link_pos, out end_link_pos);
-                            bool urlify = match_info.fetch_pos (2, out start_url_pos, out end_url_pos);
-                            bool full_found = match_info.fetch_pos (0, out start_full_pos, out end_full_pos);
-                            if (linkify && urlify && full_found) {
-                                start_full_pos = checking_copy.char_count ((ssize_t)start_full_pos);
-                                end_full_pos = checking_copy.char_count ((ssize_t)end_full_pos);
-                                //
-                                // Don't hide active link's where the cursor is present
-                                //
-                                buffer.get_iter_at_offset (out start, start_full_pos);
-                                buffer.get_iter_at_offset (out end, end_full_pos);
+                }
+            } catch (Error e) {
+                warning ("Could not adjust headers: %s", e.message);
+            }
+        }
 
-                                if (cursor_location.in_range (start, end)) {
+        private void hide_links (string checking_copy) {
+            var settings = AppSettings.get_default ();
+            try {
+                MatchInfo match_info;
+                Gtk.TextIter bound_start, bound_end, start, end;
+                buffer.get_bounds (out bound_start, out bound_end);
+                bool check_selection = buffer.get_has_selection ();
+                Gtk.TextIter? select_start = null, select_end = null;
+                if (check_selection) {
+                    buffer.get_selection_bounds (out select_start, out select_end);
+                }
+                if (is_markdown_url.match_full (checking_copy, checking_copy.length, 0, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
+                    Gtk.TextIter cursor_location;
+                    var cursor = buffer.get_insert ();
+                    buffer.get_iter_at_mark (out cursor_location, cursor);
+                    do {
+                        buffer.get_bounds (out bound_start, out bound_end);
+                        int start_link_pos, end_link_pos;
+                        int start_url_pos, end_url_pos;
+                        int start_full_pos, end_full_pos;
+                        //  warning ("Link Found, Text: %s, URL: %s", match_info.fetch (1), match_info.fetch (2));
+                        bool linkify = match_info.fetch_pos (1, out start_link_pos, out end_link_pos);
+                        bool urlify = match_info.fetch_pos (2, out start_url_pos, out end_url_pos);
+                        bool full_found = match_info.fetch_pos (0, out start_full_pos, out end_full_pos);
+                        if (linkify && urlify && full_found) {
+                            start_full_pos = checking_copy.char_count ((ssize_t)start_full_pos);
+                            end_full_pos = checking_copy.char_count ((ssize_t)end_full_pos);
+                            //
+                            // Don't hide active link's where the cursor is present
+                            //
+                            buffer.get_iter_at_offset (out start, start_full_pos);
+                            buffer.get_iter_at_offset (out end, end_full_pos);
+
+                            if (cursor_location.in_range (start, end)) {
+                                buffer.apply_tag (markdown_link, start, end);
+                                continue;
+                            }
+
+                            if (check_selection) {
+                                if (start.in_range (select_start, select_end) || end.in_range (select_start, select_end)) {
                                     buffer.apply_tag (markdown_link, start, end);
                                     continue;
                                 }
+                            }
 
-                                if (check_selection) {
-                                    if (start.in_range (select_start, select_end) || end.in_range (select_start, select_end)) {
-                                        buffer.apply_tag (markdown_link, start, end);
-                                        continue;
-                                    }
-                                }
-
-                                // Check if we're in inline code
-                                if (start.backward_line ()) {
-                                    buffer.get_iter_at_offset (out end, start_full_pos);
-                                    if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
-                                        string sanity_check = buffer.get_text (start, end, true);
-                                        if (sanity_check.index_of_char ('`') >= 0) {
-                                            buffer.get_iter_at_offset (out end, end_full_pos);
-                                            if (end.forward_line ()) {
-                                                buffer.get_iter_at_offset (out start, end_full_pos);
-                                                sanity_check = buffer.get_text (start, end, true);
-                                                if (sanity_check.index_of_char ('`') >= 0) {
-                                                    continue;
-                                                }
+                            // Check if we're in inline code
+                            if (start.backward_line ()) {
+                                buffer.get_iter_at_offset (out end, start_full_pos);
+                                if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
+                                    string sanity_check = buffer.get_text (start, end, true);
+                                    if (sanity_check.index_of_char ('`') >= 0) {
+                                        buffer.get_iter_at_offset (out end, end_full_pos);
+                                        if (end.forward_line ()) {
+                                            buffer.get_iter_at_offset (out start, end_full_pos);
+                                            sanity_check = buffer.get_text (start, end, true);
+                                            if (sanity_check.index_of_char ('`') >= 0) {
+                                                continue;
                                             }
                                         }
-                                    } else {
-                                        // Bail, our calculations are now out of range
-                                        continue;
                                     }
-                                }
-
-                                //
-                                // Link Text [Text]
-                                //
-                                start_link_pos = checking_copy.char_count ((ssize_t) start_link_pos);
-                                end_link_pos = checking_copy.char_count ((ssize_t) end_link_pos);
-                                buffer.get_iter_at_offset (out start, start_link_pos);
-                                buffer.get_iter_at_offset (out end, end_link_pos);
-                                if (start.has_tag (code_block) || end.has_tag (code_block)) {
-                                    continue;
-                                }
-                                if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
-                                    buffer.apply_tag (markdown_link, start, end);
-                                } else  {
+                                } else {
                                     // Bail, our calculations are now out of range
                                     continue;
                                 }
+                            }
 
-                                if (!UI.show_link_brackets () && !settings.focus_mode) {
-                                    //
-                                    // Starting [
-                                    //
-                                    buffer.get_iter_at_offset (out start, start_link_pos);
-                                    buffer.get_iter_at_offset (out end, start_link_pos);
-                                    start.backward_chars (1);
-                                    end.forward_char ();
-                                    if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
-                                        if (start.get_char () != '!') {
-                                            start.forward_char ();
-                                            buffer.apply_tag (markdown_url, start, end);
-                                            //
-                                            // Closing ]
-                                            //
-                                            buffer.get_iter_at_offset (out start, end_link_pos);
-                                            buffer.get_iter_at_offset (out end, end_link_pos);
-                                            start.backward_char ();
-                                            buffer.apply_tag (markdown_url, start, end);
-                                        }
-                                    } else  {
-                                        // Bail, our calculations are now out of range
-                                        continue;
-                                    }
-                                }
+                            //
+                            // Link Text [Text]
+                            //
+                            start_link_pos = checking_copy.char_count ((ssize_t) start_link_pos);
+                            end_link_pos = checking_copy.char_count ((ssize_t) end_link_pos);
+                            buffer.get_iter_at_offset (out start, start_link_pos);
+                            buffer.get_iter_at_offset (out end, end_link_pos);
+                            if (start.has_tag (code_block) || end.has_tag (code_block)) {
+                                continue;
+                            }
+                            if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
+                                buffer.apply_tag (markdown_link, start, end);
+                            } else  {
+                                // Bail, our calculations are now out of range
+                                continue;
+                            }
 
+                            if (!UI.show_link_brackets () && !settings.focus_mode) {
                                 //
-                                // Link URL (https://thiefmd.com)
+                                // Starting [
                                 //
-                                start_url_pos = checking_copy.char_count ((ssize_t) start_url_pos);
-                                buffer.get_iter_at_offset (out start, start_url_pos);
-                                start.backward_char ();
-                                buffer.get_iter_at_offset (out end, end_full_pos);
-                                if (start.has_tag (code_block) || end.has_tag (code_block)) {
-                                    continue;
-                                }
+                                buffer.get_iter_at_offset (out start, start_link_pos);
+                                buffer.get_iter_at_offset (out end, start_link_pos);
+                                start.backward_chars (1);
+                                end.forward_char ();
                                 if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
-                                    buffer.apply_tag (markdown_url, start, end);
+                                    if (start.get_char () != '!') {
+                                        start.forward_char ();
+                                        buffer.apply_tag (markdown_url, start, end);
+                                        //
+                                        // Closing ]
+                                        //
+                                        buffer.get_iter_at_offset (out start, end_link_pos);
+                                        buffer.get_iter_at_offset (out end, end_link_pos);
+                                        start.backward_char ();
+                                        buffer.apply_tag (markdown_url, start, end);
+                                    }
                                 } else  {
                                     // Bail, our calculations are now out of range
                                     continue;
                                 }
                             }
-                        } while (match_info.next ());
-                    }
+
+                            //
+                            // Link URL (https://thiefmd.com)
+                            //
+                            start_url_pos = checking_copy.char_count ((ssize_t) start_url_pos);
+                            buffer.get_iter_at_offset (out start, start_url_pos);
+                            start.backward_char ();
+                            buffer.get_iter_at_offset (out end, end_full_pos);
+                            if (start.has_tag (code_block) || end.has_tag (code_block)) {
+                                continue;
+                            }
+                            if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
+                                buffer.apply_tag (markdown_url, start, end);
+                            } else  {
+                                // Bail, our calculations are now out of range
+                                continue;
+                            }
+                        }
+                    } while (match_info.next ());
                 }
             } catch (Error e) {
-                warning ("Could not adjust headers: %s", e.message);
+                warning ("Could not hide links: %s", e.message);
             }
         }
 
