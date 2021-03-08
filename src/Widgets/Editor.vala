@@ -1305,11 +1305,13 @@ namespace ThiefMD.Widgets {
                                 buffer.get_iter_at_offset (out end, end_full_pos);
 
                                 if (cursor_location.in_range (start, end)) {
+                                    buffer.apply_tag (markdown_link, start, end);
                                     continue;
                                 }
 
                                 if (check_selection) {
                                     if (start.in_range (select_start, select_end) || end.in_range (select_start, select_end)) {
+                                        buffer.apply_tag (markdown_link, start, end);
                                         continue;
                                     }
                                 }
@@ -1558,17 +1560,28 @@ namespace ThiefMD.Widgets {
                     }
                 } else if (settings.focus_type == FocusType.SENTENCE) {
                     if (!start.starts_sentence ()) {
-                        start.backward_sentence_start ();
+                        do {
+                            start.backward_sentence_start ();
+                            if (start.get_char () == '[') {
+                                start.backward_char ();
+                            }
+                        } while (!start.starts_line () && (start.has_tag (markdown_link) || start.has_tag (markdown_url)));
                     }
-                    if (!end.ends_sentence ()) {
-                        end.forward_sentence_end ();
+                    if (!end.ends_sentence () || end.has_tag (markdown_url) || end.has_tag (markdown_link)) {
+                        do {
+                            end.forward_sentence_end ();
+                        } while (end.has_tag (markdown_link) || end.has_tag (markdown_url));
                     }
                 } else if (settings.focus_type == FocusType.PARAGRAPH) {
-                    if (!start.starts_line ()) {
-                        start.backward_line ();
+                    if (!start.starts_line () || start.has_tag (code_block)) {
+                        do {
+                            start.backward_line ();
+                        } while (start.has_tag (code_block));
                     }
-                    if (!end.ends_line ()) {
-                        end.forward_to_line_end ();
+                    if (!end.ends_line () || end.has_tag (code_block)) {
+                        do {
+                            end.forward_to_line_end ();
+                        } while (end.has_tag (code_block));
                     }
                 }
 
