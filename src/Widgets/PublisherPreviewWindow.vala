@@ -26,6 +26,8 @@ namespace ThiefMD.Widgets {
     public class PublisherPreviewWindow : Hdy.Window {
         public Hdy.HeaderBar headerbar;
         public Preview preview;
+        private Gtk.Box advanced_options;
+        public Gtk.Paned options_pane;
         private string _markdown;
         private string e_markdown;
         private ExportBase exporter;
@@ -53,6 +55,9 @@ namespace ThiefMD.Widgets {
 
         protected void build_ui () {
             Gtk.Box vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            advanced_options = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            options_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+
             var settings = AppSettings.get_default ();
             int w, h;
 
@@ -197,10 +202,24 @@ namespace ThiefMD.Widgets {
 
             set_default_size(w, h - 150);
 
-            vbox.add (preview);
+            options_pane.add1 (advanced_options);
+            options_pane.add2 (preview);
+            options_pane.set_position (0);
+            options_pane.get_child1 ().hide ();
+            options_pane.get_child2 ().show ();
+            options_pane.show ();
+            vbox.add (options_pane);
             delete_event.connect (this.on_delete_event);
 
             add (vbox);
+            preview.show_all ();
+            headerbar.show_all ();
+            vbox.show ();
+        }
+
+        public void show_advanced_options () {
+            options_pane.get_child1 ().show ();
+            options_pane.set_position (250);
         }
 
         public bool on_delete_event () {

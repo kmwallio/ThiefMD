@@ -240,7 +240,7 @@ namespace ThiefMD.Widgets {
                 menu_export_sheet.activate.connect (() => {
                     string preview_markdown = FileManager.get_file_contents (_sheet_path);
                     PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown);
-                    ppw.show_all ();
+                    ppw.show ();
                 });
 
                 menu.add (new Gtk.SeparatorMenuItem ());

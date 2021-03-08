@@ -479,7 +479,7 @@ namespace ThiefMD.Widgets {
                     if (_selected != null && _all_sheets.find (_selected) != null) {
                         string preview_markdown = build_novel (_selected, settings.export_include_metadata_file);
                         PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown);
-                        ppw.show_all ();
+                        ppw.show ();
                     }
                 });
                 menu.add (menu_preview_item);

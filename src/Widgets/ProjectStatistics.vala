@@ -65,7 +65,7 @@ namespace ThiefMD.Widgets {
             export_button.clicked.connect (() => {
                 string novel = ThiefApp.get_instance ().library.get_novel (monitor_path);
                 PublisherPreviewWindow ppw = new PublisherPreviewWindow (novel);
-                ppw.show_all ();
+                ppw.show ();
             });
 
             Gtk.Button close_button = new Gtk.Button.with_label (_("Close"));

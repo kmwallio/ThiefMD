@@ -196,6 +196,7 @@ namespace ThiefMD.Widgets {
             markdown_link = buffer.create_tag ("markdown-link");
             markdown_url = buffer.create_tag ("markdown-url");
             markdown_url.invisible = true;
+            markdown_url.invisible_set = true;
 
             last_width = settings.window_width;
             last_height = settings.window_height;
@@ -1180,7 +1181,7 @@ namespace ThiefMD.Widgets {
                 int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
                 int hashtag_w = f_w;
                 int space_w = f_w;
-                int avg_w;
+                int avg_w = f_w;
 
                 if (get_realized ()) {
                     var font_desc = new Pango.FontDescription ();
@@ -1267,14 +1268,13 @@ namespace ThiefMD.Widgets {
                     } while (match_info.next ());
                 }
 
-                //
-                // Skip high CPU stuff when skippable
-                //
-                if (skip_links) {
-                    return;
-                }
-
                 if (settings.experimental) {
+                    //
+                    // Skip high CPU stuff when skippable
+                    //
+                    if (skip_links) {
+                        return;
+                    }
                     Gtk.TextIter bound_start, bound_end;
                     buffer.get_bounds (out bound_start, out bound_end);
                     bool check_selection = buffer.get_has_selection ();
