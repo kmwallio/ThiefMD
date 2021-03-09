@@ -512,7 +512,11 @@ namespace ThiefMD.Widgets {
                 Gtk.MenuItem menu_open_item = new Gtk.MenuItem.with_label (_("Open in File Manager"));
                 menu_open_item.activate.connect (() => {
                     if (_selected != null && _all_sheets.find (_selected) != null) {
-                        AppInfo.launch_default_for_uri ("file://%s".printf (_selected._path), null);
+                        try {
+                            AppInfo.launch_default_for_uri ("file://%s".printf (_selected._path), null);
+                        } catch (Error e) {
+                            warning ("Could not open folder: %s", e.message);
+                        }
                     }
                 });
                 menu.add (menu_open_item);
