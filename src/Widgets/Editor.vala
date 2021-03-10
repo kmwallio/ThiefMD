@@ -402,6 +402,28 @@ namespace ThiefMD.Widgets {
             return have_match;
         }
 
+        private bool no_hiding = false;
+        public override bool motion_notify_event (EventMotion event ) {
+            if (((event.state & Gdk.ModifierType.BUTTON1_MASK) != 0) ||
+                ((event.state & Gdk.ModifierType.BUTTON2_MASK) != 0) ||
+                ((event.state & Gdk.ModifierType.BUTTON3_MASK) != 0) || 
+                ((event.state & Gdk.ModifierType.BUTTON4_MASK) != 0) || 
+                ((event.state & Gdk.ModifierType.BUTTON5_MASK) != 0))
+            {
+                no_hiding = true;
+            } else if (no_hiding) {
+                update_heading_margins (true);
+                Timeout.add (300, () => {
+                    no_hiding = false;
+                    update_heading_margins ();
+                    return false;
+                });
+            }
+
+            base.motion_notify_event (event);
+            return false;
+        }
+
         private void on_drag_data_received (
             Gtk.Widget widget,
             DragContext context,
@@ -1136,7 +1158,7 @@ namespace ThiefMD.Widgets {
                 try_later = true;
             }
 
-            if (try_later) {
+            if (try_later && !no_hiding && !buffer.has_selection) {
                 if (!header_redraw_scheduled) {
                     header_redraw_scheduled = true;
                     Timeout.add (350, () => {
