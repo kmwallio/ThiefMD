@@ -6,7 +6,7 @@ thieftags: #blogging
 
 Already have a [WriteFreely](https://writefreely.org) or [Write.as](https://write.as) blog? ThiefMD can publish to them!
 
-Please note, automated image upload is not supported. Check out [Snap.as](https://snap.as) as a convenient way to upload and share your photos.
+Please note [Snap.as](https://snap.as) image uploading will only work for [Write.as Pro Users](https://write.as/pro).
 
 ## Adding a Connection ❤
 
