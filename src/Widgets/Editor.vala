@@ -1187,6 +1187,18 @@ namespace ThiefMD.Widgets {
                 code_block.background_full_height_set = true;
             }
 
+            if (settings.experimental) {
+                if (no_hiding) {
+                    markdown_link.weight = Pango.Weight.NORMAL;
+                    markdown_link.weight_set = true;
+                    markdown_url.weight = Pango.Weight.NORMAL;
+                    markdown_url.weight_set = true;
+                } else {
+                    markdown_link.weight_set = false;
+                    markdown_url.weight_set = false;
+                }
+            }
+
             int m = left_margin;
             try {
                 Gtk.TextIter start, end;
@@ -1629,7 +1641,7 @@ namespace ThiefMD.Widgets {
         }
 
         public bool move_typewriter_scolling () {
-            if (!active) {
+            if (!active || buffer.has_selection) {
                 return false;
             }
 
