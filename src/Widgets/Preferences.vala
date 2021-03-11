@@ -122,7 +122,7 @@ namespace ThiefMD.Widgets {
             });
             connection_options.add (ghost_connection);
 
-            var wordpress_connection = new Gtk.Button.with_label (_("  wordpress"));
+            var wordpress_connection = new Gtk.Button.with_label (_("  WordPress"));
             wordpress_connection.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/wordpress.png"));
             wordpress_connection.hexpand = true;
             wordpress_connection.always_show_image = true;

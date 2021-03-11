@@ -238,7 +238,7 @@ namespace ThiefMD.Connections {
                             {
                                 replacements.set (images.key, upload_url);
                             } else {
-                                warning ("Could not upload image");
+                                warning ("Could not upload image %s", img_file.get_basename ());
                             }
                         }
                     }
