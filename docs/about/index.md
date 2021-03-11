@@ -11,7 +11,7 @@ title: About
 
 It is my primary way of attempting to learn [Vala](https://wiki.gnome.org/Projects/Vala) and filling in the gap of applications I miss from [macOS](https://apple.com).
 
-ThiefMD aims to make large [Markdown](https://daringfireball.net/projects/markdown/syntax) projects manageable. I've always wanted to write a novel, and thehopefully ThiefMD will help me get there.
+ThiefMD aims to make large [Markdown](https://daringfireball.net/projects/markdown/syntax) projects manageable. I've always wanted to write a novel, and hopefully ThiefMD will help me get there.
 
 # Features
 
