@@ -13,7 +13,7 @@ Feel free to reach out through [GitHub Issues](https://github.com/kmwallio/Thief
 
 * [Ghost](/help/ghost)
 * [Write Freely](/help/write-freely)
-* [Wordpress](/help/wordpress)
+* [WordPress](/help/wordpress)
 
 ### Exporting
 

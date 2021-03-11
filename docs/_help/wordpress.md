@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Help with Wordpress
+title: Help with WordPress
 ---
 
 ## Unable to Connect
@@ -9,7 +9,7 @@ Double check your username, password, and provided endpoint. If you didn't provi
 
 ### Check for /xmlrpc.php
 
-ThiefMD communicates with Wordpress through [XML-RPC](https://codex.wordpress.org/XML-RPC_Support).
+ThiefMD communicates with WordPress through [XML-RPC](https://codex.wordpress.org/XML-RPC_Support).
 
 Certain plug-ins may disable XML-RPC, and some automated installations remove the file.
 
@@ -26,6 +26,15 @@ On [DreamHost](https://dreamhost.com), you can disable mod_security by going int
 Disabling mod\_security can open up your site to DDoS attacks, SQL Injections, Brute Force attacks, and other preventable common issues. We recommend trying the other workarounds listed.
 
 Disabling mod\_security may improve XML-RPC reliability. mod\_security limits the amount of data being sent though XML-RPC. Disabling it can allow for larger photo uploads.
+
+### Disable block-xmlrpc on Digital Ocean
+
+The [WordPress Marketplace Installer](https://marketplace.digitalocean.com/apps/wordpress) disabled XML-RPC by default. To enable XML-RPC in your Droplet:
+
+```bash
+a2disconf block-xmlrpc
+systemctl reload apache2
+```
 
 ### Other issue?
 
