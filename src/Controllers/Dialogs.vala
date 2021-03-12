@@ -160,7 +160,9 @@ namespace ThiefMD.Controllers.Dialogs {
                     var filter1 = new Gtk.FileFilter ();
                     filter1.set_filter_name (_("Supported files"));
                     foreach (unowned string extension in extensions) {
-                        filter1.add_pattern (extension);
+                        if (extension != "") {
+                            filter1.add_pattern (extension);
+                        }
                     }
                     chooser.add_filter (filter1);
                 } else {
