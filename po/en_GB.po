@@ -1,28 +1,11 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: ThiefMD\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-05 22:38-0800\n"
-"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: POEditor.com\n"
-
-#: src/ThiefApp.vala:168 src/Controllers/UI.vala:497
-#: src/Widgets/Library.vala:69
-msgid "Library"
-msgstr "Library"
-
-#: src/ThiefApp.vala:169 src/Controllers/UI.vala:455
-#: src/Controllers/UI.vala:474
-msgid "Editor"
-msgstr ""
-
-#: src/ThiefApp.vala:170 src/Controllers/UI.vala:463
-#, fuzzy
-msgid "Search"
-msgstr "Search"
+"Project-Id-Version: ThiefMD\n"
+"Language: en\n"
 
 #: src/ThiefApp.vala:263
 msgid "HTML"
@@ -48,30 +31,8 @@ msgstr "LaTeX"
 msgid "DocX"
 msgstr "DocX"
 
-#. Visual Settings
-#. Arbitrary strings
-#: src/Constants/AppSettings.vala:97
-#, c-format
-msgid ""
-"# Click on a sheet to get started\n"
-"\n"
-"First time here?  Drag a folder into the library, or click on the Folder "
-"icon to select a folder to add.\n"
-"\n"
-"## Thief Tip:\n"
-"\n"
-"%s"
-msgstr ""
-"# Click on a sheet to get started\n"
-"\n"
-"First time here?  Drag a folder into the library, or click on the Folder "
-"icon to select a folder to add.\n"
-"\n"
-"## Thief Tip:\n"
-"\n"
-"%s"
-
-#: src/Controllers/FileManager.vala:45
+#. Supported import file extensions
+#: src/Controllers/FileManager.vala:38
 msgid "Importing File"
 msgstr "Importing File"
 
@@ -122,43 +83,37 @@ msgstr "MHTML files"
 msgid "LaTeX file"
 msgstr "LaTeX file"
 
-#: src/Controllers/Dialogs.vala:160
+#: src/Controllers/Dialogs.vala:175
 msgid "All files"
 msgstr "All files"
 
-#: src/Controllers/Dialogs.vala:169
+#: src/Controllers/Dialogs.vala:184
 msgid "Add to Library"
 msgstr "Add to Library"
 
-#: src/Controllers/Dialogs.vala:179
+#: src/Controllers/Dialogs.vala:194
 msgid "Open file"
 msgstr "Open file"
 
-#: src/Controllers/Dialogs.vala:191
+#: src/Controllers/Dialogs.vala:206
 msgid "Save file"
 msgstr "Save file"
 
-#: src/Controllers/Dialogs.vala:205
+#: src/Controllers/Dialogs.vala:220
 msgid "There are unsaved changes to the file. Do you want to save?"
 msgstr "There are unsaved changes to the file. Do you want to save?"
 
-#: src/Controllers/Dialogs.vala:206
+#: src/Controllers/Dialogs.vala:221
 msgid "If you don't save, changes will be lost forever."
 msgstr "If you don't save, changes will be lost forever."
 
-#: src/Controllers/Dialogs.vala:211
+#: src/Controllers/Dialogs.vala:226
 msgid "Close without saving"
 msgstr "Close without saving"
 
 #: src/Controllers/SheetManager.vala:157 src/Widgets/StatisticsBar.vala:91
 msgid "No file opened"
 msgstr "No file opened"
-
-#: src/Connections/ConnectionBase.vala:85 src/Widgets/About.vala:59
-#: src/Widgets/PublisherPreviewWindow.vala:251
-#: src/Widgets/ProjectStatistics.vala:71
-msgid "Close"
-msgstr "Close"
 
 #: src/Connections/WriteFreelyConnection.vala:100
 msgid "Username"
@@ -179,14 +134,14 @@ msgstr "Endpoint"
 msgid "_Add Account"
 msgstr "Add Account"
 
-#: src/Connections/WriteFreelyConnection.vala:278
-#: src/Connections/GhostConnection.vala:297 src/Widgets/Preferences.vala:83
+#: src/Connections/WriteFreelyConnection.vala:308
+#: src/Connections/GhostConnection.vala:299 src/Widgets/Preferences.vala:83
 #: src/Widgets/Preferences.vala:117 src/Widgets/Preferences.vala:151
 msgid " Published"
 msgstr " Published"
 
-#: src/Connections/WriteFreelyConnection.vala:278
-#: src/Connections/GhostConnection.vala:297 src/Widgets/Preferences.vala:83
+#: src/Connections/WriteFreelyConnection.vala:308
+#: src/Connections/GhostConnection.vala:299 src/Widgets/Preferences.vala:83
 #: src/Widgets/Preferences.vala:117 src/Widgets/Preferences.vala:151
 msgid "Post Published"
 msgstr "Post Published"
@@ -195,6 +150,7 @@ msgstr "Post Published"
 msgid "E-mail"
 msgstr "E-mail"
 
+#: src/Connections/WriteFreelyConnection.vala:230
 #: src/Connections/GhostConnection.vala:214
 msgid "Uploading images"
 msgstr "Uploading Images"
@@ -253,6 +209,12 @@ msgstr "About"
 msgid "Credits"
 msgstr "Credits"
 
+#: src/Connections/ConnectionBase.vala:85 src/Widgets/About.vala:59
+#: src/Widgets/PublisherPreviewWindow.vala:270
+#: src/Widgets/ProjectStatistics.vala:71
+msgid "Close"
+msgstr "Close"
+
 #: src/Widgets/HeaderBar.vala:86
 msgid "New Sheet"
 msgstr "New Sheet"
@@ -269,40 +231,40 @@ msgstr "Add Folder to Library"
 msgid "Settings"
 msgstr "Settings"
 
-#: src/Widgets/Sheet.vala:163
+#: src/Widgets/Sheet.vala:173
 msgid "Sort by"
 msgstr "Sort by"
 
-#: src/Widgets/Sheet.vala:166
+#: src/Widgets/Sheet.vala:176
 msgid "Sort by Filename Ascending"
 msgstr "Sort by Filename Ascending"
 
-#: src/Widgets/Sheet.vala:172
+#: src/Widgets/Sheet.vala:182
 msgid "Sort by Filename Descending"
 msgstr "Sort by Filename Descending"
 
-#: src/Widgets/Sheet.vala:179
+#: src/Widgets/Sheet.vala:189
 msgid "Sort by Title Ascending"
 msgstr "Sort by Title Ascending"
 
-#: src/Widgets/Sheet.vala:185
+#: src/Widgets/Sheet.vala:195
 msgid "Sort by Title Descending"
 msgstr "Sort by Title Descending"
 
-#: src/Widgets/Sheet.vala:192
+#: src/Widgets/Sheet.vala:202
 msgid "Sort by Date Ascending"
 msgstr "Sort by Date Ascending"
 
-#: src/Widgets/Sheet.vala:198
+#: src/Widgets/Sheet.vala:208
 msgid "Sort by Date Descending"
 msgstr "Sort by Date Descending"
 
-#: src/Widgets/Sheet.vala:209 src/Widgets/QuickPreferences.vala:72
+#: src/Widgets/Sheet.vala:219 src/Widgets/QuickPreferences.vala:72
 #: src/Widgets/QuickPreferences.vala:154 src/Widgets/QuickPreferences.vala:227
 msgid "Preview"
 msgstr "Preview"
 
-#: src/Widgets/Sheet.vala:217 src/Widgets/PublisherPreviewWindow.vala:136
+#: src/Widgets/Sheet.vala:227 src/Widgets/PublisherPreviewWindow.vala:141
 #: src/Widgets/ProjectStatistics.vala:64
 msgid "Export"
 msgstr "Export"
@@ -311,27 +273,27 @@ msgstr "Export"
 #. menu_rename.activate.connect (() => {
 #. });
 #. menu.add (menu_rename);
-#: src/Widgets/Sheet.vala:233
+#: src/Widgets/Sheet.vala:243
 msgid "Danger Zone"
 msgstr "Danger Zone"
 
-#: src/Widgets/Sheet.vala:239
+#: src/Widgets/Sheet.vala:249
 msgid "Move to Trash"
 msgstr "Move to Trash"
 
-#: src/Widgets/Editor.vala:379
+#: src/Widgets/Editor.vala:376
 msgid "_Load from disk"
 msgstr "Load from Disk"
 
-#: src/Widgets/Editor.vala:381
+#: src/Widgets/Editor.vala:378
 msgid "_Keep what's in editor"
 msgstr "Keep what's in Editor"
 
-#: src/Widgets/Editor.vala:1539
+#: src/Widgets/Editor.vala:1684
 msgid "Insert Datetime"
 msgstr "Insert Datetime"
 
-#: src/Widgets/Editor.vala:1557
+#: src/Widgets/Editor.vala:1702
 msgid "Insert YAML Frontmatter"
 msgstr "Insert YAML Frontmatter"
 
@@ -347,27 +309,27 @@ msgstr "Writing Statistics"
 msgid "Search "
 msgstr "Search"
 
-#: src/Widgets/Library.vala:512
+#: src/Widgets/Library.vala:524
 msgid "Create Sub-Folder"
 msgstr "Create Sub-Folder"
 
-#: src/Widgets/Library.vala:529
+#: src/Widgets/Library.vala:541
 msgid "Hide from Library"
 msgstr "Hide from Library"
 
-#: src/Widgets/Library.vala:553
+#: src/Widgets/Library.vala:565
 msgid "Show Hidden Items"
 msgstr "Show Hidden Items"
 
-#: src/Widgets/Library.vala:566
+#: src/Widgets/Library.vala:578
 msgid "Remove from Library"
 msgstr "Remove from Library"
 
-#: src/Widgets/Library.vala:801
+#: src/Widgets/Library.vala:813
 msgid "Copy"
 msgstr "Copy"
 
-#: src/Widgets/Library.vala:803
+#: src/Widgets/Library.vala:815
 msgid "Move"
 msgstr "Move"
 
@@ -379,11 +341,11 @@ msgstr "Folder Name"
 msgid "mkdir"
 msgstr "mkdir"
 
-#: src/Widgets/NewSheet.vala:31
+#: src/Widgets/NewSheet.vala:32
 msgid "Sheet name"
 msgstr "Sheet Name"
 
-#: src/Widgets/NewSheet.vala:34
+#: src/Widgets/NewSheet.vala:35
 msgid "Create"
 msgstr "Create"
 
@@ -410,11 +372,6 @@ msgstr "WriteFreely"
 #: src/Widgets/Preferences.vala:91
 msgid "  ghost"
 msgstr "Ghost"
-
-#: src/Widgets/Preferences.vala:125
-#, fuzzy
-msgid "  wordpress"
-msgstr "words"
 
 #: src/Widgets/Preferences.vala:206
 msgid "_Remove"
@@ -453,12 +410,8 @@ msgid "First Markdown File includes Author Metadata"
 msgstr "First Markdown file includes Author Metadata"
 
 #: src/Widgets/Preferences.vala:341
-msgid ""
-"First Markdown file includes <a href='https://pandoc.org/MANUAL.html#epub-"
-"metadata'>Author metadata</a>"
-msgstr ""
-"First Markdown file includes <a href='https://pandoc.org/MANUAL.html#epub-"
-"metadata'>Author metadata</a>"
+msgid "First Markdown file includes <a href='https://pandoc.org/MANUAL.html#epub-metadata'>Author metadata</a>"
+msgstr "First Markdown file includes <a href='https://pandoc.org/MANUAL.html#epub-metadata'>Author metadata</a>"
 
 #: src/Widgets/Preferences.vala:357
 msgid "Resolve full paths to resources"
@@ -568,30 +521,22 @@ msgstr "Toggle library order"
 msgid "Keep library order"
 msgstr "Keep library order"
 
-#: src/Widgets/Preferences.vala:685
-msgid "Toggle experimental features"
-msgstr ""
-
-#: src/Widgets/Preferences.vala:687
-msgid "Enable experimental features"
-msgstr ""
-
-#: src/Widgets/PublisherPreviewWindow.vala:60
-#: src/Widgets/PublisherPreviewWindow.vala:190
+#: src/Widgets/PublisherPreviewWindow.vala:65
+#: src/Widgets/PublisherPreviewWindow.vala:195
 #: src/Widgets/QuickPreferences.vala:81 src/Widgets/QuickPreferences.vala:163
 #: src/Widgets/QuickPreferences.vala:236
 msgid "Publishing Preview"
 msgstr "Publishing Preview"
 
-#: src/Widgets/PublisherPreviewWindow.vala:138
+#: src/Widgets/PublisherPreviewWindow.vala:143
 msgid "Export Item"
 msgstr "Export Item"
 
-#: src/Widgets/PublisherPreviewWindow.vala:175
+#: src/Widgets/PublisherPreviewWindow.vala:180
 msgid "File not Exported"
 msgstr "File not Exported"
 
-#: src/Widgets/PublisherPreviewWindow.vala:176
+#: src/Widgets/PublisherPreviewWindow.vala:181
 msgid "ThiefMD could not export the file, please try again."
 msgstr "ThiefMD could not export the file, please try again."
 
@@ -604,14 +549,11 @@ msgid "words"
 msgstr "words"
 
 #: src/Widgets/ProjectStatistics.vala:126
-#, c-format
-msgid ""
-"<b>Reading Time:</b>\n"
+msgid "<b>Reading Time:</b>\n"
 "%d %s\n"
 "%d %s\n"
 "%d %s"
-msgstr ""
-"<b>Reading Time:</b>\n"
+msgstr "<b>Reading Time:</b>\n"
 "%d %s\n"
 "%d %s\n"
 "%d %s"
@@ -665,23 +607,6 @@ msgstr "Toggle Write Good"
 msgid "Launch Preview"
 msgstr "Launch Preview"
 
-#: src/Widgets/QuickPreferences.vala:83 src/Widgets/QuickPreferences.vala:165
-#: src/Widgets/QuickPreferences.vala:238
-#, fuzzy
-msgid "Open Export Window"
-msgstr "Export Markdown"
-
-#: src/Widgets/QuickPreferences.vala:90 src/Widgets/QuickPreferences.vala:172
-#: src/Widgets/QuickPreferences.vala:245
-#, fuzzy
-msgid "Search Library"
-msgstr "Search"
-
-#: src/Widgets/QuickPreferences.vala:92 src/Widgets/QuickPreferences.vala:174
-#: src/Widgets/QuickPreferences.vala:247
-msgid "Open Search Window"
-msgstr ""
-
 #: src/Widgets/QuickPreferences.vala:98 src/Widgets/QuickPreferences.vala:180
 #: src/Widgets/QuickPreferences.vala:253
 msgid "Preferences"
@@ -696,29 +621,21 @@ msgstr "Edit Preferences"
 msgid "Font"
 msgstr "Font"
 
-#: src/Widgets/ThemeSelector.vala:56
-msgid "Spacing"
-msgstr ""
-
 #: src/Widgets/ThemeSelector.vala:137
 msgid "Font Selector"
 msgstr "Font Selector"
 
 #: src/Widgets/ThemeSelector.vala:320
-msgid ""
-"Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
+msgid "Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
 "<small>Stored in <a href='file://"
-msgstr ""
-"Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
+msgstr "Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
 "<small>Stored in <a href='file://"
 
 #: src/Widgets/SearchBar.vala:110
-#, c-format
 msgid "(%d occurences)"
 msgstr "(%d occurences)"
 
 #: src/Widgets/StatisticsBar.vala:98
-#, c-format
 msgid "%d %s %d %s and %d %s reading time."
 msgstr "%d %s %d %s and %d %s reading time."
 
@@ -743,7 +660,6 @@ msgid "seconds"
 msgstr "seconds"
 
 #: src/Widgets/StatisticsBar.vala:104
-#, c-format
 msgid "%s : %d words."
 msgstr "%s : %d words."
 
@@ -766,3 +682,83 @@ msgstr "<b>Stealing file contents...</b>"
 #: src/Widgets/MarkdownCheatSheet.vala:52
 msgid "Heading"
 msgstr "Heading"
+
+#. Font settings
+#. Arbitrary strings
+#: src/Constants/AppSettings.vala:97
+msgid "# Click on a sheet to get started\n"
+"\n"
+"First time here?  Drag a folder into the library, or click on the Folder icon to select a folder to add.\n"
+"\n"
+"## Thief Tip:\n"
+"\n"
+"%s"
+msgstr "# Click on a sheet to get started\n"
+"\n"
+"First time here?  Drag a folder into the library, or click on the Folder icon to select a folder to add.\n"
+"\n"
+"## Thief Tip:\n"
+"\n"
+"%s"
+
+#: src/ThiefApp.vala:168 src/Controllers/UI.vala:519
+#: src/Widgets/Library.vala:69
+msgid "Library"
+msgstr "Library"
+
+#: src/ThiefApp.vala:169 src/Controllers/UI.vala:477
+#: src/Controllers/UI.vala:496
+msgid "Editor"
+msgstr ""
+
+#: src/ThiefApp.vala:170 src/Controllers/UI.vala:485
+msgid "Search"
+msgstr ""
+
+#: src/Widgets/QuickPreferences.vala:83 src/Widgets/QuickPreferences.vala:165
+#: src/Widgets/QuickPreferences.vala:238
+msgid "Open Export Window"
+msgstr ""
+
+#: src/Widgets/QuickPreferences.vala:90 src/Widgets/QuickPreferences.vala:172
+#: src/Widgets/QuickPreferences.vala:245
+msgid "Search Library"
+msgstr ""
+
+#: src/Widgets/QuickPreferences.vala:92 src/Widgets/QuickPreferences.vala:174
+#: src/Widgets/QuickPreferences.vala:247
+msgid "Open Search Window"
+msgstr ""
+
+#: src/Widgets/ThemeSelector.vala:56
+msgid "Spacing"
+msgstr ""
+
+#: src/Widgets/Preferences.vala:685
+msgid "Toggle experimental features"
+msgstr ""
+
+#: src/Widgets/Preferences.vala:687
+msgid "Enable experimental features"
+msgstr ""
+
+#: src/Controllers/Dialogs.vala:161
+msgid "Supported files"
+msgstr ""
+
+#: src/Controllers/Dialogs.vala:168
+msgid "%s files"
+msgstr ""
+
+#: src/Widgets/Library.vala:512
+msgid "Open in File Manager"
+msgstr ""
+
+#: src/Widgets/NewSheet.vala:36
+msgid "Import"
+msgstr ""
+
+#: src/Widgets/Preferences.vala:125
+msgid "  WordPress"
+msgstr ""
+
