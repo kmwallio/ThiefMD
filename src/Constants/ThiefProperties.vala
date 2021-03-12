@@ -113,6 +113,29 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
           font-size: %dpt;
       }""";
 
+        public const string BUTTON_CSS = """@define-color borderColor %s;
+        .thief-drop-above {
+            margin-bottom: 1.5rem;
+        }
+
+        .thief-drop-below {
+            margin-top: 1.5rem;
+        }
+
+        .thief-list-sheet {
+            border-bottom: 1px solid alpha(@borderColor, 0.22);
+            border-radius: 0;
+        }
+        
+        .thief-list-sheet-active,
+        .thief-search-input,
+        .thief-search-results *:hover,
+        .thief-search-results *:active,
+        .thief-search-results *:hover:active {
+          border-bottom: 1px solid alpha(lighter(@borderColor), 0.22);
+        }
+        """;
+
         public const string DYNAMIC_CSS = """@define-color colorPrimary %s;
         @define-color colorPrimaryActive %s;
         @define-color textColorPrimary %s;

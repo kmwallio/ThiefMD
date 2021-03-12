@@ -31,7 +31,6 @@ namespace ThiefMD.Widgets {
     public class Sheet : Gtk.ToggleButton {
         private string _sheet_path;
         private Gtk.Grid _button_grid;
-        private Gtk.Separator _button_separator;
         private Gtk.Label _label;
         private string _label_buffer;
         private Sheets _parent;
@@ -75,11 +74,6 @@ namespace ThiefMD.Widgets {
             _button_grid.orientation = Gtk.Orientation.VERTICAL;
             _button_grid.hexpand = true;
             _button_grid.attach (_label, 0, 0);
-            _button_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
-            _button_separator.hexpand = true;
-            if (!settings.ui_editor_theme) {
-                _button_grid.attach (_button_separator, 0, 1);
-            }
             _button_grid.show_all ();
             add (_button_grid);
 
@@ -147,13 +141,8 @@ namespace ThiefMD.Widgets {
             } else {
                 _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "</b>";
             }
-            _label.set_label (_label_buffer);
 
-            if (!settings.ui_editor_theme && !active && _button_separator.parent == null) {
-                _button_grid.attach (_button_separator, 0, 1);
-            } else if (active || settings.ui_editor_theme && _button_separator.parent != null) {
-                _button_grid.remove (_button_separator);
-            }
+            _label.set_label (_label_buffer);
 
             settings.writing_changed ();
         }
