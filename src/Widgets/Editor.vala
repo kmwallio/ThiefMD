@@ -1394,11 +1394,13 @@ namespace ThiefMD.Widgets {
                                     //
                                     buffer.get_iter_at_offset (out start, start_link_pos);
                                     buffer.get_iter_at_offset (out end, start_link_pos);
-                                    start.backward_chars (1);
+                                    bool not_at_start = start.backward_chars (1);
                                     end.forward_char ();
                                     if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
                                         if (start.get_char () != '!') {
-                                            start.forward_char ();
+                                            if (not_at_start) {
+                                                start.forward_char ();
+                                            }
                                             buffer.apply_tag (markdown_url, start, end);
                                             //
                                             // Closing ]
@@ -1408,7 +1410,7 @@ namespace ThiefMD.Widgets {
                                             start.backward_char ();
                                             buffer.apply_tag (markdown_url, start, end);
                                         }
-                                    } else  {
+                                    } else {
                                         // Bail, our calculations are now out of range
                                         continue;
                                     }
