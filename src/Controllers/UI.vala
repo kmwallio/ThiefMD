@@ -89,7 +89,6 @@ namespace ThiefMD.Controllers.UI {
         var style_context = ThiefApp.get_instance ().toolbar.get_style_context ();
         border_provider = new Gtk.CssProvider ();
         var font_color = style_context.get_color (0);
-        warning ("Found %s", font_color.to_string ());
         string border_css = ThiefProperties.BUTTON_CSS.printf (font_color.to_string ());
         border_provider.load_from_data (border_css);
         Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default(), border_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
