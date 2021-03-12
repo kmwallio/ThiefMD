@@ -30,6 +30,9 @@ namespace ThiefMD {
         public const Gtk.License LICENSE_TYPE = Gtk.License.GPL_3_0;
         public const string[] GIANTS = {
             "<a href='https://github.com/kmwallio/ThiefMD/graphs/contributors'>Contributors who help make ThiefMD awesome</a>\n",
+            "French Translation Contributors:\n<a href='https://github.com/davidbosman'>David Bosman</a>\n",
+            "Slovak Translation Contributors:\n<a href='https://github.com/marek-lach'>Marek L'ach</a>\n",
+            "Swedish Translation Contributors:\n<a href='https://github.com/eson57'>Åke Engelbrektson</a>\n",
             "Original Code:\nBased on <a href='https://github.com/lainsce/quilter'>Quilter</a>\nCopyright © 2017 Lains.\n<a href='https://github.com/lainsce/quilter/blob/master/LICENSE'>GNU General Public License v3.0</a>\n",
             "Font:\n<a href='https://github.com/iaolo/iA-Fonts'>iA Writer Duospace</a>\nCopyright © 2018 Information Architects Inc.\nwith Reserved Font Name \"iA Writer\"\n<a href='https://github.com/iaolo/iA-Fonts/blob/master/iA%20Writer%20Duospace/LICENSE.md'>SIL OPEN FONT LICENSE Version 1.1</a>\n",
             "Font:\n<a href='https://quoteunquoteapps.com/courierprime'>Courier Prime</a>\nCopyright © 2013 Quote-Unquote Apps\n<a href='https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;id=OFL'>SIL OPEN FONT LICENSE Version 1.1</a>\n",
@@ -40,8 +43,6 @@ namespace ThiefMD {
             "XML Parsing:\n<a href='http://xmlsoft.org/'>libxml2</a>\nCopyright © 1998-2012 Daniel Veillard.\n<a href='https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/Copyright'>MIT License</a>\n",
             "Pandoc Export:\n<a href='https://pandoc.org/'>Pandoc</a>\nCopyright © 2006-2020 John MacFarlane and others\n<a href='https://github.com/jgm/pandoc/blob/master/COPYRIGHT'>GNU General Public License v2.0</a>\n",
             "libwritegood-vala based on:\n<a href='https://github.com/btford/write-good'>write-good: Naive linter for English prose</a>\nCopyright © 2014-2019 Brian Ford\n<a href='https://github.com/btford/write-good/blob/master/LICENSE'>The MIT License (MIT)</a>\n",
-            "French Translation Contributors:\n<a href='https://github.com/davidbosman'>David Bosman</a>\n",
-            "Slovak Translation Contributors:\n<a href='https://github.com/marek-lach'>Marek L'ach</a>\n",
           };
 
         public const string[] PAPER_SIZES_FRIENDLY_NAME = {
