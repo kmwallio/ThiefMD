@@ -54,6 +54,17 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.1.7" date="2021-03-14" urgency="low">
+      <description>
+        <p>Finess and WordPress</p>
+        <ul>
+          <li>Snap.as image upload support</li>
+          <li>WordPress featured image support</li>
+          <li>Performance improvements for experimental mode</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.6-finess</url>
+    </release>
     <release version="0.1.6" date="2021-03-05" urgency="low">
       <description>
         <p>Finess and WordPress</p>
