@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-12 19:03-0800\n"
+"POT-Creation-Date: 2021-03-13 13:43-0800\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -337,11 +337,11 @@ msgstr "_Läs in från disk"
 msgid "_Keep what's in editor"
 msgstr "_Behåll vad som finns i redigeraren"
 
-#: src/Widgets/Editor.vala:1686
+#: src/Widgets/Editor.vala:1694
 msgid "Insert Datetime"
 msgstr "Infoga datumtid"
 
-#: src/Widgets/Editor.vala:1704
+#: src/Widgets/Editor.vala:1712
 msgid "Insert YAML Frontmatter"
 msgstr "Infoga YAML Frontmatter"
 
@@ -707,19 +707,19 @@ msgstr "Inställningar"
 msgid "Edit Preferences"
 msgstr "Redigera inställningar"
 
-#: src/Widgets/ThemeSelector.vala:51
+#: src/Widgets/ThemeSelector.vala:50
 msgid "Font"
 msgstr "Teckensnitt"
 
-#: src/Widgets/ThemeSelector.vala:56
+#: src/Widgets/ThemeSelector.vala:55
 msgid "Spacing"
 msgstr "Mellanslag"
 
-#: src/Widgets/ThemeSelector.vala:137
+#: src/Widgets/ThemeSelector.vala:138
 msgid "Font Selector"
 msgstr "Teckensnittsväljare"
 
-#: src/Widgets/ThemeSelector.vala:320
+#: src/Widgets/ThemeSelector.vala:322
 msgid ""
 "Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
 "<small>Stored in <a href='file://"

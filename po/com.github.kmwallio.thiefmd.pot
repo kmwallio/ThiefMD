@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.kmwallio.thiefmd\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-12 19:03-0800\n"
+"POT-Creation-Date: 2021-03-13 13:43-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -337,11 +337,11 @@ msgstr ""
 msgid "_Keep what's in editor"
 msgstr ""
 
-#: src/Widgets/Editor.vala:1686
+#: src/Widgets/Editor.vala:1694
 msgid "Insert Datetime"
 msgstr ""
 
-#: src/Widgets/Editor.vala:1704
+#: src/Widgets/Editor.vala:1712
 msgid "Insert YAML Frontmatter"
 msgstr ""
 
@@ -701,19 +701,19 @@ msgstr ""
 msgid "Edit Preferences"
 msgstr ""
 
-#: src/Widgets/ThemeSelector.vala:51
+#: src/Widgets/ThemeSelector.vala:50
 msgid "Font"
 msgstr ""
 
-#: src/Widgets/ThemeSelector.vala:56
+#: src/Widgets/ThemeSelector.vala:55
 msgid "Spacing"
 msgstr ""
 
-#: src/Widgets/ThemeSelector.vala:137
+#: src/Widgets/ThemeSelector.vala:138
 msgid "Font Selector"
 msgstr ""
 
-#: src/Widgets/ThemeSelector.vala:320
+#: src/Widgets/ThemeSelector.vala:322
 msgid ""
 "Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
 "<small>Stored in <a href='file://"
