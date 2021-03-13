@@ -200,10 +200,12 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         }
 
         public string get_css_font_family () {
-            if (font_family == null || font_family.chug ().chomp () == "") {
+            var set_font_desc = Pango.FontDescription.from_string (font_family);
+            string? set_font_fam = set_font_desc.get_family ();
+            if (font_family == null || set_font_fam == null || font_family.chug ().chomp () == "") {
                 return "font-family: 'iA Writer Duospace'";
             } else {
-                return "font-family: '%s'".printf (font_family.chomp ().chug ());
+                return "font-family: '%s'".printf (set_font_fam.chomp ().chug ());
             }
         }
 

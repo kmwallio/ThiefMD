@@ -1218,22 +1218,30 @@ namespace ThiefMD.Widgets {
                 int avg_w = f_w;
 
                 if (get_realized ()) {
-                    var font_desc = new Pango.FontDescription ();
-                    font_desc.set_family (settings.get_css_font_family ());
+                    var font_desc = Pango.FontDescription.from_string (settings.font_family);
                     font_desc.set_size ((int)(f_w * Pango.SCALE * Pango.Scale.LARGE));
                     var font_context = get_pango_context ();
                     var font_layout = new Pango.Layout (font_context);
                     font_layout.set_font_description (font_desc);
                     font_layout.set_text ("#", 1);
-                    font_layout.get_pixel_size (out hashtag_w, out avg_w);
+                    Pango.Rectangle ink, logical;
+                    font_layout.get_pixel_extents (out ink, out logical);
+                    debug ("# Ink: %d, Logical: %d", ink.width, logical.width);
+                    hashtag_w = int.max (ink.width, logical.width);
                     font_layout.set_text (" ", 1);
-                    font_layout.get_pixel_size (out space_w, out avg_w);
+                    font_layout.get_pixel_extents (out ink, out logical);
+                    debug ("  Ink: %d, Logical: %d", ink.width, logical.width);
+                    space_w = int.max (ink.width, logical.width);
                     if (space_w + hashtag_w <= 0) {
                         hashtag_w = f_w;
                         space_w = f_w;
                     }
-                    avg_w = (int)((hashtag_w + space_w) / 2.0);
-                    debug ("Hashtag: %d, Space: %d, AvgChar: %d", hashtag_w, space_w, avg_w);
+                    if (space_w < (hashtag_w / 2)) {
+                        avg_w = (int)((hashtag_w + hashtag_w + space_w) / 3.0);
+                    } else {
+                        avg_w = (int)((hashtag_w + space_w) / 2.0);
+                    }
+                    debug ("%s Hashtag: %d, Space: %d, AvgChar: %d", font_desc.get_family (), hashtag_w, space_w, avg_w);
                     if (m - ((hashtag_w * 6) + space_w) <= 0) {
                         heading_text[0].left_margin = m;
                         heading_text[1].left_margin = m;
@@ -1242,18 +1250,18 @@ namespace ThiefMD.Widgets {
                         heading_text[4].left_margin = m;
                         heading_text[5].left_margin = m;
                     } else {
-                        //  heading_text[0].left_margin = m - ((hashtag_w * 1) + space_w);
-                        //  heading_text[1].left_margin = m - ((hashtag_w * 2) + space_w);
-                        //  heading_text[2].left_margin = m - ((hashtag_w * 3) + space_w);
-                        //  heading_text[3].left_margin = m - ((hashtag_w * 4) + space_w);
-                        //  heading_text[4].left_margin = m - ((hashtag_w * 5) + space_w);
-                        //  heading_text[5].left_margin = m - ((hashtag_w * 6) + space_w);
-                        heading_text[0].left_margin = m - (avg_w * 2);
-                        heading_text[1].left_margin = m - (avg_w * 3);
-                        heading_text[2].left_margin = m - (avg_w * 4);
-                        heading_text[3].left_margin = m - (avg_w * 5);
-                        heading_text[4].left_margin = m - (avg_w * 6);
-                        heading_text[5].left_margin = m - (avg_w * 7);
+                        heading_text[0].left_margin = m - ((hashtag_w * 1) + space_w);
+                        heading_text[1].left_margin = m - ((hashtag_w * 2) + space_w);
+                        heading_text[2].left_margin = m - ((hashtag_w * 3) + space_w);
+                        heading_text[3].left_margin = m - ((hashtag_w * 4) + space_w);
+                        heading_text[4].left_margin = m - ((hashtag_w * 5) + space_w);
+                        heading_text[5].left_margin = m - ((hashtag_w * 6) + space_w);
+                        //  heading_text[0].left_margin = m - (avg_w * 2);
+                        //  heading_text[1].left_margin = m - (avg_w * 3);
+                        //  heading_text[2].left_margin = m - (avg_w * 4);
+                        //  heading_text[3].left_margin = m - (avg_w * 5);
+                        //  heading_text[4].left_margin = m - (avg_w * 6);
+                        //  heading_text[5].left_margin = m - (avg_w * 7);
                     }
                 }
 
