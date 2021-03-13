@@ -46,7 +46,7 @@ namespace ThiefMD.Controllers.UI {
 
     // Switches Sheets shown in the Library view with the
     // provided sheet
-    public Sheets set_sheets (Sheets sheet) {
+    public Sheets set_sheets (Sheets? sheet) {
         if (sheet == null) {
             return sheet;
         }

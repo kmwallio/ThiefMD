@@ -412,7 +412,11 @@ namespace ThiefMD.Widgets {
             return;
         }
 
-    public static bool areEqual (Sheet a, Sheet b) {
+        public static bool areEqual (Sheet a, Sheet b) {
+            if ((b == null && a != null) || (a == null && b != null)) {
+                return false;
+            }
+
             return (a._parent.get_sheets_path () == b._parent.get_sheets_path ()) &&
                 (a._sheet_path == b._sheet_path) &&
                 (a._label_buffer == b._label_buffer);
