@@ -323,7 +323,7 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
-* Sun Mar 14 2021 kmwallio <mwallio@gmail.com> - 0.1.7
+* Sun Mar 13 2021 kmwallio <mwallio@gmail.com> - 0.1.7
 - Snap.as image upload support
 - WordPress featured image support
 - Performance improvements for experimental mode
