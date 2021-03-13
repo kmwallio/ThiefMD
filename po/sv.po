@@ -1,11 +1,27 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: ThiefMD\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-03-12 19:03-0800\n"
+"Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: POEditor.com\n"
-"Project-Id-Version: ThiefMD\n"
-"Language: sv\n"
+
+#: src/ThiefApp.vala:168 src/Controllers/UI.vala:519
+#: src/Widgets/Library.vala:69
+msgid "Library"
+msgstr "Bibliotek"
+
+#: src/ThiefApp.vala:169 src/Controllers/UI.vala:477
+#: src/Controllers/UI.vala:496
+msgid "Editor"
+msgstr "Redigerare"
+
+#: src/ThiefApp.vala:170 src/Controllers/UI.vala:485
+msgid "Search"
+msgstr "Sök"
 
 #: src/ThiefApp.vala:263
 msgid "HTML"
@@ -30,6 +46,29 @@ msgstr "LaTeX"
 #: src/ThiefApp.vala:268
 msgid "DocX"
 msgstr "DocX"
+
+#. Visual Settings
+#. Arbitrary strings
+#: src/Constants/AppSettings.vala:97
+#, c-format
+msgid ""
+"# Click on a sheet to get started\n"
+"\n"
+"First time here?  Drag a folder into the library, or click on the Folder "
+"icon to select a folder to add.\n"
+"\n"
+"## Thief Tip:\n"
+"\n"
+"%s"
+msgstr ""
+"Klicka på bladet för att komma igång\n"
+"\n"
+"Första gången här? Dra en mapp in till biblioteket, eller klicka på "
+"mappikonen för att välja en mapp att lägga till.\n"
+"\n"
+"## Thief-tips:\n"
+"\n"
+"%s"
 
 #. Supported import file extensions
 #: src/Controllers/FileManager.vala:38
@@ -83,37 +122,52 @@ msgstr "MHTML-filer"
 msgid "LaTeX file"
 msgstr "LaTeX-fil"
 
-#: src/Controllers/Dialogs.vala:175
+#: src/Controllers/Dialogs.vala:161
+msgid "Supported files"
+msgstr ""
+
+#: src/Controllers/Dialogs.vala:170
+#, c-format
+msgid "%s files"
+msgstr ""
+
+#: src/Controllers/Dialogs.vala:177
 msgid "All files"
 msgstr "Alla filer"
 
-#: src/Controllers/Dialogs.vala:184
+#: src/Controllers/Dialogs.vala:186
 msgid "Add to Library"
 msgstr "Lägg till i biblioteket"
 
-#: src/Controllers/Dialogs.vala:194
+#: src/Controllers/Dialogs.vala:196
 msgid "Open file"
 msgstr "Öppna fil"
 
-#: src/Controllers/Dialogs.vala:206
+#: src/Controllers/Dialogs.vala:208
 msgid "Save file"
 msgstr "Spara fil"
 
-#: src/Controllers/Dialogs.vala:220
+#: src/Controllers/Dialogs.vala:222
 msgid "There are unsaved changes to the file. Do you want to save?"
 msgstr "Det finns osparade ändringar i filen. Vill du spara?"
 
-#: src/Controllers/Dialogs.vala:221
+#: src/Controllers/Dialogs.vala:223
 msgid "If you don't save, changes will be lost forever."
 msgstr "Om du inte sparar kommer ändringarna att förloras för alltid."
 
-#: src/Controllers/Dialogs.vala:226
+#: src/Controllers/Dialogs.vala:228
 msgid "Close without saving"
 msgstr "Stäng utan att spara"
 
 #: src/Controllers/SheetManager.vala:157 src/Widgets/StatisticsBar.vala:91
 msgid "No file opened"
 msgstr "Ingen fil öppnad"
+
+#: src/Connections/ConnectionBase.vala:85 src/Widgets/About.vala:59
+#: src/Widgets/PublisherPreviewWindow.vala:270
+#: src/Widgets/ProjectStatistics.vala:71
+msgid "Close"
+msgstr "Stäng"
 
 #: src/Connections/WriteFreelyConnection.vala:100
 msgid "Username"
@@ -134,6 +188,11 @@ msgstr "Slutpunkt"
 msgid "_Add Account"
 msgstr "_Lägg till konto"
 
+#: src/Connections/WriteFreelyConnection.vala:230
+#: src/Connections/GhostConnection.vala:214
+msgid "Uploading images"
+msgstr "Laddar upp bilder"
+
 #: src/Connections/WriteFreelyConnection.vala:308
 #: src/Connections/GhostConnection.vala:299 src/Widgets/Preferences.vala:83
 #: src/Widgets/Preferences.vala:117 src/Widgets/Preferences.vala:151
@@ -149,11 +208,6 @@ msgstr "Efter publicering"
 #: src/Connections/GhostConnection.vala:82
 msgid "E-mail"
 msgstr "E-post"
-
-#: src/Connections/WriteFreelyConnection.vala:230
-#: src/Connections/GhostConnection.vala:214
-msgid "Uploading images"
-msgstr "Laddar upp bilder"
 
 #: src/Exporters/ExportDocx.vala:60
 msgid "Export DocX"
@@ -208,12 +262,6 @@ msgstr "Om"
 #: src/Widgets/About.vala:45
 msgid "Credits"
 msgstr "Erkännanden"
-
-#: src/Connections/ConnectionBase.vala:85 src/Widgets/About.vala:59
-#: src/Widgets/PublisherPreviewWindow.vala:270
-#: src/Widgets/ProjectStatistics.vala:71
-msgid "Close"
-msgstr "Stäng"
 
 #: src/Widgets/HeaderBar.vala:86
 msgid "New Sheet"
@@ -289,11 +337,11 @@ msgstr "_Läs in från disk"
 msgid "_Keep what's in editor"
 msgstr "_Behåll vad som finns i redigeraren"
 
-#: src/Widgets/Editor.vala:1684
+#: src/Widgets/Editor.vala:1686
 msgid "Insert Datetime"
 msgstr "Infoga datumtid"
 
-#: src/Widgets/Editor.vala:1702
+#: src/Widgets/Editor.vala:1704
 msgid "Insert YAML Frontmatter"
 msgstr "Infoga YAML Frontmatter"
 
@@ -308,6 +356,10 @@ msgstr "Skrivstatistik"
 #: src/Widgets/Library.vala:500
 msgid "Search "
 msgstr "Sök "
+
+#: src/Widgets/Library.vala:512
+msgid "Open in File Manager"
+msgstr ""
 
 #: src/Widgets/Library.vala:524
 msgid "Create Sub-Folder"
@@ -349,6 +401,10 @@ msgstr "Bladnamn"
 msgid "Create"
 msgstr "Skapa"
 
+#: src/Widgets/NewSheet.vala:36
+msgid "Import"
+msgstr ""
+
 #: src/Widgets/Preferences.vala:50
 msgid "Current Connections"
 msgstr "Aktuella anslutningar"
@@ -372,6 +428,10 @@ msgstr "  WriteFreely"
 #: src/Widgets/Preferences.vala:91
 msgid "  ghost"
 msgstr "  ghost"
+
+#: src/Widgets/Preferences.vala:125
+msgid "  WordPress"
+msgstr ""
 
 #: src/Widgets/Preferences.vala:206
 msgid "_Remove"
@@ -410,8 +470,12 @@ msgid "First Markdown File includes Author Metadata"
 msgstr "Första Markdown-filen inkluderar författares metadata"
 
 #: src/Widgets/Preferences.vala:341
-msgid "First Markdown file includes <a href='https://pandoc.org/MANUAL.html#epub-metadata'>Author metadata</a>"
-msgstr "Första Markdown-filen inkluderar <a href='https://pandoc.org/MANUAL.html#epub-metadata'>författares metadata</a>"
+msgid ""
+"First Markdown file includes <a href='https://pandoc.org/MANUAL.html#epub-"
+"metadata'>Author metadata</a>"
+msgstr ""
+"Första Markdown-filen inkluderar <a href='https://pandoc.org/MANUAL."
+"html#epub-metadata'>författares metadata</a>"
 
 #: src/Widgets/Preferences.vala:357
 msgid "Resolve full paths to resources"
@@ -521,6 +585,14 @@ msgstr "Biblioteksordning på/av"
 msgid "Keep library order"
 msgstr "Bevara biblioteksordning"
 
+#: src/Widgets/Preferences.vala:685
+msgid "Toggle experimental features"
+msgstr "Experimentella funktioner på/av"
+
+#: src/Widgets/Preferences.vala:687
+msgid "Enable experimental features"
+msgstr "Aktivera experimentella funktioner"
+
 #: src/Widgets/PublisherPreviewWindow.vala:65
 #: src/Widgets/PublisherPreviewWindow.vala:195
 #: src/Widgets/QuickPreferences.vala:81 src/Widgets/QuickPreferences.vala:163
@@ -549,11 +621,14 @@ msgid "words"
 msgstr "ord"
 
 #: src/Widgets/ProjectStatistics.vala:126
-msgid "<b>Reading Time:</b>\n"
+#, c-format
+msgid ""
+"<b>Reading Time:</b>\n"
 "%d %s\n"
 "%d %s\n"
 "%d %s"
-msgstr "<b>Lästid:</b>\n"
+msgstr ""
+"<b>Lästid:</b>\n"
 "%d %s\n"
 "%d %s\n"
 "%d %s"
@@ -607,6 +682,21 @@ msgstr "Skriv-bra på/av"
 msgid "Launch Preview"
 msgstr "Starta förhandsgranskning"
 
+#: src/Widgets/QuickPreferences.vala:83 src/Widgets/QuickPreferences.vala:165
+#: src/Widgets/QuickPreferences.vala:238
+msgid "Open Export Window"
+msgstr "Öppna exportfönster"
+
+#: src/Widgets/QuickPreferences.vala:90 src/Widgets/QuickPreferences.vala:172
+#: src/Widgets/QuickPreferences.vala:245
+msgid "Search Library"
+msgstr "Sök i biblioteket"
+
+#: src/Widgets/QuickPreferences.vala:92 src/Widgets/QuickPreferences.vala:174
+#: src/Widgets/QuickPreferences.vala:247
+msgid "Open Search Window"
+msgstr "Öppna sökfönster"
+
 #: src/Widgets/QuickPreferences.vala:98 src/Widgets/QuickPreferences.vala:180
 #: src/Widgets/QuickPreferences.vala:253
 msgid "Preferences"
@@ -621,21 +711,29 @@ msgstr "Redigera inställningar"
 msgid "Font"
 msgstr "Teckensnitt"
 
+#: src/Widgets/ThemeSelector.vala:56
+msgid "Spacing"
+msgstr "Mellanslag"
+
 #: src/Widgets/ThemeSelector.vala:137
 msgid "Font Selector"
 msgstr "Teckensnittsväljare"
 
 #: src/Widgets/ThemeSelector.vala:320
-msgid "Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
+msgid ""
+"Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
 "<small>Stored in <a href='file://"
-msgstr "Ladda ner <a href='https://themes.thiefmd.com/themes/'>fler teman</a>.\n"
+msgstr ""
+"Ladda ner <a href='https://themes.thiefmd.com/themes/'>fler teman</a>.\n"
 "<small>Lagrade i <a href='file://"
 
 #: src/Widgets/SearchBar.vala:110
+#, c-format
 msgid "(%d occurences)"
 msgstr "(%d förekomster)"
 
 #: src/Widgets/StatisticsBar.vala:98
+#, c-format
 msgid "%d %s %d %s and %d %s reading time."
 msgstr "%d %s %d %s och %d %s lästid."
 
@@ -660,6 +758,7 @@ msgid "seconds"
 msgstr "sekunder"
 
 #: src/Widgets/StatisticsBar.vala:104
+#, c-format
 msgid "%s : %d words."
 msgstr "%s : %d ord."
 
@@ -682,83 +781,3 @@ msgstr "<b>Stjäl filinnehåll...</b>"
 #: src/Widgets/MarkdownCheatSheet.vala:52
 msgid "Heading"
 msgstr "Rubrik"
-
-#. Font settings
-#. Arbitrary strings
-#: src/Constants/AppSettings.vala:97
-msgid "# Click on a sheet to get started\n"
-"\n"
-"First time here?  Drag a folder into the library, or click on the Folder icon to select a folder to add.\n"
-"\n"
-"## Thief Tip:\n"
-"\n"
-"%s"
-msgstr "Klicka på bladet för att komma igång\n"
-"\n"
-"Första gången här? Dra en mapp in till biblioteket, eller klicka på mappikonen för att välja en mapp att lägga till.\n"
-"\n"
-"## Thief-tips:\n"
-"\n"
-"%s"
-
-#: src/ThiefApp.vala:168 src/Controllers/UI.vala:519
-#: src/Widgets/Library.vala:69
-msgid "Library"
-msgstr "Bibliotek"
-
-#: src/ThiefApp.vala:169 src/Controllers/UI.vala:477
-#: src/Controllers/UI.vala:496
-msgid "Editor"
-msgstr "Redigerare"
-
-#: src/ThiefApp.vala:170 src/Controllers/UI.vala:485
-msgid "Search"
-msgstr "Sök"
-
-#: src/Widgets/QuickPreferences.vala:83 src/Widgets/QuickPreferences.vala:165
-#: src/Widgets/QuickPreferences.vala:238
-msgid "Open Export Window"
-msgstr "Öppna exportfönster"
-
-#: src/Widgets/QuickPreferences.vala:90 src/Widgets/QuickPreferences.vala:172
-#: src/Widgets/QuickPreferences.vala:245
-msgid "Search Library"
-msgstr "Sök i biblioteket"
-
-#: src/Widgets/QuickPreferences.vala:92 src/Widgets/QuickPreferences.vala:174
-#: src/Widgets/QuickPreferences.vala:247
-msgid "Open Search Window"
-msgstr "Öppna sökfönster"
-
-#: src/Widgets/ThemeSelector.vala:56
-msgid "Spacing"
-msgstr "Mellanslag"
-
-#: src/Widgets/Preferences.vala:685
-msgid "Toggle experimental features"
-msgstr "Experimentella funktioner på/av"
-
-#: src/Widgets/Preferences.vala:687
-msgid "Enable experimental features"
-msgstr "Aktivera experimentella funktioner"
-
-#: src/Controllers/Dialogs.vala:161
-msgid "Supported files"
-msgstr ""
-
-#: src/Controllers/Dialogs.vala:168
-msgid "%s files"
-msgstr ""
-
-#: src/Widgets/Library.vala:512
-msgid "Open in File Manager"
-msgstr ""
-
-#: src/Widgets/NewSheet.vala:36
-msgid "Import"
-msgstr ""
-
-#: src/Widgets/Preferences.vala:125
-msgid "  WordPress"
-msgstr ""
-

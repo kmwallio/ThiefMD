@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.kmwallio.thiefmd\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-11 20:12-0800\n"
+"POT-Creation-Date: 2021-03-12 19:03-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -126,36 +126,36 @@ msgstr ""
 msgid "Supported files"
 msgstr ""
 
-#: src/Controllers/Dialogs.vala:168
+#: src/Controllers/Dialogs.vala:170
 #, c-format
 msgid "%s files"
 msgstr ""
 
-#: src/Controllers/Dialogs.vala:175
+#: src/Controllers/Dialogs.vala:177
 msgid "All files"
 msgstr ""
 
-#: src/Controllers/Dialogs.vala:184
+#: src/Controllers/Dialogs.vala:186
 msgid "Add to Library"
 msgstr ""
 
-#: src/Controllers/Dialogs.vala:194
+#: src/Controllers/Dialogs.vala:196
 msgid "Open file"
 msgstr ""
 
-#: src/Controllers/Dialogs.vala:206
+#: src/Controllers/Dialogs.vala:208
 msgid "Save file"
 msgstr ""
 
-#: src/Controllers/Dialogs.vala:220
+#: src/Controllers/Dialogs.vala:222
 msgid "There are unsaved changes to the file. Do you want to save?"
 msgstr ""
 
-#: src/Controllers/Dialogs.vala:221
+#: src/Controllers/Dialogs.vala:223
 msgid "If you don't save, changes will be lost forever."
 msgstr ""
 
-#: src/Controllers/Dialogs.vala:226
+#: src/Controllers/Dialogs.vala:228
 msgid "Close without saving"
 msgstr ""
 
@@ -337,11 +337,11 @@ msgstr ""
 msgid "_Keep what's in editor"
 msgstr ""
 
-#: src/Widgets/Editor.vala:1684
+#: src/Widgets/Editor.vala:1686
 msgid "Insert Datetime"
 msgstr ""
 
-#: src/Widgets/Editor.vala:1702
+#: src/Widgets/Editor.vala:1704
 msgid "Insert YAML Frontmatter"
 msgstr ""
 
