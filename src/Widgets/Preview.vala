@@ -119,7 +119,7 @@ namespace ThiefMD.Widgets {
             if (print_css == "modest-splendor") {
                 style += ThiefProperties.PRINT_CSS.printf ("""content: " (" attr(href) ")";""");
             } else if (print_css != "") {
-                File css_file = File.new_for_path (Path.build_filename(UserData.css_path, preview_css,"print.css"));
+                File css_file = File.new_for_path (Path.build_filename(UserData.css_path, print_css,"print.css"));
                 if (css_file.query_exists ()) {
                     if (print_only) {
                         style += "\n" + FileManager.get_file_contents (css_file.get_path ()) + "\n";
