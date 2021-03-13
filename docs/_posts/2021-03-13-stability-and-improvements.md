@@ -35,9 +35,13 @@ We've improved how heading margins are calculated, which means... we've relaxed 
 
 We've lowered the chances of crashing in experimental mode. When selecting text with experimental mode, bold links will become normal font as [invisible text can cause a crash if formatted differently from surrounding text](https://stackoverflow.com/a/59314509).
 
+We made Experimental Mode Faster! We now check your proximity to hidden URLs instead of always scanning the whole document.
+
 ## Bug Fixes
 
 Fixed and issue where PDF export tried using non-PDF themes.
+
+More advanced Regex highlighting. Reference Links next to In-line links should look good in most cases.
 
 ## More to come...
 
