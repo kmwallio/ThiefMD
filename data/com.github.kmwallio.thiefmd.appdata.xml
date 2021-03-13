@@ -56,14 +56,16 @@
   <releases>
     <release version="0.1.7" date="2021-03-13" urgency="low">
       <description>
-        <p>Finess and WordPress</p>
+        <p>The subtle update.</p>
         <ul>
+          <li>New Translations available: French, Slovak, and Swedish</li>
           <li>Snap.as image upload support</li>
           <li>WordPress featured image support</li>
           <li>Performance improvements for experimental mode</li>
+          <li>Small UI bug fixes and PDF export fixes</li>
         </ul>
       </description>
-      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.6-finess</url>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.7-subtle</url>
     </release>
     <release version="0.1.6" date="2021-03-05" urgency="low">
       <description>
