@@ -223,12 +223,14 @@ namespace ThiefMD.Controllers.SheetManager {
         // Clear the view
         _view.hide ();
         if (show_welcome) {
+            _welcome_screen.am_active = false;
             _view.remove (_welcome_screen);
         }
 
         // Load the view
         if (_active_editors.size == 0) {
             show_welcome = true;
+            _welcome_screen.am_active = true;
             _view.add (_welcome_screen);
         } else {
             foreach (var editor in _active_editors) {
@@ -273,7 +275,16 @@ namespace ThiefMD.Controllers.SheetManager {
     Mutex loading_sheets;
     public void set_sheets (Sheets? sheets) {
         _current_sheets = sheets;
+        if (_current_sheets != null) {
+            _current_sheets.update_sheet_indicators ();
+        }
         UI.set_sheets (sheets);
+    }
+
+    public void redraw_sheets () {
+        if (_current_sheets != null) {
+            _current_sheets.update_sheet_indicators ();
+        }
     }
 
     private bool preload_sheets () {
@@ -578,15 +589,15 @@ namespace ThiefMD.Controllers.SheetManager {
             clean.editor.am_active = false;
             clean.sheet = null;
             if (_editor_pool.size < Constants.EDITOR_POOL_SIZE) {
-                clean.editor.open_file ("");
-                _editor_pool.add (clean.editor);
-            } else {
-                clean.editor.clean ();
-                clean.editor = null;
-                clean.sheet.active_sheet = false;
-                clean.sheet = null;
-                clean = null;
+                Widgets.Editor new_editor = new Widgets.Editor ("");
+                new_editor.am_active = false;
+                _editor_pool.add (new_editor);
             }
+            clean.editor.clean ();
+            clean.editor = null;
+            clean.sheet.active_sheet = false;
+            clean.sheet = null;
+            clean = null;
         }
     }
 

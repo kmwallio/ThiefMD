@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.1.6
+Version: 0.1.7
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
@@ -318,11 +318,16 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 /usr/share/locale/es/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
 /usr/share/locale/fr/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
 /usr/share/locale/sk/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
+/usr/share/locale/sv/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sun Mar 13 2021 kmwallio <mwallio@gmail.com> - 0.1.7
+- Snap.as image upload support
+- WordPress featured image support
+- Performance improvements for experimental mode
 * Fri Mar 05 2021 kmwallio <mwallio@gmail.com> - 0.1.6
 - Wordpress Export is now available, just add a Connection
 - Recessed headers

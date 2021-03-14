@@ -57,9 +57,9 @@ buffer.changed.connect (() => {
 
 [Ghost-vala](https://github.com/ThiefMD/ghost-vala) is a simple library for publishing posts to [ghost](https://ghost.org) blogs.
 
-## Wordpress-vala
+## WordPress-vala
 
-[Wordpress-vala](https://github.com/ThiefMD/wordpress-vala) is a simple library for publishing posts to [Wordpress](https://wordpress.org) blogs. It contains some workarounds and retries for some common issues.
+[WordPress-vala](https://github.com/ThiefMD/wordpress-vala) is a simple library for publishing posts to [WordPress](https://wordpress.org) blogs. It contains some workarounds and retries for some common issues.
 
 ## Theme Generator
 

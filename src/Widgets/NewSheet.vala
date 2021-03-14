@@ -25,6 +25,7 @@ namespace ThiefMD.Widgets {
         public Gtk.Label _label;
         public Gtk.Entry _file_name;
         public Gtk.Button _create;
+        public Gtk.Button _import;
 
         public NewSheet () {
             _file_name = new Gtk.Entry ();
@@ -32,6 +33,7 @@ namespace ThiefMD.Widgets {
             _file_name.activate.connect (new_file);
 
             _create = new Gtk.Button.with_label (_("Create"));
+            _import = new Gtk.Button.with_label (_("Import"));
 
             var menu_grid = new Gtk.Grid ();
             menu_grid.margin = 6;
@@ -40,6 +42,7 @@ namespace ThiefMD.Widgets {
             menu_grid.orientation = Gtk.Orientation.VERTICAL;
 
             menu_grid.attach (_file_name, 0, 0, 2, 1);
+            menu_grid.attach (_import, 0, 1, 1, 1);
             menu_grid.attach (_create, 1, 1, 1, 1);
 
             menu_grid.show_all ();
@@ -47,6 +50,13 @@ namespace ThiefMD.Widgets {
             add (menu_grid);
 
             _create.clicked.connect (new_file);
+            _import.clicked.connect (() => {
+                File import_file = Dialogs.display_open_dialog (ThiefProperties.SUPPORTED_IMPORT_FILES);
+                if (import_file != null && import_file.query_exists () && SheetManager.get_sheets () != null) {
+                    this.hide ();
+                    FileManager.import_file (import_file.get_path (), SheetManager.get_sheets ());
+                }
+            });
         }
 
         public void new_file () {

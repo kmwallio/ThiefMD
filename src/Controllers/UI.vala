@@ -25,6 +25,7 @@ namespace ThiefMD.Controllers.UI {
     private bool _show_filename = false;
     private Gtk.CssProvider active_provider = null;
     private Gtk.CssProvider font_provider = null;
+    private Gtk.CssProvider border_provider;
     private Ultheme.HexColorPalette current_palette = null;
 
     //
@@ -45,7 +46,7 @@ namespace ThiefMD.Controllers.UI {
 
     // Switches Sheets shown in the Library view with the
     // provided sheet
-    public Sheets set_sheets (Sheets sheet) {
+    public Sheets set_sheets (Sheets? sheet) {
         if (sheet == null) {
             return sheet;
         }
@@ -74,6 +75,23 @@ namespace ThiefMD.Controllers.UI {
         }
 
         user_themes.append (user_theme);
+    }
+
+    private void remove_border_color () {
+        if (border_provider != null) {
+            Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default(), border_provider);
+            border_provider = null;
+        }
+    }
+
+    private void insert_border_color () {
+        remove_border_color ();
+        var style_context = ThiefApp.get_instance ().toolbar.get_style_context ();
+        border_provider = new Gtk.CssProvider ();
+        var font_color = style_context.get_color (0);
+        string border_css = ThiefProperties.BUTTON_CSS.printf (font_color.to_string ());
+        border_provider.load_from_data (border_css);
+        Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default(), border_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
     }
 
     public void load_user_themes_and_connections () {
@@ -303,7 +321,7 @@ namespace ThiefMD.Controllers.UI {
                     set_css_scheme (palette);
                     set_scheme = true;
                 } catch (Error e) {
-                    warning ("Could not load previous style (%s): %s", settings.custom_theme, e.message);
+                    debug ("Could not load previous style (%s): %s", settings.custom_theme, e.message);
                 }
             }
         } else {
@@ -314,6 +332,8 @@ namespace ThiefMD.Controllers.UI {
         if (settings.show_writing_statistics) {
             ThiefApp.get_instance ().stats_bar.show_statistics ();
         }
+
+        SheetManager.redraw_sheets ();
 
         // Attempt to wait for app instance to be ready.
         if (!set_scheme) {
@@ -329,8 +349,9 @@ namespace ThiefMD.Controllers.UI {
             Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), active_provider);
             active_provider = null;
         }
-
         set_dark_mode_based_on_colors ();
+        remove_border_color ();
+        insert_border_color ();
     }
 
     public void reset_css () {
@@ -380,6 +401,7 @@ namespace ThiefMD.Controllers.UI {
             provider.load_from_data (new_css);
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
             active_provider = provider;
+            remove_border_color ();
         } catch (Error e) {
             warning ("Could not set dynamic css: %s", e.message);
         }

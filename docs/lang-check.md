@@ -9,6 +9,21 @@ for i, name in enumerate(friends):
     print ("iteration {iteration} is {name}".format(iteration=i, name=name))
 ```
 
+# Nim
+
+```nim
+# Thanks to Nim's 'iterator' and 'yield' constructs,
+# iterators are as easy to write as ordinary
+# functions. They are compiled to inline loops.
+iterator oddNumbers[Idx, T](a: array[Idx, T]): T =
+  for x in a:
+    if x mod 2 == 1:
+      yield x
+
+for odd in oddNumbers([3, 6, 9, 12, 15, 18]):
+  echo odd
+```
+
 # JavaScript
 
 ```js
@@ -17,6 +32,13 @@ $(document).ready(function(){
     $("p").hide();
   });
 });
+```
+
+# TypeScript
+
+```ts
+let message: string = 'Hello World';
+console.log(message);
 ```
 
 # Rust
@@ -60,6 +82,16 @@ public class MyClass {
 }
 ```
 
+# Scala
+
+```scala
+object Hello {
+    def main(args: Array[String]) = {
+        println("Hello, world")
+    }
+}
+```
+
 # Vala
 
 ```vala
@@ -80,6 +112,19 @@ public class MyClass {
                 }
             }
         }
+```
+
+# C#
+
+```csharp
+private void singToMe () {
+    string songLyrics = "You say goodbye, and I say hello";
+    Console.WriteLine(songLyrics.StartsWith("You"));
+    Console.WriteLine(songLyrics.StartsWith("goodbye"));
+
+    Console.WriteLine(songLyrics.EndsWith("hello"));
+    Console.WriteLine(songLyrics.EndsWith("goodbye"));
+}
 ```
 
 # R
@@ -160,15 +205,16 @@ puts "sample() method form : #{c.sample(3)}\n\n"
 
 ```perl
 #!/usr/bin/perl
-#
-# The traditional first program.
- 
-# Strict and warnings are recommended.
 use strict;
 use warnings;
  
 # Print a message.
-print "Hello, World!\n";
+sub Hello {
+   print "Hello, World!\n";
+}
+
+# Function call
+Hello();
 ```
 
 # PHP

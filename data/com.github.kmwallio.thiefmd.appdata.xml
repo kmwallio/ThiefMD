@@ -9,13 +9,14 @@
   <summary>The markdown editor worth stealing.</summary>
   <description>
     <p>Keep your Markdown managed. Write epic tales, a novel, keep a journal, or finally write that book report.</p>
-    <p>ThiefMD is a Markdown Editor providing an easy way to organize, format, and compile your markdown documents. When you're ready to Publish, go to ePub, PDF, Office, Ghost, Wordpress, Write-Freely, or more.</p>
+    <p>ThiefMD is a Markdown Editor providing an easy way to organize, format, and compile your markdown documents. When you're ready to Publish, go to ePub, PDF, Office, Ghost, WordPress, Write-Freely, or more.</p>
     <p>Import from and Export to Office, ePUB, HTML, and more. ThiefMD is your one stop shop for making and managing markdown mischief.</p>
   </description>
   <developer_name>kmwallio</developer_name>
   <url type="homepage">https://thiefmd.com</url>
   <url type="bugtracker">https://github.com/kmwallio/thiefmd/issues</url>
   <url type="help">https://thiefmd.com/deets</url>
+  <url type="donation">https://github.com/sponsors/kmwallio</url>
   <content_rating type="oars-1.1">
     <content_attribute id="language-humor">mild</content_attribute>
   </content_rating>
@@ -53,11 +54,24 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.1.7" date="2021-03-13" urgency="low">
+      <description>
+        <p>The subtle update.</p>
+        <ul>
+          <li>New Translations available: French, Slovak, and Swedish</li>
+          <li>Snap.as image upload support</li>
+          <li>WordPress featured image support</li>
+          <li>Performance improvements for experimental mode</li>
+          <li>Small UI bug fixes and PDF export fixes</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.7-subtle</url>
+    </release>
     <release version="0.1.6" date="2021-03-05" urgency="low">
       <description>
-        <p>Finess and Wordpress</p>
+        <p>Finess and WordPress</p>
         <ul>
-          <li>Wordpress Export is now available, just add a Connection</li>
+          <li>WordPress Export is now available, just add a Connection</li>
           <li>Recessed headers don't just look great, they help you visually identify important parts of your document</li>
           <li>Small tweaks and improvements have been made to speed up the UI</li>
           <li>New Experimental Mode for hiding links in the markdown editor</li>

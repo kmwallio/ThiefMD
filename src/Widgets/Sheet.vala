@@ -30,6 +30,7 @@ namespace ThiefMD.Widgets {
      */
     public class Sheet : Gtk.ToggleButton {
         private string _sheet_path;
+        private Gtk.Grid _button_grid;
         private Gtk.Label _label;
         private string _label_buffer;
         private Sheets _parent;
@@ -46,6 +47,7 @@ namespace ThiefMD.Widgets {
                 } else {
                     header_context.remove_class ("thief-list-sheet-active");
                 }
+                redraw ();
                 active = value;
             }
 
@@ -56,6 +58,7 @@ namespace ThiefMD.Widgets {
         }
 
         public Sheet (string sheet_path, Sheets parent) {
+            var settings = AppSettings.get_default ();
             _sheet_path = sheet_path;
             _parent = parent;
             _sheet_title = "";
@@ -67,7 +70,12 @@ namespace ThiefMD.Widgets {
             _label.use_markup = true;
             _label.set_ellipsize (Pango.EllipsizeMode.END);
             _label.xalign = 0;
-            add(_label);
+            _button_grid = new Gtk.Grid ();
+            _button_grid.orientation = Gtk.Orientation.VERTICAL;
+            _button_grid.hexpand = true;
+            _button_grid.attach (_label, 0, 0);
+            _button_grid.show_all ();
+            add (_button_grid);
 
             var header_context = this.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
@@ -133,7 +141,9 @@ namespace ThiefMD.Widgets {
             } else {
                 _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "</b>";
             }
+
             _label.set_label (_label_buffer);
+
             settings.writing_changed ();
         }
 
@@ -219,7 +229,7 @@ namespace ThiefMD.Widgets {
                 menu_export_sheet.activate.connect (() => {
                     string preview_markdown = FileManager.get_file_contents (_sheet_path);
                     PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown);
-                    ppw.show_all ();
+                    ppw.show ();
                 });
 
                 menu.add (new Gtk.SeparatorMenuItem ());
@@ -402,7 +412,11 @@ namespace ThiefMD.Widgets {
             return;
         }
 
-    public static bool areEqual (Sheet a, Sheet b) {
+        public static bool areEqual (Sheet a, Sheet b) {
+            if ((b == null && a != null) || (a == null && b != null)) {
+                return false;
+            }
+
             return (a._parent.get_sheets_path () == b._parent.get_sheets_path ()) &&
                 (a._sheet_path == b._sheet_path) &&
                 (a._label_buffer == b._label_buffer);

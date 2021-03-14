@@ -492,9 +492,17 @@ namespace ThiefMD.Widgets {
             save_metadata_file (true);
         }
 
+        public void update_sheet_indicators () {
+            foreach (var s in metadata.sheet_order) {
+                Sheet show = _sheets.get (s);
+                show.redraw ();
+            }
+        }
+
         public void redraw_sheets () {
             foreach (var s in metadata.sheet_order) {
                 Sheet show = _sheets.get (s);
+                show.redraw ();
                 _view.remove (show);
                 _view.add (show);
             }

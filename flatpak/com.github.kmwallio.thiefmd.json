@@ -76,13 +76,12 @@
             ],
             "buildsystem": "simple",
             "build-commands": [
-                "mv -v bin/pandoc /app/bin/pandoc",
-                "mv -v bin/pandoc-citeproc /app/bin/pandoc-citeproc"
+                "mv -v bin/pandoc /app/bin/pandoc"
             ],
             "sources": [{
                 "type": "archive",
-                "url": "https://github.com/jgm/pandoc/releases/download/2.10.1/pandoc-2.10.1-linux-amd64.tar.gz",
-                "sha256": "a3ab481ad53f5568d7ec5263fbdd3478fb320d13b5d61a92fb5cee410186bd86"
+                "url": "https://github.com/jgm/pandoc/releases/download/2.11.4/pandoc-2.11.4-linux-amd64.tar.gz",
+                "sha256": "b15ce6009ab833fb51fc472bf8bb9683cd2bd7f8ac948f3ddeb6b8f9a366d69a"
             }]
         },
         "shared-modules/libsecret/libsecret.json",

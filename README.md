@@ -37,7 +37,7 @@ yay -S thiefmd
  * Sheet Management
  * Shortcut key bindings
  * Themes
- * Export (DocX, ePUB, PDF, HTML, Markdown, [WriteFreely](https://thiefmd.com/tips/blogging-with-writefreely), [Ghost](https://thiefmd.com/tips/blogging-with-ghost), Wordpress, and more...)
+ * Export (DocX, ePUB, PDF, HTML, Markdown, [WriteFreely](https://thiefmd.com/tips/blogging-with-writefreely), [Ghost](https://thiefmd.com/tips/blogging-with-ghost), [WordPress](https://wordpress.org), and more...)
  * Import (DocX, ePUB, HTML, rst, textile, and more...)
  * Search `Ctrl+F` for the current file, and `Ctrl+Shift+F` for the *entire* library
  * Writing Statistics
@@ -49,11 +49,14 @@ yay -S thiefmd
 
  * French Translation by [David Bosman](https://github.com/davidbosman)
  * Slovak Translation by [Marek L'ach](https://github.com/marek-lach)
+ * Swedish Translation by [Åke Engelbrektson](https://github.com/eson57)
 
 ## Planning
 
  * Better library organization
- * Dedicated Markdown Editor
+ * Enhanced Export Tooling
+ * Screenwriting Support
+ * Project Notes
 
 ## Resources
 

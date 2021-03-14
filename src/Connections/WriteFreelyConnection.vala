@@ -223,6 +223,36 @@ namespace ThiefMD.Connections {
                     false, // Override as theme will probably display?
                     false);
 
+            Gee.Map<string, string> images_to_upload = Pandoc.file_image_map (publisher_instance.get_export_markdown ());
+            Gee.HashMap<string, string> replacements = new Gee.HashMap<string, string> ();
+
+            if (images_to_upload.keys.size > 0 && connection.endpoint.has_prefix ("https://write.as/")) {
+                Thinking worker = new Thinking (_("Uploading images"), () => {
+                    foreach (var images in images_to_upload) {
+                        File img_file = File.new_for_path (images.value);
+                        if (img_file.query_exists () && !FileUtils.test (images.value, FileTest.IS_DIR)) {
+                            string upload_url;
+                            if (connection.upload_image_simple (
+                                out upload_url,
+                                img_file.get_path ()))
+                            {
+                                replacements.set (images.key, upload_url);
+                            } else {
+                                warning ("Could not upload image %s", img_file.get_basename ());
+                            }
+                        }
+                    }
+                });
+                worker.run ();
+            }
+
+            foreach (var replacement in replacements) {
+                body = body.replace ("(" + replacement.key, "(" + replacement.value);
+                body = body.replace ("\"" + replacement.key, "\"" + replacement.value);
+                body = body.replace ("'" + replacement.key, "'" + replacement.value);
+                warning ("Replaced %s with %s", replacement.key, replacement.value);
+            }
+
             // Authenticated post
             if (collections.length () > 0 && connection.get_authenticated_user (out temp)) {
                 int option = collection_selector.get_active ();

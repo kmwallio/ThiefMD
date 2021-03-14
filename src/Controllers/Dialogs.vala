@@ -148,12 +148,29 @@ namespace ThiefMD.Controllers.Dialogs {
             });
 
         } else if (action != Gtk.FileChooserAction.SELECT_FOLDER) {
-            if (ext == "") {
+            if (ext == "md" || ext == "*.md") {
                 var filter1 = new Gtk.FileFilter ();
                 filter1.set_filter_name (_("Markdown files"));
                 filter1.add_pattern ("*.md");
                 filter1.add_pattern ("*.markdown");
                 chooser.add_filter (filter1);
+            } else if (ext != "") {
+                if (ext.index_of (";") > 0) {
+                    string[] extensions = ext.split (";");
+                    var filter1 = new Gtk.FileFilter ();
+                    filter1.set_filter_name (_("Supported files"));
+                    foreach (unowned string extension in extensions) {
+                        if (extension != "") {
+                            filter1.add_pattern (extension);
+                        }
+                    }
+                    chooser.add_filter (filter1);
+                } else {
+                    var filter1 = new Gtk.FileFilter ();
+                    filter1.set_filter_name (_("%s files").printf (ext));
+                    filter1.add_pattern (ext);
+                    chooser.add_filter (filter1);
+                }
             }
 
             var filter = new Gtk.FileFilter ();

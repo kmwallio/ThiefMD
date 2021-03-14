@@ -124,20 +124,20 @@ namespace ThiefMD.Controllers {
                             WriteFreelyConnection writeas_connection = new WriteFreelyConnection (attributes["alias"], the_secret, attributes["endpoint"]);
                             if (writeas_connection.connection_valid ()) {
                                 ThiefApp.get_instance ().exporters.register (writeas_connection.export_name, writeas_connection.exporter);
-                                ThiefApp.get_instance ().connections.add (writeas_connection);
                             }
+                            ThiefApp.get_instance ().connections.add (writeas_connection);
                         } else if (attributes["connectiontype"] == GhostConnection.CONNECTION_TYPE) {
                             GhostConnection ghost_connection = new GhostConnection (attributes["alias"], the_secret, attributes["endpoint"]);
                             if (ghost_connection.connection_valid ()) {
                                 ThiefApp.get_instance ().exporters.register (ghost_connection.export_name, ghost_connection.exporter);
-                                ThiefApp.get_instance ().connections.add (ghost_connection);
                             }
+                            ThiefApp.get_instance ().connections.add (ghost_connection);
                         } else if (attributes["connectiontype"] == WordpressConnection.CONNECTION_TYPE) {
                             WordpressConnection wordpress_connection = new WordpressConnection (attributes["alias"], the_secret, attributes["endpoint"]);
                             if (wordpress_connection.connection_valid ()) {
                                 ThiefApp.get_instance ().exporters.register (wordpress_connection.export_name, wordpress_connection.exporter);
-                                ThiefApp.get_instance ().connections.add (wordpress_connection);
                             }
+                            ThiefApp.get_instance ().connections.add (wordpress_connection);
                         }
 
                         if (!have_secret (attributes["connectiontype"], attributes["alias"], attributes["endpoint"])) {

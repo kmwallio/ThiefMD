@@ -29,8 +29,7 @@ namespace ThiefMD.Widgets {
         }
 
         public bool filter_fonts (Pango.FontFamily fam, Pango.FontFace face) {
-            return (face.describe ().get_style () == Pango.Style.NORMAL) &&
-                    (!face.get_face_name ().down ().contains ("bold") &&
+            return (!face.get_face_name ().down ().contains ("bold") &&
                     !face.get_face_name ().down ().contains ("italic") &&
                     !face.get_face_name ().down ().contains ("oblique"));
         }
@@ -61,14 +60,16 @@ namespace ThiefMD.Widgets {
             font_selector.append_text ("Courier Prime");
             fonts.add ("Courier Prime");
 
-            if (settings.font_family != null && settings.font_family.chug ().chomp () != "" && !fonts.contains (settings.font_family)) {
-                font_selector.append_text (settings.font_family);
-                fonts.add (settings.font_family);
-                font_selector.set_active (fonts.index_of (settings.font_family));
+            var set_font_desc = Pango.FontDescription.from_string (settings.font_family);
+            string? set_font_fam = set_font_desc.get_family ();
+            if (settings.font_family != null && set_font_fam != null && settings.font_family.chug ().chomp () != "" && !fonts.contains (set_font_fam)) {
+                font_selector.append_text (set_font_fam);
+                fonts.add (set_font_fam);
+                font_selector.set_active (fonts.index_of (set_font_fam));
                 other = 3;
                 items = 3;
-            } else if (fonts.contains (settings.font_family)) {
-                font_selector.set_active (fonts.index_of (settings.font_family));
+            } else if (set_font_fam != null && fonts.contains (set_font_fam)) {
+                font_selector.set_active (fonts.index_of (set_font_fam));
             } else {
                 font_selector.set_active (0);
                 items = 2;
@@ -147,13 +148,14 @@ namespace ThiefMD.Widgets {
                     int res = font_chooser.run ();
                     if (res != Gtk.ResponseType.CANCEL) {
                         string new_font = font_chooser.get_font_family ().get_name ();
+                        string font_desc = font_chooser.get_font_desc ().to_string ();
                         int new_font_size = font_chooser.get_font_size ();
                         if (new_font_size > Pango.SCALE) {
                             new_font_size /= Pango.SCALE;
                         }
                         debug ("Selected font size: %d", new_font_size);
                         debug ("Setting font: %s", new_font);
-                        settings.font_family = new_font;
+                        settings.font_family = font_desc;
                         if (!fonts.contains (new_font)) {
                             font_selector.append_text (new_font);
                             fonts.add (new_font);

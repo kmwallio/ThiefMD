@@ -74,7 +74,7 @@ namespace ThiefMD.Widgets {
             preview_button.tooltip_text = _("Launch Preview");
             preview_button.clicked.connect (() => {
                 PreviewWindow pvw = PreviewWindow.get_instance ();
-                pvw.show_all ();
+                pvw.show ();
             });
 
             var export_button = new Gtk.ModelButton ();
@@ -83,7 +83,7 @@ namespace ThiefMD.Widgets {
             export_button.tooltip_text = _("Open Export Window");
             export_button.clicked.connect (() => {
                 PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown ());
-                ppw.show_all ();
+                ppw.show ();
             });
 
             var search_button = new Gtk.ModelButton ();
@@ -165,7 +165,7 @@ namespace ThiefMD.Widgets {
             export_button.tooltip_text = _("Open Export Window");
             export_button.clicked.connect (() => {
                 PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown ());
-                ppw.show_all ();
+                ppw.show ();
             });
 
             var search_button = new Gtk.ModelButton ();
@@ -238,7 +238,7 @@ namespace ThiefMD.Widgets {
             export_button.tooltip_text = _("Open Export Window");
             export_button.clicked.connect (() => {
                 PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown ());
-                ppw.show_all ();
+                ppw.show ();
             });
 
             var search_button = new Gtk.ModelButton ();

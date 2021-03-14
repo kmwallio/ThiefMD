@@ -51,7 +51,7 @@ namespace ThiefMD.Widgets {
         public Gtk.TextTag highlight_tag;
         private int last_width = 0;
         private int last_height = 0;
-        private bool spellcheck_active;
+        private bool spellcheck_active = false;
         private bool writecheck_active;
         private bool typewriter_active;
 
@@ -80,6 +80,7 @@ namespace ThiefMD.Widgets {
         public bool is_modified { get; set; default = false; }
         private bool should_scroll { get; set; default = false; }
         private bool should_save { get; set; default = false; }
+        private bool markup_inserted_around_selection = false;
 
         public Editor (string file_path) {
             var settings = AppSettings.get_default ();
@@ -87,12 +88,12 @@ namespace ThiefMD.Widgets {
 
             try {
                 is_heading = new Regex ("(#+\\s[^\\n\\r]+?)[\\n\\R]", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF | RegexCompileFlags.CASELESS, 0);
-                is_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+(\\.|\\)))\\s)\\s*(.+)", RegexCompileFlags.CASELESS, 0);
-                is_partial_list = new Regex ("^(\\s*([\\*\\-\\+]|[0-9]+\\.))\\s+$", RegexCompileFlags.CASELESS, 0);
+                is_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+(\\.|\\)))\\s)\\s*(.+)", RegexCompileFlags.CASELESS, 0);
+                is_partial_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+\\.))\\s+$", RegexCompileFlags.CASELESS, 0);
                 numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.CASELESS, 0);
                 is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss|file)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.CASELESS, 0);
                 is_codeblock = new Regex ("(```[a-zA-Z]*[\\n\\R]((.*?)[\\n\\R])*?```[\\n\\R])", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-                is_markdown_url = new Regex ("\\[([^\\[]+?)\\](\\([^\\)\\n]+?\\))", RegexCompileFlags.CASELESS, 0);
+                is_markdown_url = new Regex ("(?<text_group>\\[(?>[^\\[\\]]+|(?&text_group))+\\])(?:\\((?<url>\\S+?)(?:[ ]\"(?<title>(?:[^\"]|(?<=\\\\)\")*?)\")?\\))", RegexCompileFlags.CASELESS, 0);
             } catch (Error e) {
                 warning ("Could not initialize regexes: %s", e.message);
             }
@@ -158,27 +159,10 @@ namespace ThiefMD.Widgets {
                 set_scheme (settings.get_valid_theme_id ());
                 return false;
             });
-            dynamic_margins ();
+
             spell = new GtkSpell.Checker ();
             writegood = new WriteGood.Checker ();
             writegood.show_tooltip = true;
-
-            if (settings.spellcheck) {
-                debug ("Spellcheck active");
-                spell.attach (this);
-                spellcheck_active = true;
-            } else {
-                debug ("Spellcheck inactive");
-                spellcheck_active = false;
-            }
-
-            if (settings.writegood) {
-                writegood.attach (this);
-                writecheck_active = true;
-            } else {
-                writegood.detach ();
-                writecheck_active = false;
-            }
 
             focus_text = buffer.create_tag ("focus-text");
             outoffocus_text = buffer.create_tag ("outoffocus-text");
@@ -212,6 +196,7 @@ namespace ThiefMD.Widgets {
             markdown_link = buffer.create_tag ("markdown-link");
             markdown_url = buffer.create_tag ("markdown-url");
             markdown_url.invisible = true;
+            markdown_url.invisible_set = true;
 
             last_width = settings.window_width;
             last_height = settings.window_height;
@@ -228,21 +213,33 @@ namespace ThiefMD.Widgets {
 
         private bool on_keypress (Gdk.EventKey key) {
             uint keycode = key.hardware_keycode;
+            bool skip_request = false;
 
             if (is_list == null || is_partial_list == null || numerical_list == null) {
                 return false;
             }
 
-            if (match_keycode (Gdk.Key.Return, keycode) || match_keycode (Gdk.Key.Tab, keycode)) {
-                debug ("Got enter or tab key");
+            // Move outside of selection if we just inserted formatting and get a right -> key from the user
+            if (match_keycode (Gdk.Key.Right, keycode) && markup_inserted_around_selection && buffer.has_selection) {
+                skip_request = true;
+            }
+
+            markup_inserted_around_selection = false;
+
+            if (match_keycode (Gdk.Key.Return, keycode) || match_keycode (Gdk.Key.Tab, keycode) || skip_request) {
+                debug ("Got enter or tab key or skip request");
                 var cursor = buffer.get_insert ();
                 Gtk.TextIter start, end;
-                buffer.get_iter_at_mark (out start, cursor);
-                buffer.get_iter_at_mark (out end, cursor);
+                if (!skip_request) {
+                    buffer.get_iter_at_mark (out start, cursor);
+                    buffer.get_iter_at_mark (out end, cursor);
+                } else {
+                    buffer.get_selection_bounds (out start, out end);
+                }
                 unichar end_char = end.get_char ();
 
                 // Tab to next item in link, or outside of current markup
-                if (match_keycode (Gdk.Key.Tab, keycode) && 
+                if ((skip_request || match_keycode (Gdk.Key.Tab, keycode)) && 
                     (end_char == '*' ||
                      end_char == ']' ||
                      end_char == ')' ||
@@ -403,6 +400,28 @@ namespace ThiefMD.Widgets {
             }
 
             return have_match;
+        }
+
+        private bool no_hiding = false;
+        public override bool motion_notify_event (EventMotion event ) {
+            if (((event.state & Gdk.ModifierType.BUTTON1_MASK) != 0) ||
+                ((event.state & Gdk.ModifierType.BUTTON2_MASK) != 0) ||
+                ((event.state & Gdk.ModifierType.BUTTON3_MASK) != 0) || 
+                ((event.state & Gdk.ModifierType.BUTTON4_MASK) != 0) || 
+                ((event.state & Gdk.ModifierType.BUTTON5_MASK) != 0))
+            {
+                no_hiding = true;
+            } else if (no_hiding) {
+                update_heading_margins (true);
+                Timeout.add (300, () => {
+                    no_hiding = false;
+                    update_heading_margins ();
+                    return false;
+                });
+            }
+
+            base.motion_notify_event (event);
+            return false;
         }
 
         private void on_drag_data_received (
@@ -597,6 +616,11 @@ namespace ThiefMD.Widgets {
                         write_good_recheck ();
                     }
 
+                    if (settings.spellcheck) {
+                        spell.attach (this);
+                        spellcheck_active = true;
+                    }
+
                     key_press_event.connect (on_keypress);
 
                     //
@@ -616,9 +640,6 @@ namespace ThiefMD.Widgets {
                     if (active != value) {
                         cursor_location = buffer.cursor_position;
                         debug ("Cursor saved at: %d", cursor_location);
-                        if (settings.spellcheck) {
-                            spell.detach ();
-                        }
 
                         preview_markdown = "";
                         try {
@@ -627,13 +648,19 @@ namespace ThiefMD.Widgets {
                             warning ("Unable to save file " + file.get_basename () + ": " + e.message);
                             SheetManager.show_error ("Unable to save file " + file.get_basename () + ": " + e.message);
                         }
+
                         buffer.changed.disconnect (on_change_notification);
                         size_allocate.disconnect (dynamic_margins);
                         settings.changed.disconnect (update_settings);
                         key_press_event.disconnect (on_keypress);
+
                         if (settings.writegood) {
                             writecheck_active = false;
                             writegood.detach ();
+                        }
+
+                        if (settings.spellcheck) {
+                            spell.detach ();
                         }
                     }
                     editable = false;
@@ -704,6 +731,7 @@ namespace ThiefMD.Widgets {
                         buffer.get_selection_bounds (out iter_start, out iter_end);
                         iter_end.backward_chars (markup.length);
                         buffer.select_range (iter_start, iter_end);
+                        markup_inserted_around_selection = true;
                     }
                 }
             }
@@ -1078,7 +1106,7 @@ namespace ThiefMD.Widgets {
             left_margin = m;
             right_margin = m;
 
-            update_heading_margins ();
+            update_heading_margins (UI.moving ());
 
             typewriter_scrolling ();
 
@@ -1087,8 +1115,41 @@ namespace ThiefMD.Widgets {
             move_typewriter_scolling ();
         }
 
+        private bool cursor_at_interesting_location = false;
+        private void cursor_update_heading_margins () {
+            var settings = AppSettings.get_default ();
+
+            if (settings.experimental) {
+                var cursor = buffer.get_insert ();
+                Gtk.TextIter cursor_location;
+                buffer.get_iter_at_mark (out cursor_location, cursor);
+                if (cursor_location.has_tag (markdown_link) || cursor_location.has_tag (markdown_url) || buffer.has_selection) {
+                    update_heading_margins ();
+                    cursor_at_interesting_location = true;
+                } else if (cursor_at_interesting_location) {
+                    update_heading_margins ();
+                    Gtk.TextIter before, after;
+                    Gtk.TextIter bound_start, bound_end;
+                    buffer.get_bounds (out bound_start, out bound_end);
+                    buffer.get_iter_at_mark (out before, cursor);
+                    buffer.get_iter_at_mark (out after, cursor);
+                    if (!before.backward_line()) {
+                        before = bound_start;
+                    }
+                    if (!after.forward_line ()) {
+                        after = bound_end;
+                    }
+                    string sample_text = buffer.get_text (before, after, true);
+                    // Keep interesting location if we're potentially in something we can remove a link to.
+                    if (!is_markdown_url.match (sample_text, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF)) {
+                        cursor_at_interesting_location = false;
+                    }
+                }
+            }
+        }
+
         bool header_redraw_scheduled = false;
-        private void update_heading_margins () {
+        private void update_heading_margins (bool skip_links = false) {
             bool try_later = false;
             // Update heading margins
             if (UI.moving ()) {
@@ -1097,7 +1158,7 @@ namespace ThiefMD.Widgets {
                 try_later = true;
             }
 
-            if (try_later) {
+            if (try_later && !no_hiding && !buffer.has_selection) {
                 if (!header_redraw_scheduled) {
                     header_redraw_scheduled = true;
                     Timeout.add (350, () => {
@@ -1126,6 +1187,18 @@ namespace ThiefMD.Widgets {
                 code_block.background_full_height_set = true;
             }
 
+            if (settings.experimental) {
+                if (no_hiding) {
+                    markdown_link.weight = Pango.Weight.NORMAL;
+                    markdown_link.weight_set = true;
+                    markdown_url.weight = Pango.Weight.NORMAL;
+                    markdown_url.weight_set = true;
+                } else {
+                    markdown_link.weight_set = false;
+                    markdown_url.weight_set = false;
+                }
+            }
+
             int m = left_margin;
             try {
                 Gtk.TextIter start, end;
@@ -1134,31 +1207,41 @@ namespace ThiefMD.Widgets {
                     buffer.remove_tag (heading_text[h], start, end);
                 }
                 buffer.remove_tag (code_block, start, end);
-                buffer.remove_tag (markdown_link, start, end);
-                buffer.remove_tag (markdown_url, start, end);
+                if (!skip_links) {
+                    buffer.remove_tag (markdown_link, start, end);
+                    buffer.remove_tag (markdown_url, start, end);
+                }
 
                 int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
                 int hashtag_w = f_w;
                 int space_w = f_w;
-                int avg_w;
+                int avg_w = f_w;
 
                 if (get_realized ()) {
-                    var font_desc = new Pango.FontDescription ();
-                    font_desc.set_family (settings.get_css_font_family ());
+                    var font_desc = Pango.FontDescription.from_string (settings.font_family);
                     font_desc.set_size ((int)(f_w * Pango.SCALE * Pango.Scale.LARGE));
                     var font_context = get_pango_context ();
                     var font_layout = new Pango.Layout (font_context);
                     font_layout.set_font_description (font_desc);
                     font_layout.set_text ("#", 1);
-                    font_layout.get_pixel_size (out hashtag_w, out avg_w);
+                    Pango.Rectangle ink, logical;
+                    font_layout.get_pixel_extents (out ink, out logical);
+                    debug ("# Ink: %d, Logical: %d", ink.width, logical.width);
+                    hashtag_w = int.max (ink.width, logical.width);
                     font_layout.set_text (" ", 1);
-                    font_layout.get_pixel_size (out space_w, out avg_w);
+                    font_layout.get_pixel_extents (out ink, out logical);
+                    debug ("  Ink: %d, Logical: %d", ink.width, logical.width);
+                    space_w = int.max (ink.width, logical.width);
                     if (space_w + hashtag_w <= 0) {
                         hashtag_w = f_w;
                         space_w = f_w;
                     }
-                    avg_w = (int)((hashtag_w + space_w) / 2.0);
-                    debug ("Hashtag: %d, Space: %d, AvgChar: %d", hashtag_w, space_w, avg_w);
+                    if (space_w < (hashtag_w / 2)) {
+                        avg_w = (int)((hashtag_w + hashtag_w + space_w) / 3.0);
+                    } else {
+                        avg_w = (int)((hashtag_w + space_w) / 2.0);
+                    }
+                    debug ("%s Hashtag: %d, Space: %d, AvgChar: %d", font_desc.get_family (), hashtag_w, space_w, avg_w);
                     if (m - ((hashtag_w * 6) + space_w) <= 0) {
                         heading_text[0].left_margin = m;
                         heading_text[1].left_margin = m;
@@ -1167,18 +1250,18 @@ namespace ThiefMD.Widgets {
                         heading_text[4].left_margin = m;
                         heading_text[5].left_margin = m;
                     } else {
-                        //  heading_text[0].left_margin = m - ((hashtag_w * 1) + space_w);
-                        //  heading_text[1].left_margin = m - ((hashtag_w * 2) + space_w);
-                        //  heading_text[2].left_margin = m - ((hashtag_w * 3) + space_w);
-                        //  heading_text[3].left_margin = m - ((hashtag_w * 4) + space_w);
-                        //  heading_text[4].left_margin = m - ((hashtag_w * 5) + space_w);
-                        //  heading_text[5].left_margin = m - ((hashtag_w * 6) + space_w);
-                        heading_text[0].left_margin = m - (avg_w * 2);
-                        heading_text[1].left_margin = m - (avg_w * 3);
-                        heading_text[2].left_margin = m - (avg_w * 4);
-                        heading_text[3].left_margin = m - (avg_w * 5);
-                        heading_text[4].left_margin = m - (avg_w * 6);
-                        heading_text[5].left_margin = m - (avg_w * 7);
+                        heading_text[0].left_margin = m - ((hashtag_w * 1) + space_w);
+                        heading_text[1].left_margin = m - ((hashtag_w * 2) + space_w);
+                        heading_text[2].left_margin = m - ((hashtag_w * 3) + space_w);
+                        heading_text[3].left_margin = m - ((hashtag_w * 4) + space_w);
+                        heading_text[4].left_margin = m - ((hashtag_w * 5) + space_w);
+                        heading_text[5].left_margin = m - ((hashtag_w * 6) + space_w);
+                        //  heading_text[0].left_margin = m - (avg_w * 2);
+                        //  heading_text[1].left_margin = m - (avg_w * 3);
+                        //  heading_text[2].left_margin = m - (avg_w * 4);
+                        //  heading_text[3].left_margin = m - (avg_w * 5);
+                        //  heading_text[4].left_margin = m - (avg_w * 6);
+                        //  heading_text[5].left_margin = m - (avg_w * 7);
                     }
                 }
 
@@ -1228,15 +1311,29 @@ namespace ThiefMD.Widgets {
                 }
 
                 if (settings.experimental) {
+                    //
+                    // Skip high CPU stuff when skippable
+                    //
+                    if (skip_links) {
+                        return;
+                    }
+                    Gtk.TextIter bound_start, bound_end;
+                    buffer.get_bounds (out bound_start, out bound_end);
+                    bool check_selection = buffer.get_has_selection ();
+                    Gtk.TextIter? select_start = null, select_end = null;
+                    if (check_selection) {
+                        buffer.get_selection_bounds (out select_start, out select_end);
+                    }
                     if (is_markdown_url.match_full (checking_copy, checking_copy.length, 0, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
                         Gtk.TextIter cursor_location;
                         var cursor = buffer.get_insert ();
                         buffer.get_iter_at_mark (out cursor_location, cursor);
                         do {
+                            buffer.get_bounds (out bound_start, out bound_end);
                             int start_link_pos, end_link_pos;
                             int start_url_pos, end_url_pos;
                             int start_full_pos, end_full_pos;
-                            //  warning ("Link Found, Text: %s, URL: %s", link, url);
+                            //  warning ("Link Found, Text: %s, URL: %s", match_info.fetch (1), match_info.fetch (2));
                             bool linkify = match_info.fetch_pos (1, out start_link_pos, out end_link_pos);
                             bool urlify = match_info.fetch_pos (2, out start_url_pos, out end_url_pos);
                             bool full_found = match_info.fetch_pos (0, out start_full_pos, out end_full_pos);
@@ -1250,7 +1347,36 @@ namespace ThiefMD.Widgets {
                                 buffer.get_iter_at_offset (out end, end_full_pos);
 
                                 if (cursor_location.in_range (start, end)) {
+                                    buffer.apply_tag (markdown_link, start, end);
                                     continue;
+                                }
+
+                                if (check_selection) {
+                                    if (start.in_range (select_start, select_end) || end.in_range (select_start, select_end)) {
+                                        buffer.apply_tag (markdown_link, start, end);
+                                        continue;
+                                    }
+                                }
+
+                                // Check if we're in inline code
+                                if (start.backward_line ()) {
+                                    buffer.get_iter_at_offset (out end, start_full_pos);
+                                    if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
+                                        string sanity_check = buffer.get_text (start, end, true);
+                                        if (sanity_check.index_of_char ('`') >= 0) {
+                                            buffer.get_iter_at_offset (out end, end_full_pos);
+                                            if (end.forward_line ()) {
+                                                buffer.get_iter_at_offset (out start, end_full_pos);
+                                                sanity_check = buffer.get_text (start, end, true);
+                                                if (sanity_check.index_of_char ('`') >= 0) {
+                                                    continue;
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        // Bail, our calculations are now out of range
+                                        continue;
+                                    }
                                 }
 
                                 //
@@ -1263,7 +1389,12 @@ namespace ThiefMD.Widgets {
                                 if (start.has_tag (code_block) || end.has_tag (code_block)) {
                                     continue;
                                 }
-                                buffer.apply_tag (markdown_link, start, end);
+                                if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
+                                    buffer.apply_tag (markdown_link, start, end);
+                                } else  {
+                                    // Bail, our calculations are now out of range
+                                    continue;
+                                }
 
                                 if (!UI.show_link_brackets () && !settings.focus_mode) {
                                     //
@@ -1271,17 +1402,25 @@ namespace ThiefMD.Widgets {
                                     //
                                     buffer.get_iter_at_offset (out start, start_link_pos);
                                     buffer.get_iter_at_offset (out end, start_link_pos);
-                                    start.backward_chars (2);
-                                    if (start.get_char () != '!') {
-                                        start.forward_char ();
-                                        buffer.apply_tag (markdown_url, start, end);
-                                        //
-                                        // Closing ]
-                                        //
-                                        buffer.get_iter_at_offset (out start, end_link_pos);
-                                        buffer.get_iter_at_offset (out end, end_link_pos);
-                                        end.forward_char ();
-                                        buffer.apply_tag (markdown_url, start, end);
+                                    bool not_at_start = start.backward_chars (1);
+                                    end.forward_char ();
+                                    if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
+                                        if (start.get_char () != '!') {
+                                            if (not_at_start) {
+                                                start.forward_char ();
+                                            }
+                                            buffer.apply_tag (markdown_url, start, end);
+                                            //
+                                            // Closing ]
+                                            //
+                                            buffer.get_iter_at_offset (out start, end_link_pos);
+                                            buffer.get_iter_at_offset (out end, end_link_pos);
+                                            start.backward_char ();
+                                            buffer.apply_tag (markdown_url, start, end);
+                                        }
+                                    } else {
+                                        // Bail, our calculations are now out of range
+                                        continue;
                                     }
                                 }
 
@@ -1289,13 +1428,18 @@ namespace ThiefMD.Widgets {
                                 // Link URL (https://thiefmd.com)
                                 //
                                 start_url_pos = checking_copy.char_count ((ssize_t) start_url_pos);
-                                end_url_pos = checking_copy.char_count ((ssize_t) end_url_pos);
                                 buffer.get_iter_at_offset (out start, start_url_pos);
-                                buffer.get_iter_at_offset (out end, end_url_pos);
+                                start.backward_char ();
+                                buffer.get_iter_at_offset (out end, end_full_pos);
                                 if (start.has_tag (code_block) || end.has_tag (code_block)) {
                                     continue;
                                 }
-                                buffer.apply_tag (markdown_url, start, end);
+                                if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
+                                    buffer.apply_tag (markdown_url, start, end);
+                                } else  {
+                                    // Bail, our calculations are now out of range
+                                    continue;
+                                }
                             }
                         } while (match_info.next ());
                     }
@@ -1403,9 +1547,9 @@ namespace ThiefMD.Widgets {
             }
 
             if (settings.experimental) {
-                buffer.notify["cursor-position"].connect (update_heading_margins);
+                buffer.notify["cursor-position"].connect (cursor_update_heading_margins);
             } else {
-                buffer.notify["cursor-position"].connect (update_heading_margins);
+                buffer.notify["cursor-position"].connect (cursor_update_heading_margins);
             }
 
             if (!header_redraw_scheduled) {
@@ -1460,17 +1604,28 @@ namespace ThiefMD.Widgets {
                     }
                 } else if (settings.focus_type == FocusType.SENTENCE) {
                     if (!start.starts_sentence ()) {
-                        start.backward_sentence_start ();
+                        do {
+                            start.backward_sentence_start ();
+                            if (start.get_char () == '[') {
+                                start.backward_char ();
+                            }
+                        } while (!start.starts_line () && (start.has_tag (markdown_link) || start.has_tag (markdown_url)));
                     }
-                    if (!end.ends_sentence ()) {
-                        end.forward_sentence_end ();
+                    if (!end.ends_sentence () || end.has_tag (markdown_url) || end.has_tag (markdown_link)) {
+                        do {
+                            end.forward_sentence_end ();
+                        } while (end.has_tag (markdown_link) || end.has_tag (markdown_url));
                     }
                 } else if (settings.focus_type == FocusType.PARAGRAPH) {
-                    if (!start.starts_line ()) {
-                        start.backward_line ();
+                    if (!start.starts_line () || start.has_tag (code_block)) {
+                        do {
+                            start.backward_line ();
+                        } while (start.has_tag (code_block));
                     }
-                    if (!end.ends_line ()) {
-                        end.forward_to_line_end ();
+                    if (!end.ends_line () || end.has_tag (code_block)) {
+                        do {
+                            end.forward_to_line_end ();
+                        } while (end.has_tag (code_block));
                     }
                 }
 
@@ -1496,7 +1651,7 @@ namespace ThiefMD.Widgets {
         }
 
         public bool move_typewriter_scolling () {
-            if (!active) {
+            if (!active || buffer.has_selection) {
                 return false;
             }
 

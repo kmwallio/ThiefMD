@@ -127,6 +127,7 @@ namespace ThiefMD.Widgets {
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.b, keycode)) {
                         SheetManager.bold ();
+                        return true;
                     }
                 }
 
@@ -134,6 +135,7 @@ namespace ThiefMD.Widgets {
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.i, keycode)) {
                         SheetManager.italic ();
+                        return true;
                     }
                 }
 
@@ -141,6 +143,7 @@ namespace ThiefMD.Widgets {
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.d, keycode)) {
                         SheetManager.strikethrough ();
+                        return true;
                     }
                 }
 
@@ -148,6 +151,7 @@ namespace ThiefMD.Widgets {
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.k, keycode)) {
                         SheetManager.link ();
+                        return true;
                     }
                 }
 
