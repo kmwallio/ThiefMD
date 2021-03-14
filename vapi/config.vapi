@@ -7,4 +7,5 @@ namespace Build {
     public const string VERSION;
     public const string VERSION_INFO;
     public const string PLUGINDIR;
+    public const string PACKAGE_LOCALEDIR;
 }

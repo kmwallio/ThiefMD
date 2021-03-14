@@ -15,6 +15,7 @@ src/Controllers/ConnectionManager.vala
 src/Connections/ConnectionBase.vala
 src/Connections/WriteFreelyConnection.vala
 src/Connections/GhostConnection.vala
+src/Connections/WordpressConnection.vala
 src/Exporters/ExportBase.vala
 src/Exporters/ExportDocx.vala
 src/Exporters/ExportEpub.vala
@@ -54,3 +55,4 @@ src/writegood/src/writegood.vala
 src/writegood/src/en_us.vala
 src/writeas/src/Writeas.vala
 src/ghost/src/Ghost.vala
+src/wordpress/src/Wordpress.vala

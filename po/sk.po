@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-13 13:43-0800\n"
+"POT-Creation-Date: 2021-03-14 07:26-0700\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -74,6 +74,7 @@ msgstr "_Uložiť"
 #: src/Controllers/Dialogs.vala:27 src/Controllers/Dialogs.vala:55
 #: src/Connections/WriteFreelyConnection.vala:129
 #: src/Connections/GhostConnection.vala:111
+#: src/Connections/WordpressConnection.vala:114
 msgid "_Cancel"
 msgstr "_Zrušiť"
 
@@ -162,37 +163,44 @@ msgid "Close"
 msgstr "Zavrieť"
 
 #: src/Connections/WriteFreelyConnection.vala:100
+#: src/Connections/WordpressConnection.vala:85
 msgid "Username"
 msgstr "Užívateľské meno"
 
 #: src/Connections/WriteFreelyConnection.vala:104
 #: src/Connections/GhostConnection.vala:86
+#: src/Connections/WordpressConnection.vala:89
 msgid "Password"
 msgstr "Heslo"
 
 #: src/Connections/WriteFreelyConnection.vala:109
 #: src/Connections/GhostConnection.vala:91
+#: src/Connections/WordpressConnection.vala:94
 msgid "Endpoint"
 msgstr ""
 
 #: src/Connections/WriteFreelyConnection.vala:127
 #: src/Connections/GhostConnection.vala:109
+#: src/Connections/WordpressConnection.vala:112
 msgid "_Add Account"
 msgstr "_Pridať účet"
 
 #: src/Connections/WriteFreelyConnection.vala:230
 #: src/Connections/GhostConnection.vala:214
+#: src/Connections/WordpressConnection.vala:216
 msgid "Uploading images"
 msgstr "Nahrávanie obrázkov"
 
 #: src/Connections/WriteFreelyConnection.vala:308
-#: src/Connections/GhostConnection.vala:299 src/Widgets/Preferences.vala:83
+#: src/Connections/GhostConnection.vala:299
+#: src/Connections/WordpressConnection.vala:300 src/Widgets/Preferences.vala:83
 #: src/Widgets/Preferences.vala:117 src/Widgets/Preferences.vala:151
 msgid " Published"
 msgstr " Zverejnené"
 
 #: src/Connections/WriteFreelyConnection.vala:308
-#: src/Connections/GhostConnection.vala:299 src/Widgets/Preferences.vala:83
+#: src/Connections/GhostConnection.vala:299
+#: src/Connections/WordpressConnection.vala:300 src/Widgets/Preferences.vala:83
 #: src/Widgets/Preferences.vala:117 src/Widgets/Preferences.vala:151
 msgid "Post Published"
 msgstr "Príspevok zverejnený"
