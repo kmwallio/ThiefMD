@@ -17,6 +17,7 @@
   <url type="bugtracker">https://github.com/kmwallio/thiefmd/issues</url>
   <url type="help">https://thiefmd.com/deets</url>
   <url type="donation">https://github.com/sponsors/kmwallio</url>
+  <url type="translate">https://poeditor.com/join/project?hash=iQkE5oTIOV</url>
   <content_rating type="oars-1.1">
     <content_attribute id="language-humor">mild</content_attribute>
   </content_rating>
@@ -54,6 +55,15 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.1.8" date="2021-03-20" urgency="low">
+      <description>
+        <p>Translation loading fixes</p>
+        <ul>
+          <li>New Translations available, hopefully for real this time: French, Slovak, and Swedish</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.8-languages</url>
+    </release>
     <release version="0.1.7" date="2021-03-13" urgency="low">
       <description>
         <p>The subtle update.</p>
