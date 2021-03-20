@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.1.7
+Version: 0.1.8
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
@@ -324,6 +324,8 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sat Mar 20 2021 kmwallio <mwallio@gmail.com> - 0.1.8
+- Fix translation issues
 * Sun Mar 13 2021 kmwallio <mwallio@gmail.com> - 0.1.7
 - Snap.as image upload support
 - WordPress featured image support

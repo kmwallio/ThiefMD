@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.kmwallio.thiefmd', ['vala', 'c'],
-    version: '0.1.7'
+    version: '0.1.8'
 )
 
 # Application ID
@@ -21,6 +21,10 @@ asresources = gnome.compile_resources(
     c_name: 'as'
 )
 
+# Translations
+gettext_package = meson.project_name()
+podir = meson.source_root() / 'po'
+
 # Set this for convenience
 conf = configuration_data()
 
@@ -34,6 +38,7 @@ conf.set_quoted('PKGDATADIR', pkgdatadir)
 conf.set_quoted('GETTEXT_PACKAGE', meson.project_name())
 conf.set_quoted('RELEASE_NAME', thief_app_id)
 conf.set_quoted('VERSION', meson.project_version())
+conf.set_quoted('PACKAGE_LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))
 add_global_arguments('-DDATADIR="' + get_option('datadir') + '"', language: 'c')
 configure_file(output: 'config.h', configuration: conf)
 config_h_dir = include_directories('.')
@@ -41,15 +46,11 @@ config_h_dir = include_directories('.')
 # Arguments for C
 c_args = [
   '-include', 'config.h',
+  '-DGETTEXT_PACKAGE="@0@"'.format(meson.project_name()),
   '-w'
 ]
 
 cc = meson.get_compiler('c')
-
-# Translations
-gettext_package = meson.project_name()
-localedir = get_option('prefix') / get_option('localedir')
-podir = meson.source_root() / 'po'
 
 # Find libMarkdown
 libmarkdown = dependency('libmarkdown', version: '>= 2.2.1', required: false)

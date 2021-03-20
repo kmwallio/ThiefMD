@@ -68,6 +68,9 @@ namespace ThiefMD.Connections {
                         label = label.substring (0, label.last_index_of ("api"));
                     }
                     label = label.substring (0, 1).up () + label.substring (1).down ();
+                    if (!label.has_suffix ("/")) {
+                        label = label + "/";
+                    }
                     export_name = label + username;
                     exporter = new WriteFreelyExporter (connection);
                 }
