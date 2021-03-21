@@ -324,6 +324,8 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
 
         public signal void changed ();
 
+        public signal void sheet_changed ();
+
         public signal void writing_changed ();
 
         private AppSettings () {

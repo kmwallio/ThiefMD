@@ -22,7 +22,7 @@ using ThiefMD.Widgets;
 
 namespace ThiefMD.Controllers.SheetManager {
     private SheetPair _currentSheet;
-    private weak Sheets _current_sheets;
+    private weak Sheets? _current_sheets;
     private Gee.LinkedList<Widgets.Editor> _editor_pool;
     private Gee.LinkedList<SheetPair> _editors;
     private Gee.LinkedList<SheetPair> _active_editors;
@@ -307,7 +307,7 @@ namespace ThiefMD.Controllers.SheetManager {
         return false;
     }
 
-    public Sheets get_sheets () {
+    public Sheets? get_sheets () {
         return _current_sheets;
     }
 
@@ -390,6 +390,7 @@ namespace ThiefMD.Controllers.SheetManager {
                 return false;
             });
         }
+        settings.sheet_changed ();
         return success;
     }
 

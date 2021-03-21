@@ -151,6 +151,10 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             box-shadow: 0 1px transparent inset;
         }
 
+        .thief-notes {
+            background: @colorPrimary;
+            color: @textColorPrimary;
+        }
 
         .thief-drop-above {
             margin-bottom: 1.5rem;

@@ -28,6 +28,7 @@ namespace ThiefMD.Widgets {
         private Gtk.Button add_library_button;
         private Gtk.MenuButton new_sheet;
         private Gtk.MenuButton menu_button;
+        private Gtk.Button sidebar_button;
         private NewSheet new_sheet_widget;
 
         public Headerbar (ThiefApp instance) {
@@ -139,12 +140,32 @@ namespace ThiefMD.Widgets {
                 });
             });
 
+            sidebar_button = new Gtk.Button ();
+            sidebar_button.has_tooltip = true;
+            sidebar_button.tooltip_text = (_("Show Notes"));
+            sidebar_button.set_image (new Gtk.Image.from_icon_name ("view-right-pane-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            sidebar_button.clicked.connect (() => {
+                if (!ThiefApp.get_instance ().am_mobile) {
+                    if (!ThiefApp.get_instance ().notes.child_revealed) {
+                        ThiefApp.get_instance ().notes_widget.show ();
+                    }
+                    ThiefApp.get_instance ().notes.set_reveal_child (!ThiefApp.get_instance ().notes.child_revealed);
+                } else {
+                    if (ThiefApp.get_instance ().mobile_stack.visible_child_name != _("Notes")) {
+                        ThiefApp.get_instance ().mobile_stack.set_visible_child_name (_("Notes"));
+                    } else {
+                        UI.show_editor ();
+                    }
+                }
+            });
+
             the_bar.pack_start (change_view_button);
             the_bar.pack_start (add_library_button);
             // @TODO: Need to find a better way to do this
             the_bar.pack_start (new Gtk.Label("                          "));
             the_bar.pack_start (new_sheet);
 
+            the_bar.pack_end (sidebar_button);
             the_bar.pack_end (menu_button);
 
             the_bar.set_show_close_button (true);

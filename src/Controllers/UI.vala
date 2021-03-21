@@ -47,6 +47,7 @@ namespace ThiefMD.Controllers.UI {
     // Switches Sheets shown in the Library view with the
     // provided sheet
     public Sheets set_sheets (Sheets? sheet) {
+        var settings = AppSettings.get_default ();
         if (sheet == null) {
             return sheet;
         }
@@ -59,6 +60,7 @@ namespace ThiefMD.Controllers.UI {
         instance.library_pane.add2 (sheet);
         instance.library_pane.set_position (cur_pos);
         instance.library_pane.get_child2 ().show_all ();
+        settings.sheet_changed ();
         return (Sheets) old;
     }
 

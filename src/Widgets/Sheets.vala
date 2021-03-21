@@ -25,6 +25,8 @@ namespace ThiefMD.Widgets {
         public string[] sheet_order { get; set; }
         public string[] hidden_folders { get; set; }
         public string[] folder_order { get; set; }
+        public string notes { get; set; }
+        public string icon { get; set ; }
 
         public ThiefSheetsSerializable (ThiefSheets sheets) {
             sheet_order = new string[sheets.sheet_order.size];
@@ -41,6 +43,9 @@ namespace ThiefMD.Widgets {
             for(int i = 0; i < sheets.hidden_folders.size; i++) {
                 hidden_folders[i] = sheets.hidden_folders.get (i);
             }
+
+            notes = string_or_empty_string (sheets.notes);
+            icon = string_or_empty_string (sheets.icon);
         }
     }
 
@@ -48,6 +53,8 @@ namespace ThiefMD.Widgets {
         public Gee.List<string> sheet_order;
         public Gee.List<string> folder_order;
         public Gee.LinkedList<string> hidden_folders;
+        public string notes { get; set; }
+        public string icon { get; set; }
 
         public ThiefSheets () {
             sheet_order = new Gee.ArrayList<string> ();
@@ -64,7 +71,7 @@ namespace ThiefMD.Widgets {
             ThiefSheetsSerializable thief_sheets = Json.gobject_deserialize (typeof (ThiefSheetsSerializable), data) as ThiefSheetsSerializable;
             if (thief_sheets != null) {
                 foreach (var s in thief_sheets.sheet_order) {
-                    t_sheets.add_sheet(s);
+                    t_sheets.add_sheet (s);
                 }
 
                 foreach (var s in thief_sheets.folder_order) {
@@ -74,6 +81,9 @@ namespace ThiefMD.Widgets {
                 foreach (var s in thief_sheets.hidden_folders) {
                     t_sheets.add_hidden_folder (s);
                 }
+
+                t_sheets.notes = string_or_empty_string (thief_sheets.notes);
+                t_sheets.icon = string_or_empty_string (thief_sheets.icon);
             }
 
             return t_sheets;
@@ -333,7 +343,7 @@ namespace ThiefMD.Widgets {
 
             if (metadata.sheet_order.size == 0) {
                 show_empty();
-            } else if (settings.save_library_order) {
+            } else if (settings.save_library_order || metadata.notes != "") {
                 save_library_order ();
             }
         }
@@ -509,6 +519,10 @@ namespace ThiefMD.Widgets {
             _view.show ();
         }
 
+        public void save_notes () {
+            save_metadata_file (metadata.notes != "");
+        }
+
         private void save_library_order () {
             save_metadata_file ();
             //  File metadata_file = File.new_for_path (Path.build_filename (_sheets_dir, ".thiefsheets"));
@@ -529,11 +543,11 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             File metadata_file = File.new_for_path (Path.build_filename (_sheets_dir, ".thiefsheets"));
 
-            if (!settings.save_library_order && metadata.hidden_folders.size == 0) {
+            if (!settings.save_library_order && metadata.hidden_folders.size == 0 && metadata.notes == "") {
                 return;
             }
 
-            if (!metadata_file.query_exists () && metadata.hidden_folders.size == 0 && !create) {
+            if (!metadata_file.query_exists () && metadata.hidden_folders.size == 0 && !create && metadata.notes == "") {
                 return;
             }
 

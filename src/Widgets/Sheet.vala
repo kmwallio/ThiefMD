@@ -37,6 +37,8 @@ namespace ThiefMD.Widgets {
         private int _word_count;
         private string _sheet_title;
         private string _sheet_date;
+        private string _notes_path;
+        public ThiefNotes metadata;
 
         // Change style depending on sheet available in the editor
         public bool active_sheet {
@@ -116,6 +118,23 @@ namespace ThiefMD.Widgets {
             // Load minimark if file has content
             redraw ();
             show_all ();
+
+            // Load file ordering information
+            metadata = null;
+            _notes_path = sheet_path + ".notes";
+            File metadata_file = File.new_for_path (_notes_path);
+            if (metadata_file.query_exists ()) {
+                try {
+                    metadata = ThiefNotes.new_for_file (metadata_file.get_path ());
+                } catch (Error e) {
+                    warning ("Could not load metafile: %s", e.message);
+                }
+            }
+
+            if (metadata == null) {
+                metadata = new ThiefNotes ();
+            }
+
             debug ("Creating %s\n", sheet_path);
         }
 
@@ -145,6 +164,30 @@ namespace ThiefMD.Widgets {
             _label.set_label (_label_buffer);
 
             settings.writing_changed ();
+        }
+
+        public void save_notes () {
+            File metadata_file = File.new_for_path (_notes_path);
+            if (metadata.notes == "" && metadata.tags.is_empty) {
+                if (metadata_file.query_exists ()) {
+                    metadata_file.trash ();
+                }
+            } else {
+                try {
+                    ThiefNotesSerializable cereal = new ThiefNotesSerializable (metadata);
+                    Json.Node root = Json.gobject_serialize (cereal);
+                    Json.Generator generate = new Json.Generator ();
+                    generate.set_root (root);
+                    generate.set_pretty (true);
+                    if (metadata_file.query_exists ()) {
+                        metadata_file.delete ();
+                    }
+                    debug ("Saving to: %s", metadata_file.get_path ());
+                    FileManager.save_file (metadata_file, generate.to_data (null).data);
+                } catch (Error e) {
+                    warning ("Could not serialize notes data: %s", e.message);
+                }
+            }
         }
 
         public int get_word_count () {
@@ -420,6 +463,60 @@ namespace ThiefMD.Widgets {
             return (a._parent.get_sheets_path () == b._parent.get_sheets_path ()) &&
                 (a._sheet_path == b._sheet_path) &&
                 (a._label_buffer == b._label_buffer);
+        }
+    }
+
+    public class ThiefNotesSerializable : Object {
+        public string[] tags { get; set; }
+        public string notes { get; set; }
+
+        public ThiefNotesSerializable (ThiefNotes thief_notes) {
+            tags = new string[thief_notes.tags.size];
+            for(int i = 0; i < thief_notes.tags.size; i++) {
+                tags[i] = thief_notes.tags.get (i);
+            }
+
+            notes = string_or_empty_string (thief_notes.notes);
+        }
+    }
+
+    public class ThiefNotes : Object {
+        public Gee.List<string> tags;
+        public string notes { get; set; }
+
+        public ThiefNotes () {
+            tags = new Gee.ArrayList<string> ();
+        }
+
+        public static ThiefNotes new_for_file (string file) throws Error {
+            ThiefNotes t_notes = new ThiefNotes ();
+
+            Json.Parser parser = new Json.Parser ();
+            parser.load_from_file (file);
+            Json.Node data = parser.get_root ();
+            ThiefNotesSerializable thief_notes = Json.gobject_deserialize (typeof (ThiefNotesSerializable), data) as ThiefNotesSerializable;
+            if (thief_notes != null) {
+                foreach (var s in thief_notes.tags) {
+                    t_notes.add_tag (s);
+                }
+
+                t_notes.notes = string_or_empty_string (thief_notes.notes);
+            }
+
+            return t_notes;
+        }
+
+        public void add_tag (string tag_name) {
+            if (!tags.contains (tag_name)) {
+                tags.add (tag_name);
+            }
+        }
+
+        public void remove_tag (string tag_name) {
+            int index = tags.index_of (tag_name);
+            if (index != -1) {
+                tags.remove_at (index);
+            }
         }
     }
 }

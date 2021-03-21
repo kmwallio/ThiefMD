@@ -96,6 +96,7 @@ executable(
     'src/Widgets/Sheet.vala',
     'src/Widgets/Editor.vala',
     'src/Widgets/Library.vala',
+    'src/Widgets/Notes.vala',
     'src/Widgets/NewFolder.vala',
     'src/Widgets/NewSheet.vala',
     'src/Widgets/Preferences.vala',

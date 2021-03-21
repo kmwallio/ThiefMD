@@ -41,6 +41,10 @@ namespace ThiefMD {
         return false;
     }
 
+    public string string_or_empty_string (string? str) {
+        return (str != null) ? str : "";
+    }
+
     public string make_title (string text) {
         string current_title = text.replace ("_", " ");
         current_title = current_title.replace ("-", " ");

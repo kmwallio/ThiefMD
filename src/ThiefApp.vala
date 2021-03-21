@@ -35,6 +35,9 @@ namespace ThiefMD {
         public Gee.ConcurrentList<Connections.ConnectionBase> connections;
         public bool ready = false;
         public bool am_mobile = false;
+        public Gtk.Revealer notes;
+        public Gtk.Box editor_notes_pane;
+        public Notes notes_widget;
 
         private string start_dir;
         private Gtk.Box desktop_box;
@@ -110,6 +113,7 @@ namespace ThiefMD {
                 mobile_box.remove (stats_bar);
                 mobile_stack.remove (library_pane);
                 mobile_stack.remove (mobile_search);
+                mobile_stack.remove (notes_widget);
                 mobile_stack.remove (SheetManager.get_view ());
                 remove (mobile_box);
                 mobile_search = null;
@@ -122,10 +126,14 @@ namespace ThiefMD {
             sheets_pane.add1 (library_pane);
             sheets_pane.add2 (SheetManager.get_view ());
             sheets_pane.set_position (settings.view_library_width + settings.view_sheets_width);
+            editor_notes_pane.add (sheets_pane);
+            editor_notes_pane.add (notes);
+            notes.add (notes_widget);
+            notes.set_reveal_child (false);
 
             desktop_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             desktop_box.add (toolbar);
-            desktop_box.add (sheets_pane);
+            desktop_box.add (editor_notes_pane);
             desktop_box.add (stats_bar);
 
             hide_titlebar_when_maximized = true;
@@ -150,9 +158,12 @@ namespace ThiefMD {
                 debug ("Deconstructing desktop UI");
                 sheets_pane.remove (library_pane);
                 sheets_pane.remove (SheetManager.get_view ());
+                editor_notes_pane.remove (notes);
+                editor_notes_pane.remove (sheets_pane);
+                notes.remove (notes_widget);
 
                 desktop_box.remove (toolbar);
-                desktop_box.remove (sheets_pane);
+                desktop_box.remove (editor_notes_pane);
                 desktop_box.remove (stats_bar);
 
                 remove (desktop_box);
@@ -168,6 +179,7 @@ namespace ThiefMD {
             mobile_stack.add_titled (library_pane, _("Library"), _("Library"));
             mobile_stack.add_titled (SheetManager.get_view (), _("Editor"), _("Editor"));
             mobile_stack.add_titled (mobile_search, _("Search"), _("Search"));
+            mobile_stack.add_titled (notes_widget, _("Notes"), _("Notes"));
 
             mobile_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             mobile_box.add (toolbar);
@@ -241,6 +253,13 @@ namespace ThiefMD {
             library_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             library_view = new Gtk.ScrolledWindow (null, null);
             library_view.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+            editor_notes_pane = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            notes = new Gtk.Revealer ();
+            notes.set_transition_type (Gtk.RevealerTransitionType.SLIDE_LEFT);
+            notes.set_reveal_child (false);
+            notes_widget = new Notes ();
+            var notes_context = notes_widget.get_style_context ();
+            notes_context.add_class ("thief-notes");
 
             library_view.add (library);
             //  library_leaf.add (library_view);
@@ -314,6 +333,7 @@ namespace ThiefMD {
 
             destroy.connect (() => {
                 SheetManager.save_active ();
+                notes_widget.save_notes ();
                 foreach (var c in _instance.connections) {
                     c.connection_close ();
                 }
