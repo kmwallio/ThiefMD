@@ -75,7 +75,7 @@ namespace ThiefMD {
             warning ("Could not extract text: %s", e.message);
         }
 
-        if (found > 150) {
+        if (found.length > 150) {
             found = "";
         }
 
