@@ -42,27 +42,29 @@ namespace ThiefMD {
         return false;
     }
 
-    public Gdk.Pixbuf? get_pixbuf_for_folder (string folder) {
+    public Gtk.ImageMenuItem set_icon_option (string name, string icon, Sheets project) {
+        Gtk.ImageMenuItem set_icon = new Gtk.ImageMenuItem.with_label (name);
+        set_icon.set_image (new Gtk.Image.from_pixbuf (get_pixbuf_for_value (icon)));
+        set_icon.always_show_image = true;
+        set_icon.activate.connect (() => {
+            project.metadata.icon = icon;
+        });
+
+        return set_icon;
+    }
+
+    public Gdk.Pixbuf? get_pixbuf_for_value (string value) {
         Gdk.Pixbuf? ret_val = null;
         try {
-            File metadata_file = File.new_for_path (Path.build_filename (folder, ".thiefsheets"));
-            ThiefSheets metadata = new ThiefSheets ();
-            if (metadata_file.query_exists ()) {
-                try {
-                    metadata = ThiefSheets.new_for_file (metadata_file.get_path ());
-                } catch (Error e) {
-                    warning ("Could not load metafile: %s", e.message);
-                }
-            }
-            if (metadata.icon != "") {
-                File icon_file = File.new_for_path (metadata.icon);
+            if (value != "") {
+                File icon_file = File.new_for_path (value);
                 if (icon_file.query_exists ()) {
-                    ret_val = new Gdk.Pixbuf.from_file (metadata.icon);
+                    ret_val = new Gdk.Pixbuf.from_file (value);
                 } else {
-                    if (metadata.icon.has_prefix ("/")) {
-                        ret_val = new Gdk.Pixbuf.from_resource (metadata.icon);
+                    if (value.has_prefix ("/")) {
+                        ret_val = new Gdk.Pixbuf.from_resource (value);
                     } else {
-                        ret_val =  Gtk.IconTheme.get_default ().load_icon (metadata.icon, Gtk.IconSize.MENU, 0);
+                        ret_val =  Gtk.IconTheme.get_default ().load_icon (value, Gtk.IconSize.MENU, 0);
                     }
                 }
             }
@@ -83,6 +85,21 @@ namespace ThiefMD {
             }
         }
 
+        return ret_val;
+    }
+
+    public Gdk.Pixbuf? get_pixbuf_for_folder (string folder) {
+        Gdk.Pixbuf? ret_val = null;
+        File metadata_file = File.new_for_path (Path.build_filename (folder, ".thiefsheets"));
+        ThiefSheets metadata = new ThiefSheets ();
+        if (metadata_file.query_exists ()) {
+            try {
+                metadata = ThiefSheets.new_for_file (metadata_file.get_path ());
+            } catch (Error e) {
+                warning ("Could not load metafile: %s", e.message);
+            }
+        }
+        ret_val = get_pixbuf_for_value (metadata.icon);
         return ret_val;
     }
 

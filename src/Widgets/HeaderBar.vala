@@ -150,7 +150,7 @@ namespace ThiefMD.Widgets {
                         ThiefApp.get_instance ().notes_widget.show ();
                     }
                     ThiefApp.get_instance ().notes.set_reveal_child (!ThiefApp.get_instance ().notes.child_revealed);
-                    Timeout.add (ThiefApp.get_instance ().notes.get_transition_duration () + 5, () => {
+                    Timeout.add (ThiefApp.get_instance ().notes.get_transition_duration () + 15, () => {
                         SheetManager.update_margins ();
                         return false;
                     });
