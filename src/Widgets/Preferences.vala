@@ -598,6 +598,22 @@ namespace ThiefMD.Widgets {
             ui_writing_statistics.add (ui_writing_statistics_label);
             editor_options.add (ui_writing_statistics);
 
+            var ui_dont_show_tips = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+            var ui_dont_show_tips_switch = new Switch ();
+            ui_dont_show_tips_switch.set_active (settings.dont_show_tips);
+            ui_dont_show_tips_switch.notify["active"].connect (() => {
+                settings.dont_show_tips = ui_dont_show_tips_switch.get_active ();
+            });
+            ui_dont_show_tips_switch.margin = 12;
+            ui_dont_show_tips_switch.tooltip_text = _("Disable application tips");
+            var ui_dont_show_tips_label = new Label(_("Start with new empty sheet on launch"));
+            ui_dont_show_tips_label.xalign = 0;
+            ui_dont_show_tips_label.margin = 12;
+            ui_dont_show_tips_label.set_line_wrap (true);
+            ui_dont_show_tips.add (ui_dont_show_tips_switch);
+            ui_dont_show_tips.add (ui_dont_show_tips_label);
+            editor_options.add (ui_dont_show_tips);
+
             //
             // More UI-ish options
             //

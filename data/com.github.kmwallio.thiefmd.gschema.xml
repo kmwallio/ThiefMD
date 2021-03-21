@@ -192,5 +192,10 @@
             <summary>Experimental Mode</summary>
             <description>Enable new features that may impact performance or reliability</description>
         </key>
+        <key name="dont-show-tips" type="b">
+            <default>false</default>
+            <summary>New File on Launch</summary>
+            <description>Open application with new empty file instead of showing tips or last file</description>
+        </key>
     </schema>
 </schemalist>

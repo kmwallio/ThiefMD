@@ -332,9 +332,11 @@ namespace ThiefMD.Widgets {
                         _sheets.set (file_name, sheet);
                         _view.add (sheet);
 
-                        if (settings.last_file == path) {
-                            sheet.active_sheet = true;
-                            SheetManager.load_sheet (sheet);
+                        if (!settings.dont_show_tips){
+                            if (settings.last_file == path) {
+                                sheet.active_sheet = true;
+                                SheetManager.load_sheet (sheet);
+                            }
                         }
                     }
                 }

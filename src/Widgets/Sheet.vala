@@ -293,9 +293,7 @@ namespace ThiefMD.Widgets {
                 menu_delete_sheet.activate.connect (() => {
                     debug ("Got remove for sheet %s", _sheet_path);
                     _parent.remove_sheet (this);
-                    if (active_sheet) {
-                        SheetManager.close_active_file (_sheet_path);
-                    }
+                    SheetManager.close_active_file (_sheet_path);
                     FileManager.move_to_trash (_sheet_path);
                 });
                 menu.add (menu_delete_sheet);

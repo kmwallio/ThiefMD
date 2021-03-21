@@ -231,11 +231,14 @@ namespace ThiefMD.Controllers.SheetManager {
         if (show_welcome) {
             _welcome_screen.am_active = false;
             _view.remove (_welcome_screen);
+            _welcome_screen.clean ();
+            _welcome_screen = null;
         }
 
         // Load the view
         if (_active_editors.size == 0) {
             show_welcome = true;
+            _welcome_screen = new Widgets.Editor ("");
             _welcome_screen.am_active = true;
             _view.add (_welcome_screen);
         } else {
@@ -547,6 +550,14 @@ namespace ThiefMD.Controllers.SheetManager {
             }
         }
 
+        if (_welcome_screen.file_path == file_path) {
+            _view.remove (_welcome_screen);
+            _welcome_screen.clean ();
+            _welcome_screen = null;
+            _welcome_screen = new Widgets.Editor ("");
+            clear_view ();
+        }
+
         if (remove_this != null) {
             remove_this.editor.am_active = false;
             remove_this.sheet.active_sheet = false;
@@ -563,10 +574,20 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     public void redraw () {
+        var settings = AppSettings.get_default ();
         foreach (var editor in _active_editors) {
             editor.editor.show ();
             editor.sheet.redraw ();
             editor.editor.move_margins ();
+        }
+
+        if (settings.dont_show_tips) {
+            if (_welcome_screen.am_active && _welcome_screen.file_path != "") {
+                Sheet? should_refresh = ThiefApp.get_instance ().library.find_sheet_for_path (_welcome_screen.file_path);
+                if (should_refresh != null) {
+                    should_refresh.redraw ();
+                }
+            }
         }
     }
 

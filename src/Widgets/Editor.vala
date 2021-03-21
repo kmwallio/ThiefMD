@@ -38,6 +38,11 @@ namespace ThiefMD.Widgets {
         private bool no_change_prompt = false; // Trying to prevent too much file changed prompts?
         private TimedMutex disk_change_prompted;
         private TimedMutex dynamic_margin_update;
+        public string file_path {
+            get {
+                return opened_filename;
+            }
+        }
 
         //
         // UI Items
@@ -103,8 +108,12 @@ namespace ThiefMD.Widgets {
             dynamic_margin_update = new TimedMutex (250);
 
             if (!open_file (file_path)) {
-                set_text (Constants.FIRST_USE.printf (ThiefProperties.THIEF_TIPS.get (Random.int_range(0, ThiefProperties.THIEF_TIPS.size))), true);
-                editable = false;
+                settings.validate_library ();
+                string[] library_check = settings.library ();
+                if (!settings.dont_show_tips || library_check.length == 0) {
+                    set_text (Constants.FIRST_USE.printf (ThiefProperties.THIEF_TIPS.get (Random.int_range(0, ThiefProperties.THIEF_TIPS.size))), true);
+                    editable = false;
+                }
             } else {
                 modified_time = new DateTime.now_utc ();
             }
@@ -341,6 +350,10 @@ namespace ThiefMD.Widgets {
                 return false;
             }
 
+            if (opened_filename == "") {
+                return false;
+            }
+
             string disk_text;
             DateTime disk_time;
             bool have_match = disk_matches_buffer (out disk_text, out disk_time);
@@ -552,6 +565,9 @@ namespace ThiefMD.Widgets {
 
         private int cursor_location;
         public bool am_active {
+            get {
+                return active;
+            }
             set {
                 var settings = AppSettings.get_default ();
                 if (value){
@@ -788,12 +804,32 @@ namespace ThiefMD.Widgets {
         }
 
         public bool save () throws Error {
+            var settings = AppSettings.get_default ();
             if (opened_filename != "" && file.query_exists () && !FileUtils.test (file.get_path (), FileTest.IS_DIR)) {
                 file_mutex.lock ();
                 FileManager.save_file (file, get_buffer_text ().data);
                 modified_time = new DateTime.now_utc ();
                 file_mutex.unlock ();
                 return true;
+            } else if (opened_filename == "" && get_buffer_text () != "" && settings.dont_show_tips && editable) {
+                Sheets? target = SheetManager.get_sheets ();
+                if (target != null) {
+                    file_mutex.lock ();
+                    DateTime now = new DateTime.now_local ();
+                    string buff_text = get_buffer_text ();
+                    string first_words = get_some_words (buff_text);
+                    string new_text = (first_words != "") ? now.format ("%Y-%m-%d") : now.format ("%Y-%m-%d_%H-%M-%S");
+                    string new_file = new_text + first_words + ".md";
+                    string new_path = Path.build_filename (target.get_sheets_path (), new_file);
+                    file = File.new_for_path (new_path);
+                    FileManager.save_file (file, buff_text.data);
+                    opened_filename = new_path;
+                    modified_time = new DateTime.now_utc ();
+                    file_mutex.unlock ();
+                    return true;
+                } else {
+                    return false;
+                }
             }
             return false;
         }
@@ -1813,9 +1849,9 @@ namespace ThiefMD.Widgets {
         }
 
         public void clean () {
+            editable = false;
             preview_markdown = "";
             buffer.text = "";
-            editable = false;
             spell.detach ();
             spell.dispose ();
             buffer.dispose ();

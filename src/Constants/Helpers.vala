@@ -42,6 +42,46 @@ namespace ThiefMD {
         return false;
     }
 
+    public string get_some_words (string buffer) {
+        string found = "";
+        try {
+            Regex check_words = new Regex ("(\\s*)([^\\.\\?!:\"\\s]+)([\\.\\?!:\"\\s]*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex is_word = new Regex ("\\w+", RegexCompileFlags.CASELESS, 0);
+            Regex file_name_chars_only = new Regex ("[^A-Za-z0-9]", RegexCompileFlags.CASELESS, 0);
+            MatchInfo match_info;
+            if (check_words.match_full (buffer, buffer.length, 0, 0, out match_info)) {
+                if (match_info == null) {
+                    return found;
+                }
+
+                string last_match = "";
+                int got_words = 0;
+                do {
+                    if (match_info.get_match_count () >= 2) {
+                        string word = match_info.fetch (2);
+                        word = (word != null) ? file_name_chars_only.replace (word, word.length, 0, "") : word;
+
+                        if (word != null && word != "" && word.length < 10 && is_word.match (word, RegexMatchFlags.NOTEMPTY)) {
+                            found += "-" + word.down ();
+                            got_words++;
+                            if (got_words >= 4) {
+                                break;
+                            }
+                        }
+                    }
+                } while (match_info.next ());
+            }
+        } catch (Error e) {
+            warning ("Could not extract text: %s", e.message);
+        }
+
+        if (found > 150) {
+            found = "";
+        }
+
+        return found;
+    }
+
     public Gtk.ImageMenuItem set_icon_option (string name, string icon, Sheets project) {
         Gtk.ImageMenuItem set_icon = new Gtk.ImageMenuItem.with_label (name);
         set_icon.set_image (new Gtk.Image.from_pixbuf (get_pixbuf_for_value (icon)));
