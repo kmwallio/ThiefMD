@@ -592,6 +592,9 @@ namespace ThiefMD.Widgets {
                         Gtk.ImageMenuItem no_icon = set_icon_option (_("None"), "", _selected._sheets);
                         icon_menu.add (no_icon);
 
+                        Gtk.ImageMenuItem folder_icon = set_icon_option (_("Folder"), "folder", _selected._sheets);
+                        icon_menu.add (folder_icon);
+
                         Gtk.ImageMenuItem reader_icon = set_icon_option (_("Reader"), "ephy-reader-mode-symbolic", _selected._sheets);
                         icon_menu.add (reader_icon);
 
