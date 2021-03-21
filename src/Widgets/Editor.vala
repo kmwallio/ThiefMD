@@ -1053,7 +1053,8 @@ namespace ThiefMD.Widgets {
             int w, h;
             ThiefApp.get_instance ().get_size (out w, out h);
 
-            w = w - ThiefApp.get_instance ().pane_position;
+            int note_w = (ThiefApp.get_instance ().notes.child_revealed) ? Notes.get_notes_width () : 0;
+            w = w - ThiefApp.get_instance ().pane_position - note_w;
             last_height = h;
 
             if (w == last_width) {
@@ -1074,7 +1075,8 @@ namespace ThiefMD.Widgets {
             int w, h, m, p;
             ThiefApp.get_instance ().get_size (out w, out h);
 
-            w = w - ThiefApp.get_instance ().pane_position;
+            int note_w = (ThiefApp.get_instance ().notes.child_revealed) ? Notes.get_notes_width () : 0;
+            w = w - ThiefApp.get_instance ().pane_position - note_w;
             last_height = h;
             last_width = w;
 

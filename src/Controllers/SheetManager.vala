@@ -157,6 +157,12 @@ namespace ThiefMD.Controllers.SheetManager {
         return _("No file opened");
     }
 
+    public void update_margins () {
+        foreach (var editor in _active_editors) {
+            editor.editor.move_margins ();
+        }
+    }
+
     public void get_word_count_stats (out int word_count, out int reading_hours, out int reading_minutes, out int reading_seconds) {
         word_count = 0;
         foreach (var editor in _active_editors) {

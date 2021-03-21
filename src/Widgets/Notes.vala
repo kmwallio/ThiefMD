@@ -39,6 +39,12 @@ namespace ThiefMD.Widgets {
             add (notes_grid);
         }
 
+        public static int get_notes_width () {
+            var settings = AppSettings.get_default ();
+
+            return settings.view_library_width + settings.view_sheets_width - 30;
+        }
+
         private Gtk.Widget build_notes_grid () {
             var settings = AppSettings.get_default ();
 
@@ -54,7 +60,7 @@ namespace ThiefMD.Widgets {
             file_notes_label.use_markup = true;
             file_notes_buffer = new Gtk.TextBuffer (null);
             var file_notes_view = new Gtk.TextView.with_buffer (file_notes_buffer);
-            file_notes_view.width_request = settings.view_library_width + settings.view_sheets_width;
+            file_notes_view.width_request = settings.view_library_width + settings.view_sheets_width - 30;
             file_notes_view.height_request = (settings.view_library_width + settings.view_sheets_width) / 2;
             file_notes_view.wrap_mode = Gtk.WrapMode.WORD_CHAR;
             var project_notes_label = new Gtk.Label ("<b>" + _("Project Notes") + "</b>");
@@ -62,7 +68,7 @@ namespace ThiefMD.Widgets {
             project_notes_label.use_markup = true;
             project_notes_buffer = new Gtk.TextBuffer (null);
             var project_notes_view = new Gtk.TextView.with_buffer (project_notes_buffer);
-            project_notes_view.width_request = settings.view_library_width + settings.view_sheets_width;
+            project_notes_view.width_request = settings.view_library_width + settings.view_sheets_width - 30;
             project_notes_view.height_request = (settings.view_library_width + settings.view_sheets_width) / 2;
             project_notes_view.wrap_mode = Gtk.WrapMode.WORD_CHAR;
 
@@ -79,6 +85,8 @@ namespace ThiefMD.Widgets {
             settings.sheet_changed.connect (load_notes);
             load_notes ();
             s_win.add (notes_grid);
+            s_win.width_request = settings.view_library_width + settings.view_sheets_width;
+            s_win.vexpand = true;
 
             return s_win;
         }
@@ -99,7 +107,7 @@ namespace ThiefMD.Widgets {
             Sheets? next_project = SheetManager.get_sheets ();
             Sheet? next_sheet = SheetManager.get_sheet ();
             save_notes ();
-            if (next_project != current_project || project_notes_buffer.text != "") {
+            if (next_project != current_project) {
                 if (next_project == null) {
                     project_notes_buffer.text = "";
                 } else {
@@ -112,11 +120,11 @@ namespace ThiefMD.Widgets {
                 current_project = next_project;
             }
 
-            if (next_sheet != current_sheet || file_notes_buffer.text != "") {
+            if (next_sheet != current_sheet) {
                 if (next_sheet == null) {
                     file_notes_buffer.text = "";
                 } else {
-                    project_notes_buffer.text = string_or_empty_string(next_sheet.metadata.notes);
+                    file_notes_buffer.text = string_or_empty_string(next_sheet.metadata.notes);
                 }
                 current_sheet = next_sheet;
             }

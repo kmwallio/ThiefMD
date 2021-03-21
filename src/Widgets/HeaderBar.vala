@@ -150,6 +150,10 @@ namespace ThiefMD.Widgets {
                         ThiefApp.get_instance ().notes_widget.show ();
                     }
                     ThiefApp.get_instance ().notes.set_reveal_child (!ThiefApp.get_instance ().notes.child_revealed);
+                    Timeout.add (ThiefApp.get_instance ().notes.get_transition_duration () + 5, () => {
+                        SheetManager.update_margins ();
+                        return false;
+                    });
                 } else {
                     if (ThiefApp.get_instance ().mobile_stack.visible_child_name != _("Notes")) {
                         ThiefApp.get_instance ().mobile_stack.set_visible_child_name (_("Notes"));
