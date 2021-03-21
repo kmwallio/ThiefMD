@@ -60,6 +60,8 @@ namespace ThiefMD.Widgets {
             sheet_order = new Gee.ArrayList<string> ();
             folder_order = new Gee.ArrayList<string> ();
             hidden_folders = new Gee.LinkedList<string> ();
+            notes = "";
+            icon = "";
         }
 
         public static ThiefSheets new_for_file (string file) throws Error {
