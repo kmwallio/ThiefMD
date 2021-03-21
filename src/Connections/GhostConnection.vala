@@ -103,7 +103,7 @@ namespace ThiefMD.Connections {
             grid.show_all ();
 
             var dialog = new Gtk.Dialog.with_buttons (
-                            "New ghost Connection",
+                            _("New ghost Connection"),
                             (parent != null) ? parent : ThiefApp.get_instance (),
                             Gtk.DialogFlags.MODAL,
                             _("_Add Account"),

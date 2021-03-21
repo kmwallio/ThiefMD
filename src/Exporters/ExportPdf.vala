@@ -43,8 +43,8 @@ namespace ThiefMD.Exporters {
 
             paper_size = new Gtk.ComboBoxText ();
             paper_size.hexpand = true;
-            for (int i = 0; i < ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.length; i++) {
-                paper_size.append_text (ThiefProperties.PAPER_SIZES_FRIENDLY_NAME[i]);
+            for (int i = 0; i < ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.size; i++) {
+                paper_size.append_text (ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.get (i));
 
                 if (settings.export_paper_size == ThiefProperties.PAPER_SIZES_GTK_NAME[i]) {
                     paper_size.set_active (i);

@@ -103,7 +103,7 @@ namespace ThiefMD.Widgets {
             dynamic_margin_update = new TimedMutex (250);
 
             if (!open_file (file_path)) {
-                set_text (Constants.FIRST_USE.printf (ThiefProperties.THIEF_TIPS[Random.int_range(0, ThiefProperties.THIEF_TIPS.length)]), true);
+                set_text (Constants.FIRST_USE.printf (ThiefProperties.THIEF_TIPS.get (Random.int_range(0, ThiefProperties.THIEF_TIPS.size))), true);
                 editable = false;
             } else {
                 modified_time = new DateTime.now_utc ();
