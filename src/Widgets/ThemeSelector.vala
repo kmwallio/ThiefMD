@@ -319,7 +319,7 @@ namespace ThiefMD.Widgets {
             app_box.attach (preview_items, 0, 1, 1, 3);
             app_box.hexpand = true;
 
-            var get_themes = new Gtk.Label (_("Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n<small>Stored in <a href='file://" + UserData.style_path + "'>" + UserData.style_path + "</a>.</small>"));
+            var get_themes = new Gtk.Label (_("Download") + "<a href='https://themes.thiefmd.com/themes/'>" + _("more themes") + "</a>.\n<small>" + _("Stored in") + "<a href='file://" + UserData.style_path + "'>" + UserData.style_path + "</a>.</small>");
             get_themes.use_markup = true;
             get_themes.xalign = 0;
 
