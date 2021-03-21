@@ -19,6 +19,7 @@
 
 using ThiefMD.Controllers;
 using ThiefMD.Connections;
+using ThiefMD.Widgets;
 
 namespace ThiefMD {
     errordomain ThiefError {
@@ -39,6 +40,50 @@ namespace ThiefMD {
         }
 
         return false;
+    }
+
+    public Gdk.Pixbuf? get_pixbuf_for_folder (string folder) {
+        Gdk.Pixbuf? ret_val = null;
+        try {
+            File metadata_file = File.new_for_path (Path.build_filename (folder, ".thiefsheets"));
+            ThiefSheets metadata = new ThiefSheets ();
+            if (metadata_file.query_exists ()) {
+                try {
+                    metadata = ThiefSheets.new_for_file (metadata_file.get_path ());
+                } catch (Error e) {
+                    warning ("Could not load metafile: %s", e.message);
+                }
+            }
+            if (metadata.icon != "") {
+                File icon_file = File.new_for_path (metadata.icon);
+                if (icon_file.query_exists ()) {
+                    ret_val = new Gdk.Pixbuf.from_file (metadata.icon);
+                } else {
+                    if (metadata.icon.has_prefix ("/")) {
+                        ret_val = new Gdk.Pixbuf.from_resource (metadata.icon);
+                    } else {
+                        ret_val =  Gtk.IconTheme.get_default ().load_icon (metadata.icon, Gtk.IconSize.MENU, 0);
+                    }
+                }
+            }
+
+            if (ret_val == null) {
+                return new Gdk.Pixbuf.from_resource ("/com/github/kmwallio/thiefmd/icons/empty.svg");
+            } else if (ret_val.get_height () != 16) {
+                double percent = (16) / ((double) ret_val.get_height ());
+                int new_w = (int)(percent * ret_val.get_width ());
+                return ret_val.scale_simple (new_w, 16, Gdk.InterpType.NEAREST);
+            }
+        } catch (Error e) {
+            warning ("Could not set default icon: %s", e.message);
+            try {
+                return Gtk.IconTheme.get_default ().load_icon ("folder", Gtk.IconSize.MENU, 0);
+            } catch (Error e) {
+                warning ("Could not set backup folder icon: %s", e.message);
+            }
+        }
+
+        return ret_val;
     }
 
     public string string_or_empty_string (string? str) {

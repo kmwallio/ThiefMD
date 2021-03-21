@@ -225,7 +225,7 @@ namespace ThiefMD.Widgets {
                     _lib_store.append (out root, null);
                     debug (lib);
                     LibPair pair = new LibPair(lib, root);
-                    var icon = Gtk.IconTheme.get_default ().load_icon ("folder", Gtk.IconSize.MENU, 0);
+                    var icon = get_pixbuf_for_folder (lib);
                     _lib_store.set (root, 0, pair._title, 1, pair, 2, icon, -1);
                     _all_sheets.append (pair);
 
@@ -288,7 +288,7 @@ namespace ThiefMD.Widgets {
                             LibPair pair = new LibPair(path, child);
                             _all_sheets.append (pair);
                             // Append dir to list
-                            var icon = Gtk.IconTheme.get_default ().load_icon ("folder", Gtk.IconSize.MENU, 0);
+                            var icon = get_pixbuf_for_folder (path);
                             _lib_store.set (child, 0, pair._title, 1, pair, 2, icon, -1);
 
                             parse_dir (pair._sheets, path, child);
@@ -315,7 +315,7 @@ namespace ThiefMD.Widgets {
                             LibPair pair = new LibPair(path, child);
                             _all_sheets.append (pair);
                             // Append dir to list
-                            var icon = Gtk.IconTheme.get_default ().load_icon ("folder", Gtk.IconSize.MENU, 0);
+                            var icon = get_pixbuf_for_folder (path);
                             _lib_store.set (child, 0, pair._title, 1, pair, 2, icon, -1);
                             sheet_dir.metadata.add_folder (file_name);
 
