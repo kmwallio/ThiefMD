@@ -117,8 +117,8 @@ namespace ThiefMD.Widgets {
                         project_notes_buffer.text = "";
                     }
                 }
-                current_project = next_project;
             }
+            current_project = next_project;
 
             if (next_sheet != current_sheet) {
                 if (next_sheet == null) {
@@ -126,8 +126,8 @@ namespace ThiefMD.Widgets {
                 } else {
                     file_notes_buffer.text = string_or_empty_string(next_sheet.metadata.notes);
                 }
-                current_sheet = next_sheet;
             }
+            current_sheet = next_sheet;
         }
     }
 }
