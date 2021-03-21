@@ -63,10 +63,19 @@ namespace ThiefMD.Widgets {
 
         public Library () {
             debug ("Setting up library");
-            _lib_store = new TreeStore (2, typeof (string), typeof (LibPair));
+            _lib_store = new TreeStore (3, typeof (string), typeof (LibPair), typeof (Pixbuf));
             parse_library ();
             set_model (_lib_store);
-            insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
+            var library_item_display = new TreeViewColumn ();
+            var library_item_text = new CellRendererText ();
+            var library_item_icon = new CellRendererPixbuf ();
+            library_item_display.pack_start (library_item_icon, false);
+            library_item_display.pack_start (library_item_text, true);
+            library_item_display.add_attribute (library_item_text, "text", 0);
+            library_item_display.add_attribute (library_item_icon, "pixbuf", 2);
+            // insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
+            library_item_display.set_title (_("Library"));
+            append_column (library_item_display);
             get_selection ().changed.connect (on_selection);
             folder_popup = new NewFolder ();
             _droppable = new PreventDelayedDrop ();
@@ -216,7 +225,8 @@ namespace ThiefMD.Widgets {
                     _lib_store.append (out root, null);
                     debug (lib);
                     LibPair pair = new LibPair(lib, root);
-                    _lib_store.set (root, 0, pair._title, 1, pair, -1);
+                    var icon = Gtk.IconTheme.get_default ().load_icon ("folder", Gtk.IconSize.MENU, 0);
+                    _lib_store.set (root, 0, pair._title, 1, pair, 2, icon, -1);
                     _all_sheets.append (pair);
 
                     parse_dir(pair._sheets, lib, root);
@@ -278,7 +288,8 @@ namespace ThiefMD.Widgets {
                             LibPair pair = new LibPair(path, child);
                             _all_sheets.append (pair);
                             // Append dir to list
-                            _lib_store.set (child, 0, pair._title, 1, pair, -1);
+                            var icon = Gtk.IconTheme.get_default ().load_icon ("folder", Gtk.IconSize.MENU, 0);
+                            _lib_store.set (child, 0, pair._title, 1, pair, 2, icon, -1);
 
                             parse_dir (pair._sheets, path, child);
                         } else if (!file.query_exists ()) {
@@ -304,7 +315,8 @@ namespace ThiefMD.Widgets {
                             LibPair pair = new LibPair(path, child);
                             _all_sheets.append (pair);
                             // Append dir to list
-                            _lib_store.set (child, 0, pair._title, 1, pair, -1);
+                            var icon = Gtk.IconTheme.get_default ().load_icon ("folder", Gtk.IconSize.MENU, 0);
+                            _lib_store.set (child, 0, pair._title, 1, pair, 2, icon, -1);
                             sheet_dir.metadata.add_folder (file_name);
 
                             parse_dir (pair._sheets, path, child);
