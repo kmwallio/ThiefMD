@@ -37,7 +37,7 @@ namespace ThiefMD.Enrichments {
         private string checking_copy;
         private TimedMutex limit_updates;
 
-        private int last_cursor = -1;
+        private int last_cursor;
         private int copy_offset;
 
         public FountainEnrichment () {
@@ -51,6 +51,12 @@ namespace ThiefMD.Enrichments {
             }
             checking = Mutex ();
             limit_updates = new TimedMutex (250);
+            last_cursor = -1;
+        }
+
+        public void reset () {
+            last_cursor = -1;
+            recheck_all ();
         }
 
         public void recheck_all () {
@@ -94,8 +100,8 @@ namespace ThiefMD.Enrichments {
                     buffer.get_iter_at_offset (out old_start, last_cursor);
                     buffer.get_iter_at_offset (out old_end, last_cursor);
                     if (old_start.in_range (bound_start, bound_end)) {
-                        if (!start.in_range (start, end)) {
-                            get_chunk_of_text_around_cursor (ref old_start, ref old_end);
+                        get_chunk_of_text_around_cursor (ref old_start, ref old_end);
+                        if (!old_start.in_range (start, end) || !old_end.in_range (start, end)) {
                             run_between_start_and_end (old_start, old_end);
                         }
                     }
@@ -114,7 +120,6 @@ namespace ThiefMD.Enrichments {
             buffer.remove_tag (tag_parenthetical, start, end);
             buffer.remove_tag (tag_dialogue, start, end);
             checking_copy = buffer.get_text (start, end, true);
-            warning (checking_copy);
 
             regex_and_tag (scene_heading, tag_scene_heading);
             tag_characters_and_dialogue ();
@@ -257,7 +262,6 @@ namespace ThiefMD.Enrichments {
             tag_dialogue.left_margin_set = true;
             tag_dialogue.right_margin = (f_w * 8);
             tag_dialogue.right_margin_set = true;
-
             last_cursor = -1;
 
             return true;

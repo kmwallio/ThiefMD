@@ -485,15 +485,11 @@ namespace ThiefMD.Controllers.SheetManager {
 
     public void drain_and_save_active () {
         foreach (var editor in _active_editors) {
-            try {
-                _view.remove (editor.editor);
-                editor.sheet.active_sheet = false;
-                editor.editor.am_active = false;
-                editor.editor.save ();
-                editor.sheet.redraw ();
-            } catch (Error e) {
-                warning ("Could not save file %s: %s", editor.sheet.file_path (), e.message);
-            }
+            _view.remove (editor.editor);
+            editor.sheet.active_sheet = false;
+            editor.editor.am_active = false;
+            editor.editor.save ();
+            editor.sheet.redraw ();
         }
 
         _active_editors.drain (_editors);
@@ -629,7 +625,6 @@ namespace ThiefMD.Controllers.SheetManager {
         while (_editors.size > Constants.KEEP_X_SHEETS_IN_MEMORY) {
             SheetPair clean = _editors.poll ();
             clean.editor.am_active = false;
-            clean.sheet = null;
             if (_editor_pool.size < Constants.EDITOR_POOL_SIZE) {
                 Widgets.Editor new_editor = new Widgets.Editor ("");
                 new_editor.am_active = false;

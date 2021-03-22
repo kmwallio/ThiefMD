@@ -63,26 +63,12 @@ namespace ThiefMD.Widgets {
 
         private Gtk.TextTag focus_text;
         private Gtk.TextTag outoffocus_text;
-        private Gtk.TextTag[] heading_text;
-        private Gtk.TextTag code_block;
-        private Gtk.TextTag markdown_link;
-        private Gtk.TextTag markdown_url;
-
-        //
-        // Regexes
-        // 
-        private Regex is_list;
-        private Regex is_partial_list;
-        private Regex numerical_list;
-        private Regex is_url;
-        private Regex is_markdown_url;
-        private Regex is_heading;
-        private Regex is_codeblock;
 
         //
         // Optional Enrichments
         //
         private FountainEnrichment? fountain = null;
+        private MarkdownEnrichment? markdown = null;
 
         //
         // Maintaining state
@@ -91,23 +77,10 @@ namespace ThiefMD.Widgets {
         public bool is_modified { get; set; default = false; }
         private bool should_scroll { get; set; default = false; }
         private bool should_save { get; set; default = false; }
-        private bool markup_inserted_around_selection = false;
 
         public Editor (string file_path) {
             var settings = AppSettings.get_default ();
             settings.changed.connect (update_settings);
-
-            try {
-                is_heading = new Regex ("(#+\\s[^\\n\\r]+?)\\r?\\n", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF | RegexCompileFlags.CASELESS, 0);
-                is_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+(\\.|\\)))\\s)\\s*(.+)", RegexCompileFlags.CASELESS, 0);
-                is_partial_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+\\.))\\s+$", RegexCompileFlags.CASELESS, 0);
-                numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.CASELESS, 0);
-                is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss|file)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.CASELESS, 0);
-                is_codeblock = new Regex ("(```[a-zA-Z]*[\\n\\r]((.*?)[\\n\\R])*?```[\\n\\r])", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-                is_markdown_url = new Regex ("(?<text_group>\\[(?>[^\\[\\]]+|(?&text_group))+\\])(?:\\((?<url>\\S+?)(?:[ ]\"(?<title>(?:[^\"]|(?<=\\\\)\")*?)\")?\\))", RegexCompileFlags.CASELESS, 0);
-            } catch (Error e) {
-                warning ("Could not initialize regexes: %s", e.message);
-            }
 
             file_mutex = Mutex ();
             disk_change_prompted = new TimedMutex (10000);
@@ -178,6 +151,8 @@ namespace ThiefMD.Widgets {
             spell = new GtkSpell.Checker ();
             writegood = new WriteGood.Checker ();
             writegood.show_tooltip = true;
+            markdown = new MarkdownEnrichment ();
+            markdown.attach (this);
 
             focus_text = buffer.create_tag ("focus-text");
             outoffocus_text = buffer.create_tag ("outoffocus-text");
@@ -196,23 +171,6 @@ namespace ThiefMD.Widgets {
             outoffocus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
             outoffocus_text.foreground_set = true;
 
-            heading_text = new Gtk.TextTag[6];
-            for (int h = 0; h < 6; h++) {
-                heading_text[h] = buffer.create_tag ("heading%d-text".printf (h + 1));
-            }
-
-            code_block = buffer.create_tag ("code-block");
-            //  code_block.accumulative_margin = true;
-            //  code_block.left_margin = 5;
-            //  code_block.left_margin_set = true;
-            //  code_block.right_margin = 5;
-            //  code_block.right_margin_set = true;
-
-            markdown_link = buffer.create_tag ("markdown-link");
-            markdown_url = buffer.create_tag ("markdown-url");
-            markdown_url.invisible = true;
-            markdown_url.invisible_set = true;
-
             last_width = settings.window_width;
             last_height = settings.window_height;
             preview_mutex = new TimedMutex ();
@@ -224,127 +182,6 @@ namespace ThiefMD.Widgets {
 
                 return false;
             });
-        }
-
-        private bool on_keypress (Gdk.EventKey key) {
-            uint keycode = key.hardware_keycode;
-            bool skip_request = false;
-
-            if (is_list == null || is_partial_list == null || numerical_list == null) {
-                return false;
-            }
-
-            // Move outside of selection if we just inserted formatting and get a right -> key from the user
-            if (match_keycode (Gdk.Key.Right, keycode) && markup_inserted_around_selection && buffer.has_selection) {
-                skip_request = true;
-            }
-
-            markup_inserted_around_selection = false;
-
-            if (match_keycode (Gdk.Key.Return, keycode) || match_keycode (Gdk.Key.Tab, keycode) || skip_request) {
-                debug ("Got enter or tab key or skip request");
-                var cursor = buffer.get_insert ();
-                Gtk.TextIter start, end;
-                if (!skip_request) {
-                    buffer.get_iter_at_mark (out start, cursor);
-                    buffer.get_iter_at_mark (out end, cursor);
-                } else {
-                    buffer.get_selection_bounds (out start, out end);
-                }
-                unichar end_char = end.get_char ();
-
-                // Tab to next item in link, or outside of current markup
-                if ((skip_request || match_keycode (Gdk.Key.Tab, keycode)) && 
-                    (end_char == '*' ||
-                     end_char == ']' ||
-                     end_char == ')' ||
-                     end_char == '_' ||
-                     end_char == '~'))
-                {
-                    if (end_char == ']') {
-                        while (end_char == ']' || end_char == '(') {
-                            end.forward_char ();
-                            end_char = end.get_char ();
-                        }
-                    } else {
-                        while (end_char == '~' || end_char == '*' || end_char == '_' || end_char == ')') {
-                            end.forward_char ();
-                            end_char = end.get_char ();
-                        }
-                    }
-                    buffer.place_cursor (end);
-                    return true;
-
-                // List movements
-                } else if (!start.starts_line ()) {
-                    while (!start.starts_line ()) {
-                        start.backward_char ();
-                    }
-                    string line_text = buffer.get_text (start, end, true);
-                    debug ("Checking '%s'", line_text);
-                    MatchInfo match_info;
-                    try {
-                        if (is_list.match_full (line_text, line_text.length, 0, 0, out match_info)) {
-                            debug ("Is a list");
-                            if (match_info == null) {
-                                return false;
-                            }
-
-                            string list_item = match_info.fetch (1);
-                            if (match_keycode (Gdk.Key.Return, keycode)) {
-                                insert_at_cursor ("\n");
-                                if (numerical_list.match_full (list_item, list_item.length, 0, 0, out match_info)) {
-                                    string spaces = match_info.fetch (1);
-                                    string close_char = match_info.fetch (3);
-                                    int number = int.parse (match_info.fetch (2)) + 1;
-                                    insert_at_cursor (spaces);
-                                    insert_at_cursor (number.to_string ());
-                                    insert_at_cursor (close_char);
-                                } else {
-                                    insert_at_cursor (list_item);
-                                }
-                            } else {
-                                if ((key.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
-                                    int diff = end.get_offset () - start.get_offset ();
-                                    buffer.place_cursor (start);
-                                    insert_at_cursor ("    ");
-                                    buffer.get_iter_at_mark (out start, cursor);
-                                    start.forward_chars (diff);
-                                    buffer.place_cursor (start);
-                                } else {
-                                    return false;
-                                }
-                            }
-                            return true;
-                        } else if (is_partial_list.match_full (line_text, line_text.length, 0, 0, out match_info)) {
-                            if (match_keycode (Gdk.Key.Return, keycode)) {
-                                Gtk.TextIter doc_start, doc_end;
-                                buffer.get_bounds (out doc_start, out doc_end);
-                                while (!end.starts_line () && end.in_range(doc_start, doc_end)) {
-                                    end.forward_char ();
-                                }
-                                buffer.@delete (ref start, ref end);
-                            } else {
-                                if ((key.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
-                                    int diff = end.get_offset () - start.get_offset ();
-                                    buffer.place_cursor (start);
-                                    insert_at_cursor ("    ");
-                                    buffer.get_iter_at_mark (out start, cursor);
-                                    start.forward_chars (diff);
-                                    buffer.place_cursor (start);
-                                    return true;
-                                } else {
-                                    return false;
-                                }
-                            }
-                        }
-                    } catch (Error e) {
-                        warning ("Error parsing key presses: %s", e.message);
-                    }
-                }
-            }
-
-            return false;
         }
 
         public bool prompt_on_disk_modifications () {
@@ -431,10 +268,14 @@ namespace ThiefMD.Widgets {
             {
                 no_hiding = true;
             } else if (no_hiding) {
-                update_heading_margins (true);
+                if (markdown != null) {
+                    markdown.recheck_all ();
+                }
                 Timeout.add (300, () => {
                     no_hiding = false;
-                    update_heading_margins ();
+                    if (markdown != null) {
+                        markdown.recheck_all ();
+                    }
                     return false;
                 });
             }
@@ -477,9 +318,9 @@ namespace ThiefMD.Widgets {
             {
                 insert = "![](" + get_base_library_path(data) + ")\n";
             } else if (ext == "yml" || ext == "js" || ext == "hpp" || ext == "coffee" || ext == "sh" ||
-                        ext == "vala" || ext == "c" || ext == "vapi" || ext == "ts" || ext == "toml" ||
+                        ext == "vala" || ext == "c" || ext == "vapi" || ext == "ts" || ext == "toml" || ext == "ps1" ||
                         ext == "cpp" || ext == "rb" || ext == "css" || ext == "php" || ext == "scss" || ext == "less" ||
-                        ext == "pl" || ext == "py" || ext == "sass" || ext == "json" ||
+                        ext == "pl" || ext == "py" || ext == "sass" || ext == "json" || ext == "nim" || ext == "ps" ||
                         ext == "pm" || ext == "h" || ext == "log" || ext == "rs")
             {
                 if (file.query_exists () &&
@@ -493,7 +334,7 @@ namespace ThiefMD.Widgets {
                         insert += "\n```\n";
                     }
                 }
-            } else if (ext == "pdf" || ext == "docx" || ext == "pptx" || ext == "html") {
+            } else if (ext == "pdf" || ext == "docx" || ext == "pptx" || ext == "html" || ext == "odt") {
                 insert = "[" + data.substring (data.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "](" + get_base_library_path(data) + ")\n";
             } else if (ext == "csv") {
                 if (file.query_exists () &&
@@ -643,8 +484,6 @@ namespace ThiefMD.Widgets {
                         spellcheck_active = true;
                     }
 
-                    key_press_event.connect (on_keypress);
-
                     //
                     // Register for redrawing of window for handling margins and other
                     // redrawing
@@ -674,7 +513,6 @@ namespace ThiefMD.Widgets {
                         buffer.changed.disconnect (on_change_notification);
                         size_allocate.disconnect (dynamic_margins);
                         settings.changed.disconnect (update_settings);
-                        key_press_event.disconnect (on_keypress);
 
                         if (settings.writegood) {
                             writecheck_active = false;
@@ -736,77 +574,20 @@ namespace ThiefMD.Widgets {
             }
         }
 
-        private void insert_markup_around_cursor (string markup) {
-            if (!buffer.get_has_selection ()) {
-                Gtk.TextIter iter;
-                insert_at_cursor (markup + markup);
-                buffer.get_iter_at_offset (out iter, buffer.cursor_position - markup.length);
-                if (buffer.cursor_position - markup.length > 0) {
-                    buffer.place_cursor (iter);
-                }
-            } else {
-                Gtk.TextIter iter_start, iter_end;
-                if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
-                    buffer.insert (ref iter_start, markup, -1);
-                    if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
-                        buffer.insert (ref iter_end, markup, -1);
-                        buffer.get_selection_bounds (out iter_start, out iter_end);
-                        iter_end.backward_chars (markup.length);
-                        buffer.select_range (iter_start, iter_end);
-                        markup_inserted_around_selection = true;
-                    }
-                }
-            }
-        }
-
         public void bold () {
-            insert_markup_around_cursor ("**");
+            markdown.bold ();
         }
 
         public void italic () {
-            insert_markup_around_cursor ("*");
+            markdown.italic ();
         }
 
         public void strikethrough () {
-            insert_markup_around_cursor ("~~");
+            markdown.strikethrough ();
         }
 
         public void link () {
-            if (buffer.has_selection) {
-                Gtk.TextIter iter_start, iter_end;
-                if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
-                    string selected_text = buffer.get_text (iter_start, iter_end, true);
-                    MatchInfo match_info;
-                    try {
-                        if (!is_url.match_full (selected_text, selected_text.length, 0, 0, out match_info)) {
-                            buffer.insert (ref iter_start, "[", -1);
-                            if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
-                                buffer.insert (ref iter_end, "]()", -1);
-                                buffer.get_selection_bounds (out iter_start, out iter_end);
-                                iter_end.backward_chars (1);
-                                buffer.place_cursor (iter_end);
-                            }
-                        } else {
-                            buffer.insert (ref iter_start, "[](", -1);
-                            if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
-                                buffer.insert (ref iter_end, ")", -1);
-                                buffer.get_selection_bounds (out iter_start, out iter_end);
-                                iter_start.backward_chars (2);
-                                buffer.place_cursor (iter_start);
-                            }
-                        }
-                    } catch (Error e) {
-                        warning ("Could not determine URL status, hit exception: %s", e.message);
-                    }
-                }
-            } else {
-                insert_at_cursor ("[]()");
-                var cursor = buffer.get_insert ();
-                Gtk.TextIter start;
-                buffer.get_iter_at_mark (out start, cursor);
-                start.backward_chars (3);
-                buffer.place_cursor (start);
-            }
+            markdown.link ();
         }
 
         public bool save () {
@@ -1057,6 +838,9 @@ namespace ThiefMD.Widgets {
                         fountain = new FountainEnrichment ();
                         fountain.attach (this);
                     }
+                    if (markdown != null) {
+                        markdown.reset ();
+                    }
                 } catch (Error e) {
                     warning ("Error: %s", e.message);
                     SheetManager.show_error ("Unexpected Error: " + e.message);
@@ -1157,7 +941,7 @@ namespace ThiefMD.Widgets {
             left_margin = m;
             right_margin = m;
 
-            update_heading_margins (UI.moving ());
+            update_heading_margins ();
 
             typewriter_scrolling ();
 
@@ -1166,44 +950,9 @@ namespace ThiefMD.Widgets {
             move_typewriter_scolling ();
         }
 
-        private bool cursor_at_interesting_location = false;
-        private void cursor_update_heading_margins () {
-            var settings = AppSettings.get_default ();
-
-            if (settings.experimental) {
-                var cursor = buffer.get_insert ();
-                Gtk.TextIter cursor_location;
-                buffer.get_iter_at_mark (out cursor_location, cursor);
-                if (cursor_location.has_tag (markdown_link) || cursor_location.has_tag (markdown_url) || buffer.has_selection) {
-                    update_heading_margins ();
-                    cursor_at_interesting_location = true;
-                } else if (cursor_at_interesting_location) {
-                    update_heading_margins ();
-                    Gtk.TextIter before, after;
-                    Gtk.TextIter bound_start, bound_end;
-                    buffer.get_bounds (out bound_start, out bound_end);
-                    buffer.get_iter_at_mark (out before, cursor);
-                    buffer.get_iter_at_mark (out after, cursor);
-                    if (!before.backward_line()) {
-                        before = bound_start;
-                    }
-                    if (!after.forward_line ()) {
-                        after = bound_end;
-                    }
-                    string sample_text = buffer.get_text (before, after, true);
-                    // Keep interesting location if we're potentially in something we can remove a link to.
-                    if (!is_markdown_url.match (sample_text, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF)) {
-                        cursor_at_interesting_location = false;
-                    }
-                }
-            }
-        }
-
         bool header_redraw_scheduled = false;
-        private int last_margin_location = -1;
-        private void update_heading_margins (bool skip_links = false) {
+        private void update_heading_margins () {
             bool try_later = false;
-            // Update heading margins
             if (UI.moving ()) {
                 try_later = true;
             } else if (!dynamic_margin_update.can_do_action ()) {
@@ -1222,328 +971,14 @@ namespace ThiefMD.Widgets {
                 return;
             }
 
-            var settings = AppSettings.get_default ();
-
-            if (settings.focus_mode) {
-                code_block.background_set = false;
-                code_block.paragraph_background_set = false;
-                code_block.background_full_height_set = false;
-            } else {
-                double r, g, b;
-                UI.get_codeblock_bg_color (out r, out g, out b);
-                code_block.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
-                code_block.background_set = true;
-                code_block.paragraph_background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
-                code_block.paragraph_background_set = true;
-                code_block.background_full_height = true;
-                code_block.background_full_height_set = true;
+            if (markdown != null) {
+                markdown.recheck_all ();
             }
 
-            if (settings.experimental) {
-                if (no_hiding) {
-                    markdown_link.weight = Pango.Weight.NORMAL;
-                    markdown_link.weight_set = true;
-                    markdown_url.weight = Pango.Weight.NORMAL;
-                    markdown_url.weight_set = true;
-                } else {
-                    markdown_link.weight_set = false;
-                    markdown_url.weight_set = false;
+            if (fountain != null) {
+                if (!buffer.has_selection) {
+                    fountain.recheck_all ();
                 }
-            }
-
-            int m = left_margin;
-            try {
-                int copy_offset = 0;
-                Gtk.TextIter start, end;
-                Gtk.TextIter cursor_location;
-                var cursor = buffer.get_insert ();
-                //
-                // Code blocks require scanning whole document
-                //
-                buffer.get_iter_at_mark (out cursor_location, cursor);
-                buffer.get_bounds (out start, out end);
-                string checking_copy = buffer.get_text (start, end, true);
-                copy_offset = start.get_offset ();
-
-                int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
-                int hashtag_w = f_w;
-                int space_w = f_w;
-                int avg_w = f_w;
-
-                if (get_realized ()) {
-                    var font_desc = Pango.FontDescription.from_string (settings.font_family);
-                    font_desc.set_size ((int)(f_w * Pango.SCALE * Pango.Scale.LARGE));
-                    var font_context = get_pango_context ();
-                    var font_layout = new Pango.Layout (font_context);
-                    font_layout.set_font_description (font_desc);
-                    font_layout.set_text ("#", 1);
-                    Pango.Rectangle ink, logical;
-                    font_layout.get_pixel_extents (out ink, out logical);
-                    debug ("# Ink: %d, Logical: %d", ink.width, logical.width);
-                    hashtag_w = int.max (ink.width, logical.width);
-                    font_layout.set_text (" ", 1);
-                    font_layout.get_pixel_extents (out ink, out logical);
-                    debug ("  Ink: %d, Logical: %d", ink.width, logical.width);
-                    space_w = int.max (ink.width, logical.width);
-                    if (space_w + hashtag_w <= 0) {
-                        hashtag_w = f_w;
-                        space_w = f_w;
-                    }
-                    if (space_w < (hashtag_w / 2)) {
-                        avg_w = (int)((hashtag_w + hashtag_w + space_w) / 3.0);
-                    } else {
-                        avg_w = (int)((hashtag_w + space_w) / 2.0);
-                    }
-                    debug ("%s Hashtag: %d, Space: %d, AvgChar: %d", font_desc.get_family (), hashtag_w, space_w, avg_w);
-                    if (m - ((hashtag_w * 6) + space_w) <= 0) {
-                        heading_text[0].left_margin = m;
-                        heading_text[1].left_margin = m;
-                        heading_text[2].left_margin = m;
-                        heading_text[3].left_margin = m;
-                        heading_text[4].left_margin = m;
-                        heading_text[5].left_margin = m;
-                    } else {
-                        heading_text[0].left_margin = m - ((hashtag_w * 1) + space_w);
-                        heading_text[1].left_margin = m - ((hashtag_w * 2) + space_w);
-                        heading_text[2].left_margin = m - ((hashtag_w * 3) + space_w);
-                        heading_text[3].left_margin = m - ((hashtag_w * 4) + space_w);
-                        heading_text[4].left_margin = m - ((hashtag_w * 5) + space_w);
-                        heading_text[5].left_margin = m - ((hashtag_w * 6) + space_w);
-                        //  heading_text[0].left_margin = m - (avg_w * 2);
-                        //  heading_text[1].left_margin = m - (avg_w * 3);
-                        //  heading_text[2].left_margin = m - (avg_w * 4);
-                        //  heading_text[3].left_margin = m - (avg_w * 5);
-                        //  heading_text[4].left_margin = m - (avg_w * 6);
-                        //  heading_text[5].left_margin = m - (avg_w * 7);
-                    }
-                }
-
-                MatchInfo match_info;
-                // Tag code blocks as such (regex hits issues on large text)
-                int block_occurrences = checking_copy.down ().split ("\n```").length - 1;
-                if (block_occurrences % 2 == 0) {
-                    int offset = checking_copy.index_of ("\n```");
-                    while (offset > 0) {
-                        offset = offset + 1;
-                        int next_offset = checking_copy.index_of ("\n```", offset + 1);
-                        if (next_offset > 0) {
-                            int start_pos, end_pos;
-                            start_pos = checking_copy.char_count ((ssize_t) offset);
-                            end_pos = checking_copy.char_count ((ssize_t)(next_offset + 4));
-                            buffer.get_iter_at_offset (out start, start_pos);
-                            buffer.get_iter_at_offset (out end, end_pos);
-                            buffer.apply_tag (code_block, start, end);
-                            //
-                            // Remove links and headings from codeblock.
-                            //
-
-                            for (int h = 0; h < 6; h++) {
-                                buffer.remove_tag (heading_text[h], start, end);
-                            }
-                            buffer.remove_tag (code_block, start, end);
-                            if (!skip_links) {
-                                buffer.remove_tag (markdown_link, start, end);
-                                buffer.remove_tag (markdown_url, start, end);
-                            }
-
-                            offset = checking_copy.index_of ("\n```", next_offset + 1);
-                        } else {
-                            break;
-                        }
-                    }
-                }
-
-                cursor = buffer.get_insert ();
-                buffer.get_iter_at_mark (out cursor_location, cursor);
-
-                //
-                // Only perform updates around where the cursor is.
-                //
-
-                if (last_margin_location == -1 || (cursor_location.get_offset () - last_margin_location).abs () > 60) {
-                    buffer.get_bounds (out start, out end);
-                } else {
-                    buffer.get_iter_at_mark (out start, cursor);
-                    buffer.get_iter_at_mark (out end, cursor);
-                    get_chunk_of_text_around_cursor (ref start, ref end);
-                    last_margin_location = cursor_location.get_offset ();
-                }
-
-                checking_copy = buffer.get_text (start, end, true);
-                copy_offset = start.get_offset ();
-
-                for (int h = 0; h < 6; h++) {
-                    buffer.remove_tag (heading_text[h], start, end);
-                }
-                buffer.remove_tag (code_block, start, end);
-                if (!skip_links) {
-                    buffer.remove_tag (markdown_link, start, end);
-                    buffer.remove_tag (markdown_url, start, end);
-                }
-
-                // Tag headings and make sure they're not in code blocks
-                if (is_heading.match_full (checking_copy, checking_copy.length, 0, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
-                    do {
-                        int start_pos, end_pos;
-                        string heading = match_info.fetch (1);
-                        bool headify = match_info.fetch_pos (1, out start_pos, out end_pos) && (heading.index_of ("\n") < 0);
-                        if (headify) {
-                            start_pos = copy_offset + checking_copy.char_count ((ssize_t) start_pos);
-                            end_pos = copy_offset + checking_copy.char_count ((ssize_t) end_pos);
-                            buffer.get_iter_at_offset (out start, start_pos);
-                            buffer.get_iter_at_offset (out end, end_pos);
-                            if (start.has_tag (code_block) || end.has_tag (code_block)) {
-                                continue;
-                            }
-                            int heading_depth = heading.index_of (" ") - 1;
-                            if (heading_depth >= 0 && heading_depth < 6) {
-                                buffer.apply_tag (heading_text[heading_depth], start, end);
-                            }
-                        }
-                    } while (match_info.next ());
-                }
-
-                if (fountain != null) {
-                    if (!buffer.has_selection) {
-                        fountain.recheck_all ();
-                    }
-                    return;
-                }
-
-                if (settings.experimental) {
-                    //
-                    // Skip high CPU stuff when skippable
-                    //
-                    if (skip_links) {
-                        return;
-                    }
-
-                    Gtk.TextIter bound_start, bound_end;
-                    buffer.get_bounds (out bound_start, out bound_end);
-                    bool check_selection = buffer.get_has_selection ();
-                    Gtk.TextIter? select_start = null, select_end = null;
-                    if (check_selection) {
-                        buffer.get_selection_bounds (out select_start, out select_end);
-                    }
-                    if (is_markdown_url.match_full (checking_copy, checking_copy.length, 0, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
-                        do {
-                            buffer.get_bounds (out bound_start, out bound_end);
-                            int start_link_pos, end_link_pos;
-                            int start_url_pos, end_url_pos;
-                            int start_full_pos, end_full_pos;
-                            //  warning ("Link Found, Text: %s, URL: %s", match_info.fetch (1), match_info.fetch (2));
-                            bool linkify = match_info.fetch_pos (1, out start_link_pos, out end_link_pos);
-                            bool urlify = match_info.fetch_pos (2, out start_url_pos, out end_url_pos);
-                            bool full_found = match_info.fetch_pos (0, out start_full_pos, out end_full_pos);
-                            if (linkify && urlify && full_found) {
-                                start_full_pos = copy_offset + checking_copy.char_count (start_full_pos);
-                                end_full_pos = copy_offset + checking_copy.char_count (end_full_pos);
-                                //
-                                // Don't hide active link's where the cursor is present
-                                //
-                                buffer.get_iter_at_offset (out start, start_full_pos);
-                                buffer.get_iter_at_offset (out end, end_full_pos);
-
-                                if (cursor_location.in_range (start, end)) {
-                                    buffer.apply_tag (markdown_link, start, end);
-                                    continue;
-                                }
-
-                                if (check_selection) {
-                                    if (start.in_range (select_start, select_end) || end.in_range (select_start, select_end)) {
-                                        buffer.apply_tag (markdown_link, start, end);
-                                        continue;
-                                    }
-                                }
-
-                                // Check if we're in inline code
-                                if (start.backward_line ()) {
-                                    buffer.get_iter_at_offset (out end, start_full_pos);
-                                    if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
-                                        string sanity_check = buffer.get_text (start, end, true);
-                                        if (sanity_check.index_of_char ('`') >= 0) {
-                                            buffer.get_iter_at_offset (out end, end_full_pos);
-                                            if (end.forward_line ()) {
-                                                buffer.get_iter_at_offset (out start, end_full_pos);
-                                                sanity_check = buffer.get_text (start, end, true);
-                                                if (sanity_check.index_of_char ('`') >= 0) {
-                                                    continue;
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        // Bail, our calculations are now out of range
-                                        continue;
-                                    }
-                                }
-
-                                //
-                                // Link Text [Text]
-                                //
-                                start_link_pos = copy_offset + checking_copy.char_count (start_link_pos);
-                                end_link_pos = copy_offset + checking_copy.char_count (end_link_pos);
-                                buffer.get_iter_at_offset (out start, start_link_pos);
-                                buffer.get_iter_at_offset (out end, end_link_pos);
-                                if (start.has_tag (code_block) || end.has_tag (code_block)) {
-                                    continue;
-                                }
-                                if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
-                                    buffer.apply_tag (markdown_link, start, end);
-                                } else  {
-                                    // Bail, our calculations are now out of range
-                                    continue;
-                                }
-
-                                if (!UI.show_link_brackets () && !settings.focus_mode) {
-                                    //
-                                    // Starting [
-                                    //
-                                    buffer.get_iter_at_offset (out start, start_link_pos);
-                                    buffer.get_iter_at_offset (out end, start_link_pos);
-                                    bool not_at_start = start.backward_chars (1);
-                                    end.forward_char ();
-                                    if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
-                                        if (start.get_char () != '!') {
-                                            if (not_at_start) {
-                                                start.forward_char ();
-                                            }
-                                            buffer.apply_tag (markdown_url, start, end);
-                                            //
-                                            // Closing ]
-                                            //
-                                            buffer.get_iter_at_offset (out start, end_link_pos);
-                                            buffer.get_iter_at_offset (out end, end_link_pos);
-                                            start.backward_char ();
-                                            buffer.apply_tag (markdown_url, start, end);
-                                        }
-                                    } else {
-                                        // Bail, our calculations are now out of range
-                                        continue;
-                                    }
-                                }
-
-                                //
-                                // Link URL (https://thiefmd.com)
-                                //
-                                start_url_pos = copy_offset + checking_copy.char_count (start_url_pos);
-                                buffer.get_iter_at_offset (out start, start_url_pos);
-                                start.backward_char ();
-                                buffer.get_iter_at_offset (out end, end_full_pos);
-                                if (start.has_tag (code_block) || end.has_tag (code_block)) {
-                                    continue;
-                                }
-                                if (start.in_range (bound_start, bound_end) && end.in_range (bound_start, bound_end)) {
-                                    buffer.apply_tag (markdown_url, start, end);
-                                } else  {
-                                    // Bail, our calculations are now out of range
-                                    continue;
-                                }
-                            }
-                        } while (match_info.next ());
-                    }
-                }
-            } catch (Error e) {
-                warning ("Could not adjust headers: %s", e.message);
             }
         }
 
@@ -1584,21 +1019,6 @@ namespace ThiefMD.Widgets {
             outoffocus_text.foreground_set = true;
             outoffocus_text.underline = Pango.Underline.NONE;
             outoffocus_text.underline_set = true;
-
-            if (!settings.focus_mode) {
-                UI.get_codeblock_bg_color (out r, out g, out b);
-                code_block.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
-                code_block.background_set = true;
-                code_block.paragraph_background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
-                code_block.paragraph_background_set = true;
-                code_block.background_full_height = true;
-                code_block.background_full_height_set = true;
-            } else {
-                code_block.background_set = false;
-                code_block.paragraph_background_set = false;
-                code_block.background_full_height = false;
-                code_block.background_full_height_set = false;
-            }
 
             typewriter_scrolling ();
             if (!typewriter_active && settings.typewriter_scrolling) {
@@ -1642,12 +1062,6 @@ namespace ThiefMD.Widgets {
                 writecheck_active = true;
                 writegood.attach (this);
                 write_good_recheck ();
-            }
-
-            if (settings.experimental) {
-                buffer.notify["cursor-position"].connect (cursor_update_heading_margins);
-            } else {
-                buffer.notify["cursor-position"].connect (cursor_update_heading_margins);
             }
 
             if (!header_redraw_scheduled) {
@@ -1707,23 +1121,23 @@ namespace ThiefMD.Widgets {
                             if (start.get_char () == '[') {
                                 start.backward_char ();
                             }
-                        } while (!start.starts_line () && (start.has_tag (markdown_link) || start.has_tag (markdown_url)));
+                        } while (!start.starts_line () && markdown != null && (start.has_tag (markdown.markdown_link) || start.has_tag (markdown.markdown_url)));
                     }
-                    if (!end.ends_sentence () || end.has_tag (markdown_url) || end.has_tag (markdown_link)) {
+                    if (!end.ends_sentence () || (markdown != null && (end.has_tag (markdown.markdown_url) || end.has_tag (markdown.markdown_link)))) {
                         do {
                             end.forward_sentence_end ();
-                        } while (end.has_tag (markdown_link) || end.has_tag (markdown_url));
+                        } while (markdown != null && (end.has_tag (markdown.markdown_url) || end.has_tag (markdown.markdown_link)));
                     }
                 } else if (settings.focus_type == FocusType.PARAGRAPH) {
-                    if (!start.starts_line () || start.has_tag (code_block)) {
+                    if (!start.starts_line () || (markdown != null && start.has_tag (markdown.code_block))) {
                         do {
                             start.backward_line ();
-                        } while (start.has_tag (code_block));
+                        } while (markdown != null && start.has_tag (markdown.code_block));
                     }
-                    if (!end.ends_line () || end.has_tag (code_block)) {
+                    if (!end.ends_line () || (markdown != null && end.has_tag (markdown.code_block))) {
                         do {
                             end.forward_to_line_end ();
-                        } while (end.has_tag (code_block));
+                        } while (markdown != null && end.has_tag (markdown.code_block));
                     }
                 }
 
@@ -1913,6 +1327,11 @@ namespace ThiefMD.Widgets {
             spell.detach ();
             if (fountain != null) {
                 fountain.detach ();
+                fountain = null;
+            }
+            if (markdown != null) {
+                markdown.detach ();
+                markdown = null;
             }
             writegood.detach ();
 

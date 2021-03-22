@@ -28,7 +28,7 @@ namespace ThiefMD {
         FILE_NOT_VALID_THEME
     }
 
-    public void get_chunk_of_text_around_cursor (ref Gtk.TextIter start, ref Gtk.TextIter end) {
+    public void get_chunk_of_text_around_cursor (ref Gtk.TextIter start, ref Gtk.TextIter end, bool force_lines = false) {
         start.backward_line ();
 
         //
@@ -37,20 +37,38 @@ namespace ThiefMD {
         // [Iter]Dialogue
         //
         int line_checks = 0;
-        while (start.get_char () != '\n' && start.get_char () != '\r' && line_checks <= 5) {
-            if (!start.backward_line ()) {
-                break;
+        if (!force_lines) {
+            while (start.get_char () != '\n' && start.get_char () != '\r' && line_checks <= 5) {
+                if (!start.backward_line ()) {
+                    break;
+                }
+                line_checks += 1;
             }
-            line_checks += 1;
-        }
 
-        end.forward_line ();
-        line_checks = 0;
-        while (end.get_char () != '\n' && end.get_char () != '\r' && line_checks <= 5) {
-            if (!end.forward_line ()) {
-                break;
+            end.forward_line ();
+            line_checks = 0;
+            while (end.get_char () != '\n' && end.get_char () != '\r' && line_checks <= 5) {
+                if (!end.forward_line ()) {
+                    break;
+                }
+                line_checks += 1;
             }
-            line_checks += 1;
+        } else {
+            while (line_checks <= 5) {
+                if (!start.backward_line ()) {
+                    break;
+                }
+                line_checks += 1;
+            }
+
+            end.forward_line ();
+            line_checks = 0;
+            while (line_checks <= 5) {
+                if (!end.forward_line ()) {
+                    break;
+                }
+                line_checks += 1;
+            }
         }
     }
 

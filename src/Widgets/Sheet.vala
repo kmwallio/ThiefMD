@@ -60,7 +60,6 @@ namespace ThiefMD.Widgets {
         }
 
         public Sheet (string sheet_path, Sheets parent) {
-            var settings = AppSettings.get_default ();
             _sheet_path = sheet_path;
             _parent = parent;
             _sheet_title = "";
@@ -170,7 +169,11 @@ namespace ThiefMD.Widgets {
             File metadata_file = File.new_for_path (_notes_path);
             if (metadata.notes == "" && metadata.tags.is_empty) {
                 if (metadata_file.query_exists ()) {
-                    metadata_file.trash ();
+                    try {
+                        metadata_file.trash ();
+                    } catch (Error e) {
+                        warning ("Could not remove empty notes file: %s", e.message);
+                    }
                 }
             } else {
                 try {
