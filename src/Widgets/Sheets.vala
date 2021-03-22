@@ -214,6 +214,24 @@ namespace ThiefMD.Widgets {
             _view.add(_empty);
         }
 
+        public string guess_extension () {
+            string ext = ".md";
+            if (_sheets.is_empty) {
+                Sheets? parent = ThiefApp.get_instance ().library.find_sheets_for_path (get_parent_sheets_path ());
+                if (parent != null) {
+                    ext = parent.guess_extension ();
+                }
+            } else {
+                foreach (var sheet in _sheets) {
+                    if (is_fountain (sheet.value.file_path ())) {
+                        ext = ".fountain";
+                    }
+                }
+            }
+
+            return ext;
+        }
+
         public void remove_sheet (Sheet sheet) {
             if (sheet != null) {
                 Sheet val;

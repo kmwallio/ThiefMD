@@ -69,7 +69,12 @@ namespace ThiefMD.Widgets {
 
             // Check for .valid extension
             if (!can_open_file (file_name)) {
-                file_name += ".md";
+                Sheets? check = SheetManager.get_sheets ();
+                if (check == null) {
+                    file_name += ".md";
+                } else {
+                    file_name += check.guess_extension ();
+                }
             }
 
             SheetManager.new_sheet(file_name);

@@ -72,7 +72,6 @@ namespace ThiefMD {
                     return found;
                 }
 
-                string last_match = "";
                 int got_words = 0;
                 do {
                     if (match_info.get_match_count () >= 2) {

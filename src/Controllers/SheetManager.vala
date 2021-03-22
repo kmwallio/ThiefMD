@@ -473,7 +473,7 @@ namespace ThiefMD.Controllers.SheetManager {
     public string mini_mark (string contents) {
         string result = contents;
         try {
-            Regex headers = new Regex ("^(#+)\\s(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex headers = new Regex ("^(I\\/E\\.?|EST\\.?|INT\\.?\\/EXT|INT\\.?|EXT\\.?|#+)\\s(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             result = result.replace ("&", "&amp;");
             result = result.replace ("<", "&lt;").replace (">", "&gt;");
             result = headers.replace (result, -1, 0, "<b>\\1 \\2</b>");

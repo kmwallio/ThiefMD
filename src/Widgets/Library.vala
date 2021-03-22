@@ -349,6 +349,23 @@ namespace ThiefMD.Widgets {
             return false;
         }
 
+        public Sheets? find_sheets_for_path (string file_path) {
+            int len = 0;
+            Sheets? parent = null;
+            foreach (LibPair p in _all_sheets)
+            {
+                if (file_path.down ().has_prefix (p._path.down ()))
+                {
+                    if (p._path.length > len) {
+                        len = p._path.length;
+                        parent = p._sheets;
+                    }
+                }
+            }
+
+            return parent;
+        }
+
         public Sheet? find_sheet_for_path (string file_path) {
             int len = 0;
             Sheets? parent = null;
@@ -455,6 +472,9 @@ namespace ThiefMD.Widgets {
                         false);
 
                     markdown.append (sheet_markdown);
+                    if (is_fountain (file)) {
+                        markdown.append ("\n");
+                    }
                     if (settings.export_break_sheets) {
                         markdown.append ("\n<div style='page-break-before: always'></div>\n");
                     } else {
