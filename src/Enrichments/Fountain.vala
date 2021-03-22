@@ -30,15 +30,15 @@ namespace ThiefMD.Enrichments {
         private Gtk.TextTag tag_dialogue;
         private Gtk.TextTag tag_scene_heading;
         private Gtk.TextTag tag_parenthetical;
-        private Gtk.TextTag tag_lyrics;
-        private Gtk.TextTag tag_transition;
-        private Gtk.TextTag tag_very_hard_sentences;
 
         private Regex scene_heading;
         private Regex character_dialogue;
         private Regex parenthetical_dialogue;
         private string checking_copy;
         private TimedMutex limit_updates;
+
+        private int last_cursor = -1;
+        private int copy_offset;
 
         public FountainEnrichment () {
             try {
@@ -67,15 +67,54 @@ namespace ThiefMD.Enrichments {
             }
 
             // Remove any previous tags
-            Gtk.TextIter start, end;
-            buffer.get_bounds (out start, out end);
+            Gtk.TextIter start, end, cursor_iter;
+            var cursor = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_iter, cursor);
+            int current_cursor = cursor_iter.get_offset ();
+
+            if (last_cursor == -1 || (current_cursor - last_cursor).abs () > 60) {
+                buffer.get_bounds (out start, out end);
+            } else {
+                buffer.get_iter_at_mark (out start, cursor);
+                buffer.get_iter_at_mark (out end, cursor);
+                start.backward_line ();
+
+                //
+                // Try to make sure we don't wind up in the middle of
+                // CHARACTER
+                // [Iter]Dialogue
+                //
+                int line_checks = 0;
+                while (start.get_char () != '\n' && start.get_char () != '\r' && line_checks <= 5) {
+                    if (!start.backward_line ()) {
+                        break;
+                    }
+                    line_checks += 1;
+                }
+
+                end.forward_line ();
+                line_checks = 0;
+                while (end.get_char () != '\n' && end.get_char () != '\r' && line_checks <= 5) {
+                    if (!end.forward_line ()) {
+                        break;
+                    }
+                    line_checks += 1;
+                }
+            }
+
+            copy_offset = start.get_offset ();
+
             buffer.remove_tag (tag_scene_heading, start, end);
             buffer.remove_tag (tag_character, start, end);
+            buffer.remove_tag (tag_parenthetical, start, end);
+            buffer.remove_tag (tag_dialogue, start, end);
             checking_copy = buffer.get_text (start, end, true);
+            warning (checking_copy);
 
             regex_and_tag (scene_heading, tag_scene_heading);
             tag_characters_and_dialogue ();
 
+            last_cursor = current_cursor;
             checking_copy = "";
             checking.unlock ();
         }
@@ -100,8 +139,8 @@ namespace ThiefMD.Enrichments {
                         // Clear tags from all
                         highlight = match_info.fetch_pos (0, out start_pos, out end_pos);
                         if (highlight) {
-                            start_pos = checking_copy.char_count (start_pos);
-                            end_pos = checking_copy.char_count (end_pos);
+                            start_pos = copy_offset + checking_copy.char_count (start_pos);
+                            end_pos = copy_offset + checking_copy.char_count (end_pos);
                             buffer.get_iter_at_offset (out start, start_pos);
                             buffer.get_iter_at_offset (out end, end_pos);
                             buffer.remove_tag (tag_character, start, end);
@@ -115,8 +154,8 @@ namespace ThiefMD.Enrichments {
                         if (character == null || dialogue == null || dialogue.chomp ().chug () == "" || dialogue.has_prefix ("\t") || dialogue.has_prefix ("    ")) {
                             continue;
                         }
-                        start_pos = checking_copy.char_count (start_pos);
-                        end_pos = checking_copy.char_count (end_pos);
+                        start_pos = copy_offset + checking_copy.char_count (start_pos);
+                        end_pos = copy_offset + checking_copy.char_count (end_pos);
         
                         if (highlight) {
                             buffer.get_iter_at_offset (out start, start_pos);
@@ -129,8 +168,8 @@ namespace ThiefMD.Enrichments {
                         }
 
                         highlight = match_info.fetch_pos (2, out start_pos, out end_pos);
-                        start_pos = checking_copy.char_count (start_pos);
-                        end_pos = checking_copy.char_count (end_pos);
+                        start_pos = copy_offset + checking_copy.char_count (start_pos);
+                        end_pos = copy_offset + checking_copy.char_count (end_pos);
                         if (highlight) {
                             buffer.get_iter_at_offset (out start, start_pos);
                             buffer.get_iter_at_offset (out end, end_pos);
@@ -163,8 +202,8 @@ namespace ThiefMD.Enrichments {
                 bool highlight = false;
                 highlight = match_info.fetch_pos (0, out start_pos, out end_pos);
                 string word = match_info.fetch (0);
-                start_pos = checking_copy.char_count (start_pos);
-                end_pos = checking_copy.char_count (end_pos);
+                start_pos = copy_offset + checking_copy.char_count (start_pos);
+                end_pos = copy_offset + checking_copy.char_count (end_pos);
 
                 if (word != null && highlight) {
                     debug ("%s: %s", marker.name, word);
