@@ -903,7 +903,7 @@ namespace ThiefMD.Widgets {
                             return;
                         }
 
-                        if (file_to_move.has_suffix (".md") || file_to_move.has_suffix (".markdown")) {
+                        if (can_open_file (file_to_move)) {
                             debug ("Prompting for action");
                             Dialog prompt = new Dialog.with_buttons (
                                 "Move into Library",
@@ -971,6 +971,10 @@ namespace ThiefMD.Widgets {
                 {
                     debug ("Moving %s to %s", file_to_move, p._path);
                     FileManager.move_item (file_to_move, p._path);
+                    File notes_page = File.new_for_path (file_to_move + ".notes");
+                    if (notes_page.query_exists ()) {
+                        FileManager.move_item (notes_page.get_path (), p._path);
+                    }
                     refresh_sheets (p._path);
                     File? parent = file.get_parent ();
                     if (parent != null)
