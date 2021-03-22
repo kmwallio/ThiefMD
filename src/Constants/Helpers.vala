@@ -28,6 +28,18 @@ namespace ThiefMD {
         FILE_NOT_VALID_THEME
     }
 
+    public bool can_open_file (string filename) {
+        string check = filename.down ();
+        return check.has_suffix (".md") || check.has_suffix (".markdown") ||
+                check.has_suffix (".fountain") || check.has_suffix (".fou") || check.has_suffix (".spmd") ||
+                check.has_suffix (".bib") || check.has_suffix (".bibtex");
+    }
+
+    public bool is_fountain (string filename) {
+        string check = filename.down ();
+        return check.has_suffix (".fountain") || check.has_suffix (".fou") || check.has_suffix (".spmd");
+    }
+
     public bool match_keycode (uint keyval, uint code) {
         Gdk.KeymapKey [] keys;
         Gdk.Keymap keymap = Gdk.Keymap.get_for_display (Gdk.Display.get_default ());

@@ -458,15 +458,29 @@ namespace ThiefMD.Controllers.UI {
         return thief_languages;
     }
 
-    public Gtk.SourceLanguage get_source_language () {
+    public Gtk.SourceLanguage get_source_language (string filename = "something.md") {
         var languages = get_language_manager ();
+        Gtk.SourceLanguage? language = null;
+        string file_name = filename.down ();
 
-        var markdown_syntax = languages.get_language ("markdown");
-        if (markdown_syntax == null) {
-            markdown_syntax = languages.guess_language (null, "text/markdown");
+        if (file_name.has_suffix (".bib") || file_name.has_suffix (".bibtex")) {
+            language = languages.get_language ("bibtex");
+            if (language == null) {
+                language = languages.guess_language (null, "text/x-bibtex");
+            }
+        } else if (file_name.has_suffix (".fountain") || file_name.has_suffix (".fou") || file_name.has_suffix (".spmd")) {
+            language = languages.get_language ("fountain");
+            if (language == null) {
+                language = languages.guess_language (null, "text/fountain");
+            }
+        } else {
+            language = languages.get_language ("markdown");
+            if (language == null) {
+                language = languages.guess_language (null, "text/markdown");
+            }
         }
 
-        return markdown_syntax;
+        return language;
     }
 
     //

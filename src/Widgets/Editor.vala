@@ -19,6 +19,7 @@
 
 using ThiefMD.Controllers;
 using Gdk;
+using ThiefMD.Enrichments;
 
 namespace ThiefMD.Widgets {
     public class Editor : Gtk.SourceView {
@@ -79,6 +80,11 @@ namespace ThiefMD.Widgets {
         private Regex is_codeblock;
 
         //
+        // Optional Enrichments
+        //
+        private FountainEnrichment? fountain = null;
+
+        //
         // Maintaining state
         //
 
@@ -92,7 +98,7 @@ namespace ThiefMD.Widgets {
             settings.changed.connect (update_settings);
 
             try {
-                is_heading = new Regex ("(#+\\s[^\\n\\r]+?)[\\n\\r]", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF | RegexCompileFlags.CASELESS, 0);
+                is_heading = new Regex ("(#+\\s[^\\n\\r]+?)\\r?\\n", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF | RegexCompileFlags.CASELESS, 0);
                 is_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+(\\.|\\)))\\s)\\s*(.+)", RegexCompileFlags.CASELESS, 0);
                 is_partial_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+\\.))\\s+$", RegexCompileFlags.CASELESS, 0);
                 numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.CASELESS, 0);
@@ -1044,6 +1050,11 @@ namespace ThiefMD.Widgets {
                     editable = true;
                     debug ("%s opened", file_name);
                     res = true;
+                    buffer.set_language (UI.get_source_language (opened_filename));
+                    if (is_fountain (filename)) {
+                        fountain = new FountainEnrichment ();
+                        fountain.attach (this);
+                    }
                 } catch (Error e) {
                     warning ("Error: %s", e.message);
                     SheetManager.show_error ("Unexpected Error: " + e.message);
@@ -1234,6 +1245,12 @@ namespace ThiefMD.Widgets {
                 } else {
                     markdown_link.weight_set = false;
                     markdown_url.weight_set = false;
+                }
+            }
+
+            if (fountain != null) {
+                if (!buffer.has_selection) {
+                    fountain.recheck_all ();
                 }
             }
 
@@ -1850,9 +1867,14 @@ namespace ThiefMD.Widgets {
 
         public void clean () {
             editable = false;
+            spell.detach ();
+            if (fountain != null) {
+                fountain.detach ();
+            }
+            writegood.detach ();
+
             preview_markdown = "";
             buffer.text = "";
-            spell.detach ();
             spell.dispose ();
             buffer.dispose ();
             file = null;

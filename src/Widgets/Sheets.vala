@@ -326,7 +326,7 @@ namespace ThiefMD.Widgets {
                 File file = File.new_for_path (path);
                 if (file.query_exists () && !_sheets.has_key (file_name)) {
                     if ((!FileUtils.test(path, FileTest.IS_DIR)) &&
-                        (path.down ().has_suffix(".md") || path. down().has_suffix(".markdown"))) {
+                        can_open_file (path.down ())) {
 
                         Sheet sheet = new Sheet (path, this);
                         _sheets.set (file_name, sheet);
@@ -365,7 +365,7 @@ namespace ThiefMD.Widgets {
                     if (!_sheets.has_key (file_name)) {
                         string path = Path.build_filename(_sheets_dir, file_name);
                         if ((!FileUtils.test(path, FileTest.IS_DIR)) &&
-                            (path.has_suffix(".md") || path.has_suffix(".markdown"))) {
+                            can_open_file (path.down ())) {
 
                             Sheet sheet = new Sheet (path, this);
                             _sheets.set (file_name, sheet);
@@ -529,18 +529,6 @@ namespace ThiefMD.Widgets {
 
         private void save_library_order () {
             save_metadata_file ();
-            //  File metadata_file = File.new_for_path (Path.build_filename (_sheets_dir, ".thiefsheets"));
-            //  if (metadata_file.query_exists ())
-            //  {
-            //      warning ("Deleting: %s", metadata_file.get_path ());
-            //      metadata_file.delete();
-            //  }
-            //  File thief_file = File.new_for_path (Path.build_filename (_sheets_dir, ".thiefignore"));
-            //  if (thief_file.query_exists ())
-            //  {
-            //      warning ("Deleting: %s", thief_file.get_path ());
-            //      thief_file.delete();
-            //  }
         }
 
         private void save_metadata_file (bool create = false) {

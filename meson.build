@@ -90,6 +90,7 @@ executable(
     'src/Exporters/ExportMarkdown.vala',
     'src/Exporters/ExportMhtml.vala',
     'src/Exporters/ExportPdf.vala',
+    'src/Enrichments/Fountain.vala',
     'src/Widgets/About.vala',
     'src/Widgets/HeaderBar.vala',
     'src/Widgets/Sheets.vala',

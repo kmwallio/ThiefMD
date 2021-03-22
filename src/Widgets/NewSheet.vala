@@ -67,8 +67,8 @@ namespace ThiefMD.Widgets {
                 return;
             }
 
-            // Check for .md extension
-            if (!file_name.ascii_down ().has_suffix(".md") && !file_name.ascii_down ().has_suffix(".markdown")) {
+            // Check for .valid extension
+            if (!can_open_file (file_name)) {
                 file_name += ".md";
             }
 
