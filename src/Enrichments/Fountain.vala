@@ -281,7 +281,6 @@ namespace ThiefMD.Enrichments {
             buffer.tag_table.remove (tag_dialogue);
             tag_scene_heading = null;
 
-            view.destroy.disconnect (detach);
             view = null;
             buffer = null;
             last_cursor = -1;

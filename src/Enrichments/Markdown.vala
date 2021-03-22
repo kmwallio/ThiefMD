@@ -761,7 +761,6 @@ namespace ThiefMD.Enrichments {
             cursor_at_interesting_location = false;
             active_selection = false;
 
-            view.destroy.disconnect (detach);
             view.key_press_event.disconnect (on_keypress);
             settings.changed.disconnect (settings_updated);
             buffer.notify["cursor-position"].disconnect (cursor_update_heading_margins);
