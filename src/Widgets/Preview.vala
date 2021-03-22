@@ -46,15 +46,16 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             settings.changed.connect (() => {
                 if (this == instance) {
-                    update_html_view (true, SheetManager.get_markdown ());
+                    update_html_view (true, SheetManager.get_markdown (), is_fountain (settings.last_file));
                 }
             });
             connect_signals ();
         }
 
         public static void update_view () {
+            var settings = AppSettings.get_default ();
             PreviewWindow.update_preview_title ();
-            get_instance ().update_html_view (true, SheetManager.get_markdown ());
+            get_instance ().update_html_view (true, SheetManager.get_markdown (), is_fountain (settings.last_file));
         }
 
         public static Preview get_instance () {
@@ -74,9 +75,27 @@ namespace ThiefMD.Widgets {
             return true;
         }
 
-        private string set_stylesheet () {
+        private string set_stylesheet (bool render_fountain = false) {
             var settings = AppSettings.get_default ();
-            return get_style_header (override_css != null ? override_css : settings.preview_css, override_css != null ? override_css : settings.print_css);
+            if (!render_fountain) {
+                return get_style_header (override_css != null ? override_css : settings.preview_css, override_css != null ? override_css : settings.print_css);
+            } else {
+                return get_fountain_header ();
+            }
+        }
+
+        public string get_fountain_header () {
+            var style = "";
+            if (!exporting) {
+                style += """<link rel="stylesheet" type="text/css" href='""";
+                style += Build.PKGDATADIR + "/styles/fountain.css";
+                style += "' />\n";
+            } else {
+                style += "\n<style>\n";
+                style += FileManager.get_file_contents (Build.PKGDATADIR + "/styles/fountain.css");
+                style += "\n</style>\n";
+            }
+            return style;
         }
 
         public string get_style_header (string preview_css = "", string print_css = "") {
@@ -257,51 +276,92 @@ namespace ThiefMD.Widgets {
             return script;
         }
 
-        private string get_javascript_header () {
-            string script;
+        private string get_javascript_header (bool render_fountain = false) {
+            string script = "";
 
-            if (!exporting) {
-                script = "<script src='";
-                script += Build.PKGDATADIR + "/scripts/highlight.js";
-                script += "'></script>\n";
-                script += """<script src='""";
-                script += Build.PKGDATADIR + "/scripts/katex.min.js";
-                script += "'></script>";
-                script += "<script src='";
-                script += Build.PKGDATADIR + "/scripts/auto-render.min.js";
-                script += "'></script>";
+            if (!render_fountain) {
+                if (!exporting) {
+                    script = "<script src='";
+                    script += Build.PKGDATADIR + "/scripts/highlight.js";
+                    script += "'></script>\n";
+                    script += """<script src='""";
+                    script += Build.PKGDATADIR + "/scripts/katex.min.js";
+                    script += "'></script>";
+                    script += "<script src='";
+                    script += Build.PKGDATADIR + "/scripts/auto-render.min.js";
+                    script += "'></script>";
+                } else {
+                    script = """
+                    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js" integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4" crossorigin="anonymous"></script>
+                    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js" integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+                    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/highlight.min.js"></script>
+                    """;
+                }
             } else {
-                script = """
-                <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js" integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4" crossorigin="anonymous"></script>
-                <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js" integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
-                <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/highlight.min.js"></script>
-                """;
+                if (!exporting) {
+                    script += "<script src='";
+                    script += Build.PKGDATADIR + "/scripts/fountain.js";
+                    script += "'></script>";
+                } else {
+                    script = """
+                    <script src="https://cdn.jsdelivr.net/npm/@thombruce/fountain.js@1.4.0/fountain.min.js"></script>
+                    """;
+                }
             }
 
             return script;
         }
 
-        public void update_html_view (bool use_thief_mark = true, string markdown = "") {
-            string stylesheet = set_stylesheet ();
+        public void update_html_view (bool use_thief_mark = true, string markdown = "", bool render_fountain = false) {
+            string stylesheet = set_stylesheet (render_fountain);
             string markdown_res = "";
-            get_preview_markdown (markdown, out markdown_res);
+            if (!render_fountain) {
+                get_preview_markdown (markdown, out markdown_res);
+            } else {
+                markdown_res = markdown;
+            }
             string script = get_javascript (use_thief_mark);
-            string headerscript = get_javascript_header ();
-            html = """
-            <!doctype html>
-            <html>
-                <head>
-                    <meta charset=utf-8>
-                    %s
-                    %s
-                </head>
-                <body>
-                    <div class=markdown-body>
+            string headerscript = get_javascript_header (render_fountain);
+            if (!render_fountain) {
+                html = """
+                <!doctype html>
+                <html>
+                    <head>
+                        <meta charset=utf-8>
                         %s
-                    </div>
-                    %s
-                </body>
-            </html>""".printf(stylesheet, headerscript, markdown_res, script);
+                        %s
+                    </head>
+                    <body>
+                        <div class=markdown-body>
+                            %s
+                        </div>
+                        %s
+                    </body>
+                </html>""".printf(stylesheet, headerscript, markdown_res, script);
+            } else {
+                html = """
+                <!doctype html>
+                <html>
+                    <head>
+                        <meta charset=utf-8>
+                        %s
+                        %s
+                    </head>
+                    <body>
+                        <script type="text/javascript">
+                            var file = `%s`;
+                            fountain.parse(file, true, function (output) {
+                                // output.title - 'Big Fish'
+                                // output.html.title_page - '<h1>Big Fish</h1><p class="author">...'
+                                // output.html.script - '<h2><span class="bold">FADE IN:</span></h2>...'
+                                // output.tokens - [ ... { type: 'transition'. text: '<span class="bold">FADE IN:</span>' } ... ]
+                                document.body.innerHTML = output.html.title_page + "<div style='clear: both'></div><div style='page-break-before: always'></div>" + output.html.script;
+                            });
+                        </script>
+                        %s
+                    </body>
+                </html>""".printf(stylesheet, headerscript, markdown_res.replace ("`", "\\`"), script);
+            }
             adjust_thief_mark (use_thief_mark);
             this.load_html (html, "file:///");
         }

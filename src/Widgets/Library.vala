@@ -403,11 +403,41 @@ namespace ThiefMD.Widgets {
             return novel;
         }
 
+        private bool render_fountain (LibPair p, bool metadata = false) {
+            var settings = AppSettings.get_default ();
+
+            foreach (var file in p._sheets.metadata.sheet_order) {
+                if (!exportable_file (file)) {
+                    continue;
+                }
+
+                if (is_fountain (file)) {
+                    return true;
+                }
+            }
+
+            foreach (var folder in p._sheets.metadata.folder_order) {
+                if (!p._sheets.metadata.hidden_folders.contains (folder)) {
+                    string path = Path.build_filename (p._path, folder);
+                    if (FileUtils.test (path, FileTest.IS_DIR) && !FileUtils.test (path, FileTest.IS_SYMLINK)) {
+                        LibPair? child = get_item (path);
+                        return render_fountain (child);
+                    }
+                }
+            }
+
+            return false;
+        }
+
         private string build_novel (LibPair p, bool metadata = false) {
             StringBuilder markdown = new StringBuilder ();
             var settings = AppSettings.get_default ();
 
             foreach (var file in p._sheets.metadata.sheet_order) {
+                if (!exportable_file (file)) {
+                    continue;
+                }
+
                 string sheet_markdown = FileManager.get_file_contents (Path.build_filename (p._path, file));
                 if (settings.export_resolve_paths) {
                     sheet_markdown = Pandoc.resolve_paths (sheet_markdown, p._path);
@@ -490,7 +520,7 @@ namespace ThiefMD.Widgets {
                 menu_preview_item.activate.connect (() => {
                     if (_selected != null && _all_sheets.find (_selected) != null) {
                         string preview_markdown = build_novel (_selected, settings.export_include_metadata_file);
-                        PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown);
+                        PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown, render_fountain (_selected));
                         ppw.show ();
                     }
                 });

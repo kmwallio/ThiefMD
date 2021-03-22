@@ -1252,6 +1252,7 @@ namespace ThiefMD.Widgets {
                 if (!buffer.has_selection) {
                     fountain.recheck_all ();
                 }
+                return;
             }
 
             int m = left_margin;

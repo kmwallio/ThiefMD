@@ -28,6 +28,12 @@ namespace ThiefMD {
         FILE_NOT_VALID_THEME
     }
 
+    public bool exportable_file (string filename) {
+        string check = filename.down ();
+        return check.has_suffix (".md") || check.has_suffix (".markdown") ||
+                check.has_suffix (".fountain") || check.has_suffix (".fou") || check.has_suffix (".spmd");
+    }
+
     public bool can_open_file (string filename) {
         string check = filename.down ();
         return check.has_suffix (".md") || check.has_suffix (".markdown") ||

@@ -38,6 +38,7 @@ namespace ThiefMD.Enrichments {
         private Regex character_dialogue;
         private Regex parenthetical_dialogue;
         private string checking_copy;
+        private TimedMutex limit_updates;
 
         public FountainEnrichment () {
             try {
@@ -49,10 +50,15 @@ namespace ThiefMD.Enrichments {
                 warning ("Could not build regexes: %s", e.message);
             }
             checking = Mutex ();
+            limit_updates = new TimedMutex (750);
         }
 
         public void recheck_all () {
             if (view == null || buffer == null) {
+                return;
+            }
+
+            if (!limit_updates.can_do_action ()) {
                 return;
             }
 
@@ -106,7 +112,7 @@ namespace ThiefMD.Enrichments {
                         highlight = match_info.fetch_pos (1, out start_pos, out end_pos);
                         string character = match_info.fetch (1);
                         string dialogue = match_info.fetch (2);
-                        if (character == null || dialogue == null || dialogue.chomp ().chug () == "") {
+                        if (character == null || dialogue == null || dialogue.chomp ().chug () == "" || dialogue.has_prefix ("\t") || dialogue.has_prefix ("    ")) {
                             continue;
                         }
                         start_pos = checking_copy.char_count (start_pos);

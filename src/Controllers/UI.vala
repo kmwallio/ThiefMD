@@ -39,7 +39,7 @@ namespace ThiefMD.Controllers.UI {
 
         if (preview_mutex.can_do_action ()) {
             var settings = AppSettings.get_default ();
-            Preview.get_instance ().update_html_view (true, SheetManager.get_markdown ());
+            Preview.get_instance ().update_html_view (true, SheetManager.get_markdown (), is_fountain (settings.last_file));
             settings.writing_changed ();
         }
     }

@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+html {
+    text-rendering: optimizeLegibility !important;
+}
+
+body 
+{
+    background-color: #FFF;
+    color: #000;
+    font-family: 'Courier Prime', 'Courier', monospace;
+    font-size: 12pt;
+    margin: 0;
+}
+
+a { color: #ED303C; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.container
+{
+    margin: 0 auto;
+    position: relative;
+    width: 850px;
+}
+
+h1 { margin-top: 50%; margin-bottom: 34px; text-align: center; width: 90.5%; }
+p.credit { text-align: center; width: 90.5%; }
+p.author,
+p.authors { margin-bottom: 32px; margin-top: 0; text-align: center; width: 90.5%; }
+p.source { margin-bottom: 32px; text-align: center; width: 90.5%; }
+
+p.notes { clear: right; margin-top: 1em; float: right; max-width: 50%; text-align: right; }
+p.date,
+p.draft-date { clear: right; margin-top: 1em; float: right; text-align: right; }
+p.contact { clear: right; margin-top: 1em; float: right; text-align: right; }
+p.copyright { clear: left; margin-top: 1em; float: left; text-align: left; }
+
+
+/* p.notes { bottom: 350px; position: static; right: 0; text-align: right; }
+p.date,
+p.draft-date { bottom: 250px; position: static; right: 0; text-align: right; }
+p.contact { bottom: 100px; position: static; right: 0; text-align: right; }
+p.copyright { bottom: 100px; position: static; text-align: left; } */
+
+/* script */
+h2 { text-align: right; }
+h2.left-aligned { text-align: left }
+h3 { position: relative; }
+h3:before { color: #bbb; content: attr(id); font-weight: bold; left: -45px; position: absolute; }
+h3:after { color: #bbb; content: attr(id); font-weight: bold; right: -45px; position: absolute; }
+
+div.dialogue { margin-left: auto; margin-right: auto; width: 68%; page-break-inside: avoid !important; }
+div.dialogue h4 { margin-bottom: 0; margin-left: 23%; page-break-after: avoid !important; }
+div.dialogue p.parenthetical { margin-bottom: 0; margin-top: 0; margin-left: 11%; page-break-after: avoid !important; }
+div.dialogue p { margin-bottom: 0; margin-top: 0; }
+
+div.dual-dialogue { margin: 2em 0 0.9em 2%; margin-right: auto; width: 95%; page-break-inside: avoid !important; }
+div.dual-dialogue div.dialogue { display: inline-block; margin: 0; width: 45%; }
+div.dual-dialogue div.dialogue h4 { margin-top: 0; page-break-after: avoid !important; }
+div.dual-dialogue div.dialogue.right { float: right; }
+
+hr {
+    clear: both;
+    visibility: hidden;
+    page-break-after: always;
+}
+
+p.centered { text-align: center; width: 92.5%; }
+
+p.section { color: #bbb; margin-left: -30px; }
+p.synopsis { color: #bbb; margin-left: -20px; }
+
+span.italic { font-style: italic; }
+span.bold { font-weight: bold; }
+span.underline { text-decoration: underline; }

@@ -271,7 +271,7 @@ namespace ThiefMD.Widgets {
                 menu.add (menu_export_sheet);
                 menu_export_sheet.activate.connect (() => {
                     string preview_markdown = FileManager.get_file_contents (_sheet_path);
-                    PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown);
+                    PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown, is_fountain (_sheet_path));
                     ppw.show ();
                 });
 
