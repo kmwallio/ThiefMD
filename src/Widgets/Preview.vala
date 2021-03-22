@@ -385,7 +385,7 @@ namespace ThiefMD.Widgets {
                                 // output.html.title_page - '<h1>Big Fish</h1><p class="author">...'
                                 // output.html.script - '<h2><span class="bold">FADE IN:</span></h2>...'
                                 // output.tokens - [ ... { type: 'transition'. text: '<span class="bold">FADE IN:</span>' } ... ]
-                                document.body.innerHTML = output.html.title_page + "<div style='clear: both'></div><div style='page-break-before: always'></div>" + output.html.script;
+                                document.body.innerHTML = output.html.title_page + ((output.html.title_page != "") ? "<div style='clear: both'></div><div style='page-break-before: always'></div>" : "") + output.html.script;
                             });
                         </script>
                         %s
