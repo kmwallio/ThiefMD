@@ -16,13 +16,6 @@ body
 a { color: #ED303C; text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-.container
-{
-    margin: 0 auto;
-    position: relative;
-    width: 850px;
-}
-
 h1 { margin-top: 50%; margin-bottom: 34px; text-align: center; width: 90.5%; }
 p.credit { text-align: center; width: 90.5%; }
 p.author,
@@ -34,13 +27,6 @@ p.date,
 p.draft-date { clear: right; margin-top: 1em; float: right; text-align: right; }
 p.contact { clear: right; margin-top: 1em; float: right; text-align: right; }
 p.copyright { clear: left; margin-top: 1em; float: left; text-align: left; }
-
-
-/* p.notes { bottom: 350px; position: static; right: 0; text-align: right; }
-p.date,
-p.draft-date { bottom: 250px; position: static; right: 0; text-align: right; }
-p.contact { bottom: 100px; position: static; right: 0; text-align: right; }
-p.copyright { bottom: 100px; position: static; text-align: left; } */
 
 /* script */
 h2 { text-align: right; }

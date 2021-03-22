@@ -85,11 +85,41 @@ namespace ThiefMD.Widgets {
         }
 
         public string get_fountain_header () {
+            var settings = AppSettings.get_default ();
             var style = "";
             if (!exporting) {
                 style += """<link rel="stylesheet" type="text/css" href='""";
                 style += Build.PKGDATADIR + "/styles/fountain.css";
                 style += "' />\n";
+                style += "\n<style>\n";
+                style += """
+                body {
+                    max-width: 80ch;
+                    margin: 0 auto 0 auto;
+                }
+
+                hr {
+                    border: none;
+                    visibility: visible;
+                    border-top: 3px double #333;
+                    color: #333;
+                    overflow: visible;
+                    text-align: center;
+                    height: 5px;
+                }
+                
+                hr:after {
+                    background: #fff;
+                    content: '§ Page Break §';
+                    padding: 0 4px;
+                    position: relative;
+                    top: -13px;
+                }
+                """;
+                if (settings.typewriter_scrolling && override_css == null) {
+                    style += "\nbody{padding-top:60%;padding-bottom:50%}\n";
+                }
+                style += "\n</style>\n";
             } else {
                 style += "\n<style>\n";
                 style += FileManager.get_file_contents (Build.PKGDATADIR + "/styles/fountain.css");
