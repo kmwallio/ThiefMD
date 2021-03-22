@@ -662,13 +662,13 @@ namespace ThiefMD.Widgets {
         private bool writecheck_scheduled = false;
         private void write_good_recheck () {
             if (writegood_limit.can_do_action () && writecheck_active) {
-                writegood.recheck_all ();
+                writegood.quick_check ();
             } else if (writecheck_active) {
                 if (!writecheck_scheduled) {
                     writecheck_scheduled = true;
                     Timeout.add (1500, () => {
                         if (writecheck_active) {
-                            writegood.recheck_all ();
+                            writegood.quick_check ();
                         }
                         writecheck_scheduled = false;
                         return false;
