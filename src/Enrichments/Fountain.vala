@@ -50,7 +50,7 @@ namespace ThiefMD.Enrichments {
                 warning ("Could not build regexes: %s", e.message);
             }
             checking = Mutex ();
-            limit_updates = new TimedMutex (750);
+            limit_updates = new TimedMutex (250);
         }
 
         public void recheck_all () {

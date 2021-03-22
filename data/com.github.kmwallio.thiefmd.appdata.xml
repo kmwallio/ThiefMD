@@ -35,6 +35,8 @@
     <keyword>ghost</keyword>
     <keyword>wordpress</keyword>
     <keyword>write</keyword>
+    <keyword>fountain</keyword>
+    <keyword>screenplay</keyword>
   </keywords>
   <screenshots>
     <screenshot type="default">
@@ -55,6 +57,17 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.0" date="2021-04-03" urgency="low">
+      <description>
+        <p>This one's for the creators, the note takers, and the plain-text savers. Notes support, screen play support, and more.</p>
+        <ul>
+          <li>Open Bibtex files</li>
+          <li>Open, Preview, and Export Fountain Screen Plays</li>
+          <li>Know what you're doing? Disable tips and start the app with a black canvas to write in</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.0-creators-edition</url>
+    </release>
     <release version="0.1.8" date="2021-03-20" urgency="low">
       <description>
         <p>Translation loading fixes</p>
