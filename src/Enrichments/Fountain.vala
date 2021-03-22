@@ -72,7 +72,7 @@ namespace ThiefMD.Enrichments {
                 return;
             }
 
-            // Remove any previous tags
+            // Get current cursor location
             Gtk.TextIter start, end, cursor_iter;
             var cursor = buffer.get_insert ();
             buffer.get_iter_at_mark (out cursor_iter, cursor);
