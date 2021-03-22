@@ -72,36 +72,41 @@ namespace ThiefMD.Enrichments {
             buffer.get_iter_at_mark (out cursor_iter, cursor);
             int current_cursor = cursor_iter.get_offset ();
 
-            if (last_cursor == -1 || (current_cursor - last_cursor).abs () > 60) {
+            if (last_cursor == -1) {
                 buffer.get_bounds (out start, out end);
+                run_between_start_and_end (start, end);
             } else {
+                //
+                // Scan where we are
+                //
                 buffer.get_iter_at_mark (out start, cursor);
                 buffer.get_iter_at_mark (out end, cursor);
-                start.backward_line ();
+                get_chunk_of_text_around_cursor (ref start, ref end);
+                run_between_start_and_end (start, end);
 
                 //
-                // Try to make sure we don't wind up in the middle of
-                // CHARACTER
-                // [Iter]Dialogue
+                // Rescan where we were if still in buffer,
+                // and not where we just scanned
                 //
-                int line_checks = 0;
-                while (start.get_char () != '\n' && start.get_char () != '\r' && line_checks <= 5) {
-                    if (!start.backward_line ()) {
-                        break;
+                if ((current_cursor - last_cursor).abs () > 60) {
+                    Gtk.TextIter old_start, old_end, bound_start, bound_end;
+                    buffer.get_bounds (out bound_start, out bound_end);
+                    buffer.get_iter_at_offset (out old_start, last_cursor);
+                    buffer.get_iter_at_offset (out old_end, last_cursor);
+                    if (old_start.in_range (bound_start, bound_end)) {
+                        if (!start.in_range (start, end)) {
+                            get_chunk_of_text_around_cursor (ref old_start, ref old_end);
+                            run_between_start_and_end (old_start, old_end);
+                        }
                     }
-                    line_checks += 1;
-                }
-
-                end.forward_line ();
-                line_checks = 0;
-                while (end.get_char () != '\n' && end.get_char () != '\r' && line_checks <= 5) {
-                    if (!end.forward_line ()) {
-                        break;
-                    }
-                    line_checks += 1;
                 }
             }
 
+            last_cursor = current_cursor;
+            checking.unlock ();
+        }
+
+        private void run_between_start_and_end (Gtk.TextIter start, Gtk.TextIter end) {
             copy_offset = start.get_offset ();
 
             buffer.remove_tag (tag_scene_heading, start, end);
@@ -113,10 +118,7 @@ namespace ThiefMD.Enrichments {
 
             regex_and_tag (scene_heading, tag_scene_heading);
             tag_characters_and_dialogue ();
-
-            last_cursor = current_cursor;
             checking_copy = "";
-            checking.unlock ();
         }
 
         private void tag_characters_and_dialogue () {
@@ -255,7 +257,8 @@ namespace ThiefMD.Enrichments {
             tag_dialogue.left_margin_set = true;
             tag_dialogue.right_margin = (f_w * 8);
             tag_dialogue.right_margin_set = true;
-            
+
+            last_cursor = -1;
 
             return true;
         }
@@ -277,6 +280,7 @@ namespace ThiefMD.Enrichments {
             view.destroy.disconnect (detach);
             view = null;
             buffer = null;
+            last_cursor = -1;
         }
     }
 }

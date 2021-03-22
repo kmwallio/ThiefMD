@@ -809,35 +809,42 @@ namespace ThiefMD.Widgets {
             }
         }
 
-        public bool save () throws Error {
+        public bool save () {
+            bool result = false;
             var settings = AppSettings.get_default ();
             if (opened_filename != "" && file.query_exists () && !FileUtils.test (file.get_path (), FileTest.IS_DIR)) {
                 file_mutex.lock ();
-                FileManager.save_file (file, get_buffer_text ().data);
-                modified_time = new DateTime.now_utc ();
+                try {
+                    FileManager.save_file (file, get_buffer_text ().data);
+                    modified_time = new DateTime.now_utc ();
+                    result = true;
+                } catch (Error e) {
+                    warning ("Could not save file: %s", e.message);
+                }
                 file_mutex.unlock ();
-                return true;
             } else if (opened_filename == "" && get_buffer_text () != "" && settings.dont_show_tips && editable) {
                 Sheets? target = SheetManager.get_sheets ();
                 if (target != null) {
                     file_mutex.lock ();
-                    DateTime now = new DateTime.now_local ();
-                    string buff_text = get_buffer_text ();
-                    string first_words = get_some_words (buff_text);
-                    string new_text = (first_words != "") ? now.format ("%Y-%m-%d") : now.format ("%Y-%m-%d_%H-%M-%S");
-                    string new_file = new_text + first_words + ".md";
-                    string new_path = Path.build_filename (target.get_sheets_path (), new_file);
-                    file = File.new_for_path (new_path);
-                    FileManager.save_file (file, buff_text.data);
-                    opened_filename = new_path;
-                    modified_time = new DateTime.now_utc ();
+                    try {
+                        DateTime now = new DateTime.now_local ();
+                        string buff_text = get_buffer_text ();
+                        string first_words = get_some_words (buff_text);
+                        string new_text = (first_words != "") ? now.format ("%Y-%m-%d") : now.format ("%Y-%m-%d_%H-%M-%S");
+                        string new_file = new_text + first_words + ".md";
+                        string new_path = Path.build_filename (target.get_sheets_path (), new_file);
+                        file = File.new_for_path (new_path);
+                        FileManager.save_file (file, buff_text.data);
+                        opened_filename = new_path;
+                        modified_time = new DateTime.now_utc ();
+                        result = true;
+                    } catch (Error e) {
+                        warning ("Could not save file: %s", e.message);
+                    }
                     file_mutex.unlock ();
-                    return true;
-                } else {
-                    return false;
                 }
             }
-            return false;
+            return result;
         }
 
         private bool autosave () {
@@ -852,13 +859,8 @@ namespace ThiefMD.Widgets {
             // Make sure we're not swapping files
             //
             if (should_save) {
-                try {
-                    save ();
-                    SheetManager.redraw ();
-                } catch (Error e) {
-                    warning ("Unable to save file " + file.get_basename () + ": " + e.message);
-                    SheetManager.show_error ("Unable to save file " + file.get_basename () + ": " + e.message);
-                }
+                save ();
+                SheetManager.redraw ();
                 should_save = false;
             }
 
@@ -1198,6 +1200,7 @@ namespace ThiefMD.Widgets {
         }
 
         bool header_redraw_scheduled = false;
+        private int last_margin_location = -1;
         private void update_heading_margins (bool skip_links = false) {
             bool try_later = false;
             // Update heading margins
@@ -1250,16 +1253,17 @@ namespace ThiefMD.Widgets {
 
             int m = left_margin;
             try {
+                int copy_offset = 0;
                 Gtk.TextIter start, end;
+                Gtk.TextIter cursor_location;
+                var cursor = buffer.get_insert ();
+                //
+                // Code blocks require scanning whole document
+                //
+                buffer.get_iter_at_mark (out cursor_location, cursor);
                 buffer.get_bounds (out start, out end);
-                for (int h = 0; h < 6; h++) {
-                    buffer.remove_tag (heading_text[h], start, end);
-                }
-                buffer.remove_tag (code_block, start, end);
-                if (!skip_links) {
-                    buffer.remove_tag (markdown_link, start, end);
-                    buffer.remove_tag (markdown_url, start, end);
-                }
+                string checking_copy = buffer.get_text (start, end, true);
+                copy_offset = start.get_offset ();
 
                 int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
                 int hashtag_w = f_w;
@@ -1315,7 +1319,6 @@ namespace ThiefMD.Widgets {
                 }
 
                 MatchInfo match_info;
-                string checking_copy = get_buffer_text ();
                 // Tag code blocks as such (regex hits issues on large text)
                 int block_occurrences = checking_copy.down ().split ("\n```").length - 1;
                 if (block_occurrences % 2 == 0) {
@@ -1330,11 +1333,52 @@ namespace ThiefMD.Widgets {
                             buffer.get_iter_at_offset (out start, start_pos);
                             buffer.get_iter_at_offset (out end, end_pos);
                             buffer.apply_tag (code_block, start, end);
+                            //
+                            // Remove links and headings from codeblock.
+                            //
+
+                            for (int h = 0; h < 6; h++) {
+                                buffer.remove_tag (heading_text[h], start, end);
+                            }
+                            buffer.remove_tag (code_block, start, end);
+                            if (!skip_links) {
+                                buffer.remove_tag (markdown_link, start, end);
+                                buffer.remove_tag (markdown_url, start, end);
+                            }
+
                             offset = checking_copy.index_of ("\n```", next_offset + 1);
                         } else {
                             break;
                         }
                     }
+                }
+
+                cursor = buffer.get_insert ();
+                buffer.get_iter_at_mark (out cursor_location, cursor);
+
+                //
+                // Only perform updates around where the cursor is.
+                //
+
+                if (last_margin_location == -1 || (cursor_location.get_offset () - last_margin_location).abs () > 60) {
+                    buffer.get_bounds (out start, out end);
+                } else {
+                    buffer.get_iter_at_mark (out start, cursor);
+                    buffer.get_iter_at_mark (out end, cursor);
+                    get_chunk_of_text_around_cursor (ref start, ref end);
+                    last_margin_location = cursor_location.get_offset ();
+                }
+
+                checking_copy = buffer.get_text (start, end, true);
+                copy_offset = start.get_offset ();
+
+                for (int h = 0; h < 6; h++) {
+                    buffer.remove_tag (heading_text[h], start, end);
+                }
+                buffer.remove_tag (code_block, start, end);
+                if (!skip_links) {
+                    buffer.remove_tag (markdown_link, start, end);
+                    buffer.remove_tag (markdown_url, start, end);
                 }
 
                 // Tag headings and make sure they're not in code blocks
@@ -1344,8 +1388,8 @@ namespace ThiefMD.Widgets {
                         string heading = match_info.fetch (1);
                         bool headify = match_info.fetch_pos (1, out start_pos, out end_pos) && (heading.index_of ("\n") < 0);
                         if (headify) {
-                            start_pos = checking_copy.char_count ((ssize_t) start_pos);
-                            end_pos = checking_copy.char_count ((ssize_t) end_pos);
+                            start_pos = copy_offset + checking_copy.char_count ((ssize_t) start_pos);
+                            end_pos = copy_offset + checking_copy.char_count ((ssize_t) end_pos);
                             buffer.get_iter_at_offset (out start, start_pos);
                             buffer.get_iter_at_offset (out end, end_pos);
                             if (start.has_tag (code_block) || end.has_tag (code_block)) {
@@ -1373,6 +1417,7 @@ namespace ThiefMD.Widgets {
                     if (skip_links) {
                         return;
                     }
+
                     Gtk.TextIter bound_start, bound_end;
                     buffer.get_bounds (out bound_start, out bound_end);
                     bool check_selection = buffer.get_has_selection ();
@@ -1381,9 +1426,6 @@ namespace ThiefMD.Widgets {
                         buffer.get_selection_bounds (out select_start, out select_end);
                     }
                     if (is_markdown_url.match_full (checking_copy, checking_copy.length, 0, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
-                        Gtk.TextIter cursor_location;
-                        var cursor = buffer.get_insert ();
-                        buffer.get_iter_at_mark (out cursor_location, cursor);
                         do {
                             buffer.get_bounds (out bound_start, out bound_end);
                             int start_link_pos, end_link_pos;
@@ -1394,8 +1436,8 @@ namespace ThiefMD.Widgets {
                             bool urlify = match_info.fetch_pos (2, out start_url_pos, out end_url_pos);
                             bool full_found = match_info.fetch_pos (0, out start_full_pos, out end_full_pos);
                             if (linkify && urlify && full_found) {
-                                start_full_pos = checking_copy.char_count ((ssize_t)start_full_pos);
-                                end_full_pos = checking_copy.char_count ((ssize_t)end_full_pos);
+                                start_full_pos = copy_offset + checking_copy.char_count (start_full_pos);
+                                end_full_pos = copy_offset + checking_copy.char_count (end_full_pos);
                                 //
                                 // Don't hide active link's where the cursor is present
                                 //
@@ -1438,8 +1480,8 @@ namespace ThiefMD.Widgets {
                                 //
                                 // Link Text [Text]
                                 //
-                                start_link_pos = checking_copy.char_count ((ssize_t) start_link_pos);
-                                end_link_pos = checking_copy.char_count ((ssize_t) end_link_pos);
+                                start_link_pos = copy_offset + checking_copy.char_count (start_link_pos);
+                                end_link_pos = copy_offset + checking_copy.char_count (end_link_pos);
                                 buffer.get_iter_at_offset (out start, start_link_pos);
                                 buffer.get_iter_at_offset (out end, end_link_pos);
                                 if (start.has_tag (code_block) || end.has_tag (code_block)) {
@@ -1483,7 +1525,7 @@ namespace ThiefMD.Widgets {
                                 //
                                 // Link URL (https://thiefmd.com)
                                 //
-                                start_url_pos = checking_copy.char_count ((ssize_t) start_url_pos);
+                                start_url_pos = copy_offset + checking_copy.char_count (start_url_pos);
                                 buffer.get_iter_at_offset (out start, start_url_pos);
                                 start.backward_char ();
                                 buffer.get_iter_at_offset (out end, end_full_pos);

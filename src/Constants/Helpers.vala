@@ -28,6 +28,32 @@ namespace ThiefMD {
         FILE_NOT_VALID_THEME
     }
 
+    public void get_chunk_of_text_around_cursor (ref Gtk.TextIter start, ref Gtk.TextIter end) {
+        start.backward_line ();
+
+        //
+        // Try to make sure we don't wind up in the middle of
+        // CHARACTER
+        // [Iter]Dialogue
+        //
+        int line_checks = 0;
+        while (start.get_char () != '\n' && start.get_char () != '\r' && line_checks <= 5) {
+            if (!start.backward_line ()) {
+                break;
+            }
+            line_checks += 1;
+        }
+
+        end.forward_line ();
+        line_checks = 0;
+        while (end.get_char () != '\n' && end.get_char () != '\r' && line_checks <= 5) {
+            if (!end.forward_line ()) {
+                break;
+            }
+            line_checks += 1;
+        }
+    }
+
     public bool exportable_file (string filename) {
         string check = filename.down ();
         return check.has_suffix (".md") || check.has_suffix (".markdown") ||
