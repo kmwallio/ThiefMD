@@ -1248,13 +1248,6 @@ namespace ThiefMD.Widgets {
                 }
             }
 
-            if (fountain != null) {
-                if (!buffer.has_selection) {
-                    fountain.recheck_all ();
-                }
-                return;
-            }
-
             int m = left_margin;
             try {
                 Gtk.TextIter start, end;
@@ -1364,6 +1357,13 @@ namespace ThiefMD.Widgets {
                             }
                         }
                     } while (match_info.next ());
+                }
+
+                if (fountain != null) {
+                    if (!buffer.has_selection) {
+                        fountain.recheck_all ();
+                    }
+                    return;
                 }
 
                 if (settings.experimental) {

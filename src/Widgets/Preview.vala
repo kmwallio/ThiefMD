@@ -123,6 +123,10 @@ namespace ThiefMD.Widgets {
             } else {
                 style += "\n<style>\n";
                 style += FileManager.get_file_contents (Build.PKGDATADIR + "/styles/fountain.css");
+                style += """
+                p.section { display: none; visibility: invisible; }
+                p.synopsis { display: none; visibility: invisible; }
+                """;
                 style += "\n</style>\n";
             }
             return style;
