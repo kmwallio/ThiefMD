@@ -28,7 +28,7 @@ namespace ThiefMD.Enrichments {
         private Mutex checking;
         private bool markup_inserted_around_selection;
         private bool cursor_at_interesting_location = false;
-        private bool active_selection = false;
+        public bool active_selection = false;
 
         private Gtk.TextTag[] heading_text;
         public Gtk.TextTag code_block;

@@ -267,6 +267,9 @@ namespace ThiefMD.Widgets {
                 ((event.state & Gdk.ModifierType.BUTTON5_MASK) != 0))
             {
                 no_hiding = true;
+                if (markdown != null) {
+                    markdown.active_selection = true;
+                }
             } else if (no_hiding) {
                 if (markdown != null) {
                     markdown.recheck_all ();
@@ -275,6 +278,7 @@ namespace ThiefMD.Widgets {
                     no_hiding = false;
                     if (markdown != null) {
                         markdown.recheck_all ();
+                        markdown.active_selection = false;
                     }
                     return false;
                 });
