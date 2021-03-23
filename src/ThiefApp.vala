@@ -99,6 +99,46 @@ namespace ThiefMD {
             library.parse_library ();
         }
 
+        private void create_widgets () {
+            var settings = AppSettings.get_default ();
+            toolbar = null;
+            search_bar = null;
+            library = null;
+            sheets_pane = null;
+            library_pane = null;
+            library_view = null;
+            editor_notes_pane = null;
+            notes = null;
+            notes_widget = null;
+
+            toolbar = new Headerbar (this);
+            // Have to init search bar before sheet manager
+            search_bar = new SearchBar ();
+            SheetManager.init ();
+            library = new Library ();
+
+            sheets_pane = new ThiefPane (Gtk.Orientation.HORIZONTAL, this);
+            library_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+            library_view = new Gtk.ScrolledWindow (null, null);
+            library_view.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+            editor_notes_pane = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            notes = new Gtk.Revealer ();
+            notes.set_transition_type (Gtk.RevealerTransitionType.SLIDE_LEFT);
+            notes.set_reveal_child (false);
+            notes_widget = new Notes ();
+            var notes_context = notes_widget.get_style_context ();
+            notes_context.add_class ("thief-notes");
+
+            library_view.add (library);
+            stats_bar = new StatisticsBar ();
+            start_sheet = library.get_sheets (start_dir);
+            library_pane.add1 (library_view);
+            library_pane.add2 (start_sheet);
+            library_pane.set_position (settings.view_library_width);
+            var toolbar_context = toolbar.get_style_context ();
+            toolbar_context.add_class("thiefmd-toolbar");
+        }
+
         private void build_desktop () {
             var settings = AppSettings.get_default ();
 
@@ -122,6 +162,7 @@ namespace ThiefMD {
 
             am_mobile = false;
             debug ("Building desktop UI");
+            create_widgets ();
 
             sheets_pane.add1 (library_pane);
             sheets_pane.add2 (SheetManager.get_view ());
@@ -142,6 +183,8 @@ namespace ThiefMD {
             set_default_size (settings.window_width, settings.window_height);
             add (desktop_box);
             show_all ();
+            library.expand_all ();
+            library.set_active ();
         }
 
         private void build_mobile () {
@@ -172,6 +215,7 @@ namespace ThiefMD {
 
             am_mobile = true;
             debug ("Building mobile UI");
+            create_widgets ();
 
             mobile_search = new SearchWidget ();
 
@@ -188,6 +232,8 @@ namespace ThiefMD {
 
             add (mobile_box);
             show_all ();
+            library.expand_all ();
+            library.set_active ();
         }
 
         protected void build_ui () {
@@ -243,31 +289,6 @@ namespace ThiefMD {
                 }
             }
 
-            toolbar = new Headerbar (this);
-            // Have to init search bar before sheet manager
-            search_bar = new SearchBar ();
-            SheetManager.init ();
-            library = new Library ();
-
-            sheets_pane = new ThiefPane (Gtk.Orientation.HORIZONTAL, this);
-            library_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-            library_view = new Gtk.ScrolledWindow (null, null);
-            library_view.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
-            editor_notes_pane = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-            notes = new Gtk.Revealer ();
-            notes.set_transition_type (Gtk.RevealerTransitionType.SLIDE_LEFT);
-            notes.set_reveal_child (false);
-            notes_widget = new Notes ();
-            var notes_context = notes_widget.get_style_context ();
-            notes_context.add_class ("thief-notes");
-
-            library_view.add (library);
-            //  library_leaf.add (library_view);
-            //  library_leaf.show_all ();
-            library.expand_all ();
-            stats_bar = new StatisticsBar ();
-            start_sheet = library.get_sheets (start_dir);
-
             settings.changed.connect (() => {
                 is_fullscreen = settings.fullscreen;
             });
@@ -289,10 +310,6 @@ namespace ThiefMD {
             // Load connections
             connections = new Gee.ConcurrentList<Connections.ConnectionBase> ();
 
-            library_pane.add1 (library_view);
-            library_pane.add2 (start_sheet);
-            library_pane.set_position (settings.view_library_width);
-
             if  (screen_width < 600) {
                 build_mobile ();
             } else {
@@ -304,20 +321,19 @@ namespace ThiefMD {
                 set_default_size (settings.window_width, settings.window_height);
             }
 
-            var toolbar_context = toolbar.get_style_context ();
-            toolbar_context.add_class("thiefmd-toolbar");
-
             size_allocate.connect (() => {
                 if (this.get_allocated_width () < 600 && !am_mobile) {
                     if (rebuild_ui.trylock ()) {
                         debug ("Switching to mobile");
                         build_mobile ();
+                        UI.set_sheets (start_sheet);
                         rebuild_ui.unlock ();
                     }
                 } else if (this.get_allocated_width () >= 600 && am_mobile) {
                     if (rebuild_ui.trylock ()) {
                         debug ("Switching to desktop");
                         build_desktop ();
+                        UI.set_sheets (start_sheet);
                         rebuild_ui.unlock ();
                     }
                 }
@@ -326,7 +342,7 @@ namespace ThiefMD {
             // Restore preview view
             UI.show_view ();
             UI.set_sheets (start_sheet);
-            library.set_active ();
+            library.expand_all ();
             UI.load_user_themes_and_connections ();
             UI.load_font ();
             UI.load_css_scheme ();
