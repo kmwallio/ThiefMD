@@ -324,14 +324,12 @@ namespace ThiefMD {
                     if (rebuild_ui.trylock ()) {
                         debug ("Switching to mobile");
                         build_mobile ();
-                        UI.set_sheets (start_sheet);
                         rebuild_ui.unlock ();
                     }
                 } else if (this.get_allocated_width () >= 600 && am_mobile) {
                     if (rebuild_ui.trylock ()) {
                         debug ("Switching to desktop");
                         build_desktop ();
-                        UI.set_sheets (start_sheet);
                         rebuild_ui.unlock ();
                     }
                 }
