@@ -100,24 +100,13 @@ namespace ThiefMD {
         }
 
         private void create_widgets () {
+            ready = false;
             var settings = AppSettings.get_default ();
-            toolbar = null;
-            search_bar = null;
-            library = null;
             sheets_pane = null;
             library_pane = null;
             library_view = null;
             editor_notes_pane = null;
             notes = null;
-            notes_widget = null;
-
-            SheetManager.drain_and_save_active ();
-
-            toolbar = new Headerbar (this);
-            // Have to init search bar before sheet manager
-            search_bar = new SearchBar ();
-            SheetManager.init ();
-            library = new Library ();
 
             sheets_pane = new ThiefPane (Gtk.Orientation.HORIZONTAL, this);
             library_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
@@ -127,9 +116,6 @@ namespace ThiefMD {
             notes = new Gtk.Revealer ();
             notes.set_transition_type (Gtk.RevealerTransitionType.SLIDE_LEFT);
             notes.set_reveal_child (false);
-            notes_widget = new Notes ();
-            var notes_context = notes_widget.get_style_context ();
-            notes_context.add_class ("thief-notes");
 
             library_view.add (library);
             stats_bar = new StatisticsBar ();
@@ -164,7 +150,7 @@ namespace ThiefMD {
 
             am_mobile = false;
             debug ("Building desktop UI");
-            create_widgets ();
+            // create_widgets ();
 
             sheets_pane.add1 (library_pane);
             sheets_pane.add2 (SheetManager.get_view ());
@@ -185,8 +171,7 @@ namespace ThiefMD {
             set_default_size (settings.window_width, settings.window_height);
             add (desktop_box);
             show_all ();
-            library.expand_all ();
-            library.set_active ();
+            ready = true;
         }
 
         private void build_mobile () {
@@ -217,7 +202,7 @@ namespace ThiefMD {
 
             am_mobile = true;
             debug ("Building mobile UI");
-            create_widgets ();
+            // create_widgets ();
 
             mobile_search = new SearchWidget ();
 
@@ -234,8 +219,7 @@ namespace ThiefMD {
 
             add (mobile_box);
             show_all ();
-            library.expand_all ();
-            library.set_active ();
+            ready = true;
         }
 
         protected void build_ui () {
@@ -290,6 +274,17 @@ namespace ThiefMD {
                     am_mobile = true;
                 }
             }
+
+            toolbar = new Headerbar (this);
+            // Have to init search bar before sheet manager
+            search_bar = new SearchBar ();
+            SheetManager.init ();
+            library = new Library ();
+            notes_widget = new Notes ();
+            var notes_context = notes_widget.get_style_context ();
+            notes_context.add_class ("thief-notes");
+
+            create_widgets ();
 
             settings.changed.connect (() => {
                 is_fullscreen = settings.fullscreen;
@@ -346,6 +341,7 @@ namespace ThiefMD {
             UI.show_view ();
             UI.set_sheets (start_sheet);
             library.expand_all ();
+            library.set_active ();
             UI.load_user_themes_and_connections ();
             UI.load_font ();
             UI.load_css_scheme ();
