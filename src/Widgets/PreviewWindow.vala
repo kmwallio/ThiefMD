@@ -67,8 +67,6 @@ namespace ThiefMD.Widgets {
             toolbar.title = title;
             UI.update_preview ();
 
-            parent = ThiefApp.get_instance ();
-            destroy_with_parent = true;
             ThiefApp.get_instance ().get_size (out w, out h);
             w = w - ThiefApp.get_instance ().pane_position;
             set_default_size(w, h - 150);
