@@ -88,6 +88,7 @@ executable(
     'src/Exporters/ExportHtml.vala',
     'src/Exporters/ExportLatex.vala',
     'src/Exporters/ExportMarkdown.vala',
+    'src/Exporters/ExportFountain.vala',
     'src/Exporters/ExportMhtml.vala',
     'src/Exporters/ExportPdf.vala',
     'src/Enrichments/Fountain.vala',

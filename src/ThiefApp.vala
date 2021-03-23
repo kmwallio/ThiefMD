@@ -308,6 +308,7 @@ namespace ThiefMD {
             exporters.register (_("Markdown"), new Exporters.ExportMarkdown ());
             exporters.register (_("LaTeX"), new Exporters.ExportLatex ());
             exporters.register (_("DocX"), new Exporters.ExportDocx ());
+            exporters.register (_("Fountain"), new Exporters.ExportFountain ());
 
             // Load connections
             connections = new Gee.ConcurrentList<Connections.ConnectionBase> ();

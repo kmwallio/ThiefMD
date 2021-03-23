@@ -71,10 +71,11 @@ namespace ThiefMD.Widgets {
             Gee.Set<string> exports = ThiefApp.get_instance ().exporters.get_export_list ();
             Gee.LinkedList<string> exporters = new Gee.LinkedList<string> ();
             foreach (var e in exports) {
-                if (!render_fountain) {
+                var check_exporter = ThiefApp.get_instance ().exporters.get_exporter (e);
+                if (!render_fountain && check_exporter.supports_markdown) {
                     exporters.add (e);
                 } else {
-                    if (e == "HTML" || e == "PDF") {
+                    if (check_exporter.supports_fountain) {
                         exporters.add (e);
                     }
                 }
