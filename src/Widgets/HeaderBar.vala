@@ -145,22 +145,14 @@ namespace ThiefMD.Widgets {
             sidebar_button.tooltip_text = (_("Show Notes"));
             sidebar_button.set_image (new Gtk.Image.from_icon_name ("view-right-pane-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
             sidebar_button.clicked.connect (() => {
-                if (!ThiefApp.get_instance ().am_mobile) {
-                    if (!ThiefApp.get_instance ().notes.child_revealed) {
-                        ThiefApp.get_instance ().notes_widget.show ();
-                    }
-                    ThiefApp.get_instance ().notes.set_reveal_child (!ThiefApp.get_instance ().notes.child_revealed);
-                    Timeout.add (ThiefApp.get_instance ().notes.get_transition_duration () + 15, () => {
-                        SheetManager.update_margins ();
-                        return false;
-                    });
-                } else {
-                    if (ThiefApp.get_instance ().mobile_stack.visible_child_name != _("Notes")) {
-                        ThiefApp.get_instance ().mobile_stack.set_visible_child_name (_("Notes"));
-                    } else {
-                        UI.show_editor ();
-                    }
+                if (!ThiefApp.get_instance ().notes.child_revealed) {
+                    ThiefApp.get_instance ().notes_widget.show ();
                 }
+                ThiefApp.get_instance ().notes.set_reveal_child (!ThiefApp.get_instance ().notes.child_revealed);
+                Timeout.add (ThiefApp.get_instance ().notes.get_transition_duration () + 15, () => {
+                    SheetManager.update_margins ();
+                    return false;
+                });
             });
 
             the_bar.pack_start (change_view_button);

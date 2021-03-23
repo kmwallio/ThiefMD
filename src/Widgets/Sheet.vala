@@ -30,7 +30,6 @@ namespace ThiefMD.Widgets {
      */
     public class Sheet : Gtk.ToggleButton {
         private string _sheet_path;
-        private Gtk.Grid _button_grid;
         private Gtk.Label _label;
         private string _label_buffer;
         private Sheets _parent;
@@ -71,12 +70,7 @@ namespace ThiefMD.Widgets {
             _label.use_markup = true;
             _label.set_ellipsize (Pango.EllipsizeMode.END);
             _label.xalign = 0;
-            _button_grid = new Gtk.Grid ();
-            _button_grid.orientation = Gtk.Orientation.VERTICAL;
-            _button_grid.hexpand = true;
-            _button_grid.attach (_label, 0, 0);
-            _button_grid.show_all ();
-            add (_button_grid);
+            add (_label);
 
             var header_context = this.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
@@ -162,6 +156,8 @@ namespace ThiefMD.Widgets {
 
             _label.set_label (_label_buffer);
 
+            _label.width_request = settings.view_sheets_width - 10;
+            width_request = settings.view_sheets_width;
             settings.writing_changed ();
         }
 

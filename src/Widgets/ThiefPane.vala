@@ -48,8 +48,6 @@ namespace ThiefMD.Widgets {
             last_x = event.x_root;
             last_y = event.y_root;
 
-            instance.save_pane_position ();
-
             if (!settings.hide_toolbar) {
                 return true;
             }

@@ -27,6 +27,7 @@ namespace ThiefMD.Widgets {
         private static PreviewWindow? instance = null;
 
         public PreviewWindow () {
+            instance = this;
             new KeyBindings (this, false);
             build_ui ();
         }
@@ -65,29 +66,27 @@ namespace ThiefMD.Widgets {
                 title = "Preview";
             }
             toolbar.title = title;
-            UI.update_preview ();
-
-            ThiefApp.get_instance ().get_size (out w, out h);
-            w = w - ThiefApp.get_instance ().pane_position;
-            set_default_size(w, h - 150);
 
             Gtk.Box vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
             toolbar.set_show_close_button (true);
             vbox.add (toolbar);
             vbox.add (Preview.get_instance ());
+            vbox.show_all ();
             add (vbox);
 
             delete_event.connect (this.hide_on_delete);
-            instance = this;
             settings.changed.connect (update_preview_title);
+
+            UI.update_preview ();
+            ThiefApp.get_instance ().get_size (out w, out h);
+            set_default_size(w, h);
+            show_all ();
         }
 
         public bool on_delete_event () {
             remove (Preview.get_instance ());
-            show_all ();
             instance = null;
-
             return false;
         }
     }

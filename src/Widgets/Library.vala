@@ -421,8 +421,6 @@ namespace ThiefMD.Widgets {
         }
 
         private bool render_fountain (LibPair p, bool metadata = false) {
-            var settings = AppSettings.get_default ();
-
             foreach (var file in p._sheets.metadata.sheet_order) {
                 if (!exportable_file (file)) {
                     continue;
@@ -717,6 +715,8 @@ namespace ThiefMD.Widgets {
                 menu.attach_to_widget (this, null);
                 menu.show_all ();
                 menu.popup_at_pointer (event);
+            } else if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 1) {
+                UI.show_sheets ();
             }
             return true;
         }

@@ -372,7 +372,7 @@ namespace ThiefMD.Widgets {
 
     public class SearchWidget : Gtk.Box {
         Hdy.SearchBar headerbar;
-        SearchBase searcher;
+        public SearchBase searcher;
         string scoped_folder;
 
         public class SearchWidget (string local_result = "") {
@@ -390,12 +390,9 @@ namespace ThiefMD.Widgets {
             headerbar.add (searcher.search);
             headerbar.show_all ();
 
-            //  var header_context = headerbar.get_style_context ();
-            //  header_context.add_class (Gtk.STYLE_CLASS_FLAT);
-            //  header_context.add_class ("thief-toolbar");
-
             add (headerbar);
             add (searcher.scrolled_results);
+            searcher.scrolled_results.show_all ();
             show_all ();
 
             delete_event.connect (() => {

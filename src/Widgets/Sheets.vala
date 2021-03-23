@@ -125,6 +125,7 @@ namespace ThiefMD.Widgets {
         Gtk.Label _empty;
 
         public Sheets (string path) {
+            var settings = AppSettings.get_default ();
             _sheets_dir = path;
             _view = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
@@ -154,6 +155,8 @@ namespace ThiefMD.Widgets {
                     warning ("Unable to monitor for folder changes: %s", e.message);
                 }
             }
+            width_request = settings.view_sheets_width;
+            set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
         }
 
         public void folder_changed (File file, File? other_file, FileMonitorEvent event_type) {
