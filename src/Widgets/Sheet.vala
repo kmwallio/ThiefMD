@@ -265,7 +265,7 @@ namespace ThiefMD.Widgets {
                 Gtk.MenuItem menu_preview_sheet = new Gtk.MenuItem.with_label (_("Preview"));
                 menu.add (menu_preview_sheet);
                 menu_preview_sheet.activate.connect (() => {
-                    SheetManager.load_sheet (this);
+                    this.clicked ();
                     PreviewWindow pvw = PreviewWindow.get_instance ();
                     pvw.show_all ();
                 });

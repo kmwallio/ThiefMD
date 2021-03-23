@@ -111,6 +111,8 @@ namespace ThiefMD {
             notes = null;
             notes_widget = null;
 
+            SheetManager.drain_and_save_active ();
+
             toolbar = new Headerbar (this);
             // Have to init search bar before sheet manager
             search_bar = new SearchBar ();

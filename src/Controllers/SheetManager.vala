@@ -484,6 +484,10 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     public void drain_and_save_active () {
+        if (_active_editors == null) {
+            return;
+        }
+
         foreach (var editor in _active_editors) {
             _view.remove (editor.editor);
             editor.sheet.active_sheet = false;
