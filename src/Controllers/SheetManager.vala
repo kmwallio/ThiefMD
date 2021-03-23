@@ -353,7 +353,7 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     public static bool load_sheet (Sheet sheet) {
-        UI.show_editor ();
+        UI.focus_editor ();
         if (_currentSheet != null && Sheet.areEqual(sheet, _currentSheet.sheet) && _active_editors.size == 1) {
             debug ("Tried loading current sheet");
             return true;

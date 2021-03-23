@@ -489,6 +489,11 @@ namespace ThiefMD.Controllers.UI {
     // Switching Main Window View
     //
 
+    public void focus_editor () {
+        ThiefApp instance = ThiefApp.get_instance ();
+        instance.main_content.set_visible_child (SheetManager.get_view ());
+    }
+
     public void show_editor () {
         var settings = AppSettings.get_default ();
         settings.view_state = 1;
