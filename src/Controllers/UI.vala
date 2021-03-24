@@ -504,9 +504,13 @@ namespace ThiefMD.Controllers.UI {
     //
 
     public void focus_editor () {
+        var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
         if (instance.main_content != null) {
             instance.main_content.set_visible_child (SheetManager.get_view ());
+            if (instance.main_content.folded) {
+                settings.view_state = 2;
+            }
         }
     }
 

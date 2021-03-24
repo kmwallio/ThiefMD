@@ -30,6 +30,7 @@ namespace ThiefMD.Widgets {
         private Gtk.MenuButton menu_button;
         private Gtk.Button sidebar_button;
         private NewSheet new_sheet_widget;
+        private Gtk.Label spacer;
 
         public Headerbar (ThiefApp instance) {
             the_bar = new Hdy.HeaderBar ();
@@ -154,11 +155,12 @@ namespace ThiefMD.Widgets {
                     return false;
                 });
             });
+            spacer = new Gtk.Label("                          ");
 
             the_bar.pack_start (change_view_button);
             the_bar.pack_start (add_library_button);
             // @TODO: Need to find a better way to do this
-            the_bar.pack_start (new Gtk.Label("                          "));
+            the_bar.pack_start (spacer);
             the_bar.pack_start (new_sheet);
 
             the_bar.pack_end (sidebar_button);
@@ -193,6 +195,12 @@ namespace ThiefMD.Widgets {
             } else {
                 the_bar.set_title ("");
                 the_bar.set_subtitle ("");
+            }
+
+            if (ThiefApp.get_instance ().main_content.folded) {
+                spacer.hide ();
+            } else {
+                spacer.show ();
             }
 
             if (!settings.hide_toolbar) {
