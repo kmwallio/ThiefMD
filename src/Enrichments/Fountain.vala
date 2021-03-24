@@ -72,6 +72,25 @@ namespace ThiefMD.Enrichments {
                 return;
             }
 
+            var settings = AppSettings.get_default ();
+
+            int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
+            if (ThiefApp.get_instance ().main_content.folded) {
+                // Character
+                tag_character.left_margin = (f_w * 8);
+                tag_parenthetical.left_margin = (f_w * 6);
+                // Dialogue
+                tag_dialogue.left_margin = (f_w * 4);
+                tag_dialogue.right_margin = 0;
+            } else {
+                // Character
+                tag_character.left_margin = (f_w * 14);
+                tag_parenthetical.left_margin = (f_w * 12);
+                // Dialogue
+                tag_dialogue.left_margin = (f_w * 8);
+                tag_dialogue.right_margin = (f_w * 8);
+            }
+
             // Get current cursor location
             Gtk.TextIter start, end, cursor_iter;
             var cursor = buffer.get_insert ();
@@ -249,20 +268,32 @@ namespace ThiefMD.Enrichments {
             // Character
             tag_character = buffer.create_tag ("fou_char");
             tag_character.accumulative_margin = true;
-            tag_character.left_margin = (f_w * 14);
             tag_character.left_margin_set = true;
             tag_parenthetical = buffer.create_tag ("fou_paren");
             tag_parenthetical.accumulative_margin = true;
-            tag_parenthetical.left_margin = (f_w * 12);
             tag_parenthetical.left_margin_set = true;
             // Dialogue
             tag_dialogue = buffer.create_tag ("fou_diag");
             tag_dialogue.accumulative_margin = true;
-            tag_dialogue.left_margin = (f_w * 8);
             tag_dialogue.left_margin_set = true;
-            tag_dialogue.right_margin = (f_w * 8);
             tag_dialogue.right_margin_set = true;
             last_cursor = -1;
+
+            if (ThiefApp.get_instance ().main_content.folded) {
+                // Character
+                tag_character.left_margin = (f_w * 8);
+                tag_parenthetical.left_margin = (f_w * 6);
+                // Dialogue
+                tag_dialogue.left_margin = (f_w * 4);
+                tag_dialogue.right_margin = 0;
+            } else {
+                // Character
+                tag_character.left_margin = (f_w * 14);
+                tag_parenthetical.left_margin = (f_w * 12);
+                // Dialogue
+                tag_dialogue.left_margin = (f_w * 8);
+                tag_dialogue.right_margin = (f_w * 8);
+            }
 
             return true;
         }
