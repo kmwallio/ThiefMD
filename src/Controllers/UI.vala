@@ -596,6 +596,7 @@ namespace ThiefMD.Controllers.UI {
             current.show ();
             current.width_request = settings.view_sheets_width;
             instance.library_pane.set_visible_child (current);
+            instance.library_pane.show ();
         }
         instance.main_content.set_visible_child (instance.library_pane);
     }
@@ -610,6 +611,7 @@ namespace ThiefMD.Controllers.UI {
             instance.library_view.hide ();
             instance.library_pane.width_request = settings.view_sheets_width;
             instance.main_content.set_visible_child (SheetManager.get_view ());
+            instance.library_pane.show ();
         }
         
         if (instance.ready && instance.main_content.folded) {
