@@ -66,6 +66,20 @@ namespace ThiefMD.Controllers.UI {
         return (Sheets) old;
     }
 
+    public void widen_sheets () {
+        if (current != null) {
+            current.hexpand = true;
+        }
+    }
+
+    public void shrink_sheets () {
+        if (current != null) {
+            var settings = AppSettings.get_default ();
+            current.hexpand = false;
+            current.width_request = settings.view_sheets_width;
+        }
+    }
+
     //
     // Themeing and Styling of the App
     //
@@ -491,7 +505,9 @@ namespace ThiefMD.Controllers.UI {
 
     public void focus_editor () {
         ThiefApp instance = ThiefApp.get_instance ();
-        instance.main_content.set_visible_child (SheetManager.get_view ());
+        if (instance.main_content != null) {
+            instance.main_content.set_visible_child (SheetManager.get_view ());
+        }
     }
 
     public void show_editor () {
@@ -526,7 +542,7 @@ namespace ThiefMD.Controllers.UI {
         }
 
         instance.hide_search ();
-        if (instance.main_content.folded) {
+        if (instance.main_content != null && instance.main_content.folded) {
             settings.view_state = (settings.view_state + 1) % 3;
             if (settings.view_state == 0) {
                 show_sheets_and_library ();

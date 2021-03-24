@@ -255,15 +255,47 @@ namespace ThiefMD {
             UI.load_font ();
             UI.load_css_scheme ();
 
+            Timeout.add (350, () => {
+                if (!ready) {
+                    return false;
+                }
+                if (main_content.folded) {
+                    show_touch_friendly = true;
+                    library_pane.hexpand = true;
+                    library.hexpand = true;
+                    library_view.hexpand = true;
+                    UI.widen_sheets ();
+                    settings.changed ();
+                } else {
+                    show_touch_friendly = false;
+                    library_pane.hexpand = false;
+                    library.hexpand = false;
+                    library_view.hexpand = false;
+                    library.width_request = settings.view_library_width;
+                    UI.shrink_sheets ();
+                    settings.changed ();
+                }
+                return false;
+            });
+
             size_allocate.connect (() => {
                 if (!ready) {
                     return;
                 }
                 if (main_content.folded && !show_touch_friendly) {
                     show_touch_friendly = true;
+                    library_pane.hexpand = true;
+                    library.hexpand = true;
+                    library_view.hexpand = true;
+                    UI.widen_sheets ();
                     settings.changed ();
                 } else if (!main_content.folded && show_touch_friendly) {
                     show_touch_friendly = false;
+                    library_pane.hexpand = false;
+                    library.hexpand = false;
+                    library_view.hexpand = false;
+                    library.width_request = settings.view_library_width;
+                    UI.shrink_sheets ();
                     settings.changed ();
                 }
             });
