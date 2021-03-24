@@ -114,7 +114,7 @@ executable(
     'src/Widgets/SearchBar.vala',
     'src/Widgets/StatisticsBar.vala',
     'src/Widgets/SearchWindow.vala',
-    'src/Widgets/ThiefPane.vala',
+    'src/Widgets/MouseMotionListener.vala',
     'src/Widgets/ThemePreview.vala',
     'src/Widgets/Thinking.vala',
     'src/Widgets/MarkdownCheatSheet.vala',

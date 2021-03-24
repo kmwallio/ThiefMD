@@ -39,6 +39,7 @@ namespace ThiefMD {
         public Notes notes_widget;
         public bool show_touch_friendly = true;
         public SearchWidget search_widget;
+        private MouseMotionListener mouse_listener;
 
         private string start_dir;
         private Gtk.Box desktop_box;
@@ -49,6 +50,7 @@ namespace ThiefMD {
             Object (application: app);
             _instance = this;
             rebuild_ui = Mutex ();
+            add_events (Gdk.EventMask.POINTER_MOTION_MASK);
             build_ui ();
         }
 
@@ -229,6 +231,10 @@ namespace ThiefMD {
             });
 
             new KeyBindings (this);
+            // KeyBindings doesn't refer to itself, so losing the reference is fine.
+            // MouseMotionListener has members to keep state, so reference needs to
+            // be kept or variables will be freed.
+            mouse_listener = new MouseMotionListener (this);
 
             UserData.create_data_directories ();
 
