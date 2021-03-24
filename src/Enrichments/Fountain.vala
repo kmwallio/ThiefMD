@@ -74,22 +74,7 @@ namespace ThiefMD.Enrichments {
 
             var settings = AppSettings.get_default ();
 
-            int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
-            if (ThiefApp.get_instance ().main_content.folded) {
-                // Character
-                tag_character.left_margin = (f_w * 8);
-                tag_parenthetical.left_margin = (f_w * 6);
-                // Dialogue
-                tag_dialogue.left_margin = (f_w * 4);
-                tag_dialogue.right_margin = 0;
-            } else {
-                // Character
-                tag_character.left_margin = (f_w * 14);
-                tag_parenthetical.left_margin = (f_w * 12);
-                // Dialogue
-                tag_dialogue.left_margin = (f_w * 8);
-                tag_dialogue.right_margin = (f_w * 8);
-            }
+            calculate_margins ();
 
             // Get current cursor location
             Gtk.TextIter start, end, cursor_iter;
@@ -279,23 +264,60 @@ namespace ThiefMD.Enrichments {
             tag_dialogue.right_margin_set = true;
             last_cursor = -1;
 
+            calculate_margins ();
+
+            return true;
+        }
+
+        private void calculate_margins () {
+            var settings = AppSettings.get_default ();
+            int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
+            int hashtag_w = f_w;
+            int space_w = f_w;
+            int avg_w = f_w;
+
+            if (view.get_realized ()) {
+                var font_desc = Pango.FontDescription.from_string (settings.font_family);
+                font_desc.set_size ((int)(f_w * Pango.SCALE * Pango.Scale.LARGE));
+                var font_context = view.get_pango_context ();
+                var font_layout = new Pango.Layout (font_context);
+                font_layout.set_font_description (font_desc);
+                font_layout.set_text ("#", 1);
+                Pango.Rectangle ink, logical;
+                font_layout.get_pixel_extents (out ink, out logical);
+                debug ("# Ink: %d, Logical: %d", ink.width, logical.width);
+                hashtag_w = int.max (ink.width, logical.width);
+                font_layout.set_text (" ", 1);
+                font_layout.get_pixel_extents (out ink, out logical);
+                debug ("  Ink: %d, Logical: %d", ink.width, logical.width);
+                space_w = int.max (ink.width, logical.width);
+                if (space_w + hashtag_w <= 0) {
+                    hashtag_w = f_w;
+                    space_w = f_w;
+                }
+                if (space_w < (hashtag_w / 2)) {
+                    avg_w = (int)((hashtag_w + hashtag_w + space_w) / 3.0);
+                } else {
+                    avg_w = (int)((hashtag_w + space_w) / 2.0);
+                }
+                debug ("%s Hashtag: %d, Space: %d, AvgChar: %d", font_desc.get_family (), hashtag_w, space_w, avg_w);
+            }
+
             if (ThiefApp.get_instance ().main_content.folded) {
                 // Character
-                tag_character.left_margin = (f_w * 8);
-                tag_parenthetical.left_margin = (f_w * 6);
+                tag_character.left_margin = (avg_w * 8);
+                tag_parenthetical.left_margin = (avg_w * 6);
                 // Dialogue
-                tag_dialogue.left_margin = (f_w * 4);
+                tag_dialogue.left_margin = (avg_w * 4);
                 tag_dialogue.right_margin = 0;
             } else {
                 // Character
-                tag_character.left_margin = (f_w * 14);
-                tag_parenthetical.left_margin = (f_w * 12);
+                tag_character.left_margin = (avg_w * 14);
+                tag_parenthetical.left_margin = (avg_w * 10);
                 // Dialogue
-                tag_dialogue.left_margin = (f_w * 8);
-                tag_dialogue.right_margin = (f_w * 8);
+                tag_dialogue.left_margin = (avg_w * 6);
+                tag_dialogue.right_margin = (avg_w * 6);
             }
-
-            return true;
         }
 
         public void detach () {

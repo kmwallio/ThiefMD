@@ -138,6 +138,7 @@ namespace ThiefMD.Widgets {
         }
 
         private void build_mobilemenu () {
+            var settings = AppSettings.get_default ();
             menu_grid.remove (_typewriter_button);
             menu_grid.remove (_spellcheck_button);
             menu_grid.remove (_writegood_button);
@@ -159,7 +160,7 @@ namespace ThiefMD.Widgets {
             export_button.has_tooltip = true;
             export_button.tooltip_text = _("Open Export Window");
             export_button.clicked.connect (() => {
-                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown ());
+                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
                 ppw.show ();
             });
 
@@ -210,6 +211,7 @@ namespace ThiefMD.Widgets {
         }
 
         private void build_desktopmenu () {
+            var settings = AppSettings.get_default ();
             menu_grid.remove (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.remove (_spellcheck_button);
@@ -232,7 +234,7 @@ namespace ThiefMD.Widgets {
             export_button.has_tooltip = true;
             export_button.tooltip_text = _("Open Export Window");
             export_button.clicked.connect (() => {
-                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown ());
+                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
                 ppw.show ();
             });
 
