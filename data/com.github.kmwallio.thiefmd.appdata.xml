@@ -8,9 +8,10 @@
   <launchable type="desktop-id">com.github.kmwallio.thiefmd.desktop</launchable>
   <summary>The markdown editor worth stealing.</summary>
   <description>
-    <p>Keep your Markdown managed. Write epic tales, a novel, keep a journal, or finally write that book report.</p>
-    <p>ThiefMD is a Markdown Editor providing an easy way to organize, format, and compile your markdown documents. When you're ready to Publish, go to ePub, PDF, Office, Ghost, WordPress, Write-Freely, or more.</p>
+    <p>Keep your Markdown managed. Write epic tales, a novel, that screen play, keep a journal, or finally write that book report.</p>
+    <p>ThiefMD is a Markdown providing an easy way to organize, format, and compile your markdown documents. When you're ready to Publish, go to ePub, PDF, Office, Ghost, WordPress, Write-Freely, or more.</p>
     <p>Import from and Export to Office, ePUB, HTML, and more. ThiefMD is your one stop shop for making and managing markdown mischief.</p>
+    <p>Working on a screenplay? ThiefMD can handle and combine Fountain files as well. Write your novel and prepare for that movie deal all from the same app.</p>
   </description>
   <developer_name>kmwallio</developer_name>
   <url type="homepage">https://thiefmd.com</url>
@@ -37,6 +38,7 @@
     <keyword>write</keyword>
     <keyword>fountain</keyword>
     <keyword>screenplay</keyword>
+    <keyword>screenwriting</keyword>
   </keywords>
   <screenshots>
     <screenshot type="default">
