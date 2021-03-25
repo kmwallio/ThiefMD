@@ -304,6 +304,95 @@ namespace ThiefMD {
         return b.str;
     }
 
+    public string get_possible_markdown_url (string url) {
+        if (url.index_of_char (':') > 0 && url.index_of_char (':') <= 7) {
+            string protocol = url.substring (0, url.index_of_char (':'));
+            if (protocol.down () != "file") {
+                return "";
+            }
+        }
+        string attempt = Pandoc.find_file (url, "");
+        if (attempt != url) {
+            return attempt;
+        } else {
+            if (url.last_index_of_char ('.') != -1) {
+                string markdownify_file = url.substring (0, url.last_index_of_char ('.'));
+                attempt = try_possible_url_exts (markdownify_file);
+                if (attempt != "") {
+                    return attempt;
+                }
+            } else if (url.has_suffix ("/")) {
+                attempt = try_possible_url_exts (url.substring (0, url.length - 1));
+                if (attempt != "") {
+                    return attempt;
+                }
+            } else {
+                attempt = try_possible_url_exts (url);
+                if (attempt != "") {
+                    return attempt;
+                }
+            }
+        }
+
+        return "";
+    }
+
+    private string try_possible_url_exts (string url, bool skip_recurse = false) {
+        string test_url = url;
+        if (test_url.has_prefix ("file://")) {
+            test_url = test_url.substring (7);
+        }
+        string[] exts = {".md", ".markdown", ".fountain", ".fou", ".spmd", "/index.md", "/index.markdown", "/index.fountain"};
+        foreach (var ext in exts) {
+            string attempt = Pandoc.find_file (test_url + ext, "");
+            if (attempt != test_url + ext) {
+                return attempt;
+            }
+        }
+
+        string next_attempt = test_url;
+        if (test_url.has_suffix ("/")) {
+            next_attempt = test_url.substring (0, test_url.length - 1);
+            debug (next_attempt);
+            string attempt = try_possible_url_exts (next_attempt);
+            if (attempt != "") {
+                return attempt;
+            }
+        }
+
+        if (test_url.index_of_char ('#') != -1) {
+            next_attempt = test_url.substring (0, test_url.index_of_char ('#'));
+            debug (next_attempt);
+            string attempt = try_possible_url_exts (next_attempt);
+            if (attempt != "") {
+                return attempt;
+            }
+        }
+
+        if (next_attempt.index_of_char ('/') != -1 && !skip_recurse) {
+            string[] parts = next_attempt.split ("/");
+            for (int i = 0; i < parts.length; i++) {
+                next_attempt = "";
+                for (int j = 0; j < parts.length; j++) {
+                    if (parts[j] == "") {
+                        continue;
+                    } else if (j == i) {
+                        next_attempt += "_" + parts[j];
+                    } else {
+                        next_attempt += parts[j];
+                    }
+                    next_attempt += "/";
+                }
+                debug (next_attempt);
+                string attempt = try_possible_url_exts (next_attempt, true);
+                if (attempt != "") {
+                    return attempt;
+                }
+            }
+        }
+        return "";
+    }
+
     public class TimedMutex {
         private bool can_action;
         private Mutex droptex;

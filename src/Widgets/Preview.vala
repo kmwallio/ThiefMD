@@ -225,9 +225,53 @@ namespace ThiefMD.Widgets {
                     set_size_request (rectangle.width, rectangle.height);
                 }
             });
+
+            load_failed.connect ((event, uri, error) => {
+                launch_browser (uri);
+                return false;
+            });
         }
 
+        private string last_url;
         private void launch_browser (string url) {
+            var thief_instance = ThiefApp.get_instance ();
+            string decoded_url = Uri.unescape_string (url);
+            warning (url);
+            if (decoded_url == null || last_url == url) {
+                stop_loading ();
+                last_url = "";
+                return;
+            }
+
+            last_url = url;
+
+            string possible_markdown = get_possible_markdown_url (url);
+            if (possible_markdown != "" && thief_instance.library.file_in_library (possible_markdown)) {
+                var load_sheet = thief_instance.library.find_sheet_for_path (possible_markdown);
+                if (load_sheet != null) {
+                    load_sheet.clicked ();
+                    Timeout.add (250, () => {
+                        UI.update_preview ();
+                        return false;
+                    });
+                }
+                stop_loading ();
+                return;
+            }
+
+            if (decoded_url.length > 8 && decoded_url.has_prefix ("file://") && thief_instance.library.file_in_library (decoded_url.substring (7))) {
+                var load_sheet = thief_instance.library.find_sheet_for_path (decoded_url.substring (7));
+                if (load_sheet != null) {
+                    load_sheet.clicked ();
+                    Timeout.add (250, () => {
+                        UI.update_preview ();
+                        return false;
+                    });
+                }
+                stop_loading ();
+                return;
+            }
+            
             if (!url.contains ("/embed/")) {
                 try {
                     AppInfo.launch_default_for_uri (url, null);

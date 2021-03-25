@@ -119,6 +119,106 @@ namespace ThiefMD.Enrichments {
             checking_copy = "";
         }
 
+        /*public bool is_linked_clicked (Gdk.EventButton event) {
+            if ((event.state & Gdk.ModifierType.BUTTON1_MASK) != 0 && !buffer.has_selection && (event.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
+                markdown.link_clicked ();
+            }
+
+            return false;
+        }
+
+        public void link_clicked () {
+            Gtk.TextIter cursor_location;
+            var cursor = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_location, cursor);
+            if (cursor_location.has_tag (markdown_link) || cursor_location.has_tag (markdown_url)) {
+                warning ("at url");
+                //
+                // Get into markdown_url
+                //
+                while (!cursor_location.has_tag (markdown_url) && cursor_location.has_tag (markdown_link)) {
+                    if (!cursor_location.forward_char ()) {
+                        return;
+                    }
+                }
+
+                Gtk.TextIter start, end;
+                buffer.get_iter_at_offset (out start, cursor_location.get_offset ());
+                buffer.get_iter_at_offset (out end, cursor_location.get_offset ());
+                while (start.has_tag (markdown_url)) {
+                    if (!start.backward_char ()) {
+                        return;
+                    }
+                }
+                if (!start.forward_chars (2)) {
+                    return;
+                }
+
+                //
+                // Markdown could end with URL, so it's fine to not be able to go foward
+                //
+                while (end.has_tag (markdown_url)) {
+                    if (!end.forward_char ()) {
+                        break;
+                    }
+                }
+
+                // If at end of doc check
+                if (!end.backward_char ()) {
+                    return;
+                }
+
+                // We weren't at the end, go back one more
+                if (end.get_char () != ')') {
+                    if (!end.backward_char ()) {
+                        return;
+                    }
+                }
+
+                // Illegal state
+                if (end.get_offset () <= start.get_offset ()) {
+                    return;
+                }
+
+                string url = buffer.get_text (start, end, true);
+                if (url.has_prefix ("https:") || url.has_prefix ("http:") || url.has_prefix ("mailto:") || url.has_prefix ("ftp:") ||
+                    url.has_prefix ("sftp:"))
+                {
+                    try {
+                        AppInfo.launch_default_for_uri (url, null);
+                    } catch (Error e) {
+                        warning ("No app to handle urls: %s", e.message);
+                    }
+                }
+                string possible = try_possible_urls (url);
+                warning ("trying %s", url);
+                if (possible != "") {
+                    warning ("Found %s", possible);
+                    var thief_instance = ThiefApp.get_instance ();
+                    if (thief_instance.library.file_in_library (possible)) {
+                        var load_sheet = thief_instance.library.find_sheet_for_path (possible);
+                        if (load_sheet != null) {
+                            load_sheet.clicked ();
+                            Timeout.add (250, () => {
+                                UI.update_preview ();
+                                return false;
+                            });
+                        } else {
+                            try {
+                                AppInfo.launch_default_for_uri (possible, null);
+                            } catch (Error e) {
+                                warning ("No app to handle urls: %s", e.message);
+                            }
+                        }
+                    } else {
+                        warning ("File not in library");
+                    }
+                }
+            } else {
+                warning ("Not at url");
+            }
+        }*/
+
         private void update_link_text (Gtk.TextIter start_region, Gtk.TextIter end_region) {
             var settings = AppSettings.get_default ();
             buffer.remove_tag (markdown_link, start_region, end_region);

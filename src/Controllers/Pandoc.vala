@@ -329,7 +329,7 @@ namespace ThiefMD.Controllers.Pandoc {
         }
     }
 
-    private string find_file (string url, string path) {
+    public string find_file (string url, string path) {
         string result = "";
         if (find_file_to_upload (url, path, out result)) {
             return result;
