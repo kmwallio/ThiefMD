@@ -17,3 +17,5 @@ bibliography: references.bib
 ```
 
 ThiefMD will find and locate the `references.bib` file and offer right-click insertion of Citations Labels.
+
+![Right-Click to Insert Citation](https://user-images.githubusercontent.com/132455/112594422-23499d00-8dc6-11eb-8bd6-b6b6bcc28f7f.gif)

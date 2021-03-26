@@ -255,10 +255,18 @@ namespace ThiefMD.Controllers.Pandoc {
 
         RegexEvalCallback add_upload_paths = (match_info, result) =>
         {
-            var url = match_info.fetch (1);
-            string abs_path = "";
-            if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
-                sub_files.set (url, abs_path);
+            if (match_info.get_match_count () >= 2) {
+                var url = match_info.fetch (2);
+                string abs_path = "";
+                if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
+                    sub_files.set (url, abs_path);
+                }
+            } else {
+                var url = match_info.fetch (1);
+                string abs_path = "";
+                if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
+                    sub_files.set (url, abs_path);
+                }
             }
             return false;
         };
@@ -276,11 +284,21 @@ namespace ThiefMD.Controllers.Pandoc {
 
         RegexEvalCallback add_import_paths = (match_info, result) =>
         {
-            var url = match_info.fetch (1);
-            if (!url.contains (":")) {
-                sub_files.add (url);
+            if (match_info.get_match_count () >= 2) {
+                var url = match_info.fetch (2);
+                string abs_path = "";
+                if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
+                    sub_files.add (url);
+                }
+            } else {
+                var url = match_info.fetch (1);
+                string abs_path = "";
+                if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
+                    sub_files.add (url);
+                }
             }
             return false;
+            
         };
         manipulate_markdown_local_paths (markdown, "",
             add_import_paths,
@@ -304,7 +322,7 @@ namespace ThiefMD.Controllers.Pandoc {
             Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex css_url_search = new Regex ("url\\(['\"]?(.+?)['\"]?\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex cover_image_search = new Regex ("(?:cover-image|coverimage|feature_image|featureimage|featured_image|featuredimage|bibliography):\\s*['\"]?(.+?)['\"]?\\s*$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex cover_image_search = new Regex ("(cover-image|coverimage|feature_image|featureimage|featured_image|featuredimage|bibliography):\\s*['\"]?(.+?)['\"]?\\s*$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
 
             processed_mk = url_search.replace_eval (
                 processed_mk,
@@ -368,8 +386,9 @@ namespace ThiefMD.Controllers.Pandoc {
                 },
             (match_info, result) =>
                 {
-                    result.append ("cover-image: ");
-                    var url = match_info.fetch (1);
+                    var key = match_info.fetch (1);
+                    result.append (key + ": ");
+                    var url = match_info.fetch (2);
                     result.append (find_file (url, path));
                     return false;
                 });
