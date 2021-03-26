@@ -656,7 +656,7 @@ namespace ThiefMD.Widgets {
             settings.window_width = w;
             settings.window_height = h;
 
-            if (spellcheck_active) {
+            if (spellcheck_active && buffer.text != "") {
                 spell.recheck_all ();
             }
 
