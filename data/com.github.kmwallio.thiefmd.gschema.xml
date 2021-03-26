@@ -197,5 +197,11 @@
             <summary>New File on Launch</summary>
             <description>Open application with new empty file instead of showing tips or last file</description>
         </key>
+        <key name="num-preview-lines" type="i">
+            <default>3</default>
+            <range min="0" max="15"/>
+            <summary>Number of Preview Lines</summary>
+            <description>Number of Lines to preview in the Sheets View</description>
+        </key>
     </schema>
 </schemalist>

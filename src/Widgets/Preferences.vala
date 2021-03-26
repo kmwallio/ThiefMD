@@ -280,6 +280,26 @@ namespace ThiefMD.Widgets {
                 }
             });
 
+            var num_preview_lines = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+            var num_preview_lines_entry = new Gtk.SpinButton.with_range (0, 15, 1);
+            num_preview_lines_entry.set_value (settings.num_preview_lines);
+            num_preview_lines_entry.value_changed.connect (() => {
+                int new_margin = (int)num_preview_lines_entry.get_value ();
+                if (new_margin >= 0 && new_margin < 15) {
+                    settings.num_preview_lines = new_margin;
+                } else {
+                    num_preview_lines_entry.set_value (settings.num_preview_lines);
+                }
+            });
+            var num_preview_lines_label = new Label(_("Number of Lines to Preview in Sheets View"));
+            num_preview_lines_label.xalign = 0;
+            num_preview_lines_label.hexpand = true;
+            num_preview_lines_label.margin = 12;
+            num_preview_lines_label.set_line_wrap (true);
+            num_preview_lines.add (num_preview_lines_entry);
+            num_preview_lines.add (num_preview_lines_label);
+            display_options.add (num_preview_lines);
+
             var add_theme_button = new Gtk.Button.with_label (_("Add New Theme"));
             add_theme_button.hexpand = true;
             display_options.add (add_theme_button);

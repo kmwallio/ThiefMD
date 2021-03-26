@@ -145,10 +145,10 @@ namespace ThiefMD.Widgets {
 
         public void redraw () {
             var settings = AppSettings.get_default ();
-            string file_contents = FileManager.get_file_lines_yaml (_sheet_path, Constants.SHEET_PREVIEW_LINES, true, out _sheet_title, out _sheet_date);
+            string file_contents = FileManager.get_file_lines_yaml (_sheet_path, settings.num_preview_lines, true, out _sheet_title, out _sheet_date);
 
             _word_count = FileManager.get_word_count (_sheet_path);
-            if (file_contents.chomp() != "") {
+            if (file_contents.chomp() != "" && settings.num_preview_lines != 0) {
                 _label_buffer = "<small>" + SheetManager.mini_mark(file_contents) + "</small>";
             } else {
                 _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "</b>";

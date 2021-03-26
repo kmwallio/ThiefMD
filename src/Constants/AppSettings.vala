@@ -146,6 +146,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public double line_spacing { get; set; default = 1; }
         public bool experimental { get; set; }
         public bool dont_show_tips { get; set; default = false; }
+        public int num_preview_lines { get; set; default = Constants.SHEET_PREVIEW_LINES; }
 
         // Transient settings
         private bool hiding_toolbar { get; set; default = false; }
@@ -375,6 +376,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("line-spacing", this, "line_spacing", SettingsBindFlags.DEFAULT);
             app_settings.bind ("experimental", this, "experimental", SettingsBindFlags.DEFAULT);
             app_settings.bind ("dont-show-tips", this, "dont_show_tips", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("num-preview-lines", this, "num_preview_lines", SettingsBindFlags.DEFAULT);
 
             app_settings.changed.connect (() => {
                 changed ();
