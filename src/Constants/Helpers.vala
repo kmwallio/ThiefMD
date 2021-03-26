@@ -28,6 +28,32 @@ namespace ThiefMD {
         FILE_NOT_VALID_THEME
     }
 
+    public bool generate_html (string raw_mk, out string processed_mk) {
+        if (Pandoc.needs_bibtex (raw_mk)) {
+            return Pandoc.make_preview (out processed_mk, raw_mk);
+        } else {
+            processed_mk = raw_mk;
+            var mkd = new Markdown.Document.from_gfm_string (processed_mk.data,
+                Markdown.DocumentFlags.TOC + 
+                Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.EXTRA_FOOTNOTE + 
+                Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.DLEXTRA + 
+                Markdown.DocumentFlags.FENCEDCODE + Markdown.DocumentFlags.GITHUBTAGS + 
+                Markdown.DocumentFlags.LATEX + Markdown.DocumentFlags.URLENCODEDANCHOR + 
+                Markdown.DocumentFlags.NOSTYLE + Markdown.DocumentFlags.EXPLICITLIST);
+
+            mkd.compile (
+                Markdown.DocumentFlags.TOC + Markdown.DocumentFlags.AUTOLINK + 
+                Markdown.DocumentFlags.EXTRA_FOOTNOTE + 
+                Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.DLEXTRA +
+                Markdown.DocumentFlags.FENCEDCODE + Markdown.DocumentFlags.GITHUBTAGS +
+                Markdown.DocumentFlags.LATEX + Markdown.DocumentFlags.URLENCODEDANCHOR +
+                Markdown.DocumentFlags.EXPLICITLIST + Markdown.DocumentFlags.NOSTYLE);
+            mkd.get_document (out processed_mk);
+
+            return (processed_mk.chomp () != "");
+        }
+    }
+
     private string find_bibtex_for_sheet (string path = "") {
         string result = "";
         string search_path = Path.get_dirname (path);
