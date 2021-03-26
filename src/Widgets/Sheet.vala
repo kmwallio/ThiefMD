@@ -274,6 +274,14 @@ namespace ThiefMD.Widgets {
                     ppw.show ();
                 });
 
+                Gtk.MenuItem copy_file_path = new Gtk.MenuItem.with_label (_("Copy File Path"));
+                menu.add (copy_file_path);
+                copy_file_path.activate.connect (() => {
+                    string file_path = _sheet_path;
+                    var copy = Gtk.Clipboard.get_default (Gdk.Display.get_default ());
+                    copy.set_text (file_path, file_path.length);
+                });
+
                 menu.add (new Gtk.SeparatorMenuItem ());
 
                 //  Gtk.MenuItem menu_rename = new Gtk.MenuItem.with_label (_("Rename File"));

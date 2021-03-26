@@ -25,6 +25,95 @@ using ThiefMD;
 using ThiefMD.Widgets;
 
 namespace ThiefMD.Controllers.Pandoc {
+    private bool has_citeproc () {
+        bool found = false;
+        bool res;
+        try {
+            string[] command = {
+                "pandoc",
+                "-h"
+            };
+            Subprocess pandoc = new Subprocess.newv (command, SubprocessFlags.STDOUT_PIPE);
+            var output_stream = pandoc.get_stdout_pipe ();
+            res = pandoc.wait ();
+            if (output_stream != null) {
+                var input = new DataInputStream (output_stream);
+                string line = "";
+                while ((line = input.read_line (null)) != null) {
+                    if (line.down ().contains ("--citeproc")) {
+                        found = true;
+                    }
+                }
+            }
+        } catch (Error e) {
+            warning ("Could not check pandoc: %s", e.message);
+        }
+        return found;
+    }
+    public bool make_preview (out string output, string markdown, string citation_file = "") {
+        output = "";
+        StringBuilder output_builder = new StringBuilder ();
+        var settings = AppSettings.get_default ();
+        string temp_file = "";
+        if (settings.export_resolve_paths) {
+            temp_file = resolve_paths (markdown);
+        } else {
+            temp_file = markdown;
+        }
+
+        bool res = false;
+        bool work_bib = citation_file != "" || markdown.contains ("bibliography:");
+        if (temp_file != "") {
+            try {
+                string[] command = {
+                    "pandoc",
+                };
+                if (work_bib) {
+                    command +=  has_citeproc () ? "--citeproc" : "--filter=pandoc-citeproc";
+                }
+                if (settings.preview_css != "") {
+                    File css_file = null;
+                    if (settings.preview_css == "modest-splendor") {
+                        css_file = File.new_for_path (Path.build_filename(Build.PKGDATADIR, "styles", "preview.css"));
+                    } else if (settings.preview_css != "") {
+                        css_file = File.new_for_path (Path.build_filename(UserData.css_path, settings.preview_css,"preview.css"));
+                    }
+                    if (css_file != null && css_file.query_exists ()) {
+                        command += "--css";
+                        command += css_file.get_path ();
+                    }
+                }
+                if (citation_file != "") {
+                    command += "--bibliography=" + citation_file;
+                }
+                Subprocess pandoc = new Subprocess.newv (command, SubprocessFlags.STDOUT_PIPE | SubprocessFlags.STDIN_PIPE);
+                var input_stream = pandoc.get_stdin_pipe ();
+                if (input_stream != null) {
+                    DataOutputStream flush_buffer = new DataOutputStream (input_stream);
+                    if (!flush_buffer.put_string (temp_file)) {
+                        warning ("Could not set buffer");
+                    }
+                    flush_buffer.flush ();
+                    flush_buffer.close ();
+                }
+                var output_stream = pandoc.get_stdout_pipe ();
+                res = pandoc.wait ();
+                if (output_stream != null) {
+                    var input = new DataInputStream (output_stream);
+                    string line = "";
+                    while ((line = input.read_line (null)) != null) {
+                        output_builder.append (line + "\n");
+                    }
+                }
+            } catch (Error e) {
+                warning ("Could not generate preview: %s", e.message);
+            }
+        }
+        output = output_builder.str;
+
+        return res;
+    }
+
     public bool make_epub (string output_file, string markdown) {
         var settings = AppSettings.get_default ();
         string resolved_mkd = resolve_paths (markdown);
@@ -32,12 +121,16 @@ namespace ThiefMD.Controllers.Pandoc {
         bool res = false;
         if (temp_file != "") {
             try {
+                bool work_bib =  markdown.contains ("bibliography:");
                 string[] command = {
                     "pandoc",
                     temp_file,
                     "-o",
                     output_file
                 };
+                if (work_bib) {
+                    command +=  has_citeproc () ? "--citeproc" : "--filter=pandoc-citeproc";
+                }
                 if (settings.preview_css != "") {
                     File css_file = null;
                     if (settings.preview_css == "modest-splendor") {
@@ -67,6 +160,7 @@ namespace ThiefMD.Controllers.Pandoc {
         bool res = false;
         if (temp_file != "") {
             try {
+                bool work_bib = markdown.contains ("bibliography:");
                 string[] command = {
                     "pandoc",
                     "-s",
@@ -74,6 +168,9 @@ namespace ThiefMD.Controllers.Pandoc {
                     "-o",
                     output_file
                 };
+                if (work_bib) {
+                    command +=  has_citeproc () ? "--citeproc" : "--filter=pandoc-citeproc";
+                }
                 Subprocess pandoc = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
                 res = pandoc.wait ();
                 File temp = File.new_for_path (temp_file);
@@ -128,6 +225,7 @@ namespace ThiefMD.Controllers.Pandoc {
         bool res = false;
         if (temp_file != "") {
             try {
+                bool work_bib = markdown.contains ("bibliography:");
                 string[] command = {
                     "pandoc",
                     "-s",
@@ -135,6 +233,9 @@ namespace ThiefMD.Controllers.Pandoc {
                     "-o",
                     output_file
                 };
+                if (work_bib) {
+                    command +=  has_citeproc () ? "--citeproc" : "--filter=pandoc-citeproc";
+                }
                 Subprocess pandoc = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
                 res = pandoc.wait ();
                 File temp = File.new_for_path (temp_file);
