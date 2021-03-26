@@ -50,6 +50,7 @@ namespace ThiefMD.Controllers.Pandoc {
         }
         return found;
     }
+
     public bool make_preview (out string output, string markdown, string citation_file = "") {
         output = "";
         StringBuilder output_builder = new StringBuilder ();
@@ -62,13 +63,14 @@ namespace ThiefMD.Controllers.Pandoc {
         }
 
         bool res = false;
-        bool work_bib = citation_file != "" || markdown.contains ("bibliography:");
+        bool work_bib = citation_file != "" || needs_bibtex (markdown);
         if (temp_file != "") {
             try {
                 string[] command = {
                     "pandoc",
                 };
                 if (work_bib) {
+                    warning ("Activating citations");
                     command +=  has_citeproc () ? "--citeproc" : "--filter=pandoc-citeproc";
                 }
                 if (settings.preview_css != "") {
@@ -121,7 +123,7 @@ namespace ThiefMD.Controllers.Pandoc {
         bool res = false;
         if (temp_file != "") {
             try {
-                bool work_bib =  markdown.contains ("bibliography:");
+                bool work_bib =  needs_bibtex (markdown);
                 string[] command = {
                     "pandoc",
                     temp_file,
@@ -160,7 +162,7 @@ namespace ThiefMD.Controllers.Pandoc {
         bool res = false;
         if (temp_file != "") {
             try {
-                bool work_bib = markdown.contains ("bibliography:");
+                bool work_bib = needs_bibtex (markdown);
                 string[] command = {
                     "pandoc",
                     "-s",
@@ -437,5 +439,88 @@ namespace ThiefMD.Controllers.Pandoc {
         } else {
             return url;
         }
+    }
+
+    public bool needs_bibtex (string markdown) {
+        string temp = "";
+        return get_bibtex_path (markdown, ref temp);
+    }
+
+    public bool get_bibtex_path (string markdown, ref string bibtex_path) {
+        string buffer = markdown;
+        Regex headers = null;
+        try {
+            headers = new Regex ("^\\s*(.+)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+        } catch (Error e) {
+            warning ("Could not compile regex: %s", e.message);
+        }
+
+        MatchInfo matches;
+
+        if (buffer.has_prefix ("---" + ThiefProperties.THIEF_MARK_CONST)) {
+            buffer = buffer.replace (ThiefProperties.THIEF_MARK_CONST, "");
+        }
+
+        if (buffer.length > 4 && buffer[0:4] == "---\n") {
+            int i = 0;
+            int last_newline = 3;
+            int next_newline;
+            bool valid_frontmatter = true;
+            string line = "";
+
+            while (valid_frontmatter) {
+                next_newline = buffer.index_of_char('\n', last_newline + 1);
+                if (next_newline == -1 && !((buffer.length > last_newline + 1) && buffer.substring (last_newline + 1).has_prefix("---"))) {
+                    valid_frontmatter = false;
+                    break;
+                }
+
+                if (next_newline == -1) {
+                    line = buffer.substring (last_newline + 1);
+                } else {
+                    line = buffer[last_newline+1:next_newline];
+                }
+                line = line.replace (ThiefProperties.THIEF_MARK_CONST, "");
+                last_newline = next_newline;
+
+                if (line == "---") {
+                    break;
+                }
+
+                if (headers != null) {
+                    if (headers.match (line, RegexMatchFlags.NOTEMPTY_ATSTART, out matches)) {
+                        if (matches.fetch (1).ascii_down() == "bibliography") {
+                            string temp_bibliography = matches.fetch (2);
+                            if (temp_bibliography.has_prefix ("\"") && temp_bibliography.has_suffix ("\"")) {
+                                temp_bibliography = temp_bibliography.substring (1, temp_bibliography.length - 2);
+                            }
+                            bibtex_path = temp_bibliography;
+                            return true;
+                        }
+                    } else {
+                        // If it's a list or empty line, we're cool
+                        line = line.down ().chomp ();
+                        if (!line.has_prefix ("-") && line != "") {
+                            valid_frontmatter = false;
+                            break;
+                        }
+                    }
+                } else {
+                    string quick_parse = line.chomp ();
+                    if (quick_parse.has_prefix ("bibliography")) {
+                        string temp_bibliography = quick_parse.substring (quick_parse.index_of (":") + 1);
+                        if (temp_bibliography.has_prefix ("\"") && temp_bibliography.has_suffix ("\"")) {
+                            temp_bibliography = temp_bibliography.substring (1, temp_bibliography.length - 2);
+                        }
+                        bibtex_path = temp_bibliography;
+                        return true;
+                    }
+                }
+
+                i++;
+            }
+        }
+
+        return false;
     }
 }

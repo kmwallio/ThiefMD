@@ -1317,7 +1317,11 @@ namespace ThiefMD.Widgets {
                 menu.append (menu_insert_datetime);
                 menu.append (menu_insert_frontmatter);
 
-                string bib_file = find_bibtex_for_sheet (opened_filename);
+                string bib_file = "";
+                if (!Pandoc.get_bibtex_path (get_buffer_text (), ref bib_file)){
+                    bib_file = find_bibtex_for_sheet (opened_filename);
+                }
+
                 if (bib_file != "") {
                     BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
                     bib_parser.parse_file ();

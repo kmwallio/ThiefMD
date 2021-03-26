@@ -260,10 +260,14 @@ namespace ThiefMD.Controllers.SheetManager {
     public string get_markdown () {
         var settings = AppSettings.get_default ();
         StringBuilder builder = new StringBuilder ();
+        int i = 0;
         foreach (var sp in _active_editors) {
             string text = (Sheet.areEqual(sp.sheet, _currentSheet.sheet)) ? sp.editor.active_markdown () : sp.editor.get_buffer_text ();
             string title, date;
-            builder.append (FileManager.get_yamlless_markdown (
+            builder.append (i == 0 ?
+                text
+                :
+                FileManager.get_yamlless_markdown (
                 text,
                 0,
                 out title,
@@ -271,6 +275,7 @@ namespace ThiefMD.Controllers.SheetManager {
                 true,
                 settings.export_include_yaml_title,
                 false));
+            i++;
         }
 
         return builder.str;
