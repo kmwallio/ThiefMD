@@ -304,7 +304,7 @@ namespace ThiefMD.Controllers.Pandoc {
             Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex css_url_search = new Regex ("url\\(['\"]?(.+?)['\"]?\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex cover_image_search = new Regex ("(?:cover-image|coverimage|feature_image|featureimage|featured_image|featuredimage):\\s*['\"]?(.+?)['\"]?\\s*$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex cover_image_search = new Regex ("(?:cover-image|coverimage|feature_image|featureimage|featured_image|featuredimage|bibliography):\\s*['\"]?(.+?)['\"]?\\s*$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
 
             processed_mk = url_search.replace_eval (
                 processed_mk,
@@ -432,7 +432,7 @@ namespace ThiefMD.Controllers.Pandoc {
         }
     }
 
-    public string find_file (string url, string path) {
+    public string find_file (string url, string path = "") {
         string result = "";
         if (find_file_to_upload (url, path, out result)) {
             return result;

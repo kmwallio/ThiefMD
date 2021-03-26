@@ -1320,6 +1320,8 @@ namespace ThiefMD.Widgets {
                 string bib_file = "";
                 if (!Pandoc.get_bibtex_path (get_buffer_text (), ref bib_file)){
                     bib_file = find_bibtex_for_sheet (opened_filename);
+                } else {
+                    bib_file = Pandoc.find_file (bib_file);
                 }
 
                 if (bib_file != "") {
