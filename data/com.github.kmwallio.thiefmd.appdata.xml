@@ -64,8 +64,7 @@
       <description>
         <p>This one's for the creators, the note takers, and the plain-text savers. Notes support, screen play support, citation insertion, and more.</p>
         <ul>
-          <li>Open Bibtex files</li>
-          <li>Right-Click Insert Citation</li>
+          <li>Open Bibtex files and Right-Click Insert Citation in Markdown</li>
           <li>Open, Preview, and Export Fountain Screen Plays</li>
           <li>A new Notes Pane can help take notes for the file you're working on, or at the project level</li>
           <li>Know what you're doing? Disable tips and start the app with a black canvas to write in</li>
