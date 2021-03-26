@@ -126,6 +126,7 @@ executable(
     'src/writeas/src/Writeas.vala',
     'src/ghost/src/Ghost.vala',
     'src/wordpress/src/Wordpress.vala',
+    'src/bibtex/src/BibTex.vala',
     asresources,
     c_args: c_args,
     dependencies: [

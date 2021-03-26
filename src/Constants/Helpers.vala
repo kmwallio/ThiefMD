@@ -28,6 +28,47 @@ namespace ThiefMD {
         FILE_NOT_VALID_THEME
     }
 
+    private string find_bibtex_for_sheet (string path = "") {
+        string result = "";
+        string search_path = Path.get_dirname (path);
+        if (search_path == "") {
+            Sheet? search_sheet = SheetManager.get_sheet ();
+            if (search_sheet != null) {
+                search_path = Path.get_dirname (search_sheet.file_path ());
+            }
+        }
+        if (search_path != "") {
+            
+            int idx = 0;
+            while (search_path != "" && ThiefApp.get_instance ().library.file_in_library (search_path)) {
+                try {
+                    Dir dir = Dir.open (search_path, 0);
+                    string? file_name = null;
+                    while ((file_name = dir.read_name()) != null) {
+                        if (!file_name.has_prefix(".")) {
+                            string file_path = Path.build_filename (search_path, file_name);
+                            if (file_path.has_suffix (".bib")) {
+                                result = file_path;
+                                break;
+                            }
+                        }
+                    }
+                } catch (Error e) {
+                    warning ("Could not scan directory: %s", e.message);
+                    break;
+                }
+                idx = search_path.last_index_of_char (Path.DIR_SEPARATOR);
+                if (idx != -1) {
+                    search_path = search_path[0:idx];
+                } else {
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
     public void get_chunk_of_text_around_cursor (ref Gtk.TextIter start, ref Gtk.TextIter end, bool force_lines = false) {
         start.backward_line ();
 

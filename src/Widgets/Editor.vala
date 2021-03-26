@@ -1316,6 +1316,39 @@ namespace ThiefMD.Widgets {
 
                 menu.append (menu_insert_datetime);
                 menu.append (menu_insert_frontmatter);
+
+                string bib_file = find_bibtex_for_sheet (opened_filename);
+                if (bib_file != "") {
+                    BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
+                    bib_parser.parse_file ();
+                    var cite_labels = bib_parser.get_labels ();
+                    if (!cite_labels.is_empty) {
+                        Gtk.MenuItem insert_citation = new Gtk.MenuItem.with_label (_("Insert Citation"));
+                        Gtk.Menu citation_menu = new Gtk.Menu ();
+                        foreach (var citation in cite_labels) {
+                            Gtk.MenuItem citation_item = new Gtk.MenuItem.with_label (citation);
+                            citation_item.set_has_tooltip (true);
+                            citation_item.set_tooltip_text (bib_parser.get_title (citation));
+                            citation_menu.add (citation_item);
+                            citation_item.activate.connect (() => {
+                                string insert_citation_string = citation;
+                                var cursor = buffer.get_insert ();
+                                Gtk.TextIter start;
+                                buffer.get_iter_at_mark (out start, cursor);
+                                if (start.backward_char ()) {
+                                    if (start.get_char () != '@') {
+                                        insert_citation_string = "@" + insert_citation_string;
+                                    }
+                                }
+                                insert_at_cursor (insert_citation_string);
+                            });
+                        }
+                        citation_menu.show_all ();
+                        insert_citation.submenu = citation_menu;
+                        menu.append (insert_citation);
+                    }
+                }
+
                 menu.show_all ();
 
                 menu.selection_done.connect (() => {

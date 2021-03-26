@@ -294,7 +294,7 @@ namespace ThiefMD.Controllers.Pandoc {
                 search_path = path;
             }
             int idx = 0;
-            while (search_path != "") {
+            while (search_path != "" && ThiefApp.get_instance ().library.file_in_library (search_path)) {
                 file = Path.build_filename (search_path, url);
                 if (FileUtils.test (file, FileTest.EXISTS)) {
                     File tmp = File.new_for_path (file);
