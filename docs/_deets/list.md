@@ -3,6 +3,9 @@ layout: page
 title: Details
 ---
 
+* Markdown Editing and Syntax Highlighting
+* Fountain Editing and Syntax Highlighting
+* BibTeX Editing and Syntax Highlighting
 * Single Window Library & Editor
   * `Ctrl+1` - Editor Only
   * `Ctrl+2` - Editor + Current Folder

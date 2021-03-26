@@ -11,6 +11,7 @@ We're making ThiefMD components reusable. You can find the components in at [Git
 - [writeas-vala](#writeas-vala)
 - [ghost-vala](#ghost-vala)
 - [wordpress-vala](#wordpress-vala)
+- [BibTeX-vala](#BibTeX-vala)
 - [Theme Generator](#theme-generator)
 - [ultheme-vala](#ultheme-vala)
 - [ThiefMD](https://github.com/kmwallio/ThiefMD)
@@ -42,9 +43,17 @@ checker.attach (view);
 checker.check_hard_sentences = false;
 
 //
-// WriteGood doesn't auto-check for changes, may be too compute heavy for large docs
+// Quick check only scans around the last check cursor position, and
+// and the current cursor position
 //
 buffer.changed.connect (() => {
+    checker.quick_check ();
+});
+
+//
+// Recheck all will scan the entire document
+//
+buffer.paste_done.connect ((clipboard) => {
     checker.recheck_all ();
 });
 ```
@@ -60,6 +69,24 @@ buffer.changed.connect (() => {
 ## WordPress-vala
 
 [WordPress-vala](https://github.com/ThiefMD/wordpress-vala) is a simple library for publishing posts to [WordPress](https://wordpress.org) blogs. It contains some workarounds and retries for some common issues.
+
+## BibTeX-vala
+
+[BibTeX-vala](https://github.com/ThiefMD/BiBtex-vala) is a quick processor for [BibTeX](http://www.bibtex.org) files. It generates a HashMap of items in the BibTeX file and allows for querying a list of the labels and getting a title for the label.
+
+```vala
+public static void main () {
+    // Set file
+    BibTex.Parser parser = new BibTex.Parser ("test.bib");
+    // Parse
+    parser.parse_file ();
+
+    // Print labels and titles
+    foreach (var label in parser.get_labels ()) {
+        print ("%s - %s\n", label, parser.get_title (label));
+    }
+}
+```
 
 ## Theme Generator
 

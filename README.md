@@ -2,7 +2,7 @@
 
 <img src="docs/images/thiefmd_64.png" width="48" style="float: left; width: 48px" />
 
-ThiefMD is a [Markdown](https://en.wikipedia.org/wiki/Markdown) editor that helps with `organization and management`. It is heavily inspired by [Ulysses](https://ulysses.app). Initial code was based on work from [Quilter](https://github.com/lainsce/quilter).
+ThiefMD is a [Markdown](https://en.wikipedia.org/wiki/Markdown) & [Fountain](https://fountain.io) editor that helps with `organization and management`. It is heavily inspired by [Ulysses](https://ulysses.app). Initial code was based on work from [Quilter](https://github.com/lainsce/quilter).
 
 ## Installation from Flatpak
 
@@ -10,14 +10,6 @@ ThiefMD is a [Markdown](https://en.wikipedia.org/wiki/Markdown) editor that help
 
 ```bash
 flatpak install flathub com.github.kmwallio.thiefmd
-```
-
-## Debian Based Distro Installation
-
-```bash
-sudo add-apt-repository ppa:thiefmd/thiefmd
-sudo apt-get update
-sudo apt-get install com.github.kmwallio.thiefmd
 ```
 
 ## Arch User Repository
@@ -42,7 +34,13 @@ yay -S thiefmd
  * Search `Ctrl+F` for the current file, and `Ctrl+Shift+F` for the *entire* library
  * Writing Statistics
  * Focus Mode (Word, Sentence, and Paragraph)
-
+ * Basic Bibtex Support
+     * Open File & Syntax Highlighting
+     * Right-Click Insert Citation Support in Markdown Documents
+ * Basic Screenwriting Support
+     * Open Fountain Files
+     * Export to HTML & PDF
+ 
 # Translating
 
 [Poeditor](https://poeditor.com/join/project?hash=iQkE5oTIOV) can be used to help translate ThiefMD.
@@ -55,8 +53,8 @@ yay -S thiefmd
 
  * Better library organization
  * Enhanced Export Tooling
- * Screenwriting Support
  * Project Notes
+ * Better import support for Screenplays
 
 ## Resources
 
@@ -94,7 +92,7 @@ Focus Mode
 
 ## Dependencies
 
-[libwritegood-vala](https://github.com/ThiefMD/libwritegood-vala), [writeas-vala](https://github.com/ThiefMD/writeas-vala), [ghost-vala](https://github.com/ThiefMD/ghost-vala), [wordpress-vala](https://github.com/ThiefMD/wordpress-vala) and the [Ulysses Theme Parser](https://github.com/TwiRp/ultheme-vala) are used as git sub-modules.
+[libwritegood-vala](https://github.com/ThiefMD/libwritegood-vala), [writeas-vala](https://github.com/ThiefMD/writeas-vala), [ghost-vala](https://github.com/ThiefMD/ghost-vala), [wordpress-vala](https://github.com/ThiefMD/wordpress-vala), [Bibtex-vala](https://github.com/ThiefMD/BiBtex-vala) and the [Ulysses Theme Parser](https://github.com/TwiRp/ultheme-vala) are used as git sub-modules.
 
 ### Ubuntu
 
@@ -144,7 +142,6 @@ $ cd ThiefMD
 $ git submodule init
 $ git submodule update --remote --recursive
 $ meson build && cd build
-$ meson configure -Dprefix=/usr
 $ ninja
 $ sudo ninja install
 ```
@@ -161,5 +158,6 @@ $ sudo ninja install
 * Preview Scroll stolen from [this Stackoverflow](https://stackoverflow.com/questions/8922107/javascript-scrollintoview-middle-alignment) by [Rohan Orton](https://stackoverflow.com/users/2800005/rohan-orton)
 * Preview Syntax Highlighting by [highlight.js](https://highlightjs.org)
 * Math Rendering by [Katex](https://katex.org)
+* Fountain Rendering by [Fountain.js](https://github.com/thombruce/fountain.js/)
 * Multi-format Export & Import by [Pandoc](https://pandoc.org)
 * Write-Good based on [btford/write-good](https://github.com/btford/write-good)
