@@ -74,10 +74,8 @@ namespace ThiefMD.Widgets {
                 var check_exporter = ThiefApp.get_instance ().exporters.get_exporter (e);
                 if (!render_fountain && check_exporter.supports_markdown) {
                     exporters.add (e);
-                } else {
-                    if (check_exporter.supports_fountain) {
-                        exporters.add (e);
-                    }
+                } else if (render_fountain && check_exporter.supports_fountain) {
+                    exporters.add (e);
                 }
             }
 
