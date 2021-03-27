@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.kmwallio.thiefmd\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-26 20:26-0700\n"
+"POT-Creation-Date: 2021-03-26 20:29-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1149,7 +1149,7 @@ msgid "Library Search"
 msgstr ""
 
 #: src/Widgets/SearchWindow.vala:422
-msgid " Search"
+msgid "Search"
 msgstr ""
 
 #: src/Widgets/SearchWindow.vala:446

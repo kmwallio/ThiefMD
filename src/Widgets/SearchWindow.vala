@@ -419,7 +419,7 @@ namespace ThiefMD.Widgets {
             if (scoped_folder == null || scoped_folder.chomp ().chug () == "") {
                 headerbar.set_title (_("Library Search"));
             } else {
-                headerbar.set_title (get_base_library_path (scoped_folder).replace (Path.DIR_SEPARATOR_S, " " + Path.DIR_SEPARATOR_S + " ") + _(" Search"));
+                headerbar.set_title (get_base_library_path (scoped_folder).replace (Path.DIR_SEPARATOR_S, " " + Path.DIR_SEPARATOR_S + " ") + " " + _("Search"));
             }
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);

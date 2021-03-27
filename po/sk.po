@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-26 20:26-0700\n"
+"POT-Creation-Date: 2021-03-26 20:29-0700\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1151,8 +1151,8 @@ msgid "Library Search"
 msgstr "Hľadanie v knižnici"
 
 #: src/Widgets/SearchWindow.vala:422
-msgid " Search"
-msgstr " Hľadanie"
+msgid "Search"
+msgstr "Hľadať"
 
 #: src/Widgets/SearchWindow.vala:446
 msgid "Monitor for Library changes"
@@ -1166,5 +1166,5 @@ msgstr ""
 msgid "Heading"
 msgstr "Nadpis"
 
-#~ msgid "Search"
-#~ msgstr "Hľadať"
+#~ msgid " Search"
+#~ msgstr " Hľadanie"

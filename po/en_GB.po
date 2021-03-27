@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-26 20:26-0700\n"
+"POT-Creation-Date: 2021-03-26 20:29-0700\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1172,8 +1172,9 @@ msgid "Library Search"
 msgstr "Library Search"
 
 #: src/Widgets/SearchWindow.vala:422
-msgid " Search"
-msgstr " Search"
+#, fuzzy
+msgid "Search"
+msgstr "Search"
 
 #: src/Widgets/SearchWindow.vala:446
 msgid "Monitor for Library changes"
@@ -1186,6 +1187,9 @@ msgstr "<b>Stealing file contents...</b>"
 #: src/Widgets/MarkdownCheatSheet.vala:52
 msgid "Heading"
 msgstr "Heading"
+
+#~ msgid " Search"
+#~ msgstr " Search"
 
 #~ msgid ""
 #~ "Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
