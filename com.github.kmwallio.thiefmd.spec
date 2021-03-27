@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.1.8
+Version: 0.2.0
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
@@ -58,6 +58,8 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 /usr/share/com.github.kmwallio.thiefmd/scripts/auto-render.min.js
 /usr/share/com.github.kmwallio.thiefmd/scripts/highlight.js
 /usr/share/com.github.kmwallio.thiefmd/scripts/katex.min.js
+/usr/share/com.github.kmwallio.thiefmd/scripts/fountain.js
+/usr/share/com.github.kmwallio.thiefmd/styles/fountain.css
 /usr/share/com.github.kmwallio.thiefmd/styles/fonts/KaTeX_AMS-Regular.ttf
 /usr/share/com.github.kmwallio.thiefmd/styles/fonts/KaTeX_AMS-Regular.woff
 /usr/share/com.github.kmwallio.thiefmd/styles/fonts/KaTeX_AMS-Regular.woff2
@@ -199,6 +201,7 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/fish.lang
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/forth.lang
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/fortran.lang
+/usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/fountain.lang
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/fsharp.lang
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/ftl.lang
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/gap.lang
@@ -324,9 +327,15 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sat Mar 27 2021 kmwallio <mwallio@gmail.com> - 0.2.0
+- Open Bibtex files and Right-Click Insert Citation in Markdown
+- Open, Preview, and Export Fountain Screen Plays
+- A new Notes Pane can help take notes for the file you're working on, or at the project level
+- Know what you're doing? Disable tips and start the app with a black canvas to write in
+- Links to other Markdown Documents in the Preview will now open in the Preview and Editor
 * Sat Mar 20 2021 kmwallio <mwallio@gmail.com> - 0.1.8
 - Fix translation issues
-* Sun Mar 13 2021 kmwallio <mwallio@gmail.com> - 0.1.7
+* Sat Mar 13 2021 kmwallio <mwallio@gmail.com> - 0.1.7
 - Snap.as image upload support
 - WordPress featured image support
 - Performance improvements for experimental mode
