@@ -7,7 +7,7 @@ title: About
 
 <div class="responsive-right hoffman"><img src="/images/preview.png" alt="ThiefMD's Live Preview Mode" /></div>
 
-<img src="/images/thiefmd_64.png" style="float: left; height: 64px; width: 64px;" />ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app). It is [Open Source](https://github.com/kmwallio/ThiefMD) and based off of [other great open source software](#credit).
+<img src="/images/thiefmd_64.png" style="float: left; height: 64px; width: 64px;" />ThiefMD is a [Markdown](https://daringfireball.net/projects/markdown) and [Fountain](https://fountain.io) editor and file manager inspired by [Ulysses](https://ulysses.app). It is [Open Source](https://github.com/kmwallio/ThiefMD) and based off of [other great open source software](#credit).
 
 It is my primary way of attempting to learn [Vala](https://wiki.gnome.org/Projects/Vala) and filling in the gap of applications I miss from [macOS](https://apple.com).
 
@@ -19,7 +19,9 @@ ThiefMD currently supports
 
 * Folder Import
 * Markdown Syntax Highlighting
+* Fountain Syntax Highlighting
 * Organization of Folders and Files
+* [BibTeX](http://www.bibtex.org) Citation Support
 * Search individual files (`Ctrl+F`) or the entire library (`Ctrl+Shift+F`)
 * Live Preview
 * Export Preview
@@ -45,10 +47,11 @@ Great software is built on the shoulders of giants.
 * Preview CSS is [Splendor](http://markdowncss.github.io/splendor) + [Modest](http://markdowncss.github.io/modest)
 * Markdown Rendering by [Discount](http://www.pell.portland.or.us/~orc/Code/discount)
 * Preview Syntax Highlighting by [highlight.js](https://highlightjs.org)
+* Fountain Rendering by [Fountain.js](https://github.com/thombruce/fountain.js/)
 * Math Rendering by [Katex](https://katex.org)
 * Multi-format Export & Import by [Pandoc](https://pandoc.org)
 * Write-Good based on [btford/write-good](https://github.com/btford/write-good)
-* Screenshots use [Vimix GTK Themes](https://github.com/vinceliuice/vimix-gtk-themes) and [Vimix Icon Theme](https://github.com/vinceliuice/vimix-icon-theme)
+* Screenshots use [Vimix GTK Themes](https://github.com/vinceliuice/vimix-gtk-themes) and [Vimix Icon Theme](https://github.com/vinceliuice/vimix-icon-theme) or [Adwaita](https://gitlab.gnome.org/GNOME/gtk/tree/master/gtk/theme/Adwaita)
 
 ## Goals
 

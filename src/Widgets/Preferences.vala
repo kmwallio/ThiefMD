@@ -133,7 +133,7 @@ namespace ThiefMD.Widgets {
                     if (data.endpoint.chug ().chomp () == "") {
                         data.endpoint = "https://my.wordpress.org/";
                     }
-                    warning ("Connecting new wordpress account: %s", data.user);
+                    debug ("Connecting new wordpress account: %s", data.user);
                     WordpressConnection connection = new WordpressConnection (data.user, data.auth, data.endpoint);
                     if (connection.connection_valid ()) {
                         SecretSchemas.get_instance ().add_wordpress_secret (data.endpoint, data.user, data.auth);
@@ -163,7 +163,7 @@ namespace ThiefMD.Widgets {
             page.add (display_options);
             page.add (connection_options);
             page.set_icon_name ("preferences-desktop-online-accounts-symbolic");
-            page.set_title ("Connections");
+            page.set_title (_("Connections"));
             return page;
         }
 
@@ -200,7 +200,7 @@ namespace ThiefMD.Widgets {
 
             button.clicked.connect (() => {
                 var dialog = new Gtk.Dialog.with_buttons (
-                    "Remove " + connection.export_name,
+                    _("Remove ") + connection.export_name,
                     this,
                     Gtk.DialogFlags.MODAL,
                     _("_Remove"),
@@ -233,12 +233,12 @@ namespace ThiefMD.Widgets {
         private Hdy.PreferencesPage display_grid () {
             var settings = AppSettings.get_default ();
             Hdy.PreferencesPage page = new Hdy.PreferencesPage ();
-            page.set_title ("Display");
+            page.set_title (_("Display"));
             page.set_icon_name ("preferences-desktop-display-symbolic");
 
             Hdy.PreferencesGroup display_options = new Hdy.PreferencesGroup ();
-            display_options.title = "Display Options";
-            display_options.description = "Make ThiefMD feel like home.";
+            display_options.title = _("Display Options");
+            display_options.description = _("Make ThiefMD feel like home.");
 
             ThiefFontSelector font_selector = new ThiefFontSelector ();
             display_options.add (font_selector);
@@ -279,6 +279,26 @@ namespace ThiefMD.Widgets {
                     settings.focus_mode = true;
                 }
             });
+
+            var num_preview_lines = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+            var num_preview_lines_entry = new Gtk.SpinButton.with_range (0, 15, 1);
+            num_preview_lines_entry.set_value (settings.num_preview_lines);
+            num_preview_lines_entry.value_changed.connect (() => {
+                int new_margin = (int)num_preview_lines_entry.get_value ();
+                if (new_margin >= 0 && new_margin < 15) {
+                    settings.num_preview_lines = new_margin;
+                } else {
+                    num_preview_lines_entry.set_value (settings.num_preview_lines);
+                }
+            });
+            var num_preview_lines_label = new Label(_("Number of Lines to Preview in Sheets View"));
+            num_preview_lines_label.xalign = 0;
+            num_preview_lines_label.hexpand = true;
+            num_preview_lines_label.margin = 12;
+            num_preview_lines_label.set_line_wrap (true);
+            num_preview_lines.add (num_preview_lines_entry);
+            num_preview_lines.add (num_preview_lines_label);
+            display_options.add (num_preview_lines);
 
             var add_theme_button = new Gtk.Button.with_label (_("Add New Theme"));
             add_theme_button.hexpand = true;
@@ -322,13 +342,13 @@ namespace ThiefMD.Widgets {
 
         private Hdy.PreferencesPage export_grid () {
             Hdy.PreferencesPage page = new Hdy.PreferencesPage ();
-            page.set_title ("Export");
+            page.set_title (_("Export"));
             page.set_icon_name ("preferences-system-devices-symbolic");
             var settings = AppSettings.get_default ();
 
             Hdy.PreferencesGroup editor_options = new Hdy.PreferencesGroup ();
-            editor_options.title = "Compiling Options";
-            editor_options.description = "Adjust how Markdown files are compiled together.";
+            editor_options.title = _("Compiling Options");
+            editor_options.description = _("Adjust how Markdown files are compiled together.");
 
             var epub_metadata = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var epub_metadata_file = new Switch ();
@@ -383,8 +403,8 @@ namespace ThiefMD.Widgets {
             editor_options.add (export_include_yaml);
 
             Hdy.PreferencesGroup page_setup = new Hdy.PreferencesGroup ();
-            page_setup.title = "Page Setup";
-            page_setup.description = "Configure PDF export options.";
+            page_setup.title = _("Page Setup");
+            page_setup.description = _("Configure PDF export options.");
 
             var pagebreak_folder = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var pagebreak_folder_switch = new Switch ();
@@ -423,8 +443,8 @@ namespace ThiefMD.Widgets {
             var paper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var paper_size = new Gtk.ComboBoxText ();
             paper_size.hexpand = true;
-            for (int i = 0; i < ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.length; i++) {
-                paper_size.append_text (ThiefProperties.PAPER_SIZES_FRIENDLY_NAME[i]);
+            for (int i = 0; i < ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.size; i++) {
+                paper_size.append_text (ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.get (i));
 
                 if (settings.export_paper_size == ThiefProperties.PAPER_SIZES_GTK_NAME[i]) {
                     paper_size.set_active (i);
@@ -481,8 +501,8 @@ namespace ThiefMD.Widgets {
             page_setup.add (top_bottom_margin);
 
             Hdy.PreferencesGroup pdf_options = new Hdy.PreferencesGroup ();
-            pdf_options.title = "PDF CSS";
-            pdf_options.description = "Choose CSS Style for PDF Export.";
+            pdf_options.title = _("PDF CSS");
+            pdf_options.description = _("Choose CSS Style for PDF Export.");
             int cur_w = this.get_allocated_width ();
 
             var print_css_selector = new CssSelector ("print");
@@ -490,8 +510,8 @@ namespace ThiefMD.Widgets {
             pdf_options.add (print_css_selector);
 
             Hdy.PreferencesGroup epub_setup = new Hdy.PreferencesGroup ();
-            epub_setup.title = "ePub & HTML CSS";
-            epub_setup.description = "Choose CSS Style to use for ePub and HTML Export.";
+            epub_setup.title = _("ePub & HTML CSS");
+            epub_setup.description = _("Choose CSS Style to use for ePub and HTML Export.");
 
             var css_selector = new CssSelector ("preview");
             css_selector.set_size_request (cur_w, (int)(1.2 * Constants.CSS_PREVIEW_HEIGHT + 5));
@@ -520,12 +540,12 @@ namespace ThiefMD.Widgets {
         private Hdy.PreferencesPage editor_grid () {
             var settings = AppSettings.get_default ();
             Hdy.PreferencesPage page = new Hdy.PreferencesPage ();
-            page.set_title ("Editor");
+            page.set_title (_("Editor"));
             page.set_icon_name ("thiefmd-symbolic");
 
             Hdy.PreferencesGroup editor_options = new Hdy.PreferencesGroup ();
-            editor_options.title = "Editor Settings";
-            editor_options.description = "Modify the ThiefMD environment.";
+            editor_options.title = _("Editor Settings");
+            editor_options.description = _("Modify the ThiefMD environment.");
 
             Gtk.Box spellcheck = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var spellcheck_switch = new Switch ();
@@ -598,13 +618,29 @@ namespace ThiefMD.Widgets {
             ui_writing_statistics.add (ui_writing_statistics_label);
             editor_options.add (ui_writing_statistics);
 
+            var ui_dont_show_tips = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+            var ui_dont_show_tips_switch = new Switch ();
+            ui_dont_show_tips_switch.set_active (settings.dont_show_tips);
+            ui_dont_show_tips_switch.notify["active"].connect (() => {
+                settings.dont_show_tips = ui_dont_show_tips_switch.get_active ();
+            });
+            ui_dont_show_tips_switch.margin = 12;
+            ui_dont_show_tips_switch.tooltip_text = _("Disable application tips");
+            var ui_dont_show_tips_label = new Label(_("Start with new empty sheet on launch"));
+            ui_dont_show_tips_label.xalign = 0;
+            ui_dont_show_tips_label.margin = 12;
+            ui_dont_show_tips_label.set_line_wrap (true);
+            ui_dont_show_tips.add (ui_dont_show_tips_switch);
+            ui_dont_show_tips.add (ui_dont_show_tips_label);
+            editor_options.add (ui_dont_show_tips);
+
             //
             // More UI-ish options
             //
 
             Hdy.PreferencesGroup thiefmd_options = new Hdy.PreferencesGroup ();
-            thiefmd_options.title = "ThiefMD Settings";
-            thiefmd_options.description = "Modify the ThiefMD appearance.";
+            thiefmd_options.title = _("ThiefMD Settings");
+            thiefmd_options.description = _("Modify the ThiefMD appearance.");
 
             var ui_colorscheme = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var ui_colorscheme_switch = new Switch ();

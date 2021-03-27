@@ -30,6 +30,12 @@ Prefer [LaTeX](https://latex-project.org)? [TeXstudio](https://flathub.org/apps/
 
 [Tomboy](https://flathub.org/apps/details/org.gnome.Tomboy) is a Wiki-like note taking about. Build worlds, link characters, and keep everything connected. [Notes-Up](https://flathub.org/apps/details/com.github.philip_scott.notes-up) supports tagging and exporting in an elegant and modern interface. Keep working in markdown instead of needing to learn new syntax.
 
+## Bibliography Management
+
+[Setzer](https://flathub.org/apps/details/org.cvfosammmm.Setzer) can handle basic BibTeX changes.
+
+[JabRef](https://flathub.org/apps/details/org.jabref.jabref) is a powerful Citation and Reference management tool.
+
 ## Making a Cover Image
 
 [Krita](https://flathub.org/apps/details/org.kde.krita) is great for drawing or digitally painting the cover of your novel. [GIMP](https://flathub.org/apps/details/org.gimp.GIMP) is another great alternative. I find GIMP is great if you're using a Photo as a starting point. Krita is great if you want to start from a blank canvas.

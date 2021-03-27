@@ -1,3 +1,13 @@
+com.github.kmwallio.thiefmd (0.2.0) groovy; urgency=load
+
+  * Open Bibtex files and Right-Click Insert Citation in Markdown
+  * Open, Preview, and Export Fountain Screen Plays
+  * A new Notes Pane can help take notes for the file you're working on, or at the project level
+  * Know what you're doing? Disable tips and start the app with a black canvas to write in
+  * Links to other Markdown Documents in the Preview will now open in the Preview and Editor
+
+ -- kmwallio <mwallio@gmail.com>  Fri, 26 Mar 2021 22:15:05 -0700
+
 com.github.kmwallio.thiefmd (0.1.8) groovy; urgency=low
 
   * Fix translation issues

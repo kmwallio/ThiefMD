@@ -39,27 +39,45 @@ namespace ThiefMD.Controllers.UI {
 
         if (preview_mutex.can_do_action ()) {
             var settings = AppSettings.get_default ();
-            Preview.get_instance ().update_html_view (true, SheetManager.get_markdown ());
+            Preview.get_instance ().update_html_view (true, SheetManager.get_markdown (), is_fountain (settings.last_file));
             settings.writing_changed ();
         }
     }
 
     // Switches Sheets shown in the Library view with the
     // provided sheet
+    Sheets? current;
     public Sheets set_sheets (Sheets? sheet) {
+        var settings = AppSettings.get_default ();
         if (sheet == null) {
             return sheet;
         }
         ThiefApp instance = ThiefApp.get_instance ();
-        var old = instance.library_pane.get_child2 ();
-        int cur_pos = instance.library_pane.get_position ();
-        if (old != null) {
-            instance.library_pane.remove (old);
+        var old = current;
+        if (current != null) {
+            instance.library_pane.remove (current);
+            sheet.width_request = settings.view_sheets_width;
+            instance.library_pane.add (sheet);
+            instance.library_pane.show_all ();
+            instance.library_pane.width_request = settings.view_sheets_width + settings.view_library_width;
         }
-        instance.library_pane.add2 (sheet);
-        instance.library_pane.set_position (cur_pos);
-        instance.library_pane.get_child2 ().show_all ();
+        settings.sheet_changed ();
+        current = sheet;
         return (Sheets) old;
+    }
+
+    public void widen_sheets () {
+        if (current != null) {
+            current.hexpand = true;
+        }
+    }
+
+    public void shrink_sheets () {
+        if (current != null) {
+            var settings = AppSettings.get_default ();
+            current.hexpand = false;
+            current.width_request = settings.view_sheets_width;
+        }
     }
 
     //
@@ -456,46 +474,61 @@ namespace ThiefMD.Controllers.UI {
         return thief_languages;
     }
 
-    public Gtk.SourceLanguage get_source_language () {
+    public Gtk.SourceLanguage get_source_language (string filename = "something.md") {
         var languages = get_language_manager ();
+        Gtk.SourceLanguage? language = null;
+        string file_name = filename.down ();
 
-        var markdown_syntax = languages.get_language ("markdown");
-        if (markdown_syntax == null) {
-            markdown_syntax = languages.guess_language (null, "text/markdown");
+        if (file_name.has_suffix (".bib") || file_name.has_suffix (".bibtex")) {
+            language = languages.get_language ("bibtex");
+            if (language == null) {
+                language = languages.guess_language (null, "text/x-bibtex");
+            }
+        } else if (file_name.has_suffix (".fountain") || file_name.has_suffix (".fou") || file_name.has_suffix (".spmd")) {
+            language = languages.get_language ("fountain");
+            if (language == null) {
+                language = languages.guess_language (null, "text/fountain");
+            }
+        } else {
+            language = languages.get_language ("markdown");
+            if (language == null) {
+                language = languages.guess_language (null, "text/markdown");
+            }
         }
 
-        return markdown_syntax;
+        return language;
     }
 
     //
     // Switching Main Window View
     //
 
-    public void show_editor () {
-        if (ThiefApp.get_instance ().am_mobile || ThiefApp.get_instance ().mobile_mode) {
-            var settings = AppSettings.get_default ();
-            ThiefApp.get_instance ().mobile_stack.set_visible_child_name (_("Editor"));
-            settings.view_state = 1;
+    public void focus_editor () {
+        var settings = AppSettings.get_default ();
+        ThiefApp instance = ThiefApp.get_instance ();
+        if (instance.main_content != null) {
+            instance.main_content.set_visible_child (SheetManager.get_view ());
+            if (instance.main_content.folded) {
+                settings.view_state = 2;
+            }
         }
+    }
+
+    public void show_editor () {
+        var settings = AppSettings.get_default ();
+        settings.view_state = 1;
+        show_view ();
     }
 
     public void show_search () {
-        if (ThiefApp.get_instance ().am_mobile || ThiefApp.get_instance ().mobile_mode) {
-            var settings = AppSettings.get_default ();
-            ThiefApp.get_instance ().mobile_stack.set_visible_child_name (_("Search"));
-            settings.view_state = 1;
-        } else {
-            SearchWindow search_window = new SearchWindow ();
-            search_window.show_all ();
-        }
+        ThiefApp instance = ThiefApp.get_instance ();
+        instance.show_search ();
     }
 
     public void show_library () {
-        if (ThiefApp.get_instance ().am_mobile || ThiefApp.get_instance ().mobile_mode) {
-            var settings = AppSettings.get_default ();
-            ThiefApp.get_instance ().mobile_stack.set_visible_child_name (_("Editor"));
-            settings.view_state = 0;
-        }
+        var settings = AppSettings.get_default ();
+        settings.view_state = 0;
+        show_view ();
     }
 
     // Cycle through views
@@ -508,29 +541,31 @@ namespace ThiefMD.Controllers.UI {
             _show_filename = settings.show_filename;
         }
 
-        if (moving ()) {
+        if (!instance.ready) {
             return;
         }
 
-        if (ThiefApp.get_instance ().am_mobile) {
-            settings.view_state = (settings.view_state + 1) % 2;
-
-            if (settings.view_state  == 0) {
-                ThiefApp.get_instance ().mobile_stack.set_visible_child_name (_("Library"));
+        instance.hide_search ();
+        if (instance.main_content != null && instance.main_content.folded) {
+            settings.view_state = (settings.view_state + 1) % 3;
+            if (settings.view_state == 0) {
+                show_sheets_and_library ();
+                instance.main_content.set_visible_child (instance.library_pane);
+                instance.library_pane.set_visible_child (instance.library_view);
+            } else if (settings.view_state == 1) {
+                show_sheets_and_library ();
+                instance.main_content.set_visible_child (instance.library_pane);
+                if (current != null) {
+                    instance.library_pane.set_visible_child (current);
+                }
+                if (!instance.library_pane.folded) {
+                    toggle_view ();
+                }
             } else {
-                show_editor ();
+                instance.main_content.set_visible_child (SheetManager.get_view ());
             }
         } else {
             settings.view_state = (settings.view_state + 1) % 3;
-
-            if (settings.view_state == 2) {
-                settings.view_sheets_width = instance.sheets_pane.get_position ();
-            } else if (settings.view_state == 1) {
-                int target_sheets = instance.sheets_pane.get_position () - instance.library_pane.get_position ();
-                settings.view_sheets_width = target_sheets;
-                settings.view_library_width = instance.library_pane.get_position ();
-            }
-
             show_view ();
         }
     }
@@ -543,230 +578,70 @@ namespace ThiefMD.Controllers.UI {
             _show_filename = settings.show_filename;
         }
 
-        if (moving ()) {
-            return;
-        }
-
+        ThiefApp.get_instance ().hide_search ();
         if (settings.view_state == 0) {
-            settings.show_filename = _show_filename;
-
-            if (settings.view_library_width <= 10) {
-                settings.view_library_width = 200;
-            }
-
-            if (settings.view_sheets_width <= 10) {
-                settings.view_sheets_width = 200;
-            }
-
             show_sheets_and_library ();
-            debug ("Show both\n");
         } else if (settings.view_state == 1) {
             hide_library ();
-            debug ("Show sheets\n");
         } else if (settings.view_state == 2) {
             hide_sheets ();
-            debug ("Show editor\n");
-            _show_filename = settings.show_filename;
-            settings.show_filename = true;
         }
-        debug ("View mode: %d\n", settings.view_state);
     }
 
     // Switch to showing Editor + Sheets
     public void show_sheets () {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
-
-        instance.library_pane.show ();
-        instance.library_pane.get_child1 ().show ();
-        instance.library_pane.get_child2 ().show_all ();
-
-        debug ("Showing sheets (%d)\n", instance.sheets_pane.get_position ());
-        move_panes(0, settings.view_sheets_width);
+        if (current != null) {
+            current.show ();
+            current.width_request = settings.view_sheets_width;
+            instance.library_pane.set_visible_child (current);
+            instance.library_pane.show ();
+        }
+        instance.main_content.set_visible_child (instance.library_pane);
     }
 
     public void hide_library () {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
-
-        instance.library_pane.show ();
-        instance.library_pane.get_child1 ().show ();
-        instance.library_pane.get_child2 ().show_all ();
-
-        debug ("Hiding library (%d)\n", instance.library_pane.get_position ());
-        if (instance.library_pane.get_position () > 0 || instance.sheets_pane.get_position () <= 0) {
-            int target_sheets = 0;
-            if (instance.library_pane.get_position () > 0) {
-                target_sheets = instance.sheets_pane.get_position () - instance.library_pane.get_position ();
-            } else {
-                if (instance.sheets_pane.get_position () > 0) {
-                    target_sheets = instance.sheets_pane.get_position ();
-                } else {
-                    target_sheets = settings.view_sheets_width;
-                }
-            }
-
-            move_panes (0, target_sheets);
+        if (current != null) {
+            current.show ();
+            current.width_request = settings.view_sheets_width;
+            instance.library_pane.set_visible_child (current);
+            instance.library_view.hide ();
+            instance.library_pane.width_request = settings.view_sheets_width;
+            instance.main_content.set_visible_child (SheetManager.get_view ());
+            instance.library_pane.show ();
         }
-
-        _moving.connect (() => {
-            // Second instance because instance above goes out of scope
-            // leading to segfault?
-            ThiefApp instance2 = ThiefApp.get_instance ();
-            instance2.library_pane.get_child1 ().hide ();
-        });
+        
+        if (instance.ready && instance.main_content.folded) {
+            settings.view_state += 1;
+        }
     }
 
     // Show all three panels
     public void show_sheets_and_library () {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
-
-        instance.library_pane.show ();
-        instance.library_pane.get_child1 ().show ();
-        instance.library_pane.get_child2 ().show_all ();
-
-        move_panes (settings.view_library_width, settings.view_sheets_width + settings.view_library_width);
+        if (current != null) {
+            current.show ();
+            current.width_request = settings.view_sheets_width;
+            instance.library_view.show ();
+            instance.library_view.width_request = settings.view_library_width;
+            instance.library_pane.show_all ();
+            instance.library_pane.width_request = settings.view_sheets_width + settings.view_library_width;
+        }
+        instance.main_content.set_visible_child (SheetManager.get_view ());
     }
 
     // Show just the Editor
     public void hide_sheets () {
         ThiefApp instance = ThiefApp.get_instance ();
-
-        debug ("Hiding sheets (%d)\n", instance.sheets_pane.get_position ());
-
-        _moving.connect (() => {
-            // Second instance because instance above goes out of scope
-            // leading to segfault?
-            ThiefApp instance2 = ThiefApp.get_instance ();
-            instance2.library_pane.get_child2 ().hide ();
-            instance2.library_pane.hide ();
-        });
-        move_panes(0, 0);
+        instance.library_pane.hide ();
     }
 
-    // There's totally a GTK thing that supports animation, but I haven't found where to
-    // steal the code from yet
-    private int _hop_sheets = 0;
-    private int _hop_library = 0;
-    private void move_panes (int library_pane, int sheet_pane) {
-        ThiefApp instance = ThiefApp.get_instance ();
-
-        if (moving ()) {
-            return;
-        }
-
-        if (!_moving.start_move ()) {
-            return;
-        }
-
-        _hop_sheets = (int)((sheet_pane - instance.sheets_pane.get_position ()) / Constants.ANIMATION_FRAMES);
-        _hop_library = (int)((library_pane - instance.library_pane.get_position ()) / Constants.ANIMATION_FRAMES);
-
-        debug ("Sheets (%d, %d), Library (%d, %d)\n", sheet_pane, instance.sheets_pane.get_position (), library_pane, instance.library_pane.get_position ());
-
-        debug ("Sheets hop: %d, Library Hop: %d\n", _hop_sheets, _hop_library);
-
-        Timeout.add ((int)(Constants.ANIMATION_TIME / Constants.ANIMATION_FRAMES), () => {
-            int next_sheets = instance.sheets_pane.get_position () + _hop_sheets;
-            int next_library = instance.library_pane.get_position () + _hop_library;
-            bool sheet_done = false;
-            bool lib_done = false;
-
-            if (!_moving.moving) {
-                // debug ("No longer moving\n");
-                return false;
-            }
-
-            // debug ("Sheets move: (%d, %d), Library move: (%d, %d)\n", next_sheets, _hop_sheets, next_library, _hop_library);
-
-            if ((_hop_sheets > 0) && (next_sheets >= sheet_pane)) {
-                instance.sheets_pane.set_position (sheet_pane);
-                sheet_done = true;
-            } else if ((_hop_sheets < 0) && (next_sheets <= sheet_pane)) {
-                instance.sheets_pane.set_position (sheet_pane);
-                sheet_done = true;
-            } else {
-                instance.sheets_pane.set_position (next_sheets);
-            }
-            sheet_done = sheet_done || (_hop_sheets == 0);
-
-            if ((_hop_library > 0) && (next_library >= library_pane)) {
-                instance.library_pane.set_position (library_pane);
-                lib_done = true;
-            } else if ((_hop_library < 0) && (next_library <= library_pane)) {
-                instance.library_pane.set_position (library_pane);
-                lib_done = true;
-            } else {
-                instance.library_pane.set_position (next_library);
-            }
-            lib_done = lib_done || (_hop_library == 0);
-
-            // debug ("Sheets done: %s, Library done: %s\n", sheet_done ? "yes" : "no", lib_done ? "yes" : "no");
-
-            bool still_moving = !lib_done || !sheet_done;
-            if (!still_moving) {
-                _moving.stop_move ();
-                _moving.movement_done ();
-                SheetManager.redraw ();
-            }
-            return _moving.moving;
-        });
-    }
-
-    private delegate void MovementCallback ();
-    private class Movement {
-        public bool moving;
-        private MovementCallback handler;
-        public signal void movement_done ();
-        Mutex move_lock;
-
-        public Movement () {
-            moving = false;
-            handler = do_nothing;
-            move_lock = new Mutex ();
-
-            movement_done.connect (() => {
-                handler ();
-                handler = do_nothing;
-            });
-        }
-
-        public bool stop_move () {
-            move_lock.lock ();
-            moving = false;
-            move_lock.unlock ();
-            return true;
-        }
-
-        public bool start_move () {
-            bool movable = false;
-            if (move_lock.trylock ()) {
-                if (!moving) {
-                    moving = true;
-                    movable = true;
-                }
-                move_lock.unlock ();
-            }
-
-            return movable;
-        }
-
-        public void do_nothing () {
-            // avoid segfault?
-        }
-
-        public void connect (MovementCallback callback) {
-            handler = callback;
-        }
-    }
-
+    // @TODO: Until we fix logic for all references
     public bool moving () {
-        if (_moving == null) {
-            _moving = new Movement ();
-        }
-
-        return _moving.moving;
+        return false;
     }
-    private static Movement _moving;
 }

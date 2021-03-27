@@ -63,10 +63,19 @@ namespace ThiefMD.Widgets {
 
         public Library () {
             debug ("Setting up library");
-            _lib_store = new TreeStore (2, typeof (string), typeof (LibPair));
+            _lib_store = new TreeStore (3, typeof (string), typeof (LibPair), typeof (Pixbuf));
             parse_library ();
             set_model (_lib_store);
-            insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
+            var library_item_display = new TreeViewColumn ();
+            var library_item_text = new CellRendererText ();
+            var library_item_icon = new CellRendererPixbuf ();
+            library_item_display.pack_start (library_item_icon, false);
+            library_item_display.pack_start (library_item_text, true);
+            library_item_display.add_attribute (library_item_text, "text", 0);
+            library_item_display.add_attribute (library_item_icon, "pixbuf", 2);
+            // insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
+            library_item_display.set_title (_("Library"));
+            append_column (library_item_display);
             get_selection ().changed.connect (on_selection);
             folder_popup = new NewFolder ();
             _droppable = new PreventDelayedDrop ();
@@ -216,7 +225,8 @@ namespace ThiefMD.Widgets {
                     _lib_store.append (out root, null);
                     debug (lib);
                     LibPair pair = new LibPair(lib, root);
-                    _lib_store.set (root, 0, pair._title, 1, pair, -1);
+                    var icon = get_pixbuf_for_folder (lib);
+                    _lib_store.set (root, 0, pair._title, 1, pair, 2, icon, -1);
                     _all_sheets.append (pair);
 
                     parse_dir(pair._sheets, lib, root);
@@ -278,7 +288,8 @@ namespace ThiefMD.Widgets {
                             LibPair pair = new LibPair(path, child);
                             _all_sheets.append (pair);
                             // Append dir to list
-                            _lib_store.set (child, 0, pair._title, 1, pair, -1);
+                            var icon = get_pixbuf_for_folder (path);
+                            _lib_store.set (child, 0, pair._title, 1, pair, 2, icon, -1);
 
                             parse_dir (pair._sheets, path, child);
                         } else if (!file.query_exists ()) {
@@ -304,7 +315,8 @@ namespace ThiefMD.Widgets {
                             LibPair pair = new LibPair(path, child);
                             _all_sheets.append (pair);
                             // Append dir to list
-                            _lib_store.set (child, 0, pair._title, 1, pair, -1);
+                            var icon = get_pixbuf_for_folder (path);
+                            _lib_store.set (child, 0, pair._title, 1, pair, 2, icon, -1);
                             sheet_dir.metadata.add_folder (file_name);
 
                             parse_dir (pair._sheets, path, child);
@@ -335,6 +347,23 @@ namespace ThiefMD.Widgets {
                 }
             }
             return false;
+        }
+
+        public Sheets? find_sheets_for_path (string file_path) {
+            int len = 0;
+            Sheets? parent = null;
+            foreach (LibPair p in _all_sheets)
+            {
+                if (file_path.down ().has_prefix (p._path.down ()))
+                {
+                    if (p._path.length > len) {
+                        len = p._path.length;
+                        parent = p._sheets;
+                    }
+                }
+            }
+
+            return parent;
         }
 
         public Sheet? find_sheet_for_path (string file_path) {
@@ -391,11 +420,39 @@ namespace ThiefMD.Widgets {
             return novel;
         }
 
+        private bool render_fountain (LibPair p, bool metadata = false) {
+            foreach (var file in p._sheets.metadata.sheet_order) {
+                if (!exportable_file (file)) {
+                    continue;
+                }
+
+                if (is_fountain (file)) {
+                    return true;
+                }
+            }
+
+            foreach (var folder in p._sheets.metadata.folder_order) {
+                if (!p._sheets.metadata.hidden_folders.contains (folder)) {
+                    string path = Path.build_filename (p._path, folder);
+                    if (FileUtils.test (path, FileTest.IS_DIR) && !FileUtils.test (path, FileTest.IS_SYMLINK)) {
+                        LibPair? child = get_item (path);
+                        return render_fountain (child);
+                    }
+                }
+            }
+
+            return false;
+        }
+
         private string build_novel (LibPair p, bool metadata = false) {
             StringBuilder markdown = new StringBuilder ();
             var settings = AppSettings.get_default ();
 
             foreach (var file in p._sheets.metadata.sheet_order) {
+                if (!exportable_file (file)) {
+                    continue;
+                }
+
                 string sheet_markdown = FileManager.get_file_contents (Path.build_filename (p._path, file));
                 if (settings.export_resolve_paths) {
                     sheet_markdown = Pandoc.resolve_paths (sheet_markdown, p._path);
@@ -413,6 +470,9 @@ namespace ThiefMD.Widgets {
                         false);
 
                     markdown.append (sheet_markdown);
+                    if (is_fountain (file)) {
+                        markdown.append ("\n");
+                    }
                     if (settings.export_break_sheets) {
                         markdown.append ("\n<div style='page-break-before: always'></div>\n");
                     } else {
@@ -478,7 +538,7 @@ namespace ThiefMD.Widgets {
                 menu_preview_item.activate.connect (() => {
                     if (_selected != null && _all_sheets.find (_selected) != null) {
                         string preview_markdown = build_novel (_selected, settings.export_include_metadata_file);
-                        PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown);
+                        PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown, render_fountain (_selected));
                         ppw.show ();
                     }
                 });
@@ -572,6 +632,63 @@ namespace ThiefMD.Widgets {
                 });
                 menu.add (menu_reveal_items);
 
+                if (_selected != null && _all_sheets.find (_selected) != null) {
+                    menu.add (new Gtk.SeparatorMenuItem ());
+                    Gtk.MenuItem set_icon = new Gtk.MenuItem.with_label (_("Set Project Icon"));
+                    Gtk.Menu icon_menu = new Gtk.Menu ();
+                    {
+                        Gtk.ImageMenuItem no_icon = set_icon_option (_("None"), "", _selected._sheets);
+                        icon_menu.add (no_icon);
+
+                        Gtk.ImageMenuItem folder_icon = set_icon_option (_("Folder"), "folder", _selected._sheets);
+                        icon_menu.add (folder_icon);
+
+                        Gtk.ImageMenuItem reader_icon = set_icon_option (_("Reader"), "ephy-reader-mode-symbolic", _selected._sheets);
+                        icon_menu.add (reader_icon);
+
+                        Gtk.ImageMenuItem love_icon = set_icon_option (_("Love"), "emote-love-symbolic", _selected._sheets);
+                        icon_menu.add (love_icon);
+
+                        Gtk.ImageMenuItem game_icon = set_icon_option (_("Game"), "applications-games-symbolic", _selected._sheets);
+                        icon_menu.add (game_icon);
+                        
+                        Gtk.ImageMenuItem art_icon = set_icon_option (_("Art"), "applications-graphics-symbolic", _selected._sheets);
+                        icon_menu.add (art_icon);
+
+                        Gtk.ImageMenuItem nature_icon = set_icon_option (_("Nature"), "emoji-nature-symbolic", _selected._sheets);
+                        icon_menu.add (nature_icon);
+
+                        Gtk.ImageMenuItem food_icon = set_icon_option (_("Food"), "emoji-food-symbolic", _selected._sheets);
+                        icon_menu.add (food_icon);
+
+                        Gtk.ImageMenuItem help_icon = set_icon_option (_("Help"), "system-help-symbolic", _selected._sheets);
+                        icon_menu.add (help_icon);
+
+                        Gtk.ImageMenuItem cool_icon = set_icon_option (_("Cool"), "face-cool-symbolic", _selected._sheets);
+                        icon_menu.add (cool_icon);
+
+                        Gtk.ImageMenuItem angel_icon = set_icon_option (_("Angel"), "face-angel-symbolic", _selected._sheets);
+                        icon_menu.add (angel_icon);
+
+                        Gtk.ImageMenuItem monkey_icon = set_icon_option (_("Monkey"), "face-monkey-symbolic", _selected._sheets);
+                        icon_menu.add (monkey_icon);
+
+                        Gtk.ImageMenuItem wordpress_icon = set_icon_option (_("WordPress"), "/com/github/kmwallio/thiefmd/icons/wordpress.png", _selected._sheets);
+                        icon_menu.add (wordpress_icon);
+
+                        Gtk.ImageMenuItem ghost_icon = set_icon_option (_("Ghost"), "/com/github/kmwallio/thiefmd/icons/ghost.png", _selected._sheets);
+                        icon_menu.add (ghost_icon);
+
+                        Gtk.ImageMenuItem writefreely_icon = set_icon_option (_("Write Freely"), "/com/github/kmwallio/thiefmd/icons/wf.png", _selected._sheets);
+                        icon_menu.add (writefreely_icon);
+
+                        Gtk.ImageMenuItem trash_icon = set_icon_option (_("Trash"), "user-trash-symbolic", _selected._sheets);
+                        icon_menu.add (trash_icon);
+                    }
+                    set_icon.submenu = icon_menu;
+                    menu.add (set_icon);
+                }
+
                 if (_selected != null && settings.is_in_library (_selected._path)) {
                     menu.add (new Gtk.SeparatorMenuItem ());
 
@@ -598,6 +715,8 @@ namespace ThiefMD.Widgets {
                 menu.attach_to_widget (this, null);
                 menu.show_all ();
                 menu.popup_at_pointer (event);
+            } else if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 1) {
+                UI.show_sheets ();
             }
             return true;
         }
@@ -804,7 +923,7 @@ namespace ThiefMD.Widgets {
                             return;
                         }
 
-                        if (file_to_move.has_suffix (".md") || file_to_move.has_suffix (".markdown")) {
+                        if (can_open_file (file_to_move)) {
                             debug ("Prompting for action");
                             Dialog prompt = new Dialog.with_buttons (
                                 "Move into Library",
@@ -872,6 +991,10 @@ namespace ThiefMD.Widgets {
                 {
                     debug ("Moving %s to %s", file_to_move, p._path);
                     FileManager.move_item (file_to_move, p._path);
+                    File notes_page = File.new_for_path (file_to_move + ".notes");
+                    if (notes_page.query_exists ()) {
+                        FileManager.move_item (notes_page.get_path (), p._path);
+                    }
                     refresh_sheets (p._path);
                     File? parent = file.get_parent ();
                     if (parent != null)

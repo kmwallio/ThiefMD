@@ -35,7 +35,7 @@ namespace ThiefMD.Exporters {
         public ExportPdf () {
             export_name = "PDF";
             export_css = "print";
-            build_ui ();
+            supports_fountain = true;
         }
 
         private void build_ui () {
@@ -43,8 +43,8 @@ namespace ThiefMD.Exporters {
 
             paper_size = new Gtk.ComboBoxText ();
             paper_size.hexpand = true;
-            for (int i = 0; i < ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.length; i++) {
-                paper_size.append_text (ThiefProperties.PAPER_SIZES_FRIENDLY_NAME[i]);
+            for (int i = 0; i < ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.size; i++) {
+                paper_size.append_text (ThiefProperties.PAPER_SIZES_FRIENDLY_NAME.get (i));
 
                 if (settings.export_paper_size == ThiefProperties.PAPER_SIZES_GTK_NAME[i]) {
                     paper_size.set_active (i);
@@ -59,18 +59,24 @@ namespace ThiefMD.Exporters {
             });
         }
 
+        private void destroy_ui () {
+            paper_size = null;
+        }
+
         public override string update_markdown (string markdown) {
             return markdown;
         }
 
         public override void attach (PublisherPreviewWindow ppw) {
             publisher_instance = ppw;
+            build_ui ();
             publisher_instance.headerbar.pack_end (paper_size);
             return;
         }
 
         public override void detach () {
             publisher_instance.headerbar.remove (paper_size);
+            destroy_ui ();
             publisher_instance = null;
             return;
         }

@@ -7,9 +7,9 @@ title: Thief Markdown Editor
 
 # ThiefMD, the Markdown Editor worth stealing
 
-Based on Open Source Technologies, ThiefMD is a Markdown editor and file manager inspired by [Ulysses](https://ulysses.app). ThiefMD is based on open source code from [Quilter](https://github.com/lainsce/quilter) and [other projects](/about#credit).
+Based on Open Source Technologies, ThiefMD is a [Markdown](https://daringfireball.net/projects/markdown) & [Fountain](https://fountain.io) editor and file manager inspired by [Ulysses](https://ulysses.app). ThiefMD is based on open source code from [Quilter](https://github.com/lainsce/quilter) and [other projects](/about#credit).
 
-Static Site Generators? Novel Writing? Book reports? ThiefMD loves handling all your markdown files and compiling them to whatever format you need. [Pandoc](https://pandoc.org) runs under the hood, so if you can dream it, ThiefMD can build it.
+Static Site Generators? Novel Writing? Book reports? Screen plays? ThiefMD loves handling all your markdown files and compiling them to whatever format you need. [Pandoc](https://pandoc.org) runs under the hood, so if you can dream it, ThiefMD can build it.
 
 Manage your <span class="pun">**\*\*mark\*\***</span> without any <span class="ny">_\_down\__</span>sides. Your library is your file system. Sync using any service you choose[^no-file-sync]. Even use [Git](https://git-scm.com/) to have a file history[^no-git].
 

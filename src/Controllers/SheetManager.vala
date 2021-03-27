@@ -21,8 +21,8 @@ using ThiefMD;
 using ThiefMD.Widgets;
 
 namespace ThiefMD.Controllers.SheetManager {
-    private SheetPair _currentSheet;
-    private weak Sheets _current_sheets;
+    private SheetPair? _currentSheet;
+    private weak Sheets? _current_sheets;
     private Gee.LinkedList<Widgets.Editor> _editor_pool;
     private Gee.LinkedList<SheetPair> _editors;
     private Gee.LinkedList<SheetPair> _active_editors;
@@ -157,6 +157,12 @@ namespace ThiefMD.Controllers.SheetManager {
         return _("No file opened");
     }
 
+    public void update_margins () {
+        foreach (var editor in _active_editors) {
+            editor.editor.move_margins ();
+        }
+    }
+
     public void get_word_count_stats (out int word_count, out int reading_hours, out int reading_minutes, out int reading_seconds) {
         word_count = 0;
         foreach (var editor in _active_editors) {
@@ -222,14 +228,17 @@ namespace ThiefMD.Controllers.SheetManager {
     private void update_view () {
         // Clear the view
         _view.hide ();
-        if (show_welcome) {
+        if (show_welcome && _welcome_screen != null) {
             _welcome_screen.am_active = false;
             _view.remove (_welcome_screen);
+            _welcome_screen.clean ();
+            _welcome_screen = null;
         }
 
         // Load the view
         if (_active_editors.size == 0) {
             show_welcome = true;
+            _welcome_screen = new Widgets.Editor ("");
             _welcome_screen.am_active = true;
             _view.add (_welcome_screen);
         } else {
@@ -251,10 +260,14 @@ namespace ThiefMD.Controllers.SheetManager {
     public string get_markdown () {
         var settings = AppSettings.get_default ();
         StringBuilder builder = new StringBuilder ();
+        int i = 0;
         foreach (var sp in _active_editors) {
             string text = (Sheet.areEqual(sp.sheet, _currentSheet.sheet)) ? sp.editor.active_markdown () : sp.editor.get_buffer_text ();
             string title, date;
-            builder.append (FileManager.get_yamlless_markdown (
+            builder.append (i == 0 ?
+                text
+                :
+                FileManager.get_yamlless_markdown (
                 text,
                 0,
                 out title,
@@ -262,6 +275,7 @@ namespace ThiefMD.Controllers.SheetManager {
                 true,
                 settings.export_include_yaml_title,
                 false));
+            i++;
         }
 
         return builder.str;
@@ -307,7 +321,7 @@ namespace ThiefMD.Controllers.SheetManager {
         return false;
     }
 
-    public Sheets get_sheets () {
+    public Sheets? get_sheets () {
         return _current_sheets;
     }
 
@@ -318,6 +332,14 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     public static Sheet? get_sheet () {
+        var settings = AppSettings.get_default ();
+        if (_currentSheet == null && _welcome_screen != null && _welcome_screen.am_active && settings.dont_show_tips && _welcome_screen.file_path != "") {
+            Sheet? welcome_mapped_sheet = ThiefApp.get_instance ().library.find_sheet_for_path (_welcome_screen.file_path);
+            if (welcome_mapped_sheet != null) {
+                return welcome_mapped_sheet;
+            }
+        }
+
         if (_currentSheet != null) {
             return _currentSheet.sheet;
         }
@@ -336,9 +358,7 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     public static bool load_sheet (Sheet sheet) {
-        if (ThiefApp.get_instance ().am_mobile) {
-            UI.show_editor ();
-        }
+        UI.focus_editor ();
         if (_currentSheet != null && Sheet.areEqual(sheet, _currentSheet.sheet) && _active_editors.size == 1) {
             debug ("Tried loading current sheet");
             return true;
@@ -390,6 +410,7 @@ namespace ThiefMD.Controllers.SheetManager {
                 return false;
             });
         }
+        settings.sheet_changed ();
         return success;
     }
 
@@ -455,7 +476,7 @@ namespace ThiefMD.Controllers.SheetManager {
     public string mini_mark (string contents) {
         string result = contents;
         try {
-            Regex headers = new Regex ("^(#+)\\s(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex headers = new Regex ("^(I\\/E\\.?|EST\\.?|INT\\.?\\/EXT|INT\\.?|EXT\\.?|#+)\\s(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             result = result.replace ("&", "&amp;");
             result = result.replace ("<", "&lt;").replace (">", "&gt;");
             result = headers.replace (result, -1, 0, "<b>\\1 \\2</b>");
@@ -466,16 +487,16 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     public void drain_and_save_active () {
+        if (_active_editors == null || _view == null) {
+            return;
+        }
+
         foreach (var editor in _active_editors) {
-            try {
-                _view.remove (editor.editor);
-                editor.sheet.active_sheet = false;
-                editor.editor.am_active = false;
-                editor.editor.save ();
-                editor.sheet.redraw ();
-            } catch (Error e) {
-                warning ("Could not save file %s: %s", editor.sheet.file_path (), e.message);
-            }
+            editor.editor.save ();
+            editor.sheet.redraw ();
+            editor.sheet.active_sheet = false;
+            editor.editor.am_active = false;
+            _view.remove (editor.editor);
         }
 
         _active_editors.drain (_editors);
@@ -527,6 +548,7 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     public static bool close_active_file (string file_path) {
+        var settings = AppSettings.get_default ();
         SheetPair remove_this = null;
         foreach (var editor in _active_editors) {
             if (editor.sheet.file_path () == file_path) {
@@ -540,7 +562,17 @@ namespace ThiefMD.Controllers.SheetManager {
             }
         }
 
+        if (_welcome_screen != null && _welcome_screen.file_path == file_path) {
+            settings.sheet_changed (); // Save notes
+            _view.remove (_welcome_screen);
+            _welcome_screen.clean ();
+            _welcome_screen = null;
+            _welcome_screen = new Widgets.Editor ("");
+            clear_view ();
+        }
+
         if (remove_this != null) {
+            settings.sheet_changed (); // Save notes
             remove_this.editor.am_active = false;
             remove_this.sheet.active_sheet = false;
             _active_editors.remove (remove_this);
@@ -552,15 +584,28 @@ namespace ThiefMD.Controllers.SheetManager {
             clear_view ();
         }
 
+        settings.sheet_changed (); // Clear notes
         return false;
     }
 
     public void redraw () {
+        var settings = AppSettings.get_default ();
         foreach (var editor in _active_editors) {
             editor.editor.show ();
             editor.sheet.redraw ();
             editor.editor.move_margins ();
         }
+
+        if (settings.dont_show_tips) {
+            if (_welcome_screen != null && _welcome_screen.am_active && _welcome_screen.file_path != "") {
+                Sheet? should_refresh = ThiefApp.get_instance ().library.find_sheet_for_path (_welcome_screen.file_path);
+                if (should_refresh != null) {
+                    should_refresh.redraw ();
+                }
+            }
+        }
+
+        settings.sheet_changed ();
     }
 
     private void clear_view () {
@@ -587,7 +632,6 @@ namespace ThiefMD.Controllers.SheetManager {
         while (_editors.size > Constants.KEEP_X_SHEETS_IN_MEMORY) {
             SheetPair clean = _editors.poll ();
             clean.editor.am_active = false;
-            clean.sheet = null;
             if (_editor_pool.size < Constants.EDITOR_POOL_SIZE) {
                 Widgets.Editor new_editor = new Widgets.Editor ("");
                 new_editor.am_active = false;

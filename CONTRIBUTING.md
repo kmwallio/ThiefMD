@@ -4,7 +4,7 @@ Thanks for considering a contribution to ThiefMD!
 
 Most of this documentation is about Code Changes. If you want to help improve are website or documentation, jump down to [Contributing Documentation](#contributing-documentation)
 
-It's recommended to first [search for or create an issue](https://github.com/kmwallio/ThiefMD/issues) or [send an e-mail](mailto:mwallio@gmail.com). I'll try to categorize issues into [Projects](https://github.com/kmwallio/ThiefMD/projects) for tracking state.
+It's recommended to first [search for or create an issue](https://github.com/kmwallio/ThiefMD/issues). I'll try to categorize issues into [Projects](https://github.com/kmwallio/ThiefMD/projects) for tracking state.
 
 This is mostly for communication and deduplicating work. There may be a branch where the feature is already in progress, or it may be a feature in the beta branch awaiting release.
 

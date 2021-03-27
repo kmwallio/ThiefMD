@@ -106,7 +106,7 @@ namespace ThiefMD.Connections {
             grid.show_all ();
 
             var dialog = new Gtk.Dialog.with_buttons (
-                            "New Wordpress Connection",
+                            _("New Wordpress Connection"),
                             (parent != null) ? parent : ThiefApp.get_instance (),
                             Gtk.DialogFlags.MODAL,
                             _("_Add Account"),
@@ -177,28 +177,6 @@ namespace ThiefMD.Connections {
             return;
         }
 
-        private bool generate_html (string raw_mk, out string processed_mk) {
-            processed_mk = raw_mk;
-            var mkd = new Markdown.Document.from_gfm_string (processed_mk.data,
-                Markdown.DocumentFlags.TOC + 
-                Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.EXTRA_FOOTNOTE + 
-                Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.DLEXTRA + 
-                Markdown.DocumentFlags.FENCEDCODE + Markdown.DocumentFlags.GITHUBTAGS + 
-                Markdown.DocumentFlags.LATEX + Markdown.DocumentFlags.URLENCODEDANCHOR + 
-                Markdown.DocumentFlags.NOSTYLE + Markdown.DocumentFlags.EXPLICITLIST);
-
-            mkd.compile (
-                Markdown.DocumentFlags.TOC + Markdown.DocumentFlags.AUTOLINK + 
-                Markdown.DocumentFlags.EXTRA_FOOTNOTE + 
-                Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.DLEXTRA +
-                Markdown.DocumentFlags.FENCEDCODE + Markdown.DocumentFlags.GITHUBTAGS +
-                Markdown.DocumentFlags.LATEX + Markdown.DocumentFlags.URLENCODEDANCHOR +
-                Markdown.DocumentFlags.EXPLICITLIST + Markdown.DocumentFlags.NOSTYLE);
-            mkd.get_document (out processed_mk);
-
-            return (processed_mk.chomp () != "");
-        }
-
         public override bool export () {
             bool published = false;
             string title;
@@ -242,6 +220,10 @@ namespace ThiefMD.Connections {
                     true,
                     false, // Override instead of use settings as theme will display
                     false);
+
+            if (metadata.has_key ("bibliography")) {
+                body = publisher_instance.get_export_markdown ();
+            }
 
             if (metadata.has_key ("title")) {
                 title = metadata.get ("title");

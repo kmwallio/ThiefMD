@@ -38,19 +38,19 @@ namespace ThiefMD.Connections {
         public string conf_alias;
 
         public WriteFreelyConnection (string username, string password, string endpoint = "https://write.as/") {
-            conf_endpoint = endpoint;
             conf_alias = username;
             conf_endpoint = endpoint;
+            string api_endpoint = conf_endpoint;
 
-            if (!(conf_endpoint.has_suffix ("api") || conf_endpoint.has_suffix ("api/"))) {
-                if (conf_endpoint.has_suffix ("/")) {
-                    conf_endpoint += "api/";
+            if (!(api_endpoint.has_suffix ("api") || api_endpoint.has_suffix ("api/"))) {
+                if (api_endpoint.has_suffix ("/")) {
+                    api_endpoint += "api/";
                 } else {
-                    conf_endpoint += "/api/";
+                    api_endpoint += "/api/";
                 }
             }
 
-            connection = new Writeas.Client (conf_endpoint);
+            connection = new Writeas.Client (api_endpoint);
             alias = "";
 
             try {
@@ -124,7 +124,7 @@ namespace ThiefMD.Connections {
             grid.show_all ();
 
             var dialog = new Gtk.Dialog.with_buttons (
-                            "New WriteFreely Connection",
+                            _("New WriteFreely Connection"),
                             (parent != null) ? parent : ThiefApp.get_instance (),
                             Gtk.DialogFlags.MODAL,
                             _("_Add Account"),

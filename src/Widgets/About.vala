@@ -23,7 +23,7 @@ using Gtk;
 using Gdk;
 
 namespace ThiefMD.Widgets {
-    public class About : Dialog {
+public class About : Dialog {
         private Gtk.Stack stack;
         private Gtk.HeaderBar bar;
 
@@ -91,13 +91,13 @@ namespace ThiefMD.Widgets {
             version_label.hexpand = true;
             grid.attach (version_label, 1, 3);
             //  website = ThiefProperties.URL;
-            var website_label = new Gtk.Label ("<a href='" + ThiefProperties.URL + "'>" + ThiefProperties.URL + "</a> - <a href='https://github.com/kmwallio/ThiefMD/discussions'>Feedback</a>");
+            var website_label = new Gtk.Label ("<a href='" + ThiefProperties.URL + "'>" + ThiefProperties.URL + "</a> - <a href='https://github.com/kmwallio/ThiefMD/discussions'>" + _("Feedback") + "</a>");
             website_label.hexpand = true;
             website_label.use_markup = true;
             grid.attach (website_label, 1, 5);
             //  license_type = ThiefProperties.LICENSE_TYPE;
-            var lic_label = new Gtk.Label ("<small>This program comes with absolutely no warranty.</small>");
-            var lic_label2 = new Gtk.Label ("<small>See the <a href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU General Public License, version 3 or later</a> for details.</small>");
+            var lic_label = new Gtk.Label ("<small>" + _("This program comes with absolutely no warranty.") + "</small>");
+            var lic_label2 = new Gtk.Label ("<small>" + _("See the <a href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU General Public License, version 3 or later</a> for details.") + "</small>");
             lic_label.hexpand = true;
             lic_label.use_markup = true;
             lic_label2.hexpand = true;
@@ -131,14 +131,15 @@ namespace ThiefMD.Widgets {
             Gtk.Grid scrl_grid = new Grid ();
             int i = 1;
 
-            foreach (var credit in ThiefProperties.GIANTS) {
+            ThiefProperties.GIANTS.foreach ((credit) => {
                 var credit_label = new Gtk.Label (credit);
                 credit_label.hexpand = true;
                 credit_label.use_markup = true;
                 credit_label.xalign = 0;
                 scrl_grid.attach (credit_label, 1, i);
                 i++;
-            }
+                return true;
+            });
             scrl.hexpand = true;
             scrl.vexpand = true;
             scrl.add (scrl_grid);

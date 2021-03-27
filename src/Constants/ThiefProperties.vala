@@ -22,38 +22,42 @@ namespace ThiefMD {
         public const string NAME = "ThiefMD";
         public const string URL = "https://thiefmd.com";
         public const string COPYRIGHT = "Copyright © 2020 kmwallio";
-        public const string TAGLINE = "The Markdown editor worth stealing";
+        public const string TAGLINE = _("The Markdown editor worth stealing");
         public const string THIEF_MARK_CONST = "THIEFMDa63471e6ec1b4f35b7ca635f3ca39a85";
         public const string THIEF_MARK = "<span id='thiefmark'></span>";
         public const string SUPPORTED_IMPORT_FILES = "*.docx;*.odt;*.html;*.tex;*.epub;*.textile;*.html;*.fb2;*.dbk;*.xml;*.opml;*.rst;";
         public const string VERSION = Build.VERSION;
         public const Gtk.License LICENSE_TYPE = Gtk.License.GPL_3_0;
-        public const string[] GIANTS = {
-            "<a href='https://github.com/kmwallio/ThiefMD/graphs/contributors'>Contributors who help make ThiefMD awesome</a>\n",
-            "French Translation Contributors:\n<a href='https://github.com/davidbosman'>David Bosman</a>\n",
-            "Slovak Translation Contributors:\n<a href='https://github.com/marek-lach'>Marek L'ach</a>\n",
-            "Swedish Translation Contributors:\n<a href='https://github.com/eson57'>Åke Engelbrektson</a>\n",
-            "Original Code:\nBased on <a href='https://github.com/lainsce/quilter'>Quilter</a>\nCopyright © 2017 Lains.\n<a href='https://github.com/lainsce/quilter/blob/master/LICENSE'>GNU General Public License v3.0</a>\n",
-            "Font:\n<a href='https://github.com/iaolo/iA-Fonts'>iA Writer Duospace</a>\nCopyright © 2018 Information Architects Inc.\nwith Reserved Font Name \"iA Writer\"\n<a href='https://github.com/iaolo/iA-Fonts/blob/master/iA%20Writer%20Duospace/LICENSE.md'>SIL OPEN FONT LICENSE Version 1.1</a>\n",
-            "Font:\n<a href='https://quoteunquoteapps.com/courierprime'>Courier Prime</a>\nCopyright © 2013 Quote-Unquote Apps\n<a href='https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;id=OFL'>SIL OPEN FONT LICENSE Version 1.1</a>\n",
-            "Preview CSS:\n<a href='https://github.com/markdowncss'>Mash up of Splendor and Modest</a>\nCopyright © 2014-2015 John Otander.\n<a href='https://github.com/markdowncss/splendor/blob/master/LICENSE'>The MIT License (MIT)</a>\n",
-            "Markdown Parsing:\n<a href='http://www.pell.portland.or.us/~orc/Code/discount/'>libmarkdown2</a>\nCopyright © 2007 David Loren Parsons.\n<a href='http://www.pell.portland.or.us/~orc/Code/discount/COPYRIGHT.html'>BSD-style License</a>\n",
-            "Syntax Highlighting:\n<a href='https://highlightjs.org/'>highlight.js</a>\nCopyright © 2006 Ivan Sagalaev.\n<a href='https://github.com/highlightjs/highlight.js/blob/master/LICENSE'>BSD-3-Clause License</a>\n",
-            "Math Rendering:\n<a href='https://katex.org/'>KaTeX</a>\nCopyright © 2013-2020 Khan Academy and other contributors.\n<a href='https://github.com/KaTeX/KaTeX/blob/master/LICENSE'>MIT License</a>\n",
-            "XML Parsing:\n<a href='http://xmlsoft.org/'>libxml2</a>\nCopyright © 1998-2012 Daniel Veillard.\n<a href='https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/Copyright'>MIT License</a>\n",
-            "Pandoc Export:\n<a href='https://pandoc.org/'>Pandoc</a>\nCopyright © 2006-2020 John MacFarlane and others\n<a href='https://github.com/jgm/pandoc/blob/master/COPYRIGHT'>GNU General Public License v2.0</a>\n",
-            "libwritegood-vala based on:\n<a href='https://github.com/btford/write-good'>write-good: Naive linter for English prose</a>\nCopyright © 2014-2019 Brian Ford\n<a href='https://github.com/btford/write-good/blob/master/LICENSE'>The MIT License (MIT)</a>\n",
-          };
 
-        public const string[] PAPER_SIZES_FRIENDLY_NAME = {
-          "A3 (11.7 x 16.5 inches)",
-          "A4 (8 x 11 inches)",
-          "A5 (5.8 x 8.3 inches)",
-          "B5 (6.93 x 9.84 inches)",
-          "Executive (7 x 10 inches)",
-          "Legal (8.5 x 14 inches)",
-          "Letter (8.5 x 11 inches)"
-        };
+        public static Gee.List<string> GIANTS {
+          get {
+            if (instance == null) {
+              instance = new ThiefProperties ();
+            }
+            return instance.giants;
+          }
+        }
+        private Gee.LinkedList<string> giants;
+
+        public static Gee.List<string> PAPER_SIZES_FRIENDLY_NAME {
+          get {
+            if (instance == null) {
+              instance = new ThiefProperties ();
+            }
+            return instance.friendly_paper;
+          }
+        }
+        private Gee.ArrayList<string> friendly_paper;
+
+        public static Gee.List<string> THIEF_TIPS {
+          get {
+            if (instance == null) {
+              instance = new ThiefProperties ();
+            }
+            return instance.thief_tips;
+          }
+        }
+        private Gee.ArrayList<string> thief_tips;
 
         public const string[] PAPER_SIZES_GTK_NAME = {
           Gtk.PAPER_NAME_A3,
@@ -65,15 +69,48 @@ namespace ThiefMD {
           Gtk.PAPER_NAME_LETTER
         };
 
-        public const string[] THIEF_TIPS = {
-          "Don't like what you see? Hit `Ctrl+,` to access the preferences.",
-          "No built in dark mode? Dark themes are available at https://themes.thiefmd.com. Add more in the Preferences (`Ctrl+,`).",
-          "Don't like the preview? Hit `Ctrl+,` to access the preferences and click Export.",
-          "Want to import a ePub, HTML, or DocX? Add a folder to the library, then drag the file onto the folder.",
-          "Ready to publish your great work? Right-click on the folder and choose \"Export Preview\"",
-          "Want to block out the world? Full-screen is just an `F11` away.",
-          "Quickly switch view modes with `Ctrl+1`, `Ctrl+2`, and `Ctrl+3`."
-        };
+        private static ThiefProperties instance;
+        public ThiefProperties () {
+          if (instance == null) {
+            giants = new Gee.LinkedList<string> ();
+            giants.add ("<a href='https://github.com/kmwallio/ThiefMD/graphs/contributors'>" + _("Contributors who help make ThiefMD awesome") + "</a>\n");
+            giants.add (_("French Translation Contributors") + ":\n<a href='https://github.com/davidbosman'>David Bosman</a>\n");
+            giants.add (_("Slovak Translation Contributors") + ":\n<a href='https://github.com/marek-lach'>Marek L'ach</a>\n");
+            giants.add (_("Swedish Translation Contributors") + ":\n<a href='https://github.com/eson57'>Åke Engelbrektson</a>\n");
+            giants.add (_("Original Code") + ":\n" + _("Based on <a href='https://github.com/lainsce/quilter'>Quilter</a>") + "\n" + _("Copyright") + " © 2017 Lains.\n<a href='https://github.com/lainsce/quilter/blob/master/LICENSE'>" + _("GNU General Public License v3.0") + "</a>" + "\n");
+            giants.add (_("Font") + ":\n<a href='https://github.com/iaolo/iA-Fonts'>iA Writer Duospace</a>\n" + _("Copyright") + " © 2018 Information Architects Inc.\nwith Reserved Font Name \"iA Writer\"\n<a href='https://github.com/iaolo/iA-Fonts/blob/master/iA%20Writer%20Duospace/LICENSE.md'>" + _("SIL OPEN FONT LICENSE Version 1.1") + "</a>\n");
+            giants.add (_("Font") + ":\n<a href='https://quoteunquoteapps.com/courierprime'>Courier Prime</a>\n" + _("Copyright") + " © 2013 Quote-Unquote Apps\n<a href='https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;id=OFL'>" + _("SIL OPEN FONT LICENSE Version 1.1") + "</a>\n");
+            giants.add (_("Preview CSS") + ":\n<a href='https://github.com/markdowncss'>" + _("Mash up of Splendor and Modest") + "</a>\n" + _("Copyright") + " © 2014-2015 John Otander.\n<a href='https://github.com/markdowncss/splendor/blob/master/LICENSE'>" + _("The MIT License (MIT)") + "</a>\n");
+            giants.add (_("Fountain Preview and Export") + ":\n<a href='https://github.com/thombruce/fountain.js/'>fountain.js</a>\n" + _("Copyright") + " © 2020 Thom Bruce.\n<a href='https://github.com/thombruce/fountain.js/blob/master/LICENSE'>" + _("MIT License") + "</a>\n");
+            giants.add (_("Markdown Parsing") + ":\n<a href='http://www.pell.portland.or.us/~orc/Code/discount/'>libmarkdown2</a>\n" + _("Copyright") + " © 2007 David Loren Parsons.\n<a href='http://www.pell.portland.or.us/~orc/Code/discount/COPYRIGHT.html'>" + _("BSD-style License") + "</a>\n");
+            giants.add (_("Syntax Highlighting") + ":\n<a href='https://highlightjs.org/'>highlight.js</a>\n" + _("Copyright") + " © 2006 Ivan Sagalaev.\n<a href='https://github.com/highlightjs/highlight.js/blob/master/LICENSE'>" + _("BSD-3-Clause License") + "</a>\n");
+            giants.add (_("Math Rendering") + ":\n<a href='https://katex.org/'>KaTeX</a>\n" + _("Copyright") + " © 2013-2020 " + _("Khan Academy and other contributors.") + "\n<a href='https://github.com/KaTeX/KaTeX/blob/master/LICENSE'>" + _("MIT License") + "</a>\n");
+            giants.add (_("XML Parsing") + ":\n<a href='http://xmlsoft.org/'>libxml2</a>\n" + _("Copyright") + " © 1998-2012 Daniel Veillard.\n<a href='https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/Copyright'>" + _("MIT License") + "</a>\n");
+            giants.add (_("Pandoc Export") + ":\n<a href='https://pandoc.org/'>Pandoc</a>\n" + _("Copyright") + " © 2006-2020 " + _("John MacFarlane and others") + "\n<a href='https://github.com/jgm/pandoc/blob/master/COPYRIGHT'>" + _("GNU General Public License v2.0") + "</a>\n");
+            giants.add (_("libwritegood-vala based on") + ":\n<a href='https://github.com/btford/write-good'>" + _("write-good: Naive linter for English prose") + "</a>\n" + _("Copyright") + " © 2014-2019 Brian Ford\n<a href='https://github.com/btford/write-good/blob/master/LICENSE'>" + _("The MIT License (MIT)") + "</a>\n");
+
+            friendly_paper = new Gee.ArrayList<string>();
+            friendly_paper.add (_("A3 (11.7 x 16.5 inches)"));
+            friendly_paper.add (_("A4 (8 x 11 inches)"));
+            friendly_paper.add (_("A5 (5.8 x 8.3 inches)"));
+            friendly_paper.add (_("B5 (6.93 x 9.84 inches)"));
+            friendly_paper.add (_("Executive (7 x 10 inches)"));
+            friendly_paper.add (_("Legal (8.5 x 14 inches)"));
+            friendly_paper.add (_("Letter (8.5 x 11 inches)"));
+
+            thief_tips = new Gee.ArrayList<string> ();
+            thief_tips.add (_("Don't like what you see? Hit `Ctrl+,` to access the preferences."));
+            thief_tips.add (_("No built in dark mode? Dark themes are available at https://themes.thiefmd.com. Add more in the Preferences (`Ctrl+,`)."));
+            thief_tips.add (_("Don't like how the preview looks? Hit `Ctrl+,` to access the preferences and click Export."));
+            thief_tips.add (_("Want to import a ePub, HTML, or DocX? Click Import from the New Sheet prompt."));
+            thief_tips.add (_("Ready to publish your great work? Right-click on the folder and choose \"Export Preview\""));
+            thief_tips.add (_("Want to block out distractions? Full-screen is just an `F11` away."));
+            thief_tips.add (_("Quickly switch view modes with `Ctrl+1`, `Ctrl+2`, and `Ctrl+3`."));
+            thief_tips.add (_("Working with a lot of links? Turn on Experimental Mode to make your markdown more readable `Ctrl+Shift+M`."));
+
+            instance = this;
+          }
+        }
 
         public const string PREVIEW_TEXT = """# %s
 The `markdown` editor worth stealing. *Focus* more on **writing**.
@@ -151,6 +188,10 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             box-shadow: 0 1px transparent inset;
         }
 
+        .thief-notes {
+            background: @colorPrimary;
+            color: @textColorPrimary;
+        }
 
         .thief-drop-above {
             margin-bottom: 1.5rem;

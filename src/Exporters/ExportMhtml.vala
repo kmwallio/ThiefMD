@@ -34,6 +34,7 @@ namespace ThiefMD.Exporters {
         public ExportMhtml () {
             export_name = "MHTML";
             export_css = "preview";
+            supports_fountain = true;
         }
 
         public override string update_markdown (string markdown) {
