@@ -20,5 +20,7 @@
   "folder-order" : [
     "docs",
     "po"
-  ]
+  ],
+  "notes" : "",
+  "icon" : ""
 }

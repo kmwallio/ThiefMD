@@ -26,14 +26,13 @@ using Gdk;
 using Gtk;
 
 namespace ThiefMD.Widgets {
-    public class ThiefPane : Paned {
+    public class MouseMotionListener {
         private ThiefApp instance;
-        public ThiefPane (Orientation orientation, ThiefApp thiefapp) {
-            set_orientation (orientation);
+        public MouseMotionListener (ThiefApp thiefapp) {
             instance = thiefapp;
-            add_events (Gdk.EventMask.POINTER_MOTION_MASK);
             still_in_motion = new TimedMutex (Constants.MOUSE_IN_MOTION_TIME);
             clear_bar = new TimedMutex (Constants.MOUSE_MOTION_CHECK_TIME);
+            instance.motion_notify_event.connect (mouse_movement);
         }
 
         private TimedMutex still_in_motion;
@@ -42,27 +41,24 @@ namespace ThiefMD.Widgets {
         private double mouse_y = 0;
         private double last_x = 0;
         private double last_y = 0;
-        public override bool motion_notify_event (EventMotion event ) {
-            base.motion_notify_event (event);
+        private bool mouse_movement (EventMotion event) {
             var settings = AppSettings.get_default ();
             last_x = event.x_root;
             last_y = event.y_root;
 
-            instance.save_pane_position ();
-
             if (!settings.hide_toolbar) {
-                return true;
+                return false;
             }
 
             if (!still_in_motion.can_do_action ()) {
-                return true;
+                return false;
             }
 
             double d_x = (mouse_x - last_x).abs ();
             double d_y = (mouse_y - last_y).abs ();
             double d = (d_x * d_x) + (d_y * d_y);
             if (d < Constants.MOUSE_SENSITIVITY) {
-                return true;
+                return false;
             }
             debug ("Distance: %f", d);
 
@@ -73,7 +69,7 @@ namespace ThiefMD.Widgets {
                 }
             }
 
-            return true;
+            return false;
         }
 
         private bool hide_the_bar () {

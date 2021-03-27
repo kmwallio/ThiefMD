@@ -67,9 +67,14 @@ namespace ThiefMD.Widgets {
                 return;
             }
 
-            // Check for .md extension
-            if (!file_name.ascii_down ().has_suffix(".md") && !file_name.ascii_down ().has_suffix(".markdown")) {
-                file_name += ".md";
+            // Check for .valid extension
+            if (!can_open_file (file_name)) {
+                Sheets? check = SheetManager.get_sheets ();
+                if (check == null) {
+                    file_name += ".md";
+                } else {
+                    file_name += check.guess_extension ();
+                }
             }
 
             SheetManager.new_sheet(file_name);

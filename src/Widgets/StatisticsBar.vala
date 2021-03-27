@@ -60,6 +60,7 @@ namespace ThiefMD.Widgets {
             settings.show_writing_statistics = true;
             update_wordcount ();
             settings.writing_changed.connect (update_wordcount);
+            settings.sheet_changed.connect (update_wordcount);
             set_reveal_child (true);
         }
 
@@ -71,6 +72,7 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             settings.show_writing_statistics = false;
             settings.writing_changed.disconnect (update_wordcount);
+            settings.sheet_changed.disconnect (update_wordcount);
             set_reveal_child (false);
         }
 

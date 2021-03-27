@@ -280,6 +280,26 @@ namespace ThiefMD.Widgets {
                 }
             });
 
+            var num_preview_lines = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+            var num_preview_lines_entry = new Gtk.SpinButton.with_range (0, 15, 1);
+            num_preview_lines_entry.set_value (settings.num_preview_lines);
+            num_preview_lines_entry.value_changed.connect (() => {
+                int new_margin = (int)num_preview_lines_entry.get_value ();
+                if (new_margin >= 0 && new_margin < 15) {
+                    settings.num_preview_lines = new_margin;
+                } else {
+                    num_preview_lines_entry.set_value (settings.num_preview_lines);
+                }
+            });
+            var num_preview_lines_label = new Label(_("Number of Lines to Preview in Sheets View"));
+            num_preview_lines_label.xalign = 0;
+            num_preview_lines_label.hexpand = true;
+            num_preview_lines_label.margin = 12;
+            num_preview_lines_label.set_line_wrap (true);
+            num_preview_lines.add (num_preview_lines_entry);
+            num_preview_lines.add (num_preview_lines_label);
+            display_options.add (num_preview_lines);
+
             var add_theme_button = new Gtk.Button.with_label (_("Add New Theme"));
             add_theme_button.hexpand = true;
             display_options.add (add_theme_button);
@@ -597,6 +617,22 @@ namespace ThiefMD.Widgets {
             ui_writing_statistics.add (ui_writing_statistics_switch);
             ui_writing_statistics.add (ui_writing_statistics_label);
             editor_options.add (ui_writing_statistics);
+
+            var ui_dont_show_tips = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+            var ui_dont_show_tips_switch = new Switch ();
+            ui_dont_show_tips_switch.set_active (settings.dont_show_tips);
+            ui_dont_show_tips_switch.notify["active"].connect (() => {
+                settings.dont_show_tips = ui_dont_show_tips_switch.get_active ();
+            });
+            ui_dont_show_tips_switch.margin = 12;
+            ui_dont_show_tips_switch.tooltip_text = _("Disable application tips");
+            var ui_dont_show_tips_label = new Label(_("Start with new empty sheet on launch"));
+            ui_dont_show_tips_label.xalign = 0;
+            ui_dont_show_tips_label.margin = 12;
+            ui_dont_show_tips_label.set_line_wrap (true);
+            ui_dont_show_tips.add (ui_dont_show_tips_switch);
+            ui_dont_show_tips.add (ui_dont_show_tips_label);
+            editor_options.add (ui_dont_show_tips);
 
             //
             // More UI-ish options

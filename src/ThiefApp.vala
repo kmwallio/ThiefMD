@@ -26,29 +26,31 @@ namespace ThiefMD {
         private static ThiefApp _instance;
         public Headerbar toolbar;
         public Library library;
-        public ThiefPane sheets_pane;
-        public Gtk.Paned library_pane;
+        public Hdy.Leaflet main_content;
+        public Hdy.Leaflet library_pane;
         public Gtk.ScrolledWindow library_view;
         public SearchBar search_bar;
         public StatisticsBar stats_bar;
         public Controllers.Exporters exporters;
         public Gee.ConcurrentList<Connections.ConnectionBase> connections;
         public bool ready = false;
-        public bool am_mobile = false;
+        public Gtk.Revealer notes;
+        public Gtk.Box editor_notes_pane;
+        public Notes notes_widget;
+        public bool show_touch_friendly = true;
+        public SearchWidget search_widget;
+        private MouseMotionListener mouse_listener;
 
         private string start_dir;
         private Gtk.Box desktop_box;
-        private Gtk.Box mobile_box;
-        public Gtk.Stack mobile_stack;
         private Sheets start_sheet;
         private Mutex rebuild_ui;
-        public bool mobile_mode = false;
-        private SearchWidget mobile_search;
 
         public ThiefApp (Gtk.Application app) {
             Object (application: app);
             _instance = this;
             rebuild_ui = Mutex ();
+            add_events (Gdk.EventMask.POINTER_MOTION_MASK);
             build_ui ();
         }
 
@@ -58,7 +60,8 @@ namespace ThiefMD {
 
         public int pane_position {
             get {
-                return sheets_pane.get_position ();
+                var settings = AppSettings.get_default ();
+                return settings.view_library_width + settings.view_sheets_width;
             }
         }
 
@@ -96,36 +99,84 @@ namespace ThiefMD {
             library.parse_library ();
         }
 
-        private void build_desktop () {
-            var settings = AppSettings.get_default ();
-
-            if (desktop_box != null) {
+        public void show_search () {
+            if (search_widget != null) {
                 return;
             }
+            search_widget = new SearchWidget ();
+            search_widget.show_all ();
+            library_pane.add (search_widget);
+            library_pane.set_visible_child (search_widget);
+            main_content.set_visible_child (library_pane);
+        }
 
-            if (mobile_box != null) {
-                debug ("Deconstructing mobile UI");
-                mobile_box.remove (toolbar);
-                mobile_box.remove (mobile_stack);
-                mobile_box.remove (stats_bar);
-                mobile_stack.remove (library_pane);
-                mobile_stack.remove (mobile_search);
-                mobile_stack.remove (SheetManager.get_view ());
-                remove (mobile_box);
-                mobile_search = null;
-                mobile_box = null;
+        public void hide_search () {
+            if (search_widget == null) {
+                return;
             }
+            search_widget.searcher.searching = false;
+            library_pane.remove (search_widget);
+            search_widget = null;
+        }
 
-            am_mobile = false;
+        private void create_widgets () {
+            if (ready) {
+                return;
+            }
+            search_widget = null;
+            var settings = AppSettings.get_default ();
+            toolbar = new Headerbar (this);
+            // Have to init search bar before sheet manager
+            search_bar = new SearchBar ();
+            SheetManager.init ();
+            library = new Library ();
+            notes_widget = new Notes ();
+            var notes_context = notes_widget.get_style_context ();
+            notes_context.add_class ("thief-notes");
+
+            library_pane = new Hdy.Leaflet ();
+            library_pane.transition_type = Hdy.LeafletTransitionType.SLIDE;
+            library_pane.set_homogeneous (true, Gtk.Orientation.HORIZONTAL, false);
+            library_pane.set_orientation (Gtk.Orientation.HORIZONTAL);
+            library_view = new Gtk.ScrolledWindow (null, null);
+            library_view.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+            editor_notes_pane = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            notes = new Gtk.Revealer ();
+            notes.set_transition_type (Gtk.RevealerTransitionType.SLIDE_LEFT);
+            notes.set_reveal_child (false);
+            main_content = new Hdy.Leaflet ();
+            main_content.transition_type = Hdy.LeafletTransitionType.SLIDE;
+            main_content.set_homogeneous (true, Gtk.Orientation.HORIZONTAL, false);
+            main_content.set_orientation (Gtk.Orientation.HORIZONTAL);
+
+            library_view.add (library);
+            library_view.width_request = settings.view_library_width;
+            stats_bar = new StatisticsBar ();
+            start_sheet = library.get_sheets (start_dir);
+            library_pane.add (library_view);
+            library_view.show_all ();
+            start_sheet.width_request = settings.view_sheets_width;
+            library_pane.add (start_sheet);
+            library_pane.show_all ();
+            var toolbar_context = toolbar.get_style_context ();
+            toolbar_context.add_class("thiefmd-toolbar");
+        }
+
+        private void create_window () {
+            var settings = AppSettings.get_default ();
             debug ("Building desktop UI");
 
-            sheets_pane.add1 (library_pane);
-            sheets_pane.add2 (SheetManager.get_view ());
-            sheets_pane.set_position (settings.view_library_width + settings.view_sheets_width);
+            main_content.add (library_pane);
+            library_pane.width_request = settings.view_library_width + settings.view_sheets_width;
+            main_content.add (SheetManager.get_view ());
+            editor_notes_pane.add (main_content);
+            editor_notes_pane.add (notes);
+            notes.add (notes_widget);
+            notes.set_reveal_child (false);
 
             desktop_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             desktop_box.add (toolbar);
-            desktop_box.add (sheets_pane);
+            desktop_box.add (editor_notes_pane);
             desktop_box.add (stats_bar);
 
             hide_titlebar_when_maximized = true;
@@ -136,52 +187,9 @@ namespace ThiefMD {
             show_all ();
         }
 
-        private void build_mobile () {
-            var settings = AppSettings.get_default ();
-
-            if (mobile_box != null) {
-                return;
-            }
-
-            settings.view_state = 0;
-            UI.show_view ();
-
-            if (desktop_box != null) {
-                debug ("Deconstructing desktop UI");
-                sheets_pane.remove (library_pane);
-                sheets_pane.remove (SheetManager.get_view ());
-
-                desktop_box.remove (toolbar);
-                desktop_box.remove (sheets_pane);
-                desktop_box.remove (stats_bar);
-
-                remove (desktop_box);
-                desktop_box = null;
-            }
-
-            am_mobile = true;
-            debug ("Building mobile UI");
-
-            mobile_search = new SearchWidget ();
-
-            mobile_stack = new Gtk.Stack ();
-            mobile_stack.add_titled (library_pane, _("Library"), _("Library"));
-            mobile_stack.add_titled (SheetManager.get_view (), _("Editor"), _("Editor"));
-            mobile_stack.add_titled (mobile_search, _("Search"), _("Search"));
-
-            mobile_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            mobile_box.add (toolbar);
-            mobile_box.add (mobile_stack);
-            mobile_box.add (stats_bar);
-
-            add (mobile_box);
-            show_all ();
-        }
-
         protected void build_ui () {
             var settings = AppSettings.get_default ();
             desktop_box = null;
-            mobile_box = null;
 
             start_dir = "";
             settings.validate_library ();
@@ -215,45 +223,18 @@ namespace ThiefMD {
                 settings.view_sheets_width = 200;
             }
 
-            //
-            // Get screen size to see if we should start in mobile mode
-            //
-
-            var monitor = Gdk.Display.get_default ().get_primary_monitor ();
-            int screen_width = settings.window_width;
-            if (monitor != null) {
-                Gdk.Rectangle screen_size = monitor.get_workarea ();
-                screen_width = screen_size.width;
-                debug ("Screen (%d, %d)", screen_size.width, screen_size.height);
-                if (screen_size.width <= 600 || screen_size.height <= 600) {
-                    mobile_mode = true;
-                    am_mobile = true;
-                }
-            }
-
-            toolbar = new Headerbar (this);
-            // Have to init search bar before sheet manager
-            search_bar = new SearchBar ();
-            SheetManager.init ();
-            library = new Library ();
-
-            sheets_pane = new ThiefPane (Gtk.Orientation.HORIZONTAL, this);
-            library_pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-            library_view = new Gtk.ScrolledWindow (null, null);
-            library_view.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
-
-            library_view.add (library);
-            //  library_leaf.add (library_view);
-            //  library_leaf.show_all ();
-            library.expand_all ();
-            stats_bar = new StatisticsBar ();
-            start_sheet = library.get_sheets (start_dir);
+            create_widgets ();
+            create_window ();
 
             settings.changed.connect (() => {
                 is_fullscreen = settings.fullscreen;
             });
 
             new KeyBindings (this);
+            // KeyBindings doesn't refer to itself, so losing the reference is fine.
+            // MouseMotionListener has members to keep state, so reference needs to
+            // be kept or variables will be freed.
+            mouse_listener = new MouseMotionListener (this);
 
             UserData.create_data_directories ();
 
@@ -266,54 +247,68 @@ namespace ThiefMD {
             exporters.register (_("Markdown"), new Exporters.ExportMarkdown ());
             exporters.register (_("LaTeX"), new Exporters.ExportLatex ());
             exporters.register (_("DocX"), new Exporters.ExportDocx ());
+            exporters.register (_("Fountain"), new Exporters.ExportFountain ());
 
             // Load connections
             connections = new Gee.ConcurrentList<Connections.ConnectionBase> ();
 
-            library_pane.add1 (library_view);
-            library_pane.add2 (start_sheet);
-            library_pane.set_position (settings.view_library_width);
-
-            if  (screen_width < 600) {
-                build_mobile ();
-            } else {
-                if (settings.window_width >= 600) {
-                    build_desktop ();
-                } else {
-                    build_mobile ();
-                }
-                set_default_size (settings.window_width, settings.window_height);
-            }
-
-            var toolbar_context = toolbar.get_style_context ();
-            toolbar_context.add_class("thiefmd-toolbar");
-
-            size_allocate.connect (() => {
-                if (this.get_allocated_width () < 600 && !am_mobile) {
-                    if (rebuild_ui.trylock ()) {
-                        debug ("Switching to mobile");
-                        build_mobile ();
-                        rebuild_ui.unlock ();
-                    }
-                } else if (this.get_allocated_width () >= 600 && am_mobile) {
-                    if (rebuild_ui.trylock ()) {
-                        debug ("Switching to desktop");
-                        build_desktop ();
-                        rebuild_ui.unlock ();
-                    }
-                }
-            });
-
             // Restore preview view
             UI.show_view ();
             UI.set_sheets (start_sheet);
+            library.expand_all ();
             library.set_active ();
             UI.load_user_themes_and_connections ();
             UI.load_font ();
             UI.load_css_scheme ();
 
+            Timeout.add (350, () => {
+                if (!ready) {
+                    return false;
+                }
+                if (main_content.folded) {
+                    show_touch_friendly = true;
+                    library_pane.hexpand = true;
+                    library.hexpand = true;
+                    library_view.hexpand = true;
+                    UI.widen_sheets ();
+                    settings.changed ();
+                } else {
+                    show_touch_friendly = false;
+                    library_pane.hexpand = false;
+                    library.hexpand = false;
+                    library_view.hexpand = false;
+                    library.width_request = settings.view_library_width;
+                    UI.shrink_sheets ();
+                    settings.changed ();
+                }
+                return false;
+            });
+
+            size_allocate.connect (() => {
+                if (!ready) {
+                    return;
+                }
+                if (main_content.folded && !show_touch_friendly) {
+                    show_touch_friendly = true;
+                    library_pane.hexpand = true;
+                    library.hexpand = true;
+                    library_view.hexpand = true;
+                    UI.widen_sheets ();
+                    settings.changed ();
+                } else if (!main_content.folded && show_touch_friendly) {
+                    show_touch_friendly = false;
+                    library_pane.hexpand = false;
+                    library.hexpand = false;
+                    library_view.hexpand = false;
+                    library.width_request = settings.view_library_width;
+                    UI.shrink_sheets ();
+                    settings.changed ();
+                }
+            });
+
             destroy.connect (() => {
                 SheetManager.save_active ();
+                notes_widget.save_notes ();
                 foreach (var c in _instance.connections) {
                     c.connection_close ();
                 }
@@ -322,19 +317,6 @@ namespace ThiefMD {
             // Go go go!
             ready = true;
             show_all ();
-        }
-
-        public void save_pane_position () {
-            if (!mobile_mode) {
-                var settings = AppSettings.get_default ();
-                if (settings.view_library_width != library_pane.get_position ()) {
-                    settings.view_library_width = library_pane.get_position ();
-                }
-
-                if (settings.view_library_width + settings.view_sheets_width != sheets_pane.get_position ()) {
-                    settings.view_sheets_width = sheets_pane.get_position () - settings.view_library_width;
-                }
-            }
         }
     }
 }

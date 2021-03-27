@@ -145,6 +145,8 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public int font_size { get; set; default = 12; }
         public double line_spacing { get; set; default = 1; }
         public bool experimental { get; set; }
+        public bool dont_show_tips { get; set; default = false; }
+        public int num_preview_lines { get; set; default = Constants.SHEET_PREVIEW_LINES; }
 
         // Transient settings
         private bool hiding_toolbar { get; set; default = false; }
@@ -324,6 +326,8 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
 
         public signal void changed ();
 
+        public signal void sheet_changed ();
+
         public signal void writing_changed ();
 
         private AppSettings () {
@@ -371,6 +375,8 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("focus-type", this, "focus_type", SettingsBindFlags.DEFAULT);
             app_settings.bind ("line-spacing", this, "line_spacing", SettingsBindFlags.DEFAULT);
             app_settings.bind ("experimental", this, "experimental", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("dont-show-tips", this, "dont_show_tips", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("num-preview-lines", this, "num_preview_lines", SettingsBindFlags.DEFAULT);
 
             app_settings.changed.connect (() => {
                 changed ();

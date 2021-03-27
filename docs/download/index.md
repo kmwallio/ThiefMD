@@ -21,7 +21,7 @@ sudo apt-get update
 sudo apt-get install com.github.kmwallio.thiefmd
 ```
 
-Builds have been tested on Ubuntu 20.04 and Pop OS 20.04. Write-Good may crash on [elementary OS 5](https://elementary.io).
+Builds have been tested on Ubuntu 20.04 and Pop OS 20.04. Newer versions of ThiefMD require [libhandy-1](https://packages.ubuntu.com/groovy/libhandy-1-0) and 20.10+. [Flatpak](#flatpak) provides libhandy and should be ran on 20.04 and below.
 
 ## Arch User Repository
 
@@ -35,7 +35,7 @@ yay -S thiefmd
 
 [Download the latest release](https://github.com/kmwallio/ThiefMD/releases) from GitHub.
 
-RPM is built on [Fedora 33](https://getfedora.org) and supports [Katex](https://katex.org).
+RPM is built on [Fedora 33](https://getfedora.org).
 
 ## Build from Source
 

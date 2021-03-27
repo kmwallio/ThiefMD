@@ -21,3 +21,6 @@
 	path = src/wordpress
 	url = https://github.com/ThiefMD/wordpress-vala.git
 	branch = main
+[submodule "src/bibtex"]
+	path = src/bibtex
+	url = https://github.com/ThiefMD/BiBtex-vala.git

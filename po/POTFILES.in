@@ -16,12 +16,15 @@ src/Connections/ConnectionBase.vala
 src/Connections/WriteFreelyConnection.vala
 src/Connections/GhostConnection.vala
 src/Connections/WordpressConnection.vala
+src/Enrichments/Fountain.vala
+src/Enrichments/Markdown.vala
 src/Exporters/ExportBase.vala
 src/Exporters/ExportDocx.vala
 src/Exporters/ExportEpub.vala
 src/Exporters/ExportHtml.vala
 src/Exporters/ExportLatex.vala
 src/Exporters/ExportMarkdown.vala
+src/Exporters/ExportFountain.vala
 src/Exporters/ExportMhtml.vala
 src/Exporters/ExportPdf.vala
 src/Widgets/About.vala
@@ -44,7 +47,7 @@ src/Widgets/DefaultTheme.vala
 src/Widgets/SearchBar.vala
 src/Widgets/StatisticsBar.vala
 src/Widgets/SearchWindow.vala
-src/Widgets/ThiefPane.vala
+src/Widgets/MouseMotionListener.vala
 src/Widgets/ThemePreview.vala
 src/Widgets/Thinking.vala
 src/Widgets/MarkdownCheatSheet.vala
@@ -56,3 +59,4 @@ src/writegood/src/en_us.vala
 src/writeas/src/Writeas.vala
 src/ghost/src/Ghost.vala
 src/wordpress/src/Wordpress.vala
+src/bibtex/src/BibTex.vala

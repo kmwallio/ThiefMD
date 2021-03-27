@@ -31,11 +31,13 @@ namespace ThiefMD.Widgets {
         private string _markdown;
         private string e_markdown;
         private ExportBase exporter;
+        private bool render_fountain;
 
-        public PublisherPreviewWindow (string markdown) {
+        public PublisherPreviewWindow (string markdown, bool generate_fountain = false) {
             preview = new Preview ();
             preview.exporting = true;
-            preview.update_html_view (false, markdown);
+            render_fountain = generate_fountain;
+            preview.update_html_view (false, markdown, render_fountain);
             _markdown = markdown;
             new KeyBindings (this, false);
             build_ui ();
@@ -69,7 +71,12 @@ namespace ThiefMD.Widgets {
             Gee.Set<string> exports = ThiefApp.get_instance ().exporters.get_export_list ();
             Gee.LinkedList<string> exporters = new Gee.LinkedList<string> ();
             foreach (var e in exports) {
-                exporters.add (e);
+                var check_exporter = ThiefApp.get_instance ().exporters.get_exporter (e);
+                if (!render_fountain && check_exporter.supports_markdown) {
+                    exporters.add (e);
+                } else if (render_fountain && check_exporter.supports_fountain) {
+                    exporters.add (e);
+                }
             }
 
             var preview_type = new Gtk.ComboBoxText ();
@@ -77,8 +84,15 @@ namespace ThiefMD.Widgets {
             foreach (var e in exporters) {
                 preview_type.append_text (e);
             }
-            preview_type.set_active (exporters.index_of (Constants.DEFAULT_EXPORTER));
-            exporter = ThiefApp.get_instance ().exporters.get_exporter (Constants.DEFAULT_EXPORTER);
+
+            if (!render_fountain) {
+                preview_type.set_active (exporters.index_of (Constants.DEFAULT_EXPORTER));
+                exporter = ThiefApp.get_instance ().exporters.get_exporter (Constants.DEFAULT_EXPORTER);
+            } else {
+                preview_type.set_active (exporters.index_of ("PDF"));
+                exporter = ThiefApp.get_instance ().exporters.get_exporter ("PDF");
+            }
+            
             exporter.attach (this);
             e_markdown = exporter.update_markdown (_markdown);
 
@@ -120,7 +134,7 @@ namespace ThiefMD.Widgets {
                     } else {
                         e_markdown = _markdown;
                     }
-                    preview.update_html_view (false, e_markdown);
+                    preview.update_html_view (false, e_markdown, render_fountain);
                 }
             });
 
@@ -134,7 +148,7 @@ namespace ThiefMD.Widgets {
                     } else {
                         e_markdown = _markdown;
                     }
-                    preview.update_html_view (false, e_markdown);
+                    preview.update_html_view (false, e_markdown, render_fountain);
                 }
             });
 
@@ -156,13 +170,13 @@ namespace ThiefMD.Widgets {
                         if (exporter.export_css == "print") {
                             preview.print_only = true;
                             e_markdown = exporter.update_markdown (_markdown);
-                            preview.update_html_view (false, e_markdown);
+                            preview.update_html_view (false, e_markdown, render_fountain);
                             headerbar.remove (preview_css);
                             headerbar.pack_start (print_css);
                         } else {
                             preview.print_only = false;
                             e_markdown = exporter.update_markdown (_markdown);
-                            preview.update_html_view (false, e_markdown);
+                            preview.update_html_view (false, e_markdown, render_fountain);
                             headerbar.remove (print_css);
                             headerbar.pack_start (preview_css);
                         }
@@ -195,8 +209,6 @@ namespace ThiefMD.Widgets {
             title = _("Publishing Preview");
 
             ThiefApp.get_instance ().get_size (out w, out h);
-            parent = ThiefApp.get_instance ();
-            destroy_with_parent = true;
 
             w = w - ThiefApp.get_instance ().pane_position;
 

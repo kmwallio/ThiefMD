@@ -80,4 +80,14 @@ install_data(
     install_dir: join_paths([ get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'scripts' ])
 )
 
+install_data(
+    join_paths('fountain', 'fountain.css'),
+    install_dir: join_paths([ get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'styles' ])
+)
+
+install_data(
+    join_paths('fountain', 'fountain.js'),
+    install_dir: join_paths([ get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'scripts' ])
+)
+
 gnome.compile_schemas()

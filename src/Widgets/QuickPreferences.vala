@@ -82,7 +82,7 @@ namespace ThiefMD.Widgets {
             export_button.has_tooltip = true;
             export_button.tooltip_text = _("Open Export Window");
             export_button.clicked.connect (() => {
-                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown ());
+                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
                 ppw.show ();
             });
 
@@ -123,11 +123,7 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
-            if (_instance.mobile_mode) {
-                menu_grid.add (export_button);
-                menu_grid.add (search_button);
-                am_mobile = true;
-            } else if (_instance.am_mobile) {
+            if (_instance.show_touch_friendly) {
                 menu_grid.add (export_button);
                 menu_grid.add (search_button);
                 am_mobile = true;
@@ -142,8 +138,8 @@ namespace ThiefMD.Widgets {
         }
 
         private void build_mobilemenu () {
+            var settings = AppSettings.get_default ();
             menu_grid.remove (_typewriter_button);
-            // menu_grid.add (separator);
             menu_grid.remove (_spellcheck_button);
             menu_grid.remove (_writegood_button);
             remove (menu_grid);
@@ -164,7 +160,7 @@ namespace ThiefMD.Widgets {
             export_button.has_tooltip = true;
             export_button.tooltip_text = _("Open Export Window");
             export_button.clicked.connect (() => {
-                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown ());
+                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
                 ppw.show ();
             });
 
@@ -207,14 +203,15 @@ namespace ThiefMD.Widgets {
             menu_grid.add (preview_button);
             menu_grid.add (export_button);
             menu_grid.add (search_button);
-            am_mobile = true;
             menu_grid.add (preferences_button);
             menu_grid.add (about_button);
             menu_grid.show_all ();
             add (menu_grid);
+            am_mobile = true;
         }
 
         private void build_desktopmenu () {
+            var settings = AppSettings.get_default ();
             menu_grid.remove (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.remove (_spellcheck_button);
@@ -237,7 +234,7 @@ namespace ThiefMD.Widgets {
             export_button.has_tooltip = true;
             export_button.tooltip_text = _("Open Export Window");
             export_button.clicked.connect (() => {
-                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown ());
+                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
                 ppw.show ();
             });
 
@@ -278,7 +275,6 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
-            am_mobile = true;
             menu_grid.add (preferences_button);
             menu_grid.add (about_button);
             menu_grid.show_all ();
@@ -292,9 +288,9 @@ namespace ThiefMD.Widgets {
             _spellcheck_button.set_active (settings.spellcheck);
             _writegood_button.set_active (settings.writegood);
 
-            if (_instance.am_mobile && !am_mobile) {
+            if (_instance.show_touch_friendly && !am_mobile) {
                 build_mobilemenu ();
-            } else if (!_instance.am_mobile && am_mobile && !_instance.mobile_mode) {
+            } else if (!_instance.show_touch_friendly && am_mobile) {
                 build_desktopmenu ();
             }
         }

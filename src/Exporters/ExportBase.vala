@@ -31,7 +31,13 @@ namespace ThiefMD.Exporters {
         public abstract string export_name { get; protected set; }
 
         // Compatible CSS for Exporter  { "preview", "print"}
-        public abstract string export_css { get; protected  set; }
+        public abstract string export_css { get; protected set; }
+
+        // Support handling of markdown files
+        public bool supports_markdown { get; protected set; default = true; }
+
+        // Support handling of fountain files
+        public bool supports_fountain { get; protected set; default = false; }
 
         public abstract string update_markdown (string markdown);
         public abstract void attach (PublisherPreviewWindow ppw);

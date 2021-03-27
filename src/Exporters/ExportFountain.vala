@@ -26,14 +26,15 @@ using ThiefMD.Widgets;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Exporters {
-    public class ExportHtml : ExportBase {
+    public class ExportFountain : ExportBase {
         public override string export_name { get; protected set; }
         public override string export_css { get; protected set; }
         private PublisherPreviewWindow publisher_instance;
 
-        public ExportHtml () {
-            export_name = "HTML";
-            export_css = "preview";
+        public ExportFountain () {
+            export_name = "Fountain";
+            export_css = "print";
+            supports_markdown = false;
             supports_fountain = true;
         }
 
@@ -52,35 +53,35 @@ namespace ThiefMD.Exporters {
         }
 
         public override bool export () {
-            var html_filter = new Gtk.FileFilter ();
-            html_filter.set_filter_name (_("HTML files"));
-            html_filter.add_mime_type ("text/html");
-            html_filter.add_pattern ("*.html");
-            html_filter.add_pattern ("*.htm");
+            var fountain_filter = new Gtk.FileFilter ();
+            fountain_filter.set_filter_name (_("Fountain files"));
+            fountain_filter.add_mime_type ("text/fountain");
+            fountain_filter.add_pattern ("*.fountain");
+            fountain_filter.add_pattern ("*.spmd");
 
-            File new_novel = Dialogs.get_target_save_file_with_extension (
-                _("Export HTML"),
-                html_filter,
-                "html");
+            File new_script = Dialogs.get_target_save_file_with_extension (
+                _("Export Fountain"),
+                fountain_filter,
+                "fountain");
 
-            if (new_novel == null) {
-                return false;
+            if (new_script == null) {
+                return true;
             }
 
             try {
-                if (new_novel.query_exists ()) {
-                    new_novel.delete ();
+                if (new_script.query_exists ()) {
+                    new_script.delete ();
                 }
 
                 FileManager.save_file (
-                    new_novel,
-                    publisher_instance.preview.html.data);
+                    new_script,
+                    publisher_instance.get_export_markdown ().data);
 
             } catch (Error e) {
-                warning ("Could not save HTML file: %s", e.message);
+                warning ("Could not save fountain file: %s", e.message);
             }
 
-            if (new_novel.query_exists ()) {
+            if (new_script.query_exists ()) {
                 return true;
             } else {
                 return false;

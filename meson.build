@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.kmwallio.thiefmd', ['vala', 'c'],
-    version: '0.1.8'
+    version: '0.2.0'
 )
 
 # Application ID
@@ -88,14 +88,18 @@ executable(
     'src/Exporters/ExportHtml.vala',
     'src/Exporters/ExportLatex.vala',
     'src/Exporters/ExportMarkdown.vala',
+    'src/Exporters/ExportFountain.vala',
     'src/Exporters/ExportMhtml.vala',
     'src/Exporters/ExportPdf.vala',
+    'src/Enrichments/Fountain.vala',
+    'src/Enrichments/Markdown.vala',
     'src/Widgets/About.vala',
     'src/Widgets/HeaderBar.vala',
     'src/Widgets/Sheets.vala',
     'src/Widgets/Sheet.vala',
     'src/Widgets/Editor.vala',
     'src/Widgets/Library.vala',
+    'src/Widgets/Notes.vala',
     'src/Widgets/NewFolder.vala',
     'src/Widgets/NewSheet.vala',
     'src/Widgets/Preferences.vala',
@@ -110,7 +114,7 @@ executable(
     'src/Widgets/SearchBar.vala',
     'src/Widgets/StatisticsBar.vala',
     'src/Widgets/SearchWindow.vala',
-    'src/Widgets/ThiefPane.vala',
+    'src/Widgets/MouseMotionListener.vala',
     'src/Widgets/ThemePreview.vala',
     'src/Widgets/Thinking.vala',
     'src/Widgets/MarkdownCheatSheet.vala',
@@ -122,6 +126,7 @@ executable(
     'src/writeas/src/Writeas.vala',
     'src/ghost/src/Ghost.vala',
     'src/wordpress/src/Wordpress.vala',
+    'src/bibtex/src/BibTex.vala',
     asresources,
     c_args: c_args,
     dependencies: [
