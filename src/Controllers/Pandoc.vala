@@ -70,7 +70,7 @@ namespace ThiefMD.Controllers.Pandoc {
                     "pandoc",
                 };
                 if (work_bib) {
-                    warning ("Activating citations");
+                    debug ("Activating citations %s", citation_file);
                     command +=  has_citeproc () ? "--citeproc" : "--filter=pandoc-citeproc";
                 }
                 if (settings.preview_css != "") {
@@ -91,6 +91,7 @@ namespace ThiefMD.Controllers.Pandoc {
                 Subprocess pandoc = new Subprocess.newv (command, SubprocessFlags.STDOUT_PIPE | SubprocessFlags.STDIN_PIPE);
                 var input_stream = pandoc.get_stdin_pipe ();
                 if (input_stream != null) {
+                    var buffer = temp_file.data;
                     DataOutputStream flush_buffer = new DataOutputStream (input_stream);
                     if (!flush_buffer.put_string (temp_file)) {
                         warning ("Could not set buffer");
@@ -99,7 +100,9 @@ namespace ThiefMD.Controllers.Pandoc {
                     flush_buffer.close ();
                 }
                 var output_stream = pandoc.get_stdout_pipe ();
-                res = pandoc.wait ();
+                bool pandoc_done = false;
+                res = pandoc.wait_check ();
+                pandoc_done = true;
                 if (output_stream != null) {
                     var input = new DataInputStream (output_stream);
                     string line = "";

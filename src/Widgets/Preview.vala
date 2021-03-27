@@ -284,14 +284,27 @@ namespace ThiefMD.Widgets {
 
         private bool get_preview_markdown (string raw_mk, out string processed_mk) {
             var settings = AppSettings.get_default ();
+
+            // Resolve paths to images or local files if needed
             if (!exporting || settings.export_resolve_paths) {
                 string file_path = settings.last_file.substring(0, settings.last_file.last_index_of(Path.DIR_SEPARATOR_S));
                 processed_mk = Pandoc.resolve_paths (raw_mk, file_path);
             } else {
                 processed_mk = raw_mk;
             }
-            string bib_file = find_bibtex_for_sheet (settings.last_file);
-            if (Pandoc.needs_bibtex (raw_mk) || bib_file != "") {
+
+            // Use fast preview if no special cases are needed
+            string bib_file = (!exporting) ? find_bibtex_for_sheet (settings.last_file) : "";
+            bool need_pandoc = Pandoc.needs_bibtex (raw_mk);
+
+            // BibTeX File
+            if (!exporting && (settings.last_file.has_suffix ("bib") || settings.last_file.has_suffix ("bibtex"))) {
+                processed_mk = "```bibtex\n" + processed_mk + "\n```";
+                need_pandoc = false;
+                bib_file = "";
+            }
+
+            if (need_pandoc || bib_file != "") {
                 return Pandoc.make_preview (out processed_mk, raw_mk, bib_file);
             } else {
                 string title, date;
