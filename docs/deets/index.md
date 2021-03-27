@@ -193,6 +193,20 @@ Currently key bound to `Ctrl+Shift+S` until we can think of something better.
 
 <div class="clear"></div>
 
+## Fountain Support
+
+<div class="responsive-left hoffman"><img src="/images/thiefmd-screenplay.png" alt="ThiefMD tracking statistics for a whole project and an individual chapter" /></div>
+
+We all know your best selling novel will become an award winning movie.
+
+Start both drafts in ThiefMD thanks to [Fountain](https://fountain.io) support.
+
+All caps for a CHARACTER followed by some text is dialogue. `EXT. PLACE` to change the setting. It's just that easy to start your journey to the big screen[^maybe-not-that-easy].
+
+[^maybe-not-that-easy]: The journey will be pretty tough, but you'll never make it without taking the first step.
+
+<div class="clear"></div>
+
 ## BibTeX Support
 
 ![Right-Click Insert Citation Support](https://user-images.githubusercontent.com/132455/112594422-23499d00-8dc6-11eb-8bd6-b6b6bcc28f7f.gif)

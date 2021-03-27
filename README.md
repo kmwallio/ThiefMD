@@ -90,6 +90,10 @@ Focus Mode
 
 [Write-Good](https://github.com/ThiefMD/libwritegood-vala) recommendations and highlighting.
 
+![](docs/images/thiefmd-screenplay.png)
+
+[Fountain](https://fountain.io) syntax highlighting.
+
 ## Dependencies
 
 [libwritegood-vala](https://github.com/ThiefMD/libwritegood-vala), [writeas-vala](https://github.com/ThiefMD/writeas-vala), [ghost-vala](https://github.com/ThiefMD/ghost-vala), [wordpress-vala](https://github.com/ThiefMD/wordpress-vala), [Bibtex-vala](https://github.com/ThiefMD/BiBtex-vala) and the [Ulysses Theme Parser](https://github.com/TwiRp/ultheme-vala) are used as git sub-modules.
