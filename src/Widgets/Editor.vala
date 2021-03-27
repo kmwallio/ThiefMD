@@ -749,21 +749,28 @@ namespace ThiefMD.Widgets {
                 buffer.get_bounds (out start, out end);
                 buffer.get_iter_at_mark (out cursor_iter, cursor);
 
-                string before = buffer.get_text (start, cursor_iter, true);
-                string last_line = before.substring (before.last_index_of ("\n") + 1);
-                string after = buffer.get_text (cursor_iter, end, true);
-                int nl_loc = after.index_of ("\n");
-                string first_line = after;
-                if (nl_loc != -1) {
-                    first_line = after.substring (0, nl_loc);
-                }
-                int adjustment = get_scrollmark_adjustment (last_line, first_line);
-                adjustment = skip_special_chars (after, adjustment);
+                string text_before = buffer.get_text (start, cursor_iter, true);
+                bool whoa_there_will_robinson = text_before == "" || (text_before.has_prefix ("-") && text_before.index_of ("\n---") == -1);
 
-                preview_markdown = before;
-                preview_markdown += after.substring (0, adjustment);
-                preview_markdown += ThiefProperties.THIEF_MARK_CONST;
-                preview_markdown += after.substring (adjustment);
+                if (!whoa_there_will_robinson) {
+                    string before = buffer.get_text (start, cursor_iter, true);
+                    string last_line = before.substring (before.last_index_of ("\n") + 1);
+                    string after = buffer.get_text (cursor_iter, end, true);
+                    int nl_loc = after.index_of ("\n");
+                    string first_line = after;
+                    if (nl_loc != -1) {
+                        first_line = after.substring (0, nl_loc);
+                    }
+                    int adjustment = get_scrollmark_adjustment (last_line, first_line);
+                    adjustment = skip_special_chars (after, adjustment);
+
+                    preview_markdown = before;
+                    preview_markdown += after.substring (0, adjustment);
+                    preview_markdown += ThiefProperties.THIEF_MARK_CONST;
+                    preview_markdown += after.substring (adjustment);
+                } else {
+                    preview_markdown = get_buffer_text ();
+                }
 
                 UI.update_preview ();
             }

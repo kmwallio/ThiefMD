@@ -292,7 +292,6 @@ namespace ThiefMD.Widgets {
             }
             string bib_file = find_bibtex_for_sheet (settings.last_file);
             if (Pandoc.needs_bibtex (raw_mk) || bib_file != "") {
-                debug ("Citation found");
                 return Pandoc.make_preview (out processed_mk, raw_mk, bib_file);
             } else {
                 string title, date;
