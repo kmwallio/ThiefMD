@@ -305,7 +305,6 @@ namespace ThiefMD.Widgets {
                 foreach (var label in bib_parser.get_labels ()) {
                     bib_mk += "1. **\\@" + label + "**: *@" + label + "*\n";
                 }
-                warning (bib_mk);
                 return Pandoc.make_preview (out processed_mk, bib_mk, bib_file);
             }
 

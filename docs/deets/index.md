@@ -193,6 +193,16 @@ Currently key bound to `Ctrl+Shift+S` until we can think of something better.
 
 <div class="clear"></div>
 
+## BibTeX Support
+
+![Right-Click Insert Citation Support](https://user-images.githubusercontent.com/132455/112594422-23499d00-8dc6-11eb-8bd6-b6b6bcc28f7f.gif)
+
+Use [BibTeX](http://www.bibtex.org) to manage your citations? ThiefMD can dig that.
+
+Use [JabRef](https://www.jabref.org) or your favorite citation manager to modify your BibTeX. Watch in Wonder as ThiefMD offers to insert citations from its right-click menu.
+
+<div class="clear"></div>
+
 ***
 
 <small>The photo of Wheat is by [Matt Hoffman](https://unsplash.com/@__matthoffman__), more Wheat by [Jonas Zürcher](https://unsplash.com/@tsueri), and even more wheat by [Gaelle Marcel](https://unsplash.com/@gaellemarcel).</small>
