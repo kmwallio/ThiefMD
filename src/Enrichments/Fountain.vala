@@ -21,8 +21,64 @@ using ThiefMD;
 using ThiefMD.Widgets;
 
 namespace ThiefMD.Enrichments {
+    public class FountainCharacterSuggestor : Gtk.SourceCompletionProvider, GLib.Object {
+        public Gee.HashSet<string> characters;
+
+        public class FountainCharacterSuggestor () {
+            characters = new Gee.HashSet<string> ();
+        }
+
+        public override string get_name () {
+            return _("Characters");
+        }
+
+        public override bool match (Gtk.SourceCompletionContext context) {
+            Gtk.TextIter? start = null, iter = null;
+            if (context.get_iter (out iter)) {
+                if (iter.ends_line () && context.get_iter (out start)) {
+                    start.backward_word_start ();
+                    if ((iter.get_offset () - start.get_offset ()) >= 2) {
+                        string check = start.get_text (iter);
+                        return check == check.up ();
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public override void populate (Gtk.SourceCompletionContext context) {
+            List<Gtk.SourceCompletionItem> completions = new List<Gtk.SourceCompletionItem> ();
+            Gtk.TextIter? start = null, iter = null;
+            if (context.get_iter (out iter)) {
+                if (iter.ends_line () && context.get_iter (out start)) {
+                    start.backward_word_start ();
+                    if ((iter.get_offset () - start.get_offset ()) >= 2) {
+                        string check = start.get_text (iter);
+                        foreach (var character in characters) {
+                            if (character.has_prefix (check) && character != check) {
+                                var com_item = new Gtk.SourceCompletionItem ();
+                                com_item.text = character;
+                                com_item.label = character;
+                                com_item.markup = character;
+                                completions.append (com_item);
+                            }
+                        }
+                    }
+                }
+            }
+            context.add_proposals (this, completions, true);
+        }
+
+        public override bool activate_proposal (Gtk.SourceCompletionProposal proposal, Gtk.TextIter iter) {
+            return false;
+        }
+    }
+
     public class FountainEnrichment {
-        private Gtk.TextView view;
+        private FountainCharacterSuggestor character_suggester;
+        private Gtk.SourceCompletionWords source_completion;
+        private Gtk.SourceView view;
         private Gtk.TextBuffer buffer;
         private Mutex checking;
 
@@ -49,9 +105,11 @@ namespace ThiefMD.Enrichments {
             } catch (Error e) {
                 warning ("Could not build regexes: %s", e.message);
             }
+            character_suggester = new FountainCharacterSuggestor ();
             checking = Mutex ();
             limit_updates = new TimedMutex (250);
             last_cursor = -1;
+            source_completion = null;
         }
 
         public void reset () {
@@ -139,6 +197,9 @@ namespace ThiefMD.Enrichments {
         }
 
         private void tag_char_diag_helper (Regex regex) {
+            Gtk.TextIter cursor_iter;
+            var cursor = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_iter, cursor);
             try {
                 MatchInfo match_info;
                 if (regex.match_full (checking_copy, checking_copy.length, 0, 0, out match_info)) {
@@ -175,6 +236,22 @@ namespace ThiefMD.Enrichments {
                                 buffer.apply_tag (tag_parenthetical, start, end);
                             } else {
                                 buffer.apply_tag (tag_character, start, end);
+                                start.backward_word_start ();
+                                end.forward_word_end ();
+                                if (!character_suggester.characters.contains (character) && !cursor_iter.in_range (start, end)) {
+                                    bool partial_character_name = false;
+                                    if (character.has_suffix ("^")) {
+                                        character = character.substring (0, character.length - 1);
+                                    }
+                                    foreach (var person in character_suggester.characters) {
+                                        if (person.contains (character)) {
+                                            partial_character_name = true;
+                                        }
+                                    }
+                                    if (!partial_character_name) {
+                                        character_suggester.characters.add (character);
+                                    }
+                                }
                             }
                         }
 
@@ -226,7 +303,7 @@ namespace ThiefMD.Enrichments {
             } while (match_info.next ());
         }
 
-        public bool attach (Gtk.TextView textview) {
+        public bool attach (Gtk.SourceView textview) {
             if (textview == null) {
                 return false;
             }
@@ -265,8 +342,24 @@ namespace ThiefMD.Enrichments {
             last_cursor = -1;
 
             calculate_margins ();
+            settings_changed ();
+            settings.changed.connect (settings_changed);
 
             return true;
+        }
+
+        private void settings_changed () {
+            var settings = AppSettings.get_default ();
+            if (settings.experimental && source_completion == null) {
+                var completion = view.get_completion ();
+                completion.add_provider (character_suggester);
+                source_completion = new Gtk.SourceCompletionWords ("Character Suggestor", null);
+                source_completion.register (buffer);
+            } else if (!settings.experimental && source_completion != null) {
+                var completion = view.get_completion ();
+                source_completion.unregister (buffer);
+                completion.remove_provider (character_suggester);
+            }
         }
 
         private void calculate_margins () {
@@ -321,6 +414,7 @@ namespace ThiefMD.Enrichments {
         }
 
         public void detach () {
+            var settings = AppSettings.get_default ();
             Gtk.TextIter start, end;
             buffer.get_bounds (out start, out end);
 
@@ -332,7 +426,17 @@ namespace ThiefMD.Enrichments {
             buffer.tag_table.remove (tag_character);
             buffer.tag_table.remove (tag_parenthetical);
             buffer.tag_table.remove (tag_dialogue);
+
+            if (source_completion != null) {
+                source_completion.unregister (buffer);
+            }
+
+            settings.changed.disconnect (settings_changed);
+
             tag_scene_heading = null;
+            tag_character = null;
+            tag_parenthetical = null;
+            tag_dialogue = null;
 
             view = null;
             buffer = null;
