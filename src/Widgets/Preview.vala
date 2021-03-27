@@ -299,9 +299,14 @@ namespace ThiefMD.Widgets {
 
             // BibTeX File
             if (!exporting && (settings.last_file.has_suffix ("bib") || settings.last_file.has_suffix ("bibtex"))) {
-                processed_mk = "```bibtex\n" + processed_mk + "\n```";
-                need_pandoc = false;
-                bib_file = "";
+                BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
+                bib_parser.parse_file ();
+                string bib_mk = "";
+                foreach (var label in bib_parser.get_labels ()) {
+                    bib_mk += "1. **\\@" + label + "**: *@" + label + "*\n";
+                }
+                warning (bib_mk);
+                return Pandoc.make_preview (out processed_mk, bib_mk, bib_file);
             }
 
             if (need_pandoc || bib_file != "") {
