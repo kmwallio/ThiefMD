@@ -3,6 +3,7 @@ public class ThiefTests {
         Test.init (ref args);
         new ImageExtractionTests ();
         new MarkdownTests ();
+        new FileManagerTests ();
         return Test.run ();
     }
 }
