@@ -302,6 +302,10 @@ namespace ThiefMD.Widgets {
                     _parent.remove_sheet (this);
                     SheetManager.close_active_file (_sheet_path);
                     FileManager.move_to_trash (_sheet_path);
+                    File metadata_file = File.new_for_path (_notes_path);
+                    if (metadata_file.query_exists ()) {
+                        FileManager.move_to_trash (_notes_path);
+                    }
                 });
                 menu.add (menu_delete_sheet);
                 menu.show_all ();

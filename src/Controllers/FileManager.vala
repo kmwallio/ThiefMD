@@ -388,11 +388,7 @@ namespace ThiefMD.Controllers.FileManager {
     }
 
     public bool get_parsed_markdown (string raw_mk, out string processed_mk) {
-        var mkd = new Markdown.Document.from_gfm_string (raw_mk.data, 0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x04000000 + 0x00400000 + 0x10000000 + 0x40000000);
-        mkd.compile (0x00200000 + 0x00004000 + 0x02000000 + 0x01000000 + 0x00400000 + 0x04000000 + 0x40000000 + 0x10000000);
-        mkd.get_document (out processed_mk);
-
-        return (processed_mk.chomp () != "");
+        return Pandoc.generate_discount_html (raw_mk, out processed_mk);
     }
 
     public Gee.Map<string, string> get_yaml_kvp (string markdown) {

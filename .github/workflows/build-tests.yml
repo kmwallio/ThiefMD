@@ -1,0 +1,41 @@
+name: ThiefDaily
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Add vala next
+        run: sudo add-apt-repository ppa:vala-team/daily
+
+      - name: Add libhandy-1 for focal
+        run: sudo add-apt-repository ppa:apandada1/libhandy-1
+
+      - name: Update Ubuntu
+        run: sudo apt-get update
+
+      - name: Install build essentials
+        run: sudo apt-get install build-essential meson ninja-build valac cmake libgtkspell3-3-dev libwebkit2gtk-4.0-dev libmarkdown2-dev libxml2-dev libclutter-1.0-dev libarchive-dev libgtk-3-dev libgee-0.8-dev libgtksourceview-4-dev libsecret-1-dev libhandy-1-dev
+
+      - name: Init submodules
+        run: git submodule init
+
+      - name: Update submodules
+        run: git submodule update --remote --recursive
+
+      - name: Setup Build
+        run: meson build
+
+      - name: Configure build
+        run: meson configure -Dbuild_tests=true build
+
+      - name: Run Build
+        run: ninja -C build
+
+      - name: Test
+        run: ./build/tests/tests

@@ -1,1 +1,2 @@
 option('profile', type: 'combo', choices: [ 'default', 'development' ], value: 'default', description: 'Dev build or production')
+option('build_tests', type: 'boolean', value: false, description: 'build tests')
