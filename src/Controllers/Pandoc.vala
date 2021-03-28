@@ -287,21 +287,23 @@ namespace ThiefMD.Controllers.Pandoc {
 
         RegexEvalCallback add_import_paths = (match_info, result) =>
         {
-            if (match_info.get_match_count () >= 2) {
+            warning ("Found: %d", match_info.get_match_count ());
+            if (match_info.get_match_count () > 2) {
                 var url = match_info.fetch (2);
                 string abs_path = "";
-                if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
+                if (!url.contains (":")) {
                     sub_files.add (url);
+                    warning ("adding: %s", url);
                 }
             } else {
                 var url = match_info.fetch (1);
                 string abs_path = "";
-                if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
+                if (!url.contains (":")) {
                     sub_files.add (url);
+                    warning ("adding: %s", url);
                 }
             }
             return false;
-            
         };
         manipulate_markdown_local_paths (markdown, "",
             add_import_paths,
