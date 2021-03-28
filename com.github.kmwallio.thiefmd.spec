@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.2.1
+Version: 0.2.2
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
@@ -329,6 +329,7 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %changelog
 * Sun Mar 28 2021 kmwallio <mwallio@gmail.com> - 0.2.2
 - Fix image upload support when blogging
+- Add watchdog for pandoc preview
 * Sat Mar 27 2021 kmwallio <mwallio@gmail.com> - 0.2.0
 - Open Bibtex files and Right-Click Insert Citation in Markdown
 - Open, Preview, and Export Fountain Screen Plays
