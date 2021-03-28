@@ -90,6 +90,9 @@ namespace ThiefMD {
         public const double SIZE_1_REM_IN_PT = 12;
         public const double SINGLE_SPACING = 1.0;
 
+        // Citation length limit
+        public const int CITATION_TITLE_MAX_LEN = 30;
+
         // Visual Settings
         public const double MINIMUM_CONTRAST_RATIO = 1.2;
 

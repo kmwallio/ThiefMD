@@ -87,8 +87,8 @@ namespace ThiefMD.Enrichments {
                             if (citation.down ().has_prefix (prefix.down ()) && citation.down () != prefix.down ()) {
                                 var com_item = new Gtk.SourceCompletionItem ();
                                 string title = bib_parser.get_title (citation);
-                                if (title.length > 30) {
-                                    title = title.substring (0, 27) + "...";
+                                if (title.length > Constants.CITATION_TITLE_MAX_LEN) {
+                                    title = title.substring (0, Constants.CITATION_TITLE_MAX_LEN - 3) + "...";
                                 }
                                 com_item.text = citation;
                                 com_item.label = citation + ": " + title;
