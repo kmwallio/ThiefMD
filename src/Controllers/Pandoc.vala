@@ -50,7 +50,6 @@ namespace ThiefMD.Controllers.Pandoc {
                     flush_buffer.close ();
                 }
                 var output_stream = pandoc.get_stdout_pipe ();
-                bool pandoc_done = false;
 
                 // Before we wait, setup watchdogs
                 Thread<void> watchdog = null;
@@ -323,13 +322,13 @@ namespace ThiefMD.Controllers.Pandoc {
             if (match_info.get_match_count () > 2) {
                 var url = match_info.fetch (2);
                 string abs_path = "";
-                if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
+                if (!url.contains (":") && find_file_to_upload (url, path, out abs_path) && abs_path != "") {
                     sub_files.set (url, abs_path);
                 }
             } else {
                 var url = match_info.fetch (1);
                 string abs_path = "";
-                if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
+                if (!url.contains (":") && find_file_to_upload (url, path, out abs_path) && abs_path != "") {
                     sub_files.set (url, abs_path);
                 }
             }
@@ -349,20 +348,15 @@ namespace ThiefMD.Controllers.Pandoc {
 
         RegexEvalCallback add_import_paths = (match_info, result) =>
         {
-            warning ("Found: %d", match_info.get_match_count ());
             if (match_info.get_match_count () > 2) {
                 var url = match_info.fetch (2);
-                string abs_path = "";
                 if (!url.contains (":")) {
                     sub_files.add (url);
-                    warning ("adding: %s", url);
                 }
             } else {
                 var url = match_info.fetch (1);
-                string abs_path = "";
                 if (!url.contains (":")) {
                     sub_files.add (url);
-                    warning ("adding: %s", url);
                 }
             }
             return false;
@@ -483,7 +477,7 @@ namespace ThiefMD.Controllers.Pandoc {
                 search_path = path;
             }
             int idx = 0;
-            while (search_path != "" && ThiefApp.get_instance ().library.file_in_library (search_path)) {
+            while (search_path != "") {
                 file = Path.build_filename (search_path, url);
                 if (FileUtils.test (file, FileTest.EXISTS)) {
                     File tmp = File.new_for_path (file);
@@ -608,5 +602,27 @@ namespace ThiefMD.Controllers.Pandoc {
         }
 
         return false;
+    }
+
+    public bool generate_discount_html (string raw_mk, out string processed_mk) {
+        processed_mk = raw_mk;
+        var mkd = new Markdown.Document.from_gfm_string (processed_mk.data,
+            Markdown.DocumentFlags.TOC + 
+            Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.EXTRA_FOOTNOTE + 
+            Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.DLEXTRA + 
+            Markdown.DocumentFlags.FENCEDCODE + Markdown.DocumentFlags.GITHUBTAGS + 
+            Markdown.DocumentFlags.LATEX + Markdown.DocumentFlags.URLENCODEDANCHOR + 
+            Markdown.DocumentFlags.NOSTYLE + Markdown.DocumentFlags.EXPLICITLIST);
+
+        mkd.compile (
+            Markdown.DocumentFlags.TOC + Markdown.DocumentFlags.AUTOLINK + 
+            Markdown.DocumentFlags.EXTRA_FOOTNOTE + 
+            Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.DLEXTRA +
+            Markdown.DocumentFlags.FENCEDCODE + Markdown.DocumentFlags.GITHUBTAGS +
+            Markdown.DocumentFlags.LATEX + Markdown.DocumentFlags.URLENCODEDANCHOR +
+            Markdown.DocumentFlags.EXPLICITLIST + Markdown.DocumentFlags.NOSTYLE);
+        mkd.get_document (out processed_mk);
+
+        return (processed_mk.chomp () != "");
     }
 }
