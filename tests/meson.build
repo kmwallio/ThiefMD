@@ -17,6 +17,7 @@ testing = executable('tests',
     meson.source_root() + '/src/Controllers/Pandoc.vala',
     meson.source_root() + '/src/Controllers/UserData.vala',
     meson.source_root() + '/src/Constants/ThiefProperties.vala',
+    meson.source_root() + '/src/Constants/Helpers.vala',
     dependencies: [
         dependency('gobject-2.0'),
         dependency('gtksourceview-4'),

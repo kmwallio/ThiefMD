@@ -48,7 +48,7 @@ namespace ThiefMD {
         if (search_path != "") {
             
             int idx = 0;
-            while (search_path != "" && ThiefApp.get_instance ().library.file_in_library (search_path)) {
+            while (search_path != "") {
                 try {
                     Dir dir = Dir.open (search_path, 0);
                     string? file_name = null;
