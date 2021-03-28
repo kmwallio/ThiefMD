@@ -284,7 +284,7 @@ namespace ThiefMD.Controllers.FileManager {
             file_opened = true;
         } else {
             editor = null;
-            warning ("File does not exist\n");
+            debug ("File does not exist\n");
         }
     }
 
@@ -609,7 +609,7 @@ namespace ThiefMD.Controllers.FileManager {
     public string get_file_lines_yaml (
         string file_path,
         int lines,
-        bool non_empty,
+        bool non_empty_lines_only,
         out string title,
         out string date)
     {
@@ -633,7 +633,7 @@ namespace ThiefMD.Controllers.FileManager {
                 bool in_yaml = false;
 
                 while (((line = input.read_line (null)) != null) && (lines_read < lines || lines <= 0)) {
-                    if ((!non_empty) || (line.chomp() != "")) {
+                    if ((!non_empty_lines_only) || (line.chomp() != "")) {
                         if (line == "---") {
                             if (in_yaml) {
                                 in_yaml = false;
