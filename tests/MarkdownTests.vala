@@ -1,4 +1,5 @@
 using ThiefMD;
+using ThiefMD.Controllers;
 
 public class MarkdownTests {
     public MarkdownTests () {
@@ -9,7 +10,7 @@ public class MarkdownTests {
             assert (!is_fountain ("screenplay.markdown"));
             assert (!is_fountain ("screenplay.fountain.markdown"));
             assert (!is_fountain ("screenplay.docx"));
-            assert (is_fountain ("screenplay.bib"));
+            assert (!is_fountain ("screenplay.bib"));
         });
 
         Test.add_func ("/thiefmd/titles", () => {
@@ -18,6 +19,11 @@ public class MarkdownTests {
             assert (make_title ("this_cool-cat") == "This Cool Cat");
             assert (make_title ("this cool-cat") == "This Cool Cat");
             assert (make_title ("this_cool cat") == "This Cool Cat");
+        });
+
+        Test.add_func ("/thiefmd/find_file", () => {
+            assert (Pandoc.find_file ("README.md", Environment.get_current_dir ()) != "");
+            assert (Pandoc.find_file ("README.md", Environment.get_current_dir ()) != "README.md");
         });
     }
 }
