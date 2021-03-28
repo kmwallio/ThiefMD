@@ -25,6 +25,88 @@ using ThiefMD;
 using ThiefMD.Widgets;
 
 namespace ThiefMD.Controllers.Pandoc {
+    public class PandocThinking : GLib.Object {
+        private int wait_time;
+        private Cancellable cancellable;
+        private bool done;
+        public PandocThinking (int timeout_millseconds = 3000) {
+            wait_time = timeout_millseconds;
+        }
+
+        public bool run_pandoc_std_in_out_command (ref string[] command, ref string input, out string output) {
+            bool res = false;
+            done = false;
+            StringBuilder output_builder = new StringBuilder ();
+            try {
+                cancellable = new Cancellable ();
+                Subprocess pandoc = new Subprocess.newv (command, SubprocessFlags.STDOUT_PIPE | SubprocessFlags.STDIN_PIPE);
+                var input_stream = pandoc.get_stdin_pipe ();
+                if (input_stream != null) {
+                    DataOutputStream flush_buffer = new DataOutputStream (input_stream);
+                    if (!flush_buffer.put_string (input)) {
+                        warning ("Could not set buffer");
+                    }
+                    flush_buffer.flush ();
+                    flush_buffer.close ();
+                }
+                var output_stream = pandoc.get_stdout_pipe ();
+                bool pandoc_done = false;
+
+                // Before we wait, setup watchdogs
+                Thread<void> watchdog = null;
+                if (Thread.supported ()) {
+                    watchdog = new Thread<void> ("pandoc_watchdog", this.watch_dog);
+                } else {
+                    int now = 0;
+                    Timeout.add (5, () => {
+                        now += 5;
+                        if (now > wait_time && !done) {
+                            cancellable.cancel ();
+                        }
+                        return done;
+                    });
+                }
+
+                res = pandoc.wait_check (cancellable);
+                done = true;
+                if (watchdog != null) {
+                    watchdog.join ();
+                }
+
+                if (output_stream != null) {
+                    var proc_input = new DataInputStream (output_stream);
+                    string line = "";
+                    while ((line = proc_input.read_line (null)) != null) {
+                        output_builder.append (line + "\n");
+                    }
+                }
+
+                output = output_builder.str;
+            } catch (Error e) {
+                warning ("Failed to run pandoc: %s", e.message);
+            }
+
+            return res;
+        }
+
+        private void watch_dog () {
+            int now = 0;
+            while (now < wait_time && !done) {
+                Thread.usleep (5000);
+                now += 5;
+            }
+
+            if (!done) {
+                cancellable.cancel ();
+                warning ("Had to terminate pandoc");
+            }
+
+            Thread.exit (0);
+            return;
+        }
+
+    }
+
     private bool has_citeproc () {
         bool found = false;
         bool res;
@@ -53,18 +135,17 @@ namespace ThiefMD.Controllers.Pandoc {
 
     public bool make_preview (out string output, string markdown, string citation_file = "") {
         output = "";
-        StringBuilder output_builder = new StringBuilder ();
         var settings = AppSettings.get_default ();
-        string temp_file = "";
+        string mk_input = "";
         if (settings.export_resolve_paths) {
-            temp_file = resolve_paths (markdown);
+            mk_input = resolve_paths (markdown);
         } else {
-            temp_file = markdown;
+            mk_input = markdown;
         }
 
         bool res = false;
         bool work_bib = citation_file != "" || needs_bibtex (markdown);
-        if (temp_file != "") {
+        if (mk_input != "") {
             try {
                 string[] command = {
                     "pandoc",
@@ -88,33 +169,14 @@ namespace ThiefMD.Controllers.Pandoc {
                 if (citation_file != "") {
                     command += "--bibliography=" + citation_file;
                 }
-                Subprocess pandoc = new Subprocess.newv (command, SubprocessFlags.STDOUT_PIPE | SubprocessFlags.STDIN_PIPE);
-                var input_stream = pandoc.get_stdin_pipe ();
-                if (input_stream != null) {
-                    var buffer = temp_file.data;
-                    DataOutputStream flush_buffer = new DataOutputStream (input_stream);
-                    if (!flush_buffer.put_string (temp_file)) {
-                        warning ("Could not set buffer");
-                    }
-                    flush_buffer.flush ();
-                    flush_buffer.close ();
-                }
-                var output_stream = pandoc.get_stdout_pipe ();
-                bool pandoc_done = false;
-                res = pandoc.wait_check ();
-                pandoc_done = true;
-                if (output_stream != null) {
-                    var input = new DataInputStream (output_stream);
-                    string line = "";
-                    while ((line = input.read_line (null)) != null) {
-                        output_builder.append (line + "\n");
-                    }
+                PandocThinking runner = new PandocThinking (300);
+                if (!runner.run_pandoc_std_in_out_command (ref command, ref mk_input, out output)) {
+                    generate_discount_html (mk_input, out output);
                 }
             } catch (Error e) {
                 warning ("Could not generate preview: %s", e.message);
             }
         }
-        output = output_builder.str;
 
         return res;
     }
