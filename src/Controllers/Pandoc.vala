@@ -258,7 +258,7 @@ namespace ThiefMD.Controllers.Pandoc {
 
         RegexEvalCallback add_upload_paths = (match_info, result) =>
         {
-            if (match_info.get_match_count () >= 2) {
+            if (match_info.get_match_count () > 2) {
                 var url = match_info.fetch (2);
                 string abs_path = "";
                 if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {

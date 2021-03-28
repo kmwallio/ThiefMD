@@ -195,6 +195,9 @@ namespace ThiefMD.Widgets {
                             new Gtk.Label (_("ThiefMD could not export the file, please try again.")));
 
                         status.run ();
+                    } else {
+                        exporter.detach ();
+                        exporter = null;
                     }
                 }
             });
@@ -236,6 +239,10 @@ namespace ThiefMD.Widgets {
 
         public bool on_delete_event () {
             remove (preview);
+            if (exporter != null) {
+                exporter.detach ();
+                exporter = null;
+            }
             show_all ();
 
             return false;
