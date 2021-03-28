@@ -251,7 +251,7 @@ namespace ThiefMD.Connections {
                 if (featured_image == replacement.key) {
                     featured_image = replacement.value;
                 }
-                warning ("Replaced %s with %s", replacement.key, replacement.value);
+                debug ("Replaced %s with %s", replacement.key, replacement.value);
             }
 
             int published_state = publish_state.get_active ();

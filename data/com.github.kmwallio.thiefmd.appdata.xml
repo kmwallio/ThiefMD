@@ -9,7 +9,7 @@
   <summary>The markdown editor worth stealing.</summary>
   <description>
     <p>Keep your Markdown managed. Write epic tales, a novel, that screen play, keep a journal, or finally write that book report.</p>
-    <p>ThiefMD is a Markdown providing an easy way to organize, format, and compile your markdown documents. When you're ready to Publish, go to ePub, PDF, Office, Ghost, WordPress, Write-Freely, or more.</p>
+    <p>ThiefMD is a Markdown Editor providing an easy way to organize, format, and compile your markdown documents. When you're ready to Publish, go to ePub, PDF, Office, Ghost, WordPress, Write-Freely, or more.</p>
     <p>Import from and Export to Office, ePUB, HTML, and more. ThiefMD is your one stop shop for making and managing markdown mischief.</p>
     <p>Working on a screenplay? ThiefMD can handle and combine Fountain files as well. Write your novel and prepare for that movie deal all from the same app.</p>
   </description>
@@ -60,7 +60,21 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="0.2.0" date="2021-03-27" urgency="low">
+    <release version="0.2.1" date="2021-03-27" urgency="low">
+      <description>
+        <p>This one's for the creators, the note takers, and the plain-text savers. Notes support, screen play support, citation insertion, and more.</p>
+        <ul>
+          <li>This is a bug fix release of the last release...</li>
+          <li>Open Bibtex files and Right-Click Insert Citation in Markdown</li>
+          <li>Open, Preview, and Export Fountain Screen Plays</li>
+          <li>A new Notes Pane can help take notes for the file you're working on, or at the project level</li>
+          <li>Know what you're doing? Disable tips and start the app with a black canvas to write in</li>
+          <li>Links to other Markdown Documents in the Preview will now open in the Preview and Editor</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.0-creators-edition</url>
+    </release>
+    <release version="0.2.0" date="2021-03-26" urgency="low">
       <description>
         <p>This one's for the creators, the note takers, and the plain-text savers. Notes support, screen play support, citation insertion, and more.</p>
         <ul>

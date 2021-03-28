@@ -236,6 +236,10 @@ namespace ThiefMD.Widgets {
 
         public bool on_delete_event () {
             remove (preview);
+            if (exporter != null) {
+                exporter.detach ();
+                exporter = null;
+            }
             show_all ();
 
             return false;

@@ -258,7 +258,7 @@ namespace ThiefMD.Controllers.Pandoc {
 
         RegexEvalCallback add_upload_paths = (match_info, result) =>
         {
-            if (match_info.get_match_count () >= 2) {
+            if (match_info.get_match_count () > 2) {
                 var url = match_info.fetch (2);
                 string abs_path = "";
                 if (!url.contains (":") && find_file_to_upload (url, "", out abs_path) && abs_path != "") {
@@ -325,7 +325,7 @@ namespace ThiefMD.Controllers.Pandoc {
             Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex css_url_search = new Regex ("url\\(['\"]?(.+?)['\"]?\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex cover_image_search = new Regex ("(cover-image|coverimage|feature_image|featureimage|featured_image|featuredimage|bibliography):\\s*['\"]?(.+?)['\"]?\\s*$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex cover_image_search = new Regex ("(cover-image|coverimage|feature_image|featureimage|featured_image|csl|featuredimage|bibliography):\\s*['\"]?(.+?)['\"]?\\s*$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
 
             processed_mk = url_search.replace_eval (
                 processed_mk,

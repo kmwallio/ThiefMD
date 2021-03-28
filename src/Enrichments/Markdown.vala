@@ -22,8 +22,96 @@ using ThiefMD.Widgets;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Enrichments {
+    public class BibTexCompletionProvider : Gtk.SourceCompletionProvider, GLib.Object {
+        public Gee.HashSet<string> characters;
+
+        public class BibTexCompletionProvider () {
+            characters = new Gee.HashSet<string> ();
+        }
+
+        public override string get_name () {
+            return _("Citations");
+        }
+
+        public override bool match (Gtk.SourceCompletionContext context) {
+            Gtk.TextIter? start = null, sanity = null;
+            if (context.get_iter (out start) && context.get_iter (out sanity)) {
+                if (start.backward_char ()) {
+                    if (start.get_char () == '@') {
+                        return true;
+                    }
+                    unichar check = start.get_char ();
+                    for (int i = 0; i < 10; i++) {
+                        if (check == ' ' || check == '@' || check == '\n' || check == '\t') {
+                            break;
+                        }
+                        if (!start.backward_char ()) {
+                            break;
+                        }
+                        check = start.get_char ();
+                    }
+
+                    if (start.get_char () == '@') {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public override void populate (Gtk.SourceCompletionContext context) {
+            List<Gtk.SourceCompletionItem> completions = new List<Gtk.SourceCompletionItem> ();
+            Gtk.TextIter? start = null, end = null;
+            if (context.get_iter (out start) && context.get_iter (out end)) {
+                string prefix = "";
+                for (int i = 0; i < 10 && start.backward_char (); i++) {
+                    unichar check = start.get_char ();
+                    if (check == ' ' || check == '@' || check == '\n' || check == '\t') {
+                        break;
+                    }
+                }
+                start.forward_char ();
+                if (start.get_offset () < end.get_offset ()) {
+                    prefix = start.get_text (end);
+                }
+
+                var settings = AppSettings.get_default ();
+                string bib_file = find_bibtex_for_sheet (settings.last_file);
+                if (bib_file != "") {
+                    BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
+                    bib_parser.parse_file ();
+                    var cite_labels = bib_parser.get_labels ();
+                    if (!cite_labels.is_empty) {
+                        foreach (var citation in cite_labels) {
+                            if (citation.down ().has_prefix (prefix.down ()) && citation.down () != prefix.down ()) {
+                                var com_item = new Gtk.SourceCompletionItem ();
+                                string title = bib_parser.get_title (citation);
+                                if (title.length > Constants.CITATION_TITLE_MAX_LEN) {
+                                    title = title.substring (0, Constants.CITATION_TITLE_MAX_LEN - 3) + "...";
+                                }
+                                com_item.text = citation;
+                                com_item.label = citation + ": " + title;
+                                com_item.info = bib_parser.get_title (citation);
+                                com_item.markup = "<b>" + citation + "</b>: <i>" + title + "</i>";
+                                completions.append (com_item);
+                            }
+                        }
+                    }
+                }
+            }
+            context.add_proposals (this, completions, true);
+        }
+
+        public override bool activate_proposal (Gtk.SourceCompletionProposal proposal, Gtk.TextIter iter) {
+            return false;
+        }
+    }
+
     public class MarkdownEnrichment {
-        private Gtk.TextView view;
+        private BibTexCompletionProvider citation_suggester = null;
+        private Gtk.SourceCompletionWords source_completion;
+        private Gtk.SourceView view;
         private Gtk.TextBuffer buffer;
         private Mutex checking;
         private bool markup_inserted_around_selection;
@@ -716,7 +804,7 @@ namespace ThiefMD.Enrichments {
             }
         }
 
-        public bool attach (Gtk.TextView textview) {
+        public bool attach (Gtk.SourceView textview) {
             if (textview == null) {
                 return false;
             }
@@ -783,6 +871,20 @@ namespace ThiefMD.Enrichments {
                 code_block.paragraph_background_set = false;
                 code_block.background_full_height = false;
                 code_block.background_full_height_set = false;
+            }
+
+            if (settings.experimental && citation_suggester == null) {
+                citation_suggester = new BibTexCompletionProvider ();
+                var completion = view.get_completion ();
+                completion.add_provider (citation_suggester);
+                source_completion = new Gtk.SourceCompletionWords ("Citation Suggestor", null);
+                source_completion.register (buffer);
+            } else if (!settings.experimental && citation_suggester != null) {
+                var completion = view.get_completion ();
+                completion.remove_provider (citation_suggester);
+                source_completion.unregister (buffer);
+                source_completion = null;
+                citation_suggester = null;
             }
 
             recalculate_margins ();
@@ -860,6 +962,12 @@ namespace ThiefMD.Enrichments {
             markup_inserted_around_selection = false;
             cursor_at_interesting_location = false;
             active_selection = false;
+
+            if (citation_suggester != null) {
+                source_completion.unregister (buffer);
+                source_completion = null;
+                citation_suggester = null;
+            }
 
             view.key_press_event.disconnect (on_keypress);
             settings.changed.disconnect (settings_updated);
