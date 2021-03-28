@@ -1,3 +1,9 @@
+com.github.kmwallio.thiefmd (0.2.1) groovy; urgency=low
+
+  * Fix image uploading for blogs
+
+ -- kmwallio <mwallio@gmail.com>  Sat, 27 Mar 2021 23:52:27 -0700
+
 com.github.kmwallio.thiefmd (0.2.0) groovy; urgency=load
 
   * Open Bibtex files and Right-Click Insert Citation in Markdown
