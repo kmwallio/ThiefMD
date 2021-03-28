@@ -4,7 +4,7 @@
 
 ThiefMD is a [Markdown](https://en.wikipedia.org/wiki/Markdown) & [Fountain](https://fountain.io) editor that helps with `organization and management`. It is heavily inspired by [Ulysses](https://ulysses.app). Initial code was based on work from [Quilter](https://github.com/lainsce/quilter).
 
-Continuous Integration: ![Continuous Integration](https://github.com/kmwallio/ThiefMD/workflows/ThiefDaily/badge.svg?branch=beta)
+![Tests](https://github.com/kmwallio/ThiefMD/workflows/ThiefDaily/badge.svg?branch=beta)
 
 ## Installation from Flatpak
 
