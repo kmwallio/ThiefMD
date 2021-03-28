@@ -16,7 +16,7 @@ jobs:
       - name: Add libhandy-1 for focal
         run: sudo add-apt-repository ppa:apandada1/libhandy-1
 
-      - name: Upload Ubuntu
+      - name: Update Ubuntu
         run: sudo apt-get update
 
       - name: Install build essentials
@@ -38,4 +38,4 @@ jobs:
         run: ninja -C build
 
       - name: Test
-        run: meson test
+        run: ./build/tests/tests
