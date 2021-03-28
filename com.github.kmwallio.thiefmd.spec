@@ -327,7 +327,7 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
-* Sun Mar 28 2021 kmwallio <mwallio@gmail.com> - 0.2.1
+* Sun Mar 28 2021 kmwallio <mwallio@gmail.com> - 0.2.2
 - Fix image upload support when blogging
 * Sat Mar 27 2021 kmwallio <mwallio@gmail.com> - 0.2.0
 - Open Bibtex files and Right-Click Insert Citation in Markdown

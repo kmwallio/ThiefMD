@@ -308,7 +308,14 @@ namespace ThiefMD.Widgets {
                 return Pandoc.make_preview (out processed_mk, bib_mk, bib_file);
             }
 
-            if (need_pandoc || bib_file != "") {
+            bool render_citations = false;
+            BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
+            bib_parser.parse_file ();
+            foreach (var label in bib_parser.get_labels ()) {
+                render_citations = render_citations || processed_mk.contains ("@" + label);
+            }
+
+            if (need_pandoc || render_citations) {
                 return Pandoc.make_preview (out processed_mk, raw_mk, bib_file);
             } else {
                 string title, date;
