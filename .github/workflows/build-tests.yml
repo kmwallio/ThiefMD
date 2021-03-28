@@ -20,7 +20,10 @@ jobs:
         run: sudo apt-get install build-essential meson ninja-build valac cmake libgtkspell3-3-dev libwebkit2gtk-4.0-dev libmarkdown2-dev libxml2-dev libclutter-1.0-dev libarchive-dev libgtk-3-dev libgee-0.8-dev libgtksourceview-4-dev libsecret-1-dev
 
       - name: Download Libhandy
-        run: wget http://mirrors.edge.kernel.org/ubuntu/pool/main/libh/libhandy-1/libhandy-1-0_0.90.0-1_amd64.deb & sudo apt install ./libhandy-1-0_0.90.0-1_amd64.deb
+        run: wget http://deb.debian.org/debian/pool/main/libh/libhandy-1/libhandy-1-0_1.0.3-2_amd64.deb  & sudo dpkg -i ./libhandy-1-0_1.0.3-2_amd64.deb
+
+      - name: Libhandy-dev?
+        run: wget http://deb.debian.org/debian/pool/main/libh/libhandy-1/libhandy-1-dev_1.0.3-2_amd64.deb & sudo dpkg -i ./libhandy-1-dev_1.0.3-2_amd64.deb
     
       - name: Setup Build
         run: meson build
