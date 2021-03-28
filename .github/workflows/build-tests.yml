@@ -7,17 +7,18 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      -name: Checkout
+      - name: Checkout
         uses: actions/checkout@v2
-      -name: Install
+        
+      - name: Install
         run: sudo add-apt-repository ppa:vala-team/daily
         run: sudo apt-get update
         run: sudo apt-get install meson ninja-build valac cmake libgtkspell3-3-dev libwebkit2gtk-4.0-dev libmarkdown2-dev libxml2-dev libclutter-1.0-dev libarchive-dev libgtk-3-dev libgee-0.8-dev libgtksourceview-4-dev libsecret-1-dev libhandy-1-dev
     
-      -name: Build
+      - name: Build
         run: meson build
         run: meson configure -Dbuild_tests=true build
         run: ninja -C build
 
-      -name: Test
+      - name: Test
         run: meson test
