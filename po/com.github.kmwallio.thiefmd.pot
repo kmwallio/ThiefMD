@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.kmwallio.thiefmd\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-26 20:29-0700\n"
+"POT-Creation-Date: 2021-03-28 17:11-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,9 +45,10 @@ msgstr ""
 msgid "Fountain"
 msgstr ""
 
+#. Citation length limit
 #. Visual Settings
 #. Arbitrary strings
-#: src/Constants/AppSettings.vala:97
+#: src/Constants/AppSettings.vala:100
 #, c-format
 msgid ""
 "# Click on a sheet to get started\n"
@@ -343,7 +344,7 @@ msgid "No file opened"
 msgstr ""
 
 #: src/Connections/ConnectionBase.vala:85 src/Widgets/About.vala:59
-#: src/Widgets/PublisherPreviewWindow.vala:282
+#: src/Widgets/PublisherPreviewWindow.vala:286
 #: src/Widgets/ProjectStatistics.vala:71
 msgid "Close"
 msgstr ""
@@ -405,6 +406,14 @@ msgstr ""
 
 #: src/Connections/WordpressConnection.vala:109
 msgid "New Wordpress Connection"
+msgstr ""
+
+#: src/Enrichments/Fountain.vala:32
+msgid "Characters"
+msgstr ""
+
+#: src/Enrichments/Markdown.vala:33
+msgid "Citations"
 msgstr ""
 
 #: src/Exporters/ExportDocx.vala:60
