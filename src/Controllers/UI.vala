@@ -108,8 +108,12 @@ namespace ThiefMD.Controllers.UI {
         border_provider = new Gtk.CssProvider ();
         var font_color = style_context.get_color (0);
         string border_css = ThiefProperties.BUTTON_CSS.printf (font_color.to_string ());
-        border_provider.load_from_data (border_css);
-        Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default(), border_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        try {
+            border_provider.load_from_data (border_css);
+            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default(), border_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        } catch (Error e) {
+            warning ("Could not add accessibility css: %s", e.message);
+        }
     }
 
     public void load_user_themes_and_connections () {

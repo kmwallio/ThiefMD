@@ -44,10 +44,6 @@ namespace ThiefMD.Widgets {
             _sheets = new Sheets(_path);
             _iter = iter;
         }
-
-        public string to_string () {
-            return _title;
-        }
     }
 
     /**
@@ -637,52 +633,52 @@ namespace ThiefMD.Widgets {
                     Gtk.MenuItem set_icon = new Gtk.MenuItem.with_label (_("Set Project Icon"));
                     Gtk.Menu icon_menu = new Gtk.Menu ();
                     {
-                        Gtk.ImageMenuItem no_icon = set_icon_option (_("None"), "", _selected._sheets);
+                        var no_icon = set_icon_option (_("None"), "", _selected._sheets);
                         icon_menu.add (no_icon);
 
-                        Gtk.ImageMenuItem folder_icon = set_icon_option (_("Folder"), "folder", _selected._sheets);
+                        var folder_icon = set_icon_option (_("Folder"), "folder", _selected._sheets);
                         icon_menu.add (folder_icon);
 
-                        Gtk.ImageMenuItem reader_icon = set_icon_option (_("Reader"), "ephy-reader-mode-symbolic", _selected._sheets);
+                        var reader_icon = set_icon_option (_("Reader"), "ephy-reader-mode-symbolic", _selected._sheets);
                         icon_menu.add (reader_icon);
 
-                        Gtk.ImageMenuItem love_icon = set_icon_option (_("Love"), "emote-love-symbolic", _selected._sheets);
+                        var love_icon = set_icon_option (_("Love"), "emote-love-symbolic", _selected._sheets);
                         icon_menu.add (love_icon);
 
-                        Gtk.ImageMenuItem game_icon = set_icon_option (_("Game"), "applications-games-symbolic", _selected._sheets);
+                        var game_icon = set_icon_option (_("Game"), "applications-games-symbolic", _selected._sheets);
                         icon_menu.add (game_icon);
                         
-                        Gtk.ImageMenuItem art_icon = set_icon_option (_("Art"), "applications-graphics-symbolic", _selected._sheets);
+                        var art_icon = set_icon_option (_("Art"), "applications-graphics-symbolic", _selected._sheets);
                         icon_menu.add (art_icon);
 
-                        Gtk.ImageMenuItem nature_icon = set_icon_option (_("Nature"), "emoji-nature-symbolic", _selected._sheets);
+                        var nature_icon = set_icon_option (_("Nature"), "emoji-nature-symbolic", _selected._sheets);
                         icon_menu.add (nature_icon);
 
-                        Gtk.ImageMenuItem food_icon = set_icon_option (_("Food"), "emoji-food-symbolic", _selected._sheets);
+                        var food_icon = set_icon_option (_("Food"), "emoji-food-symbolic", _selected._sheets);
                         icon_menu.add (food_icon);
 
-                        Gtk.ImageMenuItem help_icon = set_icon_option (_("Help"), "system-help-symbolic", _selected._sheets);
+                        var help_icon = set_icon_option (_("Help"), "system-help-symbolic", _selected._sheets);
                         icon_menu.add (help_icon);
 
-                        Gtk.ImageMenuItem cool_icon = set_icon_option (_("Cool"), "face-cool-symbolic", _selected._sheets);
+                        var cool_icon = set_icon_option (_("Cool"), "face-cool-symbolic", _selected._sheets);
                         icon_menu.add (cool_icon);
 
-                        Gtk.ImageMenuItem angel_icon = set_icon_option (_("Angel"), "face-angel-symbolic", _selected._sheets);
+                        var angel_icon = set_icon_option (_("Angel"), "face-angel-symbolic", _selected._sheets);
                         icon_menu.add (angel_icon);
 
-                        Gtk.ImageMenuItem monkey_icon = set_icon_option (_("Monkey"), "face-monkey-symbolic", _selected._sheets);
+                        var monkey_icon = set_icon_option (_("Monkey"), "face-monkey-symbolic", _selected._sheets);
                         icon_menu.add (monkey_icon);
 
-                        Gtk.ImageMenuItem wordpress_icon = set_icon_option (_("WordPress"), "/com/github/kmwallio/thiefmd/icons/wordpress.png", _selected._sheets);
+                        var wordpress_icon = set_icon_option (_("WordPress"), "/com/github/kmwallio/thiefmd/icons/wordpress.png", _selected._sheets);
                         icon_menu.add (wordpress_icon);
 
-                        Gtk.ImageMenuItem ghost_icon = set_icon_option (_("Ghost"), "/com/github/kmwallio/thiefmd/icons/ghost.png", _selected._sheets);
+                        var ghost_icon = set_icon_option (_("Ghost"), "/com/github/kmwallio/thiefmd/icons/ghost.png", _selected._sheets);
                         icon_menu.add (ghost_icon);
 
-                        Gtk.ImageMenuItem writefreely_icon = set_icon_option (_("Write Freely"), "/com/github/kmwallio/thiefmd/icons/wf.png", _selected._sheets);
+                        var writefreely_icon = set_icon_option (_("Write Freely"), "/com/github/kmwallio/thiefmd/icons/wf.png", _selected._sheets);
                         icon_menu.add (writefreely_icon);
 
-                        Gtk.ImageMenuItem trash_icon = set_icon_option (_("Trash"), "user-trash-symbolic", _selected._sheets);
+                        var trash_icon = set_icon_option (_("Trash"), "user-trash-symbolic", _selected._sheets);
                         icon_menu.add (trash_icon);
                     }
                     set_icon.submenu = icon_menu;

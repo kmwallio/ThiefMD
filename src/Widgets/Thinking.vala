@@ -28,12 +28,12 @@ namespace ThiefMD.Widgets {
         private ThinkingCallback work = null;
         private Mutex running;
 
-        public Thinking (string set_title, ThinkingCallback callback) {
+        public Thinking (string set_title, owned ThinkingCallback callback) {
             set_transient_for (ThiefApp.get_instance ());
             resizable = false;
             deletable = false;
             modal = true;
-            work = callback;
+            work = (owned) callback;
             running = Mutex ();
             title = set_title;
             build_ui ();

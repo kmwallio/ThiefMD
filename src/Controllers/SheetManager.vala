@@ -285,8 +285,6 @@ namespace ThiefMD.Controllers.SheetManager {
         return 0.1;
     }
 
-    private Thread<bool> sheet_worker_thread;
-    Mutex loading_sheets;
     public void set_sheets (Sheets? sheets) {
         _current_sheets = sheets;
         if (_current_sheets != null) {
@@ -299,26 +297,6 @@ namespace ThiefMD.Controllers.SheetManager {
         if (_current_sheets != null) {
             _current_sheets.update_sheet_indicators ();
         }
-    }
-
-    private bool preload_sheets () {
-        warning ("Thread start");
-        if (_current_sheets == null) {
-            return false;
-        }
-
-        if (loading_sheets.trylock ()) {
-            GLib.List<Sheet> sheets_to_cache = _current_sheets.get_sheets ();
-            foreach (var sheet in sheets_to_cache) {
-                warning ("Loaded: %s", sheet.file_path ());
-                silent_load_sheet (sheet);
-            }
-
-            check_queue ();
-            loading_sheets.unlock ();
-        }
-
-        return false;
     }
 
     public Sheets? get_sheets () {
@@ -505,13 +483,9 @@ namespace ThiefMD.Controllers.SheetManager {
 
     private void save_active () {
         foreach (var editor in _active_editors) {
-            try {
-                editor.editor.save ();
-                editor.sheet.redraw ();
-                UI.update_preview ();
-            } catch (Error e) {
-                warning ("Could not save file %s: %s", editor.sheet.file_path (), e.message);
-            }
+            editor.editor.save ();
+            editor.sheet.redraw ();
+            UI.update_preview ();
         }
     }
 
@@ -553,12 +527,8 @@ namespace ThiefMD.Controllers.SheetManager {
         foreach (var editor in _active_editors) {
             if (editor.sheet.file_path () == file_path) {
                 remove_this = editor;
-                try {
-                    editor.editor.save ();
-                    editor.sheet.redraw ();
-                } catch (Error e) {
-                    warning ("Could not save file %s: %s", editor.sheet.file_path (), e.message);
-                }
+                editor.editor.save ();
+                editor.sheet.redraw ();
             }
         }
 

@@ -384,6 +384,8 @@ namespace ThiefMD.Widgets {
 
         public bool disk_matches_buffer (out string disk_text, out DateTime disk_time) {
             bool match = false;
+            disk_text = "";
+            disk_time = new DateTime.now_utc ().add_years (-1);
             
             try {
                 if (file_mutex.trylock ()) {
@@ -507,12 +509,7 @@ namespace ThiefMD.Widgets {
                         debug ("Cursor saved at: %d", cursor_location);
 
                         preview_markdown = "";
-                        try {
-                            save ();
-                        } catch (Error e) {
-                            warning ("Unable to save file " + file.get_basename () + ": " + e.message);
-                            SheetManager.show_error ("Unable to save file " + file.get_basename () + ": " + e.message);
-                        }
+                        save ();
 
                         buffer.changed.disconnect (on_change_notification);
                         size_allocate.disconnect (dynamic_margins);
@@ -612,7 +609,7 @@ namespace ThiefMD.Widgets {
                 if (target != null) {
                     file_mutex.lock ();
                     try {
-                        DateTime now = new DateTime.now_local ();
+                        DateTime now = new DateTime.now_utc ();
                         string buff_text = get_buffer_text ();
                         string first_words = get_some_words (buff_text);
                         string new_text = (first_words != "") ? now.format ("%Y-%m-%d") : now.format ("%Y-%m-%d_%H-%M-%S");

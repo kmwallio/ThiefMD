@@ -23,8 +23,6 @@ using ThiefMD.Controllers;
 
 namespace ThiefMD {
     public class ThiefApplication : Gtk.Application {
-        private static ThiefApp _instance;
-
         public ThiefApplication () {
             Object (
                 application_id: "com.github.kmwallio.thiefmd",

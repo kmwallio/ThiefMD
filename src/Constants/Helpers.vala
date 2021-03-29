@@ -192,14 +192,15 @@ namespace ThiefMD {
         return found;
     }
 
-    public Gtk.ImageMenuItem set_icon_option (string name, string icon, Sheets project) {
-        Gtk.ImageMenuItem set_icon = new Gtk.ImageMenuItem.with_label (name);
-        set_icon.set_image (new Gtk.Image.from_pixbuf (get_pixbuf_for_value (icon)));
-        set_icon.always_show_image = true;
-        set_icon.activate.connect (() => {
-            project.metadata.icon = icon;
-        });
-
+    public Gtk.MenuItem set_icon_option (string name, string icon, Sheets project) {
+        var box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+        var image = new Gtk.Image.from_pixbuf (get_pixbuf_for_value (icon));
+        var label = new Gtk.Label (name);
+        var set_icon = new Gtk.MenuItem ();
+        box.add (image);
+        box.add (label);
+        set_icon.add (box);
+        box.show_all ();
         return set_icon;
     }
 

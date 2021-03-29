@@ -200,7 +200,7 @@ namespace ThiefMD.Widgets {
                 foreach (var search in searchable) {
                     SearchThread thread = new SearchThread (active_search_term, search, this);
                     add_thread ();
-                    var nt = new Thread<void> ("search_thread" + search.get_sheets_path (), thread.search);
+                    new Thread<void> ("search_thread" + search.get_sheets_path (), thread.search);
                 }
             }
         }
@@ -313,7 +313,6 @@ namespace ThiefMD.Widgets {
 
         public void update_terms () {
             debug ("Updating search term");
-            bool respawn = active_search_term != search.text;
             active_search_term = search.text;
 
             start_search.lock ();

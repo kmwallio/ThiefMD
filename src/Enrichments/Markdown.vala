@@ -874,17 +874,25 @@ namespace ThiefMD.Enrichments {
             }
 
             if (settings.experimental && citation_suggester == null) {
-                citation_suggester = new BibTexCompletionProvider ();
-                var completion = view.get_completion ();
-                completion.add_provider (citation_suggester);
-                source_completion = new Gtk.SourceCompletionWords ("Citation Suggestor", null);
-                source_completion.register (buffer);
+                try {
+                    citation_suggester = new BibTexCompletionProvider ();
+                    var completion = view.get_completion ();
+                    completion.add_provider (citation_suggester);
+                    source_completion = new Gtk.SourceCompletionWords ("Citation Suggestor", null);
+                    source_completion.register (buffer);
+                } catch (Error e) {
+                    warning ("Could not add suggestions: %s", e.message);
+                }
             } else if (!settings.experimental && citation_suggester != null) {
-                var completion = view.get_completion ();
-                completion.remove_provider (citation_suggester);
-                source_completion.unregister (buffer);
-                source_completion = null;
-                citation_suggester = null;
+                try {
+                    var completion = view.get_completion ();
+                    completion.remove_provider (citation_suggester);
+                    source_completion.unregister (buffer);
+                    source_completion = null;
+                    citation_suggester = null;
+                } catch (Error e) {
+                    warning ("Could not remove suggestions: %s", e.message);
+                }
             }
 
             recalculate_margins ();
