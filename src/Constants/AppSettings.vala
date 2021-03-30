@@ -93,6 +93,10 @@ namespace ThiefMD {
         // Citation length limit
         public const int CITATION_TITLE_MAX_LEN = 30;
 
+        // Some Grammar settings
+        public const int GRAMMAR_SENTENCE_CACHE_SIZE = 50;
+        public const int GRAMMAR_SENTENCE_CHECK_TIMEOUT = 500;
+
         // Visual Settings
         public const double MINIMUM_CONTRAST_RATIO = 1.2;
 

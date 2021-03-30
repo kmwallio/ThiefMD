@@ -131,9 +131,7 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.add (_spellcheck_button);
-            if (Intl.get_language_names ()[0].contains ("en")) {
-                menu_grid.add (_grammar_button);
-            }
+            menu_grid.add (_grammar_button);
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
@@ -155,9 +153,7 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             menu_grid.remove (_typewriter_button);
             menu_grid.remove (_spellcheck_button);
-            if (Intl.get_language_names ()[0].contains ("en")) {
-                menu_grid.remove (_grammar_button);
-            }
+            menu_grid.remove (_grammar_button);
             menu_grid.remove (_writegood_button);
             remove (menu_grid);
 
@@ -215,9 +211,7 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.add (_spellcheck_button);
-            if (Intl.get_language_names ()[0].contains ("en")) {
-                menu_grid.add (_grammar_button);
-            }
+            menu_grid.add (_grammar_button);
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
@@ -233,11 +227,8 @@ namespace ThiefMD.Widgets {
         private void build_desktopmenu () {
             var settings = AppSettings.get_default ();
             menu_grid.remove (_typewriter_button);
-            // menu_grid.add (separator);
             menu_grid.remove (_spellcheck_button);
-            if (Intl.get_language_names ()[0].contains ("en")) {
-                menu_grid.remove (_grammar_button);
-            }
+            menu_grid.remove (_grammar_button);
             menu_grid.remove (_writegood_button);
             remove (menu_grid);
 
@@ -295,9 +286,7 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.add (_spellcheck_button);
-            if (Intl.get_language_names ()[0].contains ("en")) {
-                menu_grid.add (_grammar_button);
-            }
+            menu_grid.add (_grammar_button);
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);

@@ -28,6 +28,7 @@ namespace ThiefMD.Enrichments {
         private TimedMutex limit_updates;
         private GrammarThinking checker;
         public Gtk.TextTag grammar_line;
+        public Gtk.TextTag grammar_word;
 
         private int last_cursor;
         private int copy_offset;
@@ -36,6 +37,7 @@ namespace ThiefMD.Enrichments {
             checking = Mutex ();
             limit_updates = new TimedMutex (3000);
             grammar_line = null;
+            grammar_word = null;
             last_cursor = -1;
             checker = new GrammarThinking ();
         }
@@ -99,6 +101,10 @@ namespace ThiefMD.Enrichments {
         }
 
         private void run_between_start_and_end (Gtk.TextIter start, Gtk.TextIter end) {
+            if (grammar_word == null || grammar_line == null) {
+                return;
+            }
+
             copy_offset = start.get_offset ();
             if (!start.starts_sentence ()) {
                 start.backward_sentence_start ();
@@ -125,8 +131,25 @@ namespace ThiefMD.Enrichments {
                 if (!cursor_iter.in_range (check_start, check_end))
                 {
                     string sentence = buffer.get_text (check_start, check_end, false).chug ().chomp ();
-                    if (sentence != "" && !checker.sentence_check (sentence)) {
+                    Gee.List<string> problem_words = new Gee.LinkedList<string> ();
+                    if (sentence != "" && !checker.sentence_check (sentence, ref problem_words)) {
                         buffer.apply_tag (grammar_line, check_start, check_end);
+                        Gtk.TextIter word_start = check_start;
+                        Gtk.TextIter word_end = check_start;
+                        if (!problem_words.is_empty) {
+                            while (word_end.forward_word_end () && word_end.get_offset () <= check_end.get_offset ()) {
+                                string check_word = strip_markdown (word_start.get_text (word_end)).chug ().chomp ().down ();
+                                if (problem_words.contains (check_word)) {
+                                    while (word_start.get_char () == ' ' && word_start.forward_char ()) {
+                                        if (word_start.get_char () != ' ') {
+                                            break;
+                                        }
+                                    }
+                                    buffer.apply_tag (grammar_word, word_start, word_end);
+                                }
+                                word_start = word_end;
+                            }
+                        }
                     }
                 }
                 check_start = check_end;
@@ -150,9 +173,18 @@ namespace ThiefMD.Enrichments {
             }
 
             grammar_line = buffer.create_tag ("grammar_check", "underline", Pango.Underline.ERROR, null);
-            grammar_line.underline_rgba = Gdk.RGBA () { red = 0.51, green = 0.61, blue = 0.41, alpha = 1.0 };
+            grammar_line.underline_rgba = Gdk.RGBA () { red = 0.133, green = 0.545, blue = 0.133, alpha = 1.0 };
+
+            grammar_word = buffer.create_tag ("grammar_word", "underline", Pango.Underline.ERROR, null);
+            grammar_word.underline_rgba = Gdk.RGBA () { red = 0.133, green = 0.545, blue = 0.133, alpha = 1.0 };
+            grammar_word.background_rgba = Gdk.RGBA () { red = 0.133, green = 0.545, blue = 0.133, alpha = 1.0 };
+            grammar_word.foreground_rgba = Gdk.RGBA () { red = 0.9, green = 0.9, blue = 0.9, alpha = 1.0 };
+            grammar_word.background_set = true;
+            grammar_word.foreground_set = true;
 
             last_cursor = -1;
+
+            checker.clear_cache ();
 
             return true;
         }
@@ -163,6 +195,8 @@ namespace ThiefMD.Enrichments {
 
             buffer.remove_tag (grammar_line, start, end);
             buffer.tag_table.remove (grammar_line);
+
+            checker.clear_cache ();
 
             grammar_line = null;
 
@@ -176,14 +210,40 @@ namespace ThiefMD.Enrichments {
         private int wait_time;
         private Cancellable cancellable;
         private bool done;
-        public GrammarThinking (int timeout_millseconds = 300) {
+        private Gee.LinkedList<string> cache;
+        private int cache_size;
+        public GrammarThinking (int cache_items = Constants.GRAMMAR_SENTENCE_CACHE_SIZE, int timeout_millseconds = Constants.GRAMMAR_SENTENCE_CHECK_TIMEOUT) {
             wait_time = timeout_millseconds;
+            cache_size = cache_items;
+            cache = new Gee.LinkedList<string> ();
         }
 
-        public bool sentence_check (string sentence) {
+        private void resize_cache () {
+            while (cache.size > cache_size) {
+                cache.poll ();
+            }
+        }
+
+        public void clear_cache () {
+            while (!cache.is_empty) {
+                cache.poll ();
+            }
+        }
+
+        public bool sentence_check (string sentence, ref Gee.List<string> problem_words = null) {
+            var settings = AppSettings.get_default ();
+            string language = "en";
+            if (settings.spellcheck_language.length > 2) {
+                language = settings.spellcheck_language.substring (0, 2);
+            }
             bool error_free = false;
             bool res = false;
             done = false;
+
+            if (cache.contains (sentence)) {
+                warning ("Cache hit");
+                return true;
+            }
 
             string check_sentence = strip_markdown (sentence).chug ().chomp ();
             if (check_sentence.contains ("[") || check_sentence.contains ("]") ||
@@ -197,14 +257,26 @@ namespace ThiefMD.Enrichments {
 
             try {
                 cancellable = new Cancellable ();
-                string[] command = {
-                    "link-parser",
-                    "-batch"
-                };
-                grammar = new Subprocess.newv (command,
-                    SubprocessFlags.STDOUT_PIPE |
-                    SubprocessFlags.STDIN_PIPE |
-                    SubprocessFlags.STDERR_MERGE);
+                if (problem_words == null) {
+                    string[] command = {
+                        "link-parser",
+                        language,
+                        "-batch"
+                    };
+                    grammar = new Subprocess.newv (command,
+                        SubprocessFlags.STDOUT_PIPE |
+                        SubprocessFlags.STDIN_PIPE |
+                        SubprocessFlags.STDERR_MERGE);
+                } else {
+                    string[] command = {
+                        "link-parser",
+                        language
+                    };
+                    grammar = new Subprocess.newv (command,
+                        SubprocessFlags.STDOUT_PIPE |
+                        SubprocessFlags.STDIN_PIPE |
+                        SubprocessFlags.STDERR_MERGE);
+                }
 
                 var input_stream = grammar.get_stdin_pipe ();
                 if (input_stream != null) {
@@ -247,7 +319,23 @@ namespace ThiefMD.Enrichments {
                     var proc_input = new DataInputStream (output_stream);
                     string line = "";
                     while ((line = proc_input.read_line (null)) != null) {
-                        error_free = error_free || line.down ().contains ("0 errors");
+                        line = line.chomp ().chug ();
+                        if (problem_words == null) {
+                            error_free = error_free || line.down ().contains ("0 errors");
+                        } else {
+                            error_free = error_free || line.down ().contains ("unused=0");
+                            if (line.has_prefix ("LEFT-WALL")) {
+                                string[] parts = line.split (" ");
+                                foreach (var word in parts) {
+                                    if (word.has_prefix ("[")) {
+                                        string problem_word = word.substring (1, word.index_of_char (']') - 1);
+                                        if (problem_word != "") {
+                                            problem_words.add (problem_word);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 } else {
                     warning ("Got nothing");
@@ -258,6 +346,11 @@ namespace ThiefMD.Enrichments {
                 }
             } catch (Error e) {
                 warning ("Could not process output: %s", e.message);
+            }
+
+            if (error_free) {
+                cache.add (sentence);
+                resize_cache ();
             }
 
             return error_free;
