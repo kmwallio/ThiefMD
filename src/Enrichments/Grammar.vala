@@ -73,7 +73,7 @@ namespace ThiefMD.Enrichments {
                 //
                 buffer.get_iter_at_mark (out start, cursor);
                 buffer.get_iter_at_mark (out end, cursor);
-                get_chunk_of_text_around_cursor (ref start, ref end, true);
+                get_chunk_of_text_around_cursor (ref start, ref end, false);
                 run_between_start_and_end (start, end);
 
                 //
@@ -86,7 +86,7 @@ namespace ThiefMD.Enrichments {
                     buffer.get_iter_at_offset (out old_start, last_cursor);
                     buffer.get_iter_at_offset (out old_end, last_cursor);
                     if (old_start.in_range (bound_start, bound_end)) {
-                        get_chunk_of_text_around_cursor (ref old_start, ref old_end, true);
+                        get_chunk_of_text_around_cursor (ref old_start, ref old_end, false);
                         if (!old_start.in_range (start, end) || !old_end.in_range (start, end)) {
                             run_between_start_and_end (old_start, old_end);
                         }
@@ -176,7 +176,7 @@ namespace ThiefMD.Enrichments {
         private int wait_time;
         private Cancellable cancellable;
         private bool done;
-        public GrammarThinking (int timeout_millseconds = 500) {
+        public GrammarThinking (int timeout_millseconds = 300) {
             wait_time = timeout_millseconds;
         }
 
@@ -192,13 +192,16 @@ namespace ThiefMD.Enrichments {
                 return true;
             }
 
+            Subprocess grammar;
+            InputStream? output_stream = null;
+
             try {
                 cancellable = new Cancellable ();
                 string[] command = {
                     "link-parser",
                     "-batch"
                 };
-                Subprocess grammar = new Subprocess.newv (command,
+                grammar = new Subprocess.newv (command,
                     SubprocessFlags.STDOUT_PIPE |
                     SubprocessFlags.STDIN_PIPE |
                     SubprocessFlags.STDERR_MERGE);
@@ -212,7 +215,7 @@ namespace ThiefMD.Enrichments {
                     flush_buffer.flush ();
                     flush_buffer.close ();
                 }
-                var output_stream = grammar.get_stdout_pipe ();
+                output_stream = grammar.get_stdout_pipe ();
 
                 // Before we wait, setup watchdogs
                 Thread<void> watchdog = null;
@@ -234,21 +237,27 @@ namespace ThiefMD.Enrichments {
                 if (watchdog != null) {
                     watchdog.join ();
                 }
+            } catch (Error e) {
+                warning ("Failed to run grammar: %s", e.message);
+                error_free = true;
+            }
 
+            try {
                 if (output_stream != null) {
                     var proc_input = new DataInputStream (output_stream);
                     string line = "";
                     while ((line = proc_input.read_line (null)) != null) {
                         error_free = error_free || line.down ().contains ("0 errors");
                     }
+                } else {
+                    warning ("Got nothing");
                 }
 
                 if (!res || output_stream == null) {
                     error_free = true;
                 }
             } catch (Error e) {
-                warning ("Failed to run grammar: %s", e.message);
-                error_free = true;
+                warning ("Could not process output: %s", e.message);
             }
 
             return error_free;

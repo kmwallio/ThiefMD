@@ -489,7 +489,7 @@ namespace ThiefMD.Widgets {
                         write_good_recheck ();
                     }
 
-                    if (settings.grammar) {
+                    if (settings.grammar && !grammar_active) {
                         grammar_active = true;
                         grammar.attach (this);
                         GLib.Idle.add (grammar_recheck);
@@ -672,10 +672,6 @@ namespace ThiefMD.Widgets {
                 spell.recheck_all ();
             }
 
-            if (grammar_active && buffer.text != "") {
-                grammar_recheck ();
-            }
-
             return settings.autosave;
         }
 
@@ -738,6 +734,10 @@ namespace ThiefMD.Widgets {
 
             if (writecheck_active) {
                 write_good_recheck ();
+            }
+
+            if (grammar_active) {
+                grammar_recheck ();
             }
 
             // Move the preview if present
