@@ -188,6 +188,7 @@ namespace ThiefMD.Enrichments {
             grammar_word.foreground_rgba = Gdk.RGBA () { red = 0.9, green = 0.9, blue = 0.9, alpha = 1.0 };
             grammar_word.background_set = true;
             grammar_word.foreground_set = true;
+            checker.check_language_settings ();
 
             last_cursor = -1;
 
@@ -223,10 +224,13 @@ namespace ThiefMD.Enrichments {
             wait_time = timeout_millseconds;
             cache_size = cache_items;
             cache = new Gee.LinkedList<string> ();
+            check_language_settings ();
+        }
 
-            // @TODO could check file path and if this changes sometime
+        public void check_language_settings () {
             language = "en";
             var settings = AppSettings.get_default ();
+            // @TODO could check file path and if this changes sometime
             if (settings.spellcheck_language.length > 2) {
                 language = settings.spellcheck_language.substring (0, 2);
                 if (!language_check (language)) {
