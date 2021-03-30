@@ -28,6 +28,33 @@ namespace ThiefMD {
         FILE_NOT_VALID_THEME
     }
 
+    public string strip_markdown (string sentence) {
+        string result = sentence;
+        try {
+            Regex is_url = new Regex ("(?<text_group>\\[(?>[^\\[\\]]+|(?&text_group))+\\])(?:\\((?<url>\\S+?)(?:[ ]\"(?<title>(?:[^\"]|(?<=\\\\)\")*?)\")?\\))", RegexCompileFlags.CASELESS, 0);
+            result = is_url.replace_eval (
+                result,
+                (ssize_t) result.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                (match_info, result) =>
+                {
+                    var title = match_info.fetch (1);
+                    result.append (title);
+                    return false;
+                });
+
+            result = result.replace ("*", "");
+            result = result.replace ("[", "");
+            result = result.replace ("]", "");
+            result = result.replace ("_", "");
+        } catch (Error e) {
+            warning ("Could not strip markdown: %s", e.message);
+        }
+
+        return result;
+    }
+
     public bool generate_html (string raw_mk, out string processed_mk) {
         if (Pandoc.needs_bibtex (raw_mk)) {
             return Pandoc.make_preview (out processed_mk, raw_mk);

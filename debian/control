@@ -14,8 +14,6 @@ Build-Depends: meson,
                libwebkit2gtk-4.0-dev,
                libmarkdown2-dev,
                libgtkspell3-3-dev,
-               pandoc,
-               pandoc-citeproc,
                libclutter-1.0-dev,
                libxml2-dev,
                libarchive-dev,
@@ -27,6 +25,6 @@ Homepage: https://thiefmd.com
 
 Package: com.github.kmwallio.thiefmd
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, pandoc
+Depends: ${misc:Depends}, ${shlibs:Depends}, pandoc, pandoc-citeproc, link-grammar
 Description: Markdown Library Manager and Editor
   built on the efforts of other OSS.

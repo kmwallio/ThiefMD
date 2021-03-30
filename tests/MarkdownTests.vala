@@ -1,5 +1,6 @@
 using ThiefMD;
 using ThiefMD.Controllers;
+using ThiefMD.Enrichments;
 
 public class MarkdownTests {
     public MarkdownTests () {
@@ -24,6 +25,18 @@ public class MarkdownTests {
         Test.add_func ("/thiefmd/find_file", () => {
             assert (Pandoc.find_file ("README.md", Environment.get_current_dir ()) != "");
             assert (Pandoc.find_file ("README.md", Environment.get_current_dir ()) != "README.md");
+        });
+
+        Test.add_func ("/thiefmd/strip_markdown", () => {
+            assert (strip_markdown ("this is a [link](https://thiefmd.com)") == "this is a link");
+            assert (strip_markdown ("some **bold** text") == "some bold text");
+            assert (strip_markdown ("some _italic_ text") == "some italic text");
+        });
+
+        Test.add_func ("/thiefmd/grammar", () => {
+            GrammarThinking grammar_check = new GrammarThinking ();
+            assert (grammar_check.sentence_check ("he ate cake"));
+            assert (!grammar_check.sentence_check ("he eat cake"));
         });
     }
 }

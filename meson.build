@@ -91,6 +91,7 @@ executable(
     'src/Exporters/ExportFountain.vala',
     'src/Exporters/ExportMhtml.vala',
     'src/Exporters/ExportPdf.vala',
+    'src/Enrichments/Grammar.vala',
     'src/Enrichments/Fountain.vala',
     'src/Enrichments/Markdown.vala',
     'src/Widgets/About.vala',

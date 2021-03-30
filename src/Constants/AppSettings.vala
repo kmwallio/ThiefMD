@@ -193,6 +193,19 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             }
         }
 
+        private bool grammar_enabled = false;
+        public bool grammar {
+            set {
+                if (value != grammar_enabled) {
+                    grammar_enabled = value;
+                    changed ();
+                }
+            }
+            get {
+                return grammar_enabled;
+            }
+        }
+
         public string get_valid_theme_id () {
             UI.UserSchemes ().force_rescan ();
             foreach (var id in UI.UserSchemes ().scheme_ids) {

@@ -27,6 +27,7 @@ namespace ThiefMD.Widgets {
         public Gtk.Button _create;
         public Gtk.ToggleButton _spellcheck_button;
         public Gtk.ToggleButton _writegood_button;
+        public Gtk.ToggleButton _grammar_button;
         public Gtk.ToggleButton _typewriter_button;
         private ThiefApp _instance;
         private bool am_mobile = false;
@@ -64,6 +65,16 @@ namespace ThiefMD.Widgets {
 
             _writegood_button.toggled.connect (() => {
                 settings.writegood = _writegood_button.active;
+            });
+
+            _grammar_button = new Gtk.ToggleButton.with_label ((_("Check Grammar")));
+            _grammar_button.set_image (new Gtk.Image.from_icon_name ("tools-check-spelling-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
+            _grammar_button.set_always_show_image (true);
+            _grammar_button.tooltip_text = _("Toggle Grammar Checking");
+            _grammar_button.set_active (settings.grammar);
+
+            _grammar_button.toggled.connect (() => {
+                settings.grammar = _grammar_button.active;
             });
 
             var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
@@ -120,6 +131,9 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.add (_spellcheck_button);
+            if (Intl.get_language_names ()[0].contains ("en")) {
+                menu_grid.add (_grammar_button);
+            }
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
@@ -141,6 +155,9 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             menu_grid.remove (_typewriter_button);
             menu_grid.remove (_spellcheck_button);
+            if (Intl.get_language_names ()[0].contains ("en")) {
+                menu_grid.remove (_grammar_button);
+            }
             menu_grid.remove (_writegood_button);
             remove (menu_grid);
 
@@ -198,6 +215,9 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.add (_spellcheck_button);
+            if (Intl.get_language_names ()[0].contains ("en")) {
+                menu_grid.add (_grammar_button);
+            }
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
@@ -215,6 +235,9 @@ namespace ThiefMD.Widgets {
             menu_grid.remove (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.remove (_spellcheck_button);
+            if (Intl.get_language_names ()[0].contains ("en")) {
+                menu_grid.remove (_grammar_button);
+            }
             menu_grid.remove (_writegood_button);
             remove (menu_grid);
 
@@ -272,6 +295,9 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.add (_spellcheck_button);
+            if (Intl.get_language_names ()[0].contains ("en")) {
+                menu_grid.add (_grammar_button);
+            }
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);

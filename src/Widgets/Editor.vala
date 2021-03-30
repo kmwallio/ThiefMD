@@ -51,6 +51,7 @@ namespace ThiefMD.Widgets {
 
         public GtkSpell.Checker spell = null;
         public WriteGood.Checker writegood = null;
+        public GrammarChecker grammar = null;
         private TimedMutex writegood_limit;
         public Gtk.TextTag warning_tag;
         public Gtk.TextTag error_tag;
@@ -60,6 +61,7 @@ namespace ThiefMD.Widgets {
         private bool spellcheck_active = false;
         private bool writecheck_active;
         private bool typewriter_active;
+        private bool grammar_active = false;
 
         private Gtk.TextTag focus_text;
         private Gtk.TextTag outoffocus_text;
@@ -153,6 +155,8 @@ namespace ThiefMD.Widgets {
             writegood.show_tooltip = true;
             markdown = new MarkdownEnrichment ();
             markdown.attach (this);
+            grammar = new GrammarChecker ();
+            grammar_active = false;
 
             focus_text = buffer.create_tag ("focus-text");
             outoffocus_text = buffer.create_tag ("outoffocus-text");
@@ -485,6 +489,12 @@ namespace ThiefMD.Widgets {
                         write_good_recheck ();
                     }
 
+                    if (settings.grammar) {
+                        grammar_active = true;
+                        grammar.attach (this);
+                        GLib.Idle.add (grammar_recheck);
+                    }
+
                     if (settings.spellcheck) {
                         spell.attach (this);
                         spellcheck_active = true;
@@ -518,6 +528,11 @@ namespace ThiefMD.Widgets {
                         if (settings.writegood) {
                             writecheck_active = false;
                             writegood.detach ();
+                        }
+
+                        if (settings.grammar) {
+                            grammar_active = false;
+                            grammar.detach ();
                         }
 
                         if (settings.spellcheck) {
@@ -655,6 +670,10 @@ namespace ThiefMD.Widgets {
 
             if (spellcheck_active && buffer.text != "") {
                 spell.recheck_all ();
+            }
+
+            if (grammar_active && buffer.text != "") {
+                grammar_recheck ();
             }
 
             return settings.autosave;
@@ -1078,6 +1097,17 @@ namespace ThiefMD.Widgets {
                 write_good_recheck ();
             }
 
+            if (!settings.grammar && grammar_active) {
+                grammar_active = false;
+                grammar.detach ();
+            } else if (settings.grammar && !grammar_active) {
+                grammar_active = true;
+                grammar.attach (this);
+                if (am_active) {
+                    GLib.Idle.add (grammar_recheck);
+                }
+            }
+
             if (!header_redraw_scheduled) {
                 update_heading_margins ();
             }
@@ -1086,6 +1116,17 @@ namespace ThiefMD.Widgets {
         private void spellcheck_enable () {
             var settings = AppSettings.get_default ();
             spellcheck = settings.spellcheck;
+        }
+
+        private bool grammar_recheck () {
+            var settings = AppSettings.get_default ();
+            if (settings.grammar) {
+                if (editable) {
+                    grammar.recheck_all ();
+                }
+            }
+
+            return false;
         }
 
         public void set_scheme (string id) {
@@ -1387,6 +1428,7 @@ namespace ThiefMD.Widgets {
                 markdown = null;
             }
             writegood.detach ();
+            grammar.detach ();
 
             preview_markdown = "";
             buffer.text = "";
