@@ -19,6 +19,7 @@
 
 using ThiefMD;
 using ThiefMD.Controllers;
+using ThiefMD.Enrichments;
 
 namespace ThiefMD.Widgets {
     public class QuickPreferences : Gtk.Popover {
@@ -74,7 +75,18 @@ namespace ThiefMD.Widgets {
             _grammar_button.set_active (settings.grammar);
 
             _grammar_button.toggled.connect (() => {
-                settings.grammar = _grammar_button.active;
+                GrammarThinking gram = new GrammarThinking ();
+                if (gram.language_detected ()) {
+                    settings.grammar = _grammar_button.active;
+                } else {
+                    var dialog = new Gtk.MessageDialog (
+                        ThiefApp.get_instance (),
+                        Gtk.DialogFlags.MODAL,
+                        Gtk.MessageType.ERROR,
+                        Gtk.ButtonsType.CLOSE,
+                        _("Grammar check is not available for your language"));
+                    dialog.run ();
+                }
             });
 
             var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);

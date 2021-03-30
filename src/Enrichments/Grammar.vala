@@ -117,6 +117,7 @@ namespace ThiefMD.Enrichments {
             }
 
             buffer.remove_tag (grammar_line, start, end);
+            buffer.remove_tag (grammar_word, start, end);
             Gtk.TextIter check_start = start;
             Gtk.TextIter check_end = start;
             check_end.forward_sentence_end ();
@@ -132,13 +133,19 @@ namespace ThiefMD.Enrichments {
                 {
                     string sentence = buffer.get_text (check_start, check_end, false).chug ().chomp ();
                     Gee.List<string> problem_words = new Gee.LinkedList<string> ();
-                    if (sentence != "" && !checker.sentence_check (sentence, ref problem_words)) {
+                    if (sentence != "" && !checker.sentence_check (sentence, problem_words)) {
+                        while (check_start.get_char () == ' ' && check_start.forward_char ()) {
+                            if (check_start.get_char () != ' ') {
+                                break;
+                            }
+                        }
                         buffer.apply_tag (grammar_line, check_start, check_end);
                         Gtk.TextIter word_start = check_start;
                         Gtk.TextIter word_end = check_start;
                         if (!problem_words.is_empty) {
                             while (word_end.forward_word_end () && word_end.get_offset () <= check_end.get_offset ()) {
                                 string check_word = strip_markdown (word_start.get_text (word_end)).chug ().chomp ().down ();
+                                check_word = check_word.replace ("\"", "");
                                 if (problem_words.contains (check_word)) {
                                     while (word_start.get_char () == ' ' && word_start.forward_char ()) {
                                         if (word_start.get_char () != ' ') {
@@ -173,18 +180,16 @@ namespace ThiefMD.Enrichments {
             }
 
             grammar_line = buffer.create_tag ("grammar_check", "underline", Pango.Underline.ERROR, null);
-            grammar_line.underline_rgba = Gdk.RGBA () { red = 0.133, green = 0.545, blue = 0.133, alpha = 1.0 };
+            grammar_line.underline_rgba = Gdk.RGBA () { red = 0.0, green = 0.40, blue = 0.133, alpha = 1.0 };
 
             grammar_word = buffer.create_tag ("grammar_word", "underline", Pango.Underline.ERROR, null);
-            grammar_word.underline_rgba = Gdk.RGBA () { red = 0.133, green = 0.545, blue = 0.133, alpha = 1.0 };
-            grammar_word.background_rgba = Gdk.RGBA () { red = 0.133, green = 0.545, blue = 0.133, alpha = 1.0 };
+            grammar_word.underline_rgba = Gdk.RGBA () { red = 0.0, green = 0.40, blue = 0.133, alpha = 1.0 };
+            grammar_word.background_rgba = Gdk.RGBA () { red = 0.0, green = 0.40, blue = 0.133, alpha = 1.0 };
             grammar_word.foreground_rgba = Gdk.RGBA () { red = 0.9, green = 0.9, blue = 0.9, alpha = 1.0 };
             grammar_word.background_set = true;
             grammar_word.foreground_set = true;
 
             last_cursor = -1;
-
-            checker.clear_cache ();
 
             return true;
         }
@@ -194,11 +199,12 @@ namespace ThiefMD.Enrichments {
             buffer.get_bounds (out start, out end);
 
             buffer.remove_tag (grammar_line, start, end);
+            buffer.remove_tag (grammar_word, start, end);
             buffer.tag_table.remove (grammar_line);
-
-            checker.clear_cache ();
+            buffer.tag_table.remove (grammar_word);
 
             grammar_line = null;
+            grammar_word = null;
 
             view = null;
             buffer = null;
@@ -212,10 +218,25 @@ namespace ThiefMD.Enrichments {
         private bool done;
         private Gee.LinkedList<string> cache;
         private int cache_size;
+        private string language;
         public GrammarThinking (int cache_items = Constants.GRAMMAR_SENTENCE_CACHE_SIZE, int timeout_millseconds = Constants.GRAMMAR_SENTENCE_CHECK_TIMEOUT) {
             wait_time = timeout_millseconds;
             cache_size = cache_items;
             cache = new Gee.LinkedList<string> ();
+
+            // @TODO could check file path and if this changes sometime
+            language = "en";
+            var settings = AppSettings.get_default ();
+            if (settings.spellcheck_language.length > 2) {
+                language = settings.spellcheck_language.substring (0, 2);
+                if (!language_check (language)) {
+                    language = "";
+                }
+            }
+        }
+
+        public bool language_detected () {
+            return language != "";
         }
 
         private void resize_cache () {
@@ -230,22 +251,91 @@ namespace ThiefMD.Enrichments {
             }
         }
 
-        public bool sentence_check (string sentence, ref Gee.List<string> problem_words = null) {
-            var settings = AppSettings.get_default ();
-            string language = "en";
-            if (settings.spellcheck_language.length > 2) {
-                language = settings.spellcheck_language.substring (0, 2);
+        public bool language_check (string lang) {
+            bool have_language = false;
+            bool res = false;
+            done = false;
+
+            Subprocess grammar;
+            InputStream? output_stream = null;
+            try {
+                cancellable = new Cancellable ();
+                string[] command = {
+                    "link-parser",
+                    lang,
+                    "-batch"
+                };
+                grammar = new Subprocess.newv (command,
+                    SubprocessFlags.STDOUT_PIPE |
+                    SubprocessFlags.STDIN_PIPE |
+                    SubprocessFlags.STDERR_MERGE);
+
+                var input_stream = grammar.get_stdin_pipe ();
+                if (input_stream != null) {
+                    DataOutputStream flush_buffer = new DataOutputStream (input_stream);
+                    if (!flush_buffer.put_string ("thief were here")) {
+                        warning ("Could not set buffer");
+                    }
+                    flush_buffer.flush ();
+                    flush_buffer.close ();
+                }
+                output_stream = grammar.get_stdout_pipe ();
+
+                // Before we wait, setup watchdogs
+                Thread<void> watchdog = null;
+                if (Thread.supported ()) {
+                    watchdog = new Thread<void> ("grammar_watchdog", this.watch_dog);
+                } else {
+                    int now = 0;
+                    Timeout.add (5, () => {
+                        now += 5;
+                        if (now > wait_time && !done) {
+                            cancellable.cancel ();
+                        }
+                        return done;
+                    });
+                }
+
+                res = grammar.wait (cancellable);
+                done = true;
+                if (watchdog != null) {
+                    watchdog.join ();
+                }
+            } catch (Error e) {
+                warning ("Failed to run grammar: %s", e.message);
             }
+
+            try {
+                if (output_stream != null) {
+                    var proc_input = new DataInputStream (output_stream);
+                    string line = "";
+                    while ((line = proc_input.read_line (null)) != null) {
+                        line = line.down ();
+                        have_language = have_language || line.contains ("dictionary found");
+                    }
+                }
+            } catch (Error e) {
+                warning ("Could not process output: %s", e.message);
+            }
+
+            return have_language;
+        }
+
+        public bool sentence_check (string sentence, Gee.List<string>? problem_words = null) {
+            if (cache.contains (sentence)) {
+                return true;
+            }
+
+            if (language == "") {
+                return true;
+            }
+
             bool error_free = false;
             bool res = false;
             done = false;
 
-            if (cache.contains (sentence)) {
-                warning ("Cache hit");
-                return true;
-            }
-
             string check_sentence = strip_markdown (sentence).chug ().chomp ();
+            // If it looks like we'd be noisy for HTML or random syntax
             if (check_sentence.contains ("[") || check_sentence.contains ("]") ||
                 sentence.contains ("<") || sentence.contains (">"))
             {
@@ -326,9 +416,15 @@ namespace ThiefMD.Enrichments {
                             error_free = error_free || line.down ().contains ("unused=0");
                             if (line.has_prefix ("LEFT-WALL")) {
                                 string[] parts = line.split (" ");
+                                string last_word = "";
                                 foreach (var word in parts) {
                                     if (word.has_prefix ("[")) {
                                         string problem_word = word.substring (1, word.index_of_char (']') - 1);
+                                        if (problem_word.has_prefix ("'") || problem_word.has_prefix (",") || problem_word.has_prefix (".") ||
+                                            problem_word.has_prefix ("?") || problem_word.has_prefix ("?"))
+                                        {
+                                            problem_word = last_word + problem_word;
+                                        }
                                         if (problem_word != "") {
                                             problem_words.add (problem_word);
                                         }
