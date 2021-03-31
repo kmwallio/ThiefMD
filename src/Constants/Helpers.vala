@@ -48,6 +48,9 @@ namespace ThiefMD {
             result = result.replace ("[", "");
             result = result.replace ("]", "");
             result = result.replace ("_", "");
+            while (result.has_prefix ("\n") || result.has_prefix ("#") || result.has_prefix (">") || result.has_prefix (" ")) {
+                result = result.substring (1);
+            }
         } catch (Error e) {
             warning ("Could not strip markdown: %s", e.message);
         }

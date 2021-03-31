@@ -139,6 +139,8 @@ namespace ThiefMD.Enrichments {
             grab_sentence (ref start, ref check_end);
             Gtk.TextIter check_start = start;
 
+            var code_block = buffer.tag_table.lookup ("code-block");
+
             while (check_start.in_range (start, end) &&
                     check_end.in_range (start, end) &&
                     (check_end.get_offset () != check_start.get_offset ())) 
@@ -146,7 +148,9 @@ namespace ThiefMD.Enrichments {
                 Gtk.TextIter cursor_iter;
                 var cursor = buffer.get_insert ();
                 buffer.get_iter_at_mark (out cursor_iter, cursor);
-                if (!cursor_iter.in_range (check_start, check_end))
+
+                if ((!cursor_iter.in_range (check_start, check_end)) &&
+                    (!(code_block != null && (check_start.has_tag (code_block) || check_end.has_tag (code_block)))))
                 {
                     string sentence = buffer.get_text (check_start, check_end, false).chug ().chomp ();
                     Gee.List<string> problem_words = new Gee.LinkedList<string> ();
