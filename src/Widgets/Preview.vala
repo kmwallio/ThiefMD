@@ -170,7 +170,12 @@ namespace ThiefMD.Widgets {
             }
 
             if (print_css == "modest-splendor") {
-                style += ThiefProperties.PRINT_CSS.printf ("""content: " (" attr(href) ")";""");
+                if (print_only) {
+                    style += "\n" + ThiefProperties.PRINT_CSS + "\n";
+                }
+                style += "\n@media print {\n";
+                style += ThiefProperties.PRINT_CSS;
+                style += "}\n";
             } else if (print_css != "") {
                 File css_file = File.new_for_path (Path.build_filename(UserData.css_path, print_css,"print.css"));
                 if (css_file.query_exists ()) {

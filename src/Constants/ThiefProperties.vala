@@ -290,7 +290,8 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         public const string NO_CSS_CSS = """
         @media print {
           tr,
-          img {
+          img,
+          figure {
             page-break-inside: avoid;
             max-width: 100%;
           }
@@ -300,12 +301,13 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
           }
         }
 
-        img {
+        img,
+        figure {
           max-width: 100%;
         }
         """;
 
-        public const string PRINT_CSS = """@media print {
+        public const string PRINT_CSS = """
             *,
             *:before,
             *:after {
@@ -326,7 +328,7 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
 
             a[href^="#"]:after,
             a[href^="javascript:"]:after {
-              content: "";
+              content: " (" attr(href) ")";
             }
 
             pre,
@@ -360,9 +362,9 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             h3 {
               page-break-after: avoid;
             }
-          }
 
-          img {
+          img,
+          figure {
             max-width: 100%;
           }""";
     }

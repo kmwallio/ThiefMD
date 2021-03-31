@@ -119,6 +119,12 @@ namespace ThiefMD.Enrichments {
                     }
                 } while ((end.has_tag (url_tag) || end.has_tag (link_tag)));
             }
+
+            while (!end.get_char ().isspace ()) {
+                if (!end.forward_char ()) {
+                    break;
+                }
+            }
         }
 
         private void run_between_start_and_end (Gtk.TextIter start, Gtk.TextIter end) {
@@ -296,13 +302,17 @@ namespace ThiefMD.Enrichments {
         private int wait_time;
         private Cancellable cancellable;
         private bool done;
-        private Gee.LinkedList<string> cache;
+        private Gee.LinkedList<string> valid_cache;
+        private Gee.LinkedList<string> invalid_cache;
+        private Gee.LinkedList<string> invalid_suggestion;
         private int cache_size;
         private string language;
         public GrammarThinking (int cache_items = Constants.GRAMMAR_SENTENCE_CACHE_SIZE, int timeout_millseconds = Constants.GRAMMAR_SENTENCE_CHECK_TIMEOUT) {
             wait_time = timeout_millseconds;
             cache_size = cache_items;
-            cache = new Gee.LinkedList<string> ();
+            valid_cache = new Gee.LinkedList<string> ();
+            invalid_cache = new Gee.LinkedList<string> ();
+            invalid_suggestion = new Gee.LinkedList<string> ();
             check_language_settings ();
         }
 
@@ -323,14 +333,22 @@ namespace ThiefMD.Enrichments {
         }
 
         private void resize_cache () {
-            while (cache.size > cache_size) {
-                cache.poll ();
+            while (valid_cache.size > cache_size) {
+                valid_cache.poll ();
+            }
+            while (invalid_cache.size > (cache_size / 2)) {
+                invalid_cache.poll ();
+                invalid_suggestion.poll ();
             }
         }
 
         public void clear_cache () {
-            while (!cache.is_empty) {
-                cache.poll ();
+            while (!valid_cache.is_empty) {
+                valid_cache.poll ();
+            }
+            while (!invalid_cache.is_empty) {
+                invalid_cache.poll ();
+                invalid_suggestion.poll ();
             }
         }
 
@@ -405,9 +423,57 @@ namespace ThiefMD.Enrichments {
         }
 
         public bool sentence_check_suggestion (string sentence, out string suggestion) {
+            return sentence_check_ex (sentence, out suggestion);
+        }
+
+        public bool sentence_check (string sentence, Gee.List<string>? problem_words = null) {
+            string suggestion;
+            return sentence_check_ex (sentence, out suggestion, problem_words);
+        }
+
+        private void parse_suggestion (string raw_suggestion, out string suggestion, Gee.List<string>? problem_words = null) {
             suggestion = "";
-            if (cache.contains (sentence)) {
+            string[] parts = raw_suggestion.replace ("LEFT-WALL", "").replace ("RIGHT-WALL", "").replace ("  ", " ").chug ().chomp ().split (" ");
+            string last_word = "";
+            foreach (var word in parts) {
+                if (problem_words != null && word.has_prefix ("[")) {
+                    string problem_word = word.substring (1, word.index_of_char (']') - 1);
+                    if (problem_word.has_prefix ("'") || problem_word.has_prefix (",") || problem_word.has_prefix (".") ||
+                        problem_word.has_prefix ("?") || problem_word.has_prefix ("?"))
+                    {
+                        problem_word = last_word + problem_word;
+                    }
+                    if (problem_word != "") {
+                        problem_words.add (problem_word);
+                    }
+                }
+
+                if (word.index_of_char ('.') != -1) {
+                    word = word.substring (0, word.index_of_char ('.'));
+                }
+                last_word = word;
+                suggestion += word + " ";
+            }
+        }
+
+        private bool grab_invalid_suggestion (string sentence, out string suggestion, Gee.List<string>? problem_words = null) {
+            int index = invalid_cache.index_of (sentence);
+            if (index != -1) {
+                parse_suggestion (invalid_suggestion.get (index), out suggestion, problem_words);
+            } else {
+                suggestion = "";
+            }
+            return false;
+        }
+
+        public bool sentence_check_ex (string sentence, out string suggestion, Gee.List<string>? problem_words = null) {
+            suggestion = "";
+            if (valid_cache.contains (sentence)) {
                 return true;
+            }
+
+            if (invalid_cache.contains (sentence)) {
+                return grab_invalid_suggestion (sentence, out suggestion, problem_words);
             }
 
             if (language == "") {
@@ -417,16 +483,16 @@ namespace ThiefMD.Enrichments {
             bool error_free = false;
             bool res = false;
             done = false;
-
+            string raw_suggestion = "";
             string check_sentence = strip_markdown (sentence).chug ().chomp ();
             // If it looks like we'd be noisy for HTML or random syntax
             if (check_sentence.contains ("[") || check_sentence.contains ("]") ||
-                sentence.contains ("<") || sentence.contains (">") || sentence.has_prefix ("!"))
+                sentence.contains ("<") || sentence.contains (">") || sentence.has_prefix ("!") ||
+                sentence.replace ("-", "").chug ().chomp () == "" || sentence.replace ("*", "").chug ().chomp () == "")
             {
                 return true;
             }
 
-            Subprocess grammar;
             InputStream? output_stream = null;
 
             try {
@@ -435,7 +501,7 @@ namespace ThiefMD.Enrichments {
                     "link-parser",
                     language
                 };
-                grammar = new Subprocess.newv (command,
+                Subprocess grammar = new Subprocess.newv (command,
                     SubprocessFlags.STDOUT_PIPE |
                     SubprocessFlags.STDIN_PIPE |
                     SubprocessFlags.STDERR_MERGE);
@@ -484,13 +550,8 @@ namespace ThiefMD.Enrichments {
                         line = line.chomp ().chug ();
                         error_free = error_free || line.down ().contains ("unused=0");
                         if (line.has_prefix ("LEFT-WALL")) {
-                            string[] parts = line.replace ("LEFT-WALL", "").replace ("RIGHT-WALL", "").replace ("  ", " ").chug ().chomp ().split (" ");
-                            foreach (var part in parts) {
-                                if (part.index_of_char ('.') != -1) {
-                                    part = part.substring (0, part.index_of_char ('.'));
-                                }
-                                suggestion += part + " ";
-                            }
+                            raw_suggestion = line;
+                            parse_suggestion (raw_suggestion, out suggestion, problem_words);
                         }
                     }
                 } else {
@@ -505,138 +566,12 @@ namespace ThiefMD.Enrichments {
             }
 
             if (error_free) {
-                cache.add (sentence);
+                valid_cache.add (sentence);
                 resize_cache ();
             }
-
-            return error_free;
-        }
-
-        public bool sentence_check (string sentence, Gee.List<string>? problem_words = null) {
-            if (cache.contains (sentence)) {
-                return true;
-            }
-
-            if (language == "") {
-                return true;
-            }
-
-            bool error_free = false;
-            bool res = false;
-            done = false;
-
-            string check_sentence = strip_markdown (sentence).chug ().chomp ();
-            // If it looks like we'd be noisy for HTML or random syntax
-            if (check_sentence.contains ("[") || check_sentence.contains ("]") ||
-                sentence.contains ("<") || sentence.contains (">") || sentence.has_prefix ("!"))
-            {
-                return true;
-            }
-
-            Subprocess grammar;
-            InputStream? output_stream = null;
-
-            try {
-                cancellable = new Cancellable ();
-                if (problem_words == null) {
-                    string[] command = {
-                        "link-parser",
-                        language,
-                        "-batch"
-                    };
-                    grammar = new Subprocess.newv (command,
-                        SubprocessFlags.STDOUT_PIPE |
-                        SubprocessFlags.STDIN_PIPE |
-                        SubprocessFlags.STDERR_MERGE);
-                } else {
-                    string[] command = {
-                        "link-parser",
-                        language
-                    };
-                    grammar = new Subprocess.newv (command,
-                        SubprocessFlags.STDOUT_PIPE |
-                        SubprocessFlags.STDIN_PIPE |
-                        SubprocessFlags.STDERR_MERGE);
-                }
-
-                var input_stream = grammar.get_stdin_pipe ();
-                if (input_stream != null) {
-                    DataOutputStream flush_buffer = new DataOutputStream (input_stream);
-                    if (!flush_buffer.put_string (check_sentence)) {
-                        warning ("Could not set buffer");
-                    }
-                    flush_buffer.flush ();
-                    flush_buffer.close ();
-                }
-                output_stream = grammar.get_stdout_pipe ();
-
-                // Before we wait, setup watchdogs
-                Thread<void> watchdog = null;
-                if (Thread.supported ()) {
-                    watchdog = new Thread<void> ("grammar_watchdog", this.watch_dog);
-                } else {
-                    int now = 0;
-                    Timeout.add (5, () => {
-                        now += 5;
-                        if (now > wait_time && !done) {
-                            cancellable.cancel ();
-                        }
-                        return done;
-                    });
-                }
-
-                res = grammar.wait (cancellable);
-                done = true;
-                if (watchdog != null) {
-                    watchdog.join ();
-                }
-            } catch (Error e) {
-                warning ("Failed to run grammar: %s", e.message);
-                error_free = true;
-            }
-
-            try {
-                if (output_stream != null) {
-                    var proc_input = new DataInputStream (output_stream);
-                    string line = "";
-                    while ((line = proc_input.read_line (null)) != null) {
-                        line = line.chomp ().chug ();
-                        if (problem_words == null) {
-                            error_free = error_free || line.down ().contains ("0 errors");
-                        } else {
-                            error_free = error_free || line.down ().contains ("unused=0");
-                            if (line.has_prefix ("LEFT-WALL")) {
-                                string[] parts = line.split (" ");
-                                string last_word = "";
-                                foreach (var word in parts) {
-                                    if (word.has_prefix ("[")) {
-                                        string problem_word = word.substring (1, word.index_of_char (']') - 1);
-                                        if (problem_word.has_prefix ("'") || problem_word.has_prefix (",") || problem_word.has_prefix (".") ||
-                                            problem_word.has_prefix ("?") || problem_word.has_prefix ("?"))
-                                        {
-                                            problem_word = last_word + problem_word;
-                                        }
-                                        if (problem_word != "") {
-                                            problem_words.add (problem_word);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    warning ("Got nothing");
-                }
-
-                if (!res || output_stream == null) {
-                    error_free = true;
-                }
-            } catch (Error e) {
-                warning ("Could not process output: %s", e.message);
-            }
-
-            if (error_free) {
-                cache.add (sentence);
+            if (!error_free && raw_suggestion != "") {
+                invalid_cache.add (sentence);
+                invalid_suggestion.add (raw_suggestion);
                 resize_cache ();
             }
 
