@@ -60,6 +60,15 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.3" date="2021-04-10" urgency="low">
+      <description>
+        <p>Spell-Check, Check. Write-Good Check, Check. Grammar Check... Check! ThiefMD offers Spell Check, Write-Good Style Check, and now Grammar Check!</p>
+        <ul>
+          <li>Link-Grammar Checking</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.3-draftcheck</url>
+    </release>
     <release version="0.2.2" date="2021-03-27" urgency="low">
       <description>
         <p>This one's for the creators, the note takers, and the plain-text savers. Notes support, screen play support, citation insertion, and more.</p>

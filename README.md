@@ -36,13 +36,14 @@ yay -S thiefmd
  * Search `Ctrl+F` for the current file, and `Ctrl+Shift+F` for the *entire* library
  * Writing Statistics
  * Focus Mode (Word, Sentence, and Paragraph)
+ * Spell Check, Write-Good Style Suggestions, and Grammar Check
  * Basic Bibtex Support
      * Open File & Syntax Highlighting
      * Right-Click Insert Citation Support in Markdown Documents
  * Basic Screenwriting Support
      * Open Fountain Files
      * Export to HTML & PDF
- 
+
 # Translating
 
 [Poeditor](https://poeditor.com/join/project?hash=iQkE5oTIOV) can be used to help translate ThiefMD.
@@ -167,3 +168,4 @@ $ sudo ninja install
 * Fountain Rendering by [Fountain.js](https://github.com/thombruce/fountain.js/)
 * Multi-format Export & Import by [Pandoc](https://pandoc.org)
 * Write-Good based on [btford/write-good](https://github.com/btford/write-good)
+* Grammar Checked with [Link Grammar Parser](https://www.abisource.com/projects/link-grammar/)
