@@ -278,12 +278,17 @@ namespace ThiefMD.Widgets {
 
         public void refresh () {
             bool am_empty = (_sheets.keys.size == 0);
-            foreach (var file_check in metadata.sheet_order) {
-                string path = Path.build_filename(_sheets_dir, file_check);
+            var keys = _sheets.keys;
+            Gee.LinkedList<string> doublecheck = new Gee.LinkedList<string> ();
+            foreach (var key in keys) {
+                doublecheck.add (key);
+            }
+            foreach (var key in doublecheck) {
+                string path = Path.build_filename(_sheets_dir, key);
                 File file = File.new_for_path (path);
                 if (!file.query_exists ()) {
                     Sheet bad_sheet = null;
-                    _sheets.unset (file_check, out bad_sheet);
+                    _sheets.unset (key, out bad_sheet);
                     if (bad_sheet != null) {
                         _view.remove (bad_sheet);
                     }
@@ -293,6 +298,10 @@ namespace ThiefMD.Widgets {
 
             if (am_empty && (_sheets.keys.size != 0)) {
                 _view.remove (_empty);
+            }
+
+            if (_sheets.keys.size == 0 && !am_empty) {
+                _view.add (_empty);
             }
         }
 

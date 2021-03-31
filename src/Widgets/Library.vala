@@ -187,7 +187,10 @@ namespace ThiefMD.Widgets {
 
         public void refresh_sheets (string path) {
             foreach (LibPair pair in _all_sheets) {
-                if (pair._sheets.get_sheets_path () == path) {
+                string lib_path = pair._sheets.get_sheets_path ();
+                lib_path = lib_path.has_suffix (Path.DIR_SEPARATOR_S) ? lib_path : lib_path + Path.DIR_SEPARATOR_S;
+                string comp_path = path.has_suffix (Path.DIR_SEPARATOR_S) ? path : path + Path.DIR_SEPARATOR_S;
+                if (lib_path == comp_path) {
                     pair._sheets.refresh ();
                 }
             }
@@ -195,8 +198,10 @@ namespace ThiefMD.Widgets {
 
         public Sheets get_sheets (string path) {
             foreach (LibPair pair in _all_sheets) {
-                debug ("Checking if %s is %s", path, pair._sheets.get_sheets_path());
-                if (pair._sheets.get_sheets_path() == path) {
+                string lib_path = pair._sheets.get_sheets_path ();
+                lib_path = lib_path.has_suffix (Path.DIR_SEPARATOR_S) ? lib_path : lib_path + Path.DIR_SEPARATOR_S;
+                string comp_path = path.has_suffix (Path.DIR_SEPARATOR_S) ? path : path + Path.DIR_SEPARATOR_S;
+                if (lib_path == comp_path) {
                     debug ("Found %s", path);
                     return pair._sheets;
                 }
