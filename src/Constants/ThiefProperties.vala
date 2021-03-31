@@ -59,6 +59,16 @@ namespace ThiefMD {
         }
         private Gee.ArrayList<string> thief_tips;
 
+        public static Gee.List<string> GRAMMAR_WINDOW_MESSAGES {
+          get {
+            if (instance == null) {
+              instance = new ThiefProperties ();
+            }
+            return instance.grammar_messages;
+          }
+        }
+        private Gee.ArrayList<string> grammar_messages;
+
         public const string[] PAPER_SIZES_GTK_NAME = {
           Gtk.PAPER_NAME_A3,
           Gtk.PAPER_NAME_A4,
@@ -90,6 +100,7 @@ namespace ThiefMD {
             giants.add (_("Grammar Check") + ":\n<a href='https://www.abisource.com/projects/link-grammar/'>Link Grammar Parser</a>\n" + _("Copyright") + " © 1998-2017 " + _("the AbiSource Community") + "\n<a href='https://github.com/opencog/link-grammar/blob/master/LICENSE'>" + _("GNU Lesser General Public License v2.1") + "</a>\n");
             giants.add (_("libwritegood-vala based on") + ":\n<a href='https://github.com/btford/write-good'>" + _("write-good: Naive linter for English prose") + "</a>\n" + _("Copyright") + " © 2014-2019 Brian Ford\n<a href='https://github.com/btford/write-good/blob/master/LICENSE'>" + _("The MIT License (MIT)") + "</a>\n");
 
+            // Needs to be kept in sync with PAPER_SIZES_GTK_NAME
             friendly_paper = new Gee.ArrayList<string>();
             friendly_paper.add (_("A3 (11.7 x 16.5 inches)"));
             friendly_paper.add (_("A4 (8 x 11 inches)"));
@@ -108,6 +119,13 @@ namespace ThiefMD {
             thief_tips.add (_("Want to block out distractions? Full-screen is just an `F11` away."));
             thief_tips.add (_("Quickly switch view modes with `Ctrl+1`, `Ctrl+2`, and `Ctrl+3`."));
             thief_tips.add (_("Working with a lot of links? Turn on Experimental Mode to make your markdown more readable `Ctrl+Shift+M`."));
+
+            grammar_messages = new Gee.ArrayList<string> ();
+            grammar_messages.add (_("Great Work! Looking for minor improvements."));
+            grammar_messages.add (_("Does this count as collaboration?"));
+            grammar_messages.add (_("Grammar isn't my strong point,\nbut doing what I can."));
+            grammar_messages.add (_("Such wow! Let's polish those words."));
+            grammar_messages.add (_("You inspire me."));
 
             instance = this;
           }

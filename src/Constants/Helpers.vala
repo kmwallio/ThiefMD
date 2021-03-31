@@ -28,6 +28,14 @@ namespace ThiefMD {
         FILE_NOT_VALID_THEME
     }
 
+    //
+    // A quick stripper for Markdown. Tries to turn
+    // [This website](https://thiefmd.com) is **super** _cool_.
+    //             into:
+    // This website is super cool.
+    //
+    // For grammar checking and whatnot.
+    //
     public string strip_markdown (string sentence) {
         string result = sentence;
         try {
@@ -48,7 +56,8 @@ namespace ThiefMD {
             result = result.replace ("[", "");
             result = result.replace ("]", "");
             result = result.replace ("_", "");
-            while (result.has_prefix ("\n") || result.has_prefix ("#") || result.has_prefix (">") || result.has_prefix (" ")) {
+            result = result.replace ("`", "");
+            while (result.has_prefix ("\n") || result.has_prefix ("#") || result.has_prefix (">") || result.has_prefix (" ") || result.has_prefix ("\t")) {
                 result = result.substring (1);
             }
         } catch (Error e) {
@@ -58,6 +67,14 @@ namespace ThiefMD {
         return result;
     }
 
+    //
+    // generate_html
+    //
+    // Generates HTML in memory. Uses PanDoc if pandoc functionality appears to be needed.
+    // Discount otherwise.
+    //
+    // If pandoc hits a timeout, discount is used.
+    //
     public bool generate_html (string raw_mk, out string processed_mk) {
         if (Pandoc.needs_bibtex (raw_mk)) {
             return Pandoc.make_preview (out processed_mk, raw_mk);
@@ -66,6 +83,7 @@ namespace ThiefMD {
         }
     }
 
+    // Scans the library for a possible BibTeX file associated with the sheet
     private string find_bibtex_for_sheet (string path = "") {
         string result = "";
         string search_path = Path.get_dirname (path);

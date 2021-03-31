@@ -18,35 +18,60 @@
  */
 
 using ThiefMD;
+using ThiefMD.Controllers;
 using ThiefMD.Widgets;
 
 namespace ThiefMD.Enrichments {
     public class GrammarChecker {
+        // TextView to attach to and buffer of view
         private Gtk.TextView view;
         private Gtk.TextBuffer buffer;
+
+        // Mutex to prevent multiple scans at same time
         private Mutex checking;
+
+        // Timer between when checks can run
         private TimedMutex limit_updates;
+
+        // Class for scanning setences for grammar,
+        // we do this to have watchdog thread to kill
+        // link-parser if taking too long
         private GrammarThinking checker;
+
+        // Tags to style grammar errors
         public Gtk.TextTag grammar_line;
         public Gtk.TextTag grammar_word;
 
+        // Last place cursor was in the previous run to
+        // scan sentences around it as well as new cursor location
         private int last_cursor;
-        private int copy_offset;
 
         public GrammarChecker () {
             checking = Mutex ();
-            limit_updates = new TimedMutex (3000);
+
+            // Default to allow scanning every 2 seconds
+            limit_updates = new TimedMutex (2000);
             grammar_line = null;
             grammar_word = null;
             last_cursor = -1;
             checker = new GrammarThinking ();
         }
 
+        /**
+        * reset ()
+        * Reset scan area and grammar check entire document
+        */
         public void reset () {
             last_cursor = -1;
             recheck_all ();
         }
 
+        /**
+        * recheck_all ()
+        * Rechecks all sentences around cursor (see what I did there...?)
+        * Scans previous cursor location to attempt to keep whole document
+        * up to date.
+        */
         public void recheck_all () {
             if (view == null || buffer == null) {
                 return;
@@ -66,12 +91,16 @@ namespace ThiefMD.Enrichments {
             buffer.get_iter_at_mark (out cursor_iter, cursor);
             int current_cursor = cursor_iter.get_offset ();
 
+            // If last cursor isn't set, scan whole doc
             if (last_cursor == -1) {
-                Thinking worker = new Thinking (_("Checking Grammar"), () => {
-                    Gtk.TextIter t_start, t_end;
-                    buffer.get_bounds (out t_start, out t_end);
-                    run_between_start_and_end (t_start, t_end);
-                });
+                Thinking worker = new Thinking (
+                    _("Checking Grammar"),
+                    () => {
+                        Gtk.TextIter t_start, t_end;
+                        buffer.get_bounds (out t_start, out t_end);
+                        run_between_start_and_end (t_start, t_end);
+                    },
+                    ThiefProperties.GRAMMAR_WINDOW_MESSAGES);
                 worker.run ();
             } else {
                 //
@@ -85,6 +114,10 @@ namespace ThiefMD.Enrichments {
                 //
                 // Rescan where we were if still in buffer,
                 // and not where we just scanned
+                //
+                // 60 because some people type sentence per line,
+                // Assuming ~6-15 words in a sentence at ~7 characters per word
+                // Also need to account for mouse click jumps
                 //
                 if ((current_cursor - last_cursor).abs () > 60) {
                     Gtk.TextIter old_start, old_end, bound_start, bound_end;
@@ -104,9 +137,21 @@ namespace ThiefMD.Enrichments {
             checking.unlock ();
         }
 
+        //
+        // Where the magic happens
+        //
         private void grab_sentence (ref Gtk.TextIter start, ref Gtk.TextIter end) {
+            //
+            // Check if we're tagging markdown links and URLs
+            //
             var link_tag = buffer.tag_table.lookup ("markdown-link");
             var url_tag = buffer.tag_table.lookup ("markdown-url");
+
+            //
+            // Gtk.TextIter determines .end_sentence () based on punctuation. "thiefmd.com"
+            // would cause "thief" to be detected as the end of sentence. But, we're in a URL
+            // So continue on down, and check for end_sentence not in a URL.
+            //
             if (!end.ends_sentence () || ((link_tag != null && end.has_tag (link_tag)) || (url_tag != null && end.has_tag (url_tag)))) {
                 do {
                     Gtk.TextIter next_line = end.copy (), next_sentence = end.copy ();
@@ -120,6 +165,11 @@ namespace ThiefMD.Enrichments {
                 } while ((end.has_tag (url_tag) || end.has_tag (link_tag)));
             }
 
+            //
+            // We may have found a valid end of sentence, but writers could do:
+            // "You're a wizard Harry!"
+            // And grammar checking might notice the missing " if not included
+            //
             while (!end.get_char ().isspace ()) {
                 if (!end.forward_char ()) {
                     break;
@@ -127,30 +177,45 @@ namespace ThiefMD.Enrichments {
             }
         }
 
+        //
+        // run_between_start_and_end (Gtk.TextIter start, Gtk.TextIter end)
+        // Scans for sentences and runs grammar checking on the sentences between
+        // the start and end TextIters.
+        //
         private void run_between_start_and_end (Gtk.TextIter start, Gtk.TextIter end) {
             if (grammar_word == null || grammar_line == null) {
                 return;
             }
 
-            copy_offset = start.get_offset ();
+            // Okay, we lied. Try to make sure the start starts at the start of a sentence
             if (!start.starts_sentence ()) {
                 start.backward_sentence_start ();
             }
+
+            // We move backward because forward could grab more lines
             if (!end.ends_sentence ()) {
                 end.backward_sentence_start ();
             }
+
+            // Make sure we have something to grab
             if (end.get_offset () == start.get_offset ()) {
                 return;
             }
 
+            // Remove grammar tags between scan area
             buffer.remove_tag (grammar_line, start, end);
             buffer.remove_tag (grammar_word, start, end);
+
+            // Grab the first sentence and move the end iterator
             Gtk.TextIter check_end = start;
             grab_sentence (ref start, ref check_end);
             Gtk.TextIter check_start = start;
 
+            // So we don't grammar check in code
             var code_block = buffer.tag_table.lookup ("code-block");
 
+            // Where something not quite as magical happens...
+            // loop over every sentence in range.
             while (check_start.in_range (start, end) &&
                     check_end.in_range (start, end) &&
                     (check_end.get_offset () != check_start.get_offset ())) 
@@ -159,25 +224,46 @@ namespace ThiefMD.Enrichments {
                 var cursor = buffer.get_insert ();
                 buffer.get_iter_at_mark (out cursor_iter, cursor);
 
+                // If the cursor is in the sentence, don't tell the user their possibly
+                // incomplete sentence is grammatically incorrect. It's in progress, mmkay?
+                //
+                // Also make sure we're not in a code block.
                 if ((!cursor_iter.in_range (check_start, check_end)) &&
                     (!(code_block != null && (check_start.has_tag (code_block) || check_end.has_tag (code_block)))))
                 {
+                    // Grab the sentence and prep for problem word tagging
                     string sentence = buffer.get_text (check_start, check_end, false).chug ().chomp ();
                     Gee.List<string> problem_words = new Gee.LinkedList<string> ();
+                    // Only run on full sentences
                     if (sentence != "" && !checker.sentence_check (sentence, problem_words)) {
+                        // Sentences may be surrounded by whitespace, move iters to prevent highlighting
+                        // whitespace
                         while (check_start.get_char () == ' ' && check_start.forward_char ()) {
                             if (check_start.get_char () != ' ') {
                                 break;
                             }
                         }
+
+                        // Highlight error line
                         buffer.apply_tag (grammar_line, check_start, check_end);
                         Gtk.TextIter word_start = check_start.copy ();
                         Gtk.TextIter word_end = check_start.copy ();
+
+                        // If we have words we can highlight, highlight them.
+                        // Sadly note, we do not highlight punctuation, we also highlight
+                        // multiple occurrences of a matchin word even though one instance
+                        // may be incorrect
                         if (!problem_words.is_empty) {
                             while (word_end.forward_word_end () && word_end.get_offset () <= check_end.get_offset ()) {
+                                // Grab the word in the sentence and try to make it as basic as possible
                                 string check_word = strip_markdown (word_start.get_text (word_end)).chug ().chomp ();
                                 check_word = check_word.replace ("\"", "");
-                                if (problem_words.contains (check_word) || problem_words.contains (check_word.down ())) {
+
+                                // Check if the word is in the list of problematic words
+                                if (problem_words.contains (check_word) || // what's coding style?
+                                    problem_words.contains (check_word.down ()))
+                                {
+                                    // Strip whitespace in iter
                                     while (word_start.get_char () == ' ' && word_start.forward_char ()) {
                                         if (word_start.get_char () != ' ') {
                                             break;
@@ -190,6 +276,8 @@ namespace ThiefMD.Enrichments {
                         }
                     }
                 }
+
+                // Move along to the next sentence (if possible)
                 check_start = check_end;
                 check_start.forward_char ();
                 if (!check_end.forward_sentence_end ()) {
@@ -199,8 +287,17 @@ namespace ThiefMD.Enrichments {
             }
         }
 
+        //
+        // handle_tooltip (...)
+        //
+        // Check if mouse is over a grammatically incorrect sentence, and if so
+        // show the error string representation of the grammar checker because people
+        // who didn't code this will totally understand how to interpret it...
+        //
         public bool handle_tooltip (int x, int y, bool keyboard_tooltip, Gtk.Tooltip tooltip) {
             Gtk.TextIter? iter;
+
+            // Determine if user requested a tooltip via mouse or keyboard
             if (keyboard_tooltip) {
                 int offset = buffer.cursor_position;
                 buffer.get_iter_at_offset (out iter, offset);
@@ -212,6 +309,7 @@ namespace ThiefMD.Enrichments {
 
             if (iter != null) {
                 if (iter.has_tag (grammar_line)) {
+                    // Find the sentence the user is hovered over or in
                     Gtk.TextIter start = iter.copy (), end = iter.copy ();
                     bool no_foward = false;
                     while (start.has_tag (grammar_line)) {
@@ -230,23 +328,30 @@ namespace ThiefMD.Enrichments {
                             break;
                         }
                     }
-                    if (!no_foward) {
+                    if (!no_foward) { // lol, variable reuse
                         end.backward_char ();
                     }
                     string suggestion = "";
+
+                    // Run the checker over the sentence to and show raw suggestion output
                     if (!checker.sentence_check_suggestion (strip_markdown (buffer.get_text (start, end, false)), out suggestion) && suggestion != "") {
-                        tooltip.set_markup (suggestion);
-                        return true;
+                        tooltip.set_markup (suggestion.replace ("&", "&amp;"));
+                        return true; // Don't try to find other tooltips
                     }
                 }
             } else {
-                return false;
+                return false; // I got nothing for you, see if someone else has a tooltip
             }
 
             return false;
         }
 
-        public bool attach (Gtk.SourceView textview) {
+        //
+        // attach (Gtk.TextView textview)
+        //
+        // Attach to the view in a similar style like Gtk.Spell.
+        //
+        public bool attach (Gtk.TextView textview) {
             if (textview == null) {
                 return false;
             }
@@ -273,11 +378,18 @@ namespace ThiefMD.Enrichments {
             view.set_has_tooltip (true);
             view.query_tooltip.connect (handle_tooltip);
 
-            last_cursor = -1;
+            last_cursor = -1; // reset to scan whole document on attach
 
             return true;
         }
 
+        //
+        // detach ()
+        //
+        // Detach from view and remove all references to view.
+        //
+        // Cache will not be cleared.
+        //
         public void detach () {
             Gtk.TextIter start, end;
             buffer.get_bounds (out start, out end);
@@ -298,15 +410,30 @@ namespace ThiefMD.Enrichments {
         }
     }
 
+    //
+    // Class for running `link-parser` with timing constraints
+    //
     public class GrammarThinking : GLib.Object {
+        // Time we are willing to wait and signal to cancel
         private int wait_time;
         private Cancellable cancellable;
+
+        // Variable to let watchdog know everything is fine...
         private bool done;
+
+        // Sentence caches so if we scan while user is typing,
+        // it seems magically fast and non-disruptive.
         private Gee.LinkedList<string> valid_cache;
         private Gee.LinkedList<string> invalid_cache;
         private Gee.LinkedList<string> invalid_suggestion;
+
+        // Max size of valid sentences to keep.
+        // Invalid = cache_size / 2 because we hope people fix it
+        // and sentences are more likely to change due to errors being
+        // fixed.
         private int cache_size;
         private string language;
+
         public GrammarThinking (int cache_items = Constants.GRAMMAR_SENTENCE_CACHE_SIZE, int timeout_millseconds = Constants.GRAMMAR_SENTENCE_CHECK_TIMEOUT) {
             wait_time = timeout_millseconds;
             cache_size = cache_items;
@@ -316,6 +443,9 @@ namespace ThiefMD.Enrichments {
             check_language_settings ();
         }
 
+        //
+        // Look at spellcheck settings, and attempt to use that.
+        //
         public void check_language_settings () {
             language = "en";
             var settings = AppSettings.get_default ();
@@ -328,10 +458,12 @@ namespace ThiefMD.Enrichments {
             }
         }
 
+        // If we have a language we could use
         public bool language_detected () {
             return language != "";
         }
 
+        // Keep caches within condigured range
         private void resize_cache () {
             while (valid_cache.size > cache_size) {
                 valid_cache.poll ();
@@ -342,6 +474,7 @@ namespace ThiefMD.Enrichments {
             }
         }
 
+        // Empty the caches
         public void clear_cache () {
             while (!valid_cache.is_empty) {
                 valid_cache.poll ();
@@ -352,6 +485,9 @@ namespace ThiefMD.Enrichments {
             }
         }
 
+        // Need to figure out how to do this in flatpak and native
+        // But currently check to see if `link-parser` is able to load
+        // the dictionary.
         public bool language_check (string lang) {
             bool have_language = false;
             bool res = false;
@@ -422,15 +558,18 @@ namespace ThiefMD.Enrichments {
             return have_language;
         }
 
+        // Check if sentence is valid or not, and get the raw error string
         public bool sentence_check_suggestion (string sentence, out string suggestion) {
             return sentence_check_ex (sentence, out suggestion);
         }
 
+        // Check if sentence if valid or not, and get a list of problem words
         public bool sentence_check (string sentence, Gee.List<string>? problem_words = null) {
             string suggestion;
             return sentence_check_ex (sentence, out suggestion, problem_words);
         }
 
+        // Convert the raw output of link parser into a suggestion string and a list of possible issues
         private void parse_suggestion (string raw_suggestion, out string suggestion, Gee.List<string>? problem_words = null) {
             suggestion = "";
             string[] parts = raw_suggestion.replace ("LEFT-WALL", "").replace ("RIGHT-WALL", "").replace ("  ", " ").chug ().chomp ().split (" ");
@@ -456,6 +595,7 @@ namespace ThiefMD.Enrichments {
             }
         }
 
+        // If there's a cache hit, this'll grab the item from the cache.
         private bool grab_invalid_suggestion (string sentence, out string suggestion, Gee.List<string>? problem_words = null) {
             int index = invalid_cache.index_of (sentence);
             if (index != -1) {
@@ -466,6 +606,7 @@ namespace ThiefMD.Enrichments {
             return false;
         }
 
+        // Check grammar in a sentence
         public bool sentence_check_ex (string sentence, out string suggestion, Gee.List<string>? problem_words = null) {
             suggestion = "";
             if (valid_cache.contains (sentence)) {
@@ -542,6 +683,9 @@ namespace ThiefMD.Enrichments {
                 error_free = true;
             }
 
+            // output scan in separate try in case process gets killed
+            // killed process winds up in the first catch. It's possible
+            // STDOUT could have some output.
             try {
                 if (output_stream != null) {
                     var proc_input = new DataInputStream (output_stream);
@@ -565,6 +709,9 @@ namespace ThiefMD.Enrichments {
                 warning ("Could not process output: %s", e.message);
             }
 
+            // We got here meaning we processed something or we won't be able to process
+            // the output if passed it again.
+            // Cache the result.
             if (error_free) {
                 valid_cache.add (sentence);
                 resize_cache ();
@@ -578,6 +725,8 @@ namespace ThiefMD.Enrichments {
             return error_free;
         }
 
+        // Watchdog just hangs out until we need to terminate the
+        // process or bails out.
         private void watch_dog () {
             int now = 0;
             while (now < wait_time && !done) {

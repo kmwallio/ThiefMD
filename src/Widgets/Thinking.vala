@@ -27,8 +27,9 @@ namespace ThiefMD.Widgets {
     public class Thinking : Gtk.Dialog {
         private ThinkingCallback work = null;
         private Mutex running;
+        private string message;
 
-        public Thinking (string set_title, owned ThinkingCallback callback) {
+        public Thinking (string set_title, owned ThinkingCallback callback, Gee.List<string>? messages = null) {
             set_transient_for (ThiefApp.get_instance ());
             resizable = false;
             deletable = false;
@@ -36,11 +37,16 @@ namespace ThiefMD.Widgets {
             work = (owned) callback;
             running = Mutex ();
             title = set_title;
+            if (messages == null || messages.is_empty) {
+                message = "";
+            } else {
+                message = messages.get (Random.int_range(0, messages.size));
+            }
             build_ui ();
         }
 
         private void build_ui () {
-            window_position = WindowPosition.CENTER;
+            window_position = Gtk.WindowPosition.CENTER;
             this.get_content_area().add (build_thinking_ui ());
             show_all ();
             Timeout.add (500, run_and_done);
@@ -61,24 +67,24 @@ namespace ThiefMD.Widgets {
         }
 
         private Gtk.Grid build_thinking_ui () {
-            Grid grid = new Grid ();
+            Gtk.Grid grid = new Gtk.Grid ();
             grid.margin = 12;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
-            grid.orientation = Orientation.VERTICAL;
+            grid.orientation = Gtk.Orientation.VERTICAL;
             grid.hexpand = true;
             grid.vexpand = true;
 
             try {
-                IconTheme icon_theme = IconTheme.get_default();
-                var thief_icon = icon_theme.load_icon("com.github.kmwallio.thiefmd", 128, IconLookupFlags.FORCE_SVG);
+                Gtk.IconTheme icon_theme = Gtk.IconTheme.get_default();
+                var thief_icon = icon_theme.load_icon("com.github.kmwallio.thiefmd", 128, Gtk.IconLookupFlags.FORCE_SVG);
                 var icon = new Gtk.Image.from_pixbuf (thief_icon);
                 grid.attach (icon, 1, 1);
             } catch (Error e) {
                 warning ("Could not load logo: %s", e.message);
             }
 
-            var stealing_label = new Gtk.Label (_("<b>Stealing file contents...</b>"));
+            var stealing_label = new Gtk.Label ((message != "") ? "<b>" + message + "</b>" : _("<b>Stealing file contents...</b>"));
             stealing_label.use_markup = true;
             stealing_label.hexpand = true;
             grid.attach (stealing_label, 1, 2);
