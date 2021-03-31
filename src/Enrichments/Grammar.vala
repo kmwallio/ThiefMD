@@ -67,8 +67,12 @@ namespace ThiefMD.Enrichments {
             int current_cursor = cursor_iter.get_offset ();
 
             if (last_cursor == -1) {
-                buffer.get_bounds (out start, out end);
-                run_between_start_and_end (start, end);
+                Thinking worker = new Thinking (_("Checking Grammar"), () => {
+                    Gtk.TextIter t_start, t_end;
+                    buffer.get_bounds (out t_start, out t_end);
+                    run_between_start_and_end (t_start, t_end);
+                });
+                worker.run ();
             } else {
                 //
                 // Scan where we are
