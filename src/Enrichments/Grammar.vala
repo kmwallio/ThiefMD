@@ -185,6 +185,53 @@ namespace ThiefMD.Enrichments {
             }
         }
 
+        public bool handle_tooltip (int x, int y, bool keyboard_tooltip, Gtk.Tooltip tooltip) {
+            Gtk.TextIter? iter;
+            if (keyboard_tooltip) {
+                int offset = buffer.cursor_position;
+                buffer.get_iter_at_offset (out iter, offset);
+            } else {
+                int m_x, m_y, trailing;
+                view.window_to_buffer_coords (Gtk.TextWindowType.TEXT, x, y, out m_x, out m_y);
+                view.get_iter_at_position (out iter, out trailing, m_x, m_y);
+            }
+
+            if (iter != null) {
+                if (iter.has_tag (grammar_line)) {
+                    Gtk.TextIter start = iter.copy (), end = iter.copy ();
+                    bool no_foward = false;
+                    while (start.has_tag (grammar_line)) {
+                        if (!start.backward_char ()) {
+                            no_foward = true;
+                            break;
+                        }
+                    }
+                    if (!no_foward) {
+                        start.forward_char ();
+                    }
+                    no_foward = false;
+                    while (end.has_tag (grammar_line)) {
+                        if (!end.forward_char ()) {
+                            no_foward = true;
+                            break;
+                        }
+                    }
+                    if (!no_foward) {
+                        end.backward_char ();
+                    }
+                    string suggestion = "";
+                    if (!checker.sentence_check_suggestion (strip_markdown (buffer.get_text (start, end, false)), out suggestion) && suggestion != "") {
+                        tooltip.set_markup (suggestion);
+                        return true;
+                    }
+                }
+            } else {
+                return false;
+            }
+
+            return false;
+        }
+
         public bool attach (Gtk.SourceView textview) {
             if (textview == null) {
                 return false;
@@ -209,6 +256,9 @@ namespace ThiefMD.Enrichments {
             grammar_word.foreground_set = true;
             checker.check_language_settings ();
 
+            view.set_has_tooltip (true);
+            view.query_tooltip.connect (handle_tooltip);
+
             last_cursor = -1;
 
             return true;
@@ -222,6 +272,8 @@ namespace ThiefMD.Enrichments {
             buffer.remove_tag (grammar_word, start, end);
             buffer.tag_table.remove (grammar_line);
             buffer.tag_table.remove (grammar_word);
+
+            view.query_tooltip.disconnect (handle_tooltip);
 
             grammar_line = null;
             grammar_word = null;
@@ -342,6 +394,114 @@ namespace ThiefMD.Enrichments {
             }
 
             return have_language;
+        }
+
+        public bool sentence_check_suggestion (string sentence, out string suggestion) {
+            suggestion = "";
+            if (cache.contains (sentence)) {
+                return true;
+            }
+
+            if (language == "") {
+                return true;
+            }
+
+            bool error_free = false;
+            bool res = false;
+            done = false;
+
+            string check_sentence = strip_markdown (sentence).chug ().chomp ();
+            // If it looks like we'd be noisy for HTML or random syntax
+            if (check_sentence.contains ("[") || check_sentence.contains ("]") ||
+                sentence.contains ("<") || sentence.contains (">") || sentence.has_prefix ("!"))
+            {
+                return true;
+            }
+
+            Subprocess grammar;
+            InputStream? output_stream = null;
+
+            try {
+                cancellable = new Cancellable ();
+                string[] command = {
+                    "link-parser",
+                    language
+                };
+                grammar = new Subprocess.newv (command,
+                    SubprocessFlags.STDOUT_PIPE |
+                    SubprocessFlags.STDIN_PIPE |
+                    SubprocessFlags.STDERR_MERGE);
+
+                var input_stream = grammar.get_stdin_pipe ();
+                if (input_stream != null) {
+                    DataOutputStream flush_buffer = new DataOutputStream (input_stream);
+                    if (!flush_buffer.put_string (check_sentence)) {
+                        warning ("Could not set buffer");
+                    }
+                    flush_buffer.flush ();
+                    flush_buffer.close ();
+                }
+                output_stream = grammar.get_stdout_pipe ();
+
+                // Before we wait, setup watchdogs
+                Thread<void> watchdog = null;
+                if (Thread.supported ()) {
+                    watchdog = new Thread<void> ("grammar_watchdog", this.watch_dog);
+                } else {
+                    int now = 0;
+                    Timeout.add (5, () => {
+                        now += 5;
+                        if (now > wait_time && !done) {
+                            cancellable.cancel ();
+                        }
+                        return done;
+                    });
+                }
+
+                res = grammar.wait (cancellable);
+                done = true;
+                if (watchdog != null) {
+                    watchdog.join ();
+                }
+            } catch (Error e) {
+                warning ("Failed to run grammar: %s", e.message);
+                error_free = true;
+            }
+
+            try {
+                if (output_stream != null) {
+                    var proc_input = new DataInputStream (output_stream);
+                    string line = "";
+                    while ((line = proc_input.read_line (null)) != null) {
+                        line = line.chomp ().chug ();
+                        error_free = error_free || line.down ().contains ("unused=0");
+                        if (line.has_prefix ("LEFT-WALL")) {
+                            string[] parts = line.replace ("LEFT-WALL", "").replace ("RIGHT-WALL", "").replace ("  ", " ").chug ().chomp ().split (" ");
+                            foreach (var part in parts) {
+                                if (part.index_of_char ('.') != -1) {
+                                    part = part.substring (0, part.index_of_char ('.'));
+                                }
+                                suggestion += part + " ";
+                            }
+                        }
+                    }
+                } else {
+                    warning ("Got nothing");
+                }
+
+                if (!res || output_stream == null) {
+                    error_free = true;
+                }
+            } catch (Error e) {
+                warning ("Could not process output: %s", e.message);
+            }
+
+            if (error_free) {
+                cache.add (sentence);
+                resize_cache ();
+            }
+
+            return error_free;
         }
 
         public bool sentence_check (string sentence, Gee.List<string>? problem_words = null) {

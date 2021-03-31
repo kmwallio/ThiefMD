@@ -25,12 +25,14 @@
         "/share/man",
         "/share/vala",
         "/bin/vapi*",
-        "*.a",
         "*.la"
     ],
     "modules": [{
             "name": "gtksourceview",
             "buildsystem": "meson",
+            "cleanup": [
+                "*.a"
+            ],
             "sources": [{
                 "type": "archive",
                 "url": "https://download.gnome.org/sources/gtksourceview/4.8/gtksourceview-4.8.1.tar.xz",
@@ -39,6 +41,9 @@
         },
         {
             "name": "gtkspell",
+            "cleanup": [
+                "*.a"
+            ],
             "sources": [{
                 "type": "archive",
                 "url": "https://sourceforge.net/projects/gtkspell/files/3.0.10/gtkspell3-3.0.10.tar.xz",
@@ -46,6 +51,9 @@
             }],
             "modules": [{
                     "name": "enchant",
+                    "cleanup": [
+                        "*.a"
+                    ],
                     "sources": [{
                         "type": "archive",
                         "url": "https://github.com/AbiWord/enchant/releases/download/v2.2.11/enchant-2.2.11.tar.gz",
@@ -58,6 +66,9 @@
         {
             "name": "discount",
             "buildsystem": "simple",
+            "cleanup": [
+                "*.a"
+            ],
             "build-commands": [
                 "./configure.sh --prefix=/app --enable-all-features --github-checkbox --with-fenced-code --shared",
                 "sed -e 's|/sbin/ldconfig|/sbin/ldconfig -n|' -i librarian.sh",
@@ -71,6 +82,9 @@
         },
         {
             "name": "pandoc",
+            "cleanup": [
+                "*.a"
+            ],
             "only-arches": [
                 "x86_64"
             ],
@@ -98,6 +112,9 @@
         {
             "name" : "libhandy",
             "buildsystem" : "meson",
+            "cleanup": [
+                "*.a"
+            ],
             "config-opts" : [
                 "-Dexamples=false",
                 "-Dprofiling=false",
@@ -116,6 +133,9 @@
         },
         {
             "name": "thiefmd",
+            "cleanup": [
+                "*.a"
+            ],
             "buildsystem": "meson",
             "sources": [{
                 "type": "dir",
