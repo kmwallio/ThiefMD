@@ -44,6 +44,8 @@ public class MarkdownTests {
             Gee.List<string> no_problem_words = new Gee.LinkedList<string> ();
             assert (grammar_check.sentence_check ("he ate cake", no_problem_words));
             assert (no_problem_words.is_empty);
+            assert (grammar_check.sentence_check ("[ThiefMD](https://thiefmd.com) aims to master neither")); // Passes, couldn't strip markdown
+            assert (grammar_check.sentence_check (strip_markdown ("[ThiefMD](https://thiefmd.com) aims to master neither"))); // Pass, valid grammar...
         });
     }
 }

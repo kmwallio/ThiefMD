@@ -25,6 +25,6 @@ Homepage: https://thiefmd.com
 
 Package: com.github.kmwallio.thiefmd
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, pandoc, pandoc-citeproc, link-grammar
+Depends: ${misc:Depends}, ${shlibs:Depends}, pandoc, pandoc-citeproc, link-grammar, link-grammar-dictionaries-all
 Description: Markdown Library Manager and Editor
   built on the efforts of other OSS.

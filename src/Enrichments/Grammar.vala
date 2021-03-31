@@ -100,6 +100,23 @@ namespace ThiefMD.Enrichments {
             checking.unlock ();
         }
 
+        private void grab_sentence (ref Gtk.TextIter start, ref Gtk.TextIter end) {
+            var link_tag = buffer.tag_table.lookup ("markdown-link");
+            var url_tag = buffer.tag_table.lookup ("markdown-url");
+            if (!end.ends_sentence () || ((link_tag != null && end.has_tag (link_tag)) || (url_tag != null && end.has_tag (url_tag)))) {
+                do {
+                    Gtk.TextIter next_line = end.copy (), next_sentence = end.copy ();
+                    if (next_line.forward_to_line_end () && next_sentence.forward_sentence_end () && next_line.get_offset () < next_sentence.get_offset ()) {
+                        end.forward_to_line_end ();
+                        break;
+                    }
+                    if (!end.forward_sentence_end ()) {
+                        break;
+                    }
+                } while ((end.has_tag (url_tag) || end.has_tag (link_tag)));
+            }
+        }
+
         private void run_between_start_and_end (Gtk.TextIter start, Gtk.TextIter end) {
             if (grammar_word == null || grammar_line == null) {
                 return;
@@ -118,9 +135,9 @@ namespace ThiefMD.Enrichments {
 
             buffer.remove_tag (grammar_line, start, end);
             buffer.remove_tag (grammar_word, start, end);
-            Gtk.TextIter check_start = start;
             Gtk.TextIter check_end = start;
-            check_end.forward_sentence_end ();
+            grab_sentence (ref start, ref check_end);
+            Gtk.TextIter check_start = start;
 
             while (check_start.in_range (start, end) &&
                     check_end.in_range (start, end) &&
@@ -140,13 +157,13 @@ namespace ThiefMD.Enrichments {
                             }
                         }
                         buffer.apply_tag (grammar_line, check_start, check_end);
-                        Gtk.TextIter word_start = check_start;
-                        Gtk.TextIter word_end = check_start;
+                        Gtk.TextIter word_start = check_start.copy ();
+                        Gtk.TextIter word_end = check_start.copy ();
                         if (!problem_words.is_empty) {
                             while (word_end.forward_word_end () && word_end.get_offset () <= check_end.get_offset ()) {
-                                string check_word = strip_markdown (word_start.get_text (word_end)).chug ().chomp ().down ();
+                                string check_word = strip_markdown (word_start.get_text (word_end)).chug ().chomp ();
                                 check_word = check_word.replace ("\"", "");
-                                if (problem_words.contains (check_word)) {
+                                if (problem_words.contains (check_word) || problem_words.contains (check_word.down ())) {
                                     while (word_start.get_char () == ' ' && word_start.forward_char ()) {
                                         if (word_start.get_char () != ' ') {
                                             break;
@@ -160,9 +177,11 @@ namespace ThiefMD.Enrichments {
                     }
                 }
                 check_start = check_end;
+                check_start.forward_char ();
                 if (!check_end.forward_sentence_end ()) {
                     break;
                 }
+                grab_sentence (ref check_start, ref check_end);
             }
         }
 
@@ -341,7 +360,7 @@ namespace ThiefMD.Enrichments {
             string check_sentence = strip_markdown (sentence).chug ().chomp ();
             // If it looks like we'd be noisy for HTML or random syntax
             if (check_sentence.contains ("[") || check_sentence.contains ("]") ||
-                sentence.contains ("<") || sentence.contains (">"))
+                sentence.contains ("<") || sentence.contains (">") || sentence.has_prefix ("!"))
             {
                 return true;
             }

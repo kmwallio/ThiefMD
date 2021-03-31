@@ -84,6 +84,16 @@
                 "sha256": "b15ce6009ab833fb51fc472bf8bb9683cd2bd7f8ac948f3ddeb6b8f9a366d69a"
             }]
         },
+        {
+            "name" : "link-grammar",
+            "sources" : [
+                {
+                    "type" : "archive",
+                    "url" : "https://www.abisource.com/downloads/link-grammar/5.8.1/link-grammar-5.8.1.tar.gz",
+                    "sha256" : "11c4ff551fa5169257dacc575080c63b075c790edac29984a94641a0993b505b"
+                }
+            ]
+        },
         "shared-modules/libsecret/libsecret.json",
         {
             "name" : "libhandy",
