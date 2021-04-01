@@ -264,8 +264,13 @@ namespace ThiefMD.Enrichments {
                                     problem_words.contains (check_word.down ()))
                                 {
                                     // Strip whitespace in iter
-                                    while (word_start.get_char () == ' ' && word_start.forward_char ()) {
-                                        if (word_start.get_char () != ' ') {
+                                    while ((word_start.get_char () == ' ' || word_start.get_char () == '#' ||
+                                            word_start.get_char () == '>' || word_start.get_char () == '-') &&
+                                            word_start.forward_char ())
+                                    {
+                                        if (word_start.get_char () != ' ' && word_start.get_char () != '#' &&
+                                            word_start.get_char () != '>' && word_start.get_char () != '-')
+                                        {
                                             break;
                                         }
                                     }
