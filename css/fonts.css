@@ -1,0 +1,36 @@
+@font-face {
+    font-family: 'Stolen Victory Duo';
+    src: url('StolenVictoryDuo-Italic.woff2') format('woff2'),
+        url('StolenVictoryDuo-Italic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Stolen Victory Duo';
+    src: url('StolenVictoryDuo-Regular.woff2') format('woff2'),
+        url('StolenVictoryDuo-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Stolen Victory Sans';
+    src: url('StolenVictorySans.woff2') format('woff2'),
+        url('StolenVictorySans.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Stolen Victory Sans';
+    src: url('StolenVictorySans-Italic.woff2') format('woff2'),
+        url('StolenVictorySans-Italic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
