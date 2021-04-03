@@ -1,0 +1,27 @@
+---
+layout: page
+title: Changeblog Categories
+---
+<div>
+<p>
+<ul>
+{% for kategory in site.categories %}
+  <li><a href="#{{ kategory[0] }}">{{ kategory[0] }}</a></li>
+{% endfor %}
+</ul>
+</p>
+</div>
+<div id="blog-archives">
+{% for kategory in site.categories %}
+  <h1><a name="{{ kategory[0] }}"></a>{{ kategory[0] }}</h1>
+  {% for post in site.posts %}
+    {% for pt in post.categories %}
+    {% if pt == kategory[0] %}
+    <article>
+      {% include archive_post.html %}
+    </article>
+    {% endif %}
+    {% endfor %}
+  {% endfor %}
+{% endfor %}
+</div>

@@ -1,0 +1,22 @@
+{% unless page.no_header %}
+  <header>
+    {% if index %}
+      <h1 class="entry-title"><span class="entry-date">{% include post/date.html %}{{ time }}</span><a href="{{ root_url }}{{ post.url }}">{% if site.titlecase %}{{ post.title | titlecase }}{% else %}{{ post.title }}{% endif %}</a></h1>
+    {% else %}
+      <h1 class="entry-title"><span class="entry-date">{% include post/date.html %}{{ time }}</span>{% if site.titlecase %}{{ page.title | titlecase }}{% else %}{{ page.title }}{% endif %}</h1>
+    {% endif %}
+  </header>
+{% endunless %}
+{% if index %}
+  <div class="entry-content">
+    {{ content }}
+  </div>
+  {% capture excerpted %}{{ content | has_excerpt }}{% endcapture %}
+  {% if content != post.content %}
+    <footer>
+      <a rel="full-article" href="{{ root_url }}{{ post.url }}#more">{{ site.excerpt_link }}</a>
+    </footer>
+  {% endif %}
+{% else %}
+<div class="entry-content">{{ content | replace:'<!-- more -->', '<a name="more"></a>' }}</div>
+{% endif %}

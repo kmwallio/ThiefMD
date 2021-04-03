@@ -1,0 +1,15 @@
+name: ThiefMD
+markdown: kramdown
+collections:
+  posts:
+    output: true
+    permalink: /changeblog/:year/:month/:day/:title/
+  tips:
+    output: true
+    permalink: /:collection/:path/
+  deets:
+    output: true
+    permalink: /:collection/:path/
+  help:
+    output: true
+    permalink: /:collection/:path/
