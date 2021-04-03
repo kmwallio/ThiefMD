@@ -69,31 +69,31 @@ yay -S thiefmd
 
 ## Screenshots
 
-![](docs/images/theme_preferences.png)
+![](https://thiefmd.com/images/theme_preferences.png)
 
 Download themes from [https://themes.thiefmd.com](https://themes.thiefmd.com) or [make your own](https://themes.thiefmd.com/howto). [Ulysses Themes](https://styles.ulysses.app/themes) can also be imported through the preferences `Ctrl+,`.
 
-![](docs/images/drag_n_drop_sheets.gif)
+![](https://thiefmd.com/images/drag_n_drop_sheets.gif)
 
 Drag and Drop organizing of the library.
 
-![](docs/images/epub-export.png)
+![](https://thiefmd.com/images/epub-export.png)
 
 Live Preview & Export Preview
 
-![](docs/images/typewriter_scrolling.gif)
+![](https://thiefmd.com/images/typewriter_scrolling.gif)
 
 Typewriter Scrolling.
 
-![](docs/images/focus_mode.png)
+![](https://thiefmd.com/images/focus_mode.png)
 
 Focus Mode
 
-![](docs/images/write-good.png)
+![](https://thiefmd.com/images/write-good.png)
 
 [Write-Good](https://github.com/ThiefMD/libwritegood-vala) recommendations and highlighting.
 
-![](docs/images/thiefmd-screenplay.png)
+![](https://thiefmd.com/images/thiefmd-screenplay.png)
 
 [Fountain](https://fountain.io) syntax highlighting.
 

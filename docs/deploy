@@ -1,8 +1,0 @@
-#!/bin/sh
-USER=kmw
-HOST=matt.km-w.org
-DIR=/home/kmw/thiefmd.app
-
-jekyll build && rsync -avz --delete _site/ ${USER}@${HOST}:${DIR}
-
-exit 0
