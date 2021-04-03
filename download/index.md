@@ -21,7 +21,7 @@ sudo apt-get update
 sudo apt-get install com.github.kmwallio.thiefmd
 ```
 
-Builds have been tested on Ubuntu 20.04 and Pop OS 20.04. Newer versions of ThiefMD require [libhandy-1](https://packages.ubuntu.com/groovy/libhandy-1-0) and 20.10+. [Flatpak](#flatpak) provides libhandy and should be ran on 20.04 and below.
+The ThiefMD PPA requires Ubuntu 20.10+. [Flatpak](#flatpak) provides libhandy and should be ran on 20.04 and below.
 
 ## Arch User Repository
 

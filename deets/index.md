@@ -65,6 +65,24 @@ Toggle it on, or toggle it off. They're <span style="background: #20528c; color:
 
 <div class="clear"></div>
 
+## Grammar Check and Notes
+
+<div class="responsive-left marcel"><img src="/images/grammar-notes.png" alt="ThiefMD highlighting potential grammar issues with notes pane open" /></div>
+
+Not all of us are whoever the Picaso of the writing world would be, but with Write-Good + Grammar Check, you writing can look like a Picaso! None of us have an English Degree, but ThiefMD will attempt to highlight what's potentially wrong.
+
+Our grammar check uses the revolutionary [Link Grammar Parser](https://www.abisource.com/projects/link-grammar/), the same parser grammar checking [AbiWord](http://www.abisource.com/), so you know it's good.
+
+With Link Grammar, you'll be saying "*[Hyah!](https://www.youtube.com/watch?v=q7IfOwcaxwc)*" to Grammar in no time[^fn-link-joke].
+
+[^fn-link-joke]: *Link* Grammar... Grammar check is always green... get it...? I don't know why they let me update the site. These are the jokes kid 😼.
+
+**Noted.** ThiefMD also lets you take notes for the file you working on, or for the project your in. Notes aren't part of you work but are great for keeping track on it.
+
+
+
+<div class="clear"></div>
+
 ## Typewriter Scrolling
 
 ![ThiefMD's typewriter scrolling feature](/images/typewriter_scrolling.gif)
