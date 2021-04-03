@@ -2,19 +2,11 @@
 layout: page
 title: Details
 ---
-
-[Prefer a list](/deets/list)?
-
-## Keyboard Shortcuts
-
-[Learn all our keyboard shortcuts](/shortcuts)
-
-Some of our favorites:
-
-* `Ctrl + ,` Access preferences window
-* `F11` Toggle Full Screen
-* `Ctrl + 1` Editor Only
-* `Ctrl + 3` Editor, Folder, and Library View
+<div class="jumbotron">
+  <h1>ThiefMD isn't your average text editor</h1>
+  <p><a href="https://blog.thiefmd.com/introducing-fountain-support/">Fountain Support</a>, <a href="/tips/blogging-with-ghost/">Blog Publishing</a>, and so much more. It's too much for one page.</p>
+  <p><a class="btn btn-primary btn-lg" href="/deets/list" role="button">Check out a List of Features</a> <a class="btn btn-primary btn-lg" href="/shortcuts" role="button">Learn our Keyboard Shortcuts</a></p>
+</div>
 
 ## Live Preview
 

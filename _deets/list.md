@@ -17,6 +17,7 @@ title: Details
 * Typewriting Scrolling
 * Spell Check
 * Write-Good Suggestions
+* Grammar Check
 * Focus Mode (Toggle with `Ctrl+Shift+R`)
   * Paragraph
   * Sentence
