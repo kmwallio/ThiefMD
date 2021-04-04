@@ -63,15 +63,13 @@ Toggle it on, or toggle it off. They're <span style="background: #20528c; color:
 
 Not all of us are whoever the Picaso of the writing world would be, but with Write-Good + Grammar Check, your writing can look like a Picaso! None of us here have an English Degree, but ThiefMD will attempt to highlight what's potentially wrong.
 
-Our grammar checker uses the revolutionary [Link Grammar Parser](https://www.abisource.com/projects/link-grammar/), the same parser grammar checking [AbiWord](http://www.abisource.com/), so you know it's good.
+Our grammar checker uses the revolutionary [Link Grammar Parser](https://www.abisource.com/projects/link-grammar/), the same grammar checking in [AbiWord](http://www.abisource.com/), so you know it's good.
 
 With Link Grammar, you'll be saying "*[Hyah!](https://www.youtube.com/watch?v=q7IfOwcaxwc)*" to bad Grammar in no time[^fn-link-joke].
 
 [^fn-link-joke]: *Link* Grammar... Grammar check is always green... get it...? I don't know why they let me update the site. These are the jokes kid 😼.
 
-**Noted.** ThiefMD also lets you take notes for the file you working on, or for the project your in. Notes aren't part of you work but are great for keeping track on it.
-
-
+**Noted.** ThiefMD also lets you take notes for the file you working on, or for the project you are in. Notes aren't part of you work but are great for keeping track on it.
 
 <div class="clear"></div>
 
@@ -81,7 +79,7 @@ With Link Grammar, you'll be saying "*[Hyah!](https://www.youtube.com/watch?v=q7
 
 Stay centered and stay focused. Type writer scrolling keeps your active line fixed, both in the editor and the preview.
 
-No longer look for where you're typing keep your eye muscles on what matters most.
+No longer look for where you're typing, keep your eye muscles on what matters most.
 
 ## Focus Mode
 
