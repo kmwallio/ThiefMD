@@ -132,6 +132,7 @@ namespace ThiefMD.Enrichments {
         private Regex is_url;
         private Regex is_markdown_url;
         private Regex is_heading;
+        private Regex is_markdown_list;
         private Regex is_codeblock;
 
         private string checking_copy;
@@ -146,6 +147,7 @@ namespace ThiefMD.Enrichments {
         public MarkdownEnrichment () {
             try {
                 is_heading = new Regex ("(#+\\s[^\\n\\r]+?)\\r?\\n", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF | RegexCompileFlags.CASELESS, 0);
+                is_markdown_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+(\\.|\\))))\\s(\\.+?)$", RegexCompileFlags.CASELESS | RegexCompileFlags.MULTILINE, 0);
                 is_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+(\\.|\\)))\\s)\\s*(.+)", RegexCompileFlags.CASELESS, 0);
                 is_partial_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+\\.))\\s+$", RegexCompileFlags.CASELESS, 0);
                 numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.CASELESS, 0);
@@ -461,6 +463,12 @@ namespace ThiefMD.Enrichments {
                     buffer.remove_tag (heading_text[h], start_region, end_region);
                 }
 
+                buffer.tag_table.foreach ((tag) => {
+                    if (tag.name != null && tag.name.has_prefix ("list-")) {
+                        buffer.remove_tag (tag, start_region, end_region);
+                    }
+                });
+
                 // Tag headings and make sure they're not in code blocks
                 if (is_heading.match_full (checking_copy, checking_copy.length, 0, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
                     do {
@@ -475,13 +483,49 @@ namespace ThiefMD.Enrichments {
                             if (start.has_tag (code_block) || end.has_tag (code_block)) {
                                 continue;
                             }
-                            int heading_depth = heading.index_of (" ") - 1;
+                            int heading_depth = heading.index_of_char (' ') - 1;
                             if (heading_depth >= 0 && heading_depth < 6) {
                                 buffer.apply_tag (heading_text[heading_depth], start, end);
                             }
                         }
                     } while (match_info.next ());
                 }
+
+                // Tag lists and make sure they're not in code blocks
+                //  if (is_markdown_list.match_full (checking_copy, checking_copy.length, 0, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
+                //      do {
+                //          int start_pos, end_pos;
+                //          string list_marker = match_info.fetch (1);
+                //          string list_line = match_info.fetch (0);
+                //          bool headify = match_info.fetch_pos (0, out start_pos, out end_pos) && (list_marker.index_of ("\n") < 0);
+                //          if (headify) {
+                //              warning (list_marker);
+                //              warning (list_line);
+                //              start_pos = copy_offset + checking_copy.char_count (start_pos);
+                //              end_pos = copy_offset + checking_copy.char_count (end_pos);
+                //              buffer.get_iter_at_offset (out start, start_pos);
+                //              buffer.get_iter_at_offset (out end, end_pos);
+                //              if (start.has_tag (code_block) || end.has_tag (code_block)) {
+                //                  continue;
+                //              }
+                //              int list_depth = list_marker.length;
+                //              if (list_depth >= 0) {
+                //                  int list_px_index = get_string_px_width (list_marker) + space_w;
+                //                  Gtk.TextTag? list_indent = buffer.tag_table.lookup ("list-" + list_px_index.to_string ());
+                //                  if (list_indent == null) {
+                //                      list_indent = buffer.create_tag ("list-" + list_px_index.to_string ());
+                //                  }
+                //                  warning ("Setting `%s` = %d", list_marker, list_px_index);
+                //                  list_indent.left_margin = view.left_margin;
+                //                  list_indent.left_margin_set = false;
+                //                  list_indent.accumulative_margin = false;
+                //                  list_indent.indent = -list_px_index;
+                //                  list_indent.indent_set = true;
+                //                  buffer.apply_tag (list_indent, start, end);
+                //              }
+                //          }
+                //      } while (match_info.next ());
+                //  }
             } catch (Error e) {
                 warning ("Could not adjust headers: %s", e.message);
             }
@@ -896,6 +940,24 @@ namespace ThiefMD.Enrichments {
             }
 
             recalculate_margins ();
+        }
+
+        private int get_string_px_width (string str) {
+            var settings = AppSettings.get_default ();
+            int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
+            if (view.get_realized ()) {
+                var font_desc = Pango.FontDescription.from_string (settings.font_family);
+                font_desc.set_size ((int)(f_w * Pango.SCALE * Pango.Scale.LARGE));
+                var font_context = view.get_pango_context ();
+                var font_layout = new Pango.Layout (font_context);
+                font_layout.set_font_description (font_desc);
+                font_layout.set_text (str, str.length);
+                Pango.Rectangle ink, logical;
+                font_layout.get_pixel_extents (out ink, out logical);
+                debug ("# Ink: %d, Logical: %d", ink.width, logical.width);
+                return int.max (ink.width, logical.width);
+            }
+            return f_w;
         }
 
         private void recalculate_margins () {
