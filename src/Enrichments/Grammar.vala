@@ -254,32 +254,25 @@ namespace ThiefMD.Enrichments {
             buffer.get_iter_at_mark (out cursor_location, cursor);
 
             buffer.get_bounds (out buffer_start, out buffer_end);
+            string buffer_text = buffer.get_text (buffer_start, buffer_end, true);
             while (send_to_buffer.size != 0) {
                 GrammarUpdateRequest requested = send_to_buffer.first ();
                 send_to_buffer.remove (requested);
 
+                int start_pos = buffer_text.index_of (requested.text);
+                start_pos = buffer_text.char_count (start_pos);
+                int end_pos = buffer_text.char_count (start_pos) + requested.text.char_count ();
+
                 // Check at the offset in the request
                 Gtk.TextIter check_start, check_end;
-                buffer.get_iter_at_offset (out check_start, requested.text_offset);
-                buffer.get_iter_at_offset (out check_end, requested.text_offset + requested.text.length);
+                buffer.get_iter_at_offset (out check_start, start_pos);
+                buffer.get_iter_at_offset (out check_end, end_pos);
                 if (check_start.in_range (buffer_start, buffer_end) && 
                     check_end.in_range (buffer_start, buffer_end) && 
                     check_start.get_text (check_end).chug ().chomp () == requested.text)
                 {
                     tag_sentence (check_start, check_end, requested.words);
                     continue;
-                }
-
-                int cursor_change = cursor_location.get_offset () - requested.cursor_offset;
-                if (check_start.forward_chars (cursor_change)) {
-                    buffer.get_iter_at_offset (out check_end, check_start.get_offset () + requested.text.length);
-                    if (check_start.in_range (buffer_start, buffer_end) && 
-                        check_end.in_range (buffer_start, buffer_end) && 
-                        check_start.get_text (check_end).chug ().chomp () == requested.text)
-                    {
-                        tag_sentence (check_start, check_end, requested.words);
-                        continue;
-                    }
                 }
             }
 
