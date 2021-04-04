@@ -61,11 +61,11 @@ Toggle it on, or toggle it off. They're <span style="background: #20528c; color:
 
 <div class="responsive-left marcel"><img src="/images/grammar-notes.png" alt="ThiefMD highlighting potential grammar issues with notes pane open" /></div>
 
-Not all of us are whoever the Picaso of the writing world would be, but with Write-Good + Grammar Check, you writing can look like a Picaso! None of us have an English Degree, but ThiefMD will attempt to highlight what's potentially wrong.
+Not all of us are whoever the Picaso of the writing world would be, but with Write-Good + Grammar Check, your writing can look like a Picaso! None of us here have an English Degree, but ThiefMD will attempt to highlight what's potentially wrong.
 
-Our grammar check uses the revolutionary [Link Grammar Parser](https://www.abisource.com/projects/link-grammar/), the same parser grammar checking [AbiWord](http://www.abisource.com/), so you know it's good.
+Our grammar checker uses the revolutionary [Link Grammar Parser](https://www.abisource.com/projects/link-grammar/), the same parser grammar checking [AbiWord](http://www.abisource.com/), so you know it's good.
 
-With Link Grammar, you'll be saying "*[Hyah!](https://www.youtube.com/watch?v=q7IfOwcaxwc)*" to Grammar in no time[^fn-link-joke].
+With Link Grammar, you'll be saying "*[Hyah!](https://www.youtube.com/watch?v=q7IfOwcaxwc)*" to bad Grammar in no time[^fn-link-joke].
 
 [^fn-link-joke]: *Link* Grammar... Grammar check is always green... get it...? I don't know why they let me update the site. These are the jokes kid 😼.
 
