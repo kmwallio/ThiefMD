@@ -162,7 +162,7 @@ namespace ThiefMD.Widgets {
 
             page.add (display_options);
             page.add (connection_options);
-            page.set_icon_name ("preferences-desktop-online-accounts-symbolic");
+            page.set_icon_name ("network-server-symbolic");
             page.set_title (_("Connections"));
             return page;
         }

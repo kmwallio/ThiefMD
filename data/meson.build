@@ -9,14 +9,17 @@ endforeach
 
 
 font_types = ['Bold', 'Italic', 'BoldItalic', 'Regular']
-fonts = ['Courier Prime', 'iAWriterDuospace']
+fonts = ['Courier Prime', 'iAWriterDuospace', 'Stolen Victory Duo', 'Stolen Victory Sans']
 
 foreach f : fonts
     foreach ft : font_types
-        install_data(
-            join_paths('font', f + '-' + ft + '.ttf'),
-            install_dir: join_paths(get_option('datadir'), 'fonts', 'truetype', 'thiefmd')
-        )
+        if (run_command('[', '-e', join_paths('font', f + '-' + ft + '.ttf'), ']').returncode() == 0)
+            # message('Installing ' + f + '-' + ft + '.ttf')
+            install_data(
+                join_paths('font', f + '-' + ft + '.ttf'),
+                install_dir: join_paths(get_option('datadir'), 'fonts', 'truetype', 'thiefmd')
+            )
+        endif
     endforeach
 endforeach
 

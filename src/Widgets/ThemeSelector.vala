@@ -55,6 +55,10 @@ namespace ThiefMD.Widgets {
             var line_label = new Gtk.Label (_("Spacing"));
 
             var font_selector = new Gtk.ComboBoxText ();
+            font_selector.append_text ("Stolen Victory Duo");
+            fonts.add ("Stolen Victory Duo");
+            font_selector.append_text ("Stolen Victory Sans");
+            fonts.add ("Stolen Victory Sans");
             font_selector.append_text ("iA Writer Duospace");
             fonts.add ("iA Writer Duospace");
             font_selector.append_text ("Courier Prime");
