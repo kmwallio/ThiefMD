@@ -23,8 +23,6 @@ using ThiefMD.Widgets;
 
 namespace ThiefMD.Enrichments {
     public class GrammarUpdateRequest {
-        public int cursor_offset;
-        public int text_offset;
         public string text;
         public Gee.List<string> words;
 
@@ -33,27 +31,7 @@ namespace ThiefMD.Enrichments {
         }
 
         public static int compare_tag_requests (GrammarUpdateRequest a, GrammarUpdateRequest b) {
-            if ((a.cursor_offset == b.cursor_offset) &&
-                (a.text_offset == b.text_offset) &&
-                (a.text == b.text))
-            {
-                return 0;
-            }
-
-            if (a.text != b.text) {
-                return strcmp (a.text, b.text);
-            }
-
-            if (a.text_offset != b.text_offset) {
-                return a.text_offset - b.text_offset;
-            }
-
-            if (a.cursor_offset != b.cursor_offset) {
-                return a.cursor_offset - b.cursor_offset;
-            }
-
-            // Tags are different?
-            return -1;
+            return strcmp (a.text, b.text);
         }
     }
 
@@ -159,7 +137,7 @@ namespace ThiefMD.Enrichments {
                 buffer.get_iter_at_mark (out start, cursor);
                 buffer.get_iter_at_mark (out end, cursor);
                 get_chunk_of_text_around_cursor (ref start, ref end, false);
-                run_between_start_and_end (start, end);
+                run_worker_between_start_and_end (start, end);
 
                 //
                 // Rescan where we were if still in buffer,
@@ -177,7 +155,7 @@ namespace ThiefMD.Enrichments {
                     if (old_start.in_range (bound_start, bound_end)) {
                         get_chunk_of_text_around_cursor (ref old_start, ref old_end, false);
                         if (!old_start.in_range (start, end) || !old_end.in_range (start, end)) {
-                            run_between_start_and_end (old_start, old_end);
+                            run_worker_between_start_and_end (old_start, old_end);
                         }
                     }
                 }
@@ -236,8 +214,8 @@ namespace ThiefMD.Enrichments {
                     grammar_processor.join ();
                 }
 
-                grammar_processor = new Thread<void> ("grammar-processor", process_grammar);
                 processor_running = true;
+                grammar_processor = new Thread<void> ("grammar-processor", process_grammar);
             }
             processor_check.unlock ();
         }
@@ -281,6 +259,7 @@ namespace ThiefMD.Enrichments {
 
         private void process_grammar () {
             if (buffer == null) {
+                processor_running = false;
                 return;
             }
 
@@ -354,12 +333,22 @@ namespace ThiefMD.Enrichments {
                     string sentence = buffer.get_text (check_start, check_end, false).chug ().chomp ();
                     // Only run on full sentences
                     if (sentence != "") {
-                        GrammarUpdateRequest request = new GrammarUpdateRequest () {
-                            cursor_offset = cursor_iter.get_offset (),
-                            text_offset = check_start.get_offset (),
-                            text = sentence
-                        };
-                        send_to_processor.add (request);
+                        // Lines around cursor should hopefully stick around in cache allowing for
+                        // real time update without flicker.
+                        string suggestion;
+                        Gee.List<string> problem_words = new Gee.LinkedList<string> ();
+                        if (checker.cache_check (sentence, out suggestion, problem_words)) {
+                            // Separate if statement because we want to enter this, but not tag
+                            // if the sentence is valid.
+                            if (suggestion != "") {
+                                tag_sentence (check_start, check_end, problem_words);
+                            }
+                        } else {
+                            GrammarUpdateRequest request = new GrammarUpdateRequest () {
+                                text = sentence
+                            };
+                            send_to_processor.add (request);
+                        }
                     }
                 }
 
@@ -373,79 +362,6 @@ namespace ThiefMD.Enrichments {
             }
 
             start_worker ();
-        }
-
-        //
-        // run_between_start_and_end (Gtk.TextIter start, Gtk.TextIter end)
-        // Scans for sentences and runs grammar checking on the sentences between
-        // the start and end TextIters.
-        //
-        private void run_between_start_and_end (Gtk.TextIter start, Gtk.TextIter end) {
-            if (grammar_word == null || grammar_line == null) {
-                return;
-            }
-
-            // Okay, we lied. Try to make sure the start starts at the start of a sentence
-            if (!start.starts_sentence ()) {
-                start.backward_sentence_start ();
-            }
-
-            // We move backward because forward could grab more lines
-            if (!end.ends_sentence ()) {
-                end.backward_sentence_start ();
-            }
-
-            // Make sure we have something to grab
-            if (end.get_offset () == start.get_offset ()) {
-                return;
-            }
-
-            // Remove grammar tags between scan area
-            buffer.remove_tag (grammar_line, start, end);
-            buffer.remove_tag (grammar_word, start, end);
-
-            // Grab the first sentence and move the end iterator
-            Gtk.TextIter check_end = start;
-            grab_sentence (ref start, ref check_end);
-            Gtk.TextIter check_start = start;
-
-            // So we don't grammar check in code
-            var code_block = buffer.tag_table.lookup ("code-block");
-
-            // Where something not quite as magical happens...
-            // loop over every sentence in range.
-            while (check_start.in_range (start, end) &&
-                    check_end.in_range (start, end) &&
-                    (check_end.get_offset () != check_start.get_offset ())) 
-            {
-                Gtk.TextIter cursor_iter;
-                var cursor = buffer.get_insert ();
-                buffer.get_iter_at_mark (out cursor_iter, cursor);
-
-                // If the cursor is in the sentence, don't tell the user their possibly
-                // incomplete sentence is grammatically incorrect. It's in progress, mmkay?
-                //
-                // Also make sure we're not in a code block.
-                if ((!cursor_iter.in_range (check_start, check_end)) &&
-                    (!(code_block != null && (check_start.has_tag (code_block) || check_end.has_tag (code_block)))))
-                {
-                    // Grab the sentence and prep for problem word tagging
-                    string sentence = buffer.get_text (check_start, check_end, false).chug ().chomp ();
-                    Gee.List<string> problem_words = new Gee.LinkedList<string> ();
-                    // Only run on full sentences
-                    if (sentence != "" && !checker.sentence_check (sentence, problem_words)) {
-                        tag_sentence (check_start, check_end, problem_words);
-                    }
-                }
-
-                // Move along to the next sentence (if possible)
-                check_start = check_end;
-                check_start.forward_char ();
-                if (!check_end.forward_sentence_end ()) {
-                    break;
-                }
-                grab_sentence (ref check_start, ref check_end);
-            }
         }
 
         //
@@ -610,6 +526,7 @@ namespace ThiefMD.Enrichments {
             }
             if (grammar_processor != null) {
                 grammar_processor.join ();
+                processor_running = false;
             }
             ThiefApp.get_instance ().destroy.disconnect (detach);
 
@@ -660,7 +577,11 @@ namespace ThiefMD.Enrichments {
         private int cache_size;
         private string language;
 
+        // Mutex for multiple threads...
+        private Mutex cache_mutex;
+
         public GrammarThinking (int cache_items = Constants.GRAMMAR_SENTENCE_CACHE_SIZE, int timeout_millseconds = Constants.GRAMMAR_SENTENCE_CHECK_TIMEOUT) {
+            cache_mutex = Mutex ();
             wait_time = timeout_millseconds;
             cache_size = cache_items;
             valid_cache = new Gee.LinkedList<string> ();
@@ -832,18 +753,42 @@ namespace ThiefMD.Enrichments {
             return false;
         }
 
+        public bool cache_check (string sentence, out string suggestion, Gee.List<string> problem_words) {
+            if (!cache_mutex.trylock ()) {
+                return false;
+            }
+            bool res = false;
+
+            if (valid_cache.contains (sentence)) {
+                suggestion = "";
+                res = true;
+            } else if (invalid_cache.contains (sentence)) {
+                res = true;
+                grab_invalid_suggestion (sentence, out suggestion, problem_words);
+            }
+
+            cache_mutex.unlock ();
+            return res;
+        }
+
         // Check grammar in a sentence
         public bool sentence_check_ex (string sentence, out string suggestion, Gee.List<string>? problem_words = null) {
             suggestion = "";
+            cache_mutex.lock ();
+
             if (valid_cache.contains (sentence)) {
+                cache_mutex.unlock ();
                 return true;
             }
 
             if (invalid_cache.contains (sentence)) {
-                return grab_invalid_suggestion (sentence, out suggestion, problem_words);
+                bool res = grab_invalid_suggestion (sentence, out suggestion, problem_words);
+                cache_mutex.unlock ();
+                return res;
             }
 
             if (language == "") {
+                cache_mutex.unlock ();
                 return true;
             }
 
@@ -857,6 +802,7 @@ namespace ThiefMD.Enrichments {
                 sentence.contains ("<") || sentence.contains (">") || sentence.has_prefix ("!") ||
                 sentence.replace ("-", "").chug ().chomp () == "" || sentence.replace ("*", "").chug ().chomp () == "")
             {
+                cache_mutex.unlock ();
                 return true;
             }
 
@@ -947,6 +893,7 @@ namespace ThiefMD.Enrichments {
                 invalid_suggestion.add (raw_suggestion);
                 resize_cache ();
             }
+            cache_mutex.unlock ();
 
             return error_free;
         }
