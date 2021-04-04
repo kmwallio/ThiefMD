@@ -59,16 +59,6 @@ namespace ThiefMD {
         }
         private Gee.ArrayList<string> thief_tips;
 
-        public static Gee.List<string> GRAMMAR_WINDOW_MESSAGES {
-          get {
-            if (instance == null) {
-              instance = new ThiefProperties ();
-            }
-            return instance.grammar_messages;
-          }
-        }
-        private Gee.ArrayList<string> grammar_messages;
-
         public const string[] PAPER_SIZES_GTK_NAME = {
           Gtk.PAPER_NAME_A3,
           Gtk.PAPER_NAME_A4,
@@ -122,13 +112,6 @@ namespace ThiefMD {
             thief_tips.add (_("Want to block out distractions? Full-screen is just an `F11` away."));
             thief_tips.add (_("Quickly switch view modes with `Ctrl+1`, `Ctrl+2`, and `Ctrl+3`."));
             thief_tips.add (_("Working with a lot of links? Turn on Experimental Mode to make your markdown more readable `Ctrl+Shift+M`."));
-
-            grammar_messages = new Gee.ArrayList<string> ();
-            grammar_messages.add (_("Great Work! Looking for minor improvements."));
-            grammar_messages.add (_("Does this count as collaboration?"));
-            grammar_messages.add (_("Grammar isn't my strong point,\nbut doing what I can."));
-            grammar_messages.add (_("Such wow! Let's polish those words."));
-            grammar_messages.add (_("You inspire me."));
 
             instance = this;
           }

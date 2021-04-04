@@ -118,15 +118,6 @@ namespace ThiefMD.Enrichments {
 
             // If last cursor isn't set, scan whole doc
             if (last_cursor == -1) {
-                //  Thinking worker = new Thinking (
-                //      _("Checking Grammar"),
-                //      () => {
-                //          Gtk.TextIter t_start, t_end;
-                //          buffer.get_bounds (out t_start, out t_end);
-                //          run_between_start_and_end (t_start, t_end);
-                //      },
-                //      ThiefProperties.GRAMMAR_WINDOW_MESSAGES);
-                //  worker.run ();
                 Gtk.TextIter t_start, t_end;
                 buffer.get_bounds (out t_start, out t_end);
                 run_worker_between_start_and_end (t_start, t_end);
