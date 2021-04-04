@@ -22,6 +22,41 @@ using ThiefMD.Controllers;
 using ThiefMD.Widgets;
 
 namespace ThiefMD.Enrichments {
+    public class GrammarUpdateRequest {
+        public int cursor_offset;
+        public int text_offset;
+        public string text;
+        public Gee.List<string> words;
+
+        public GrammarUpdateRequest () {
+            words = new Gee.LinkedList<string> ();
+        }
+
+        public static int compare_tag_requests (GrammarUpdateRequest a, GrammarUpdateRequest b) {
+            if ((a.cursor_offset == b.cursor_offset) &&
+                (a.text_offset == b.text_offset) &&
+                (a.text == b.text))
+            {
+                return 0;
+            }
+
+            if (a.text != b.text) {
+                return strcmp (a.text, b.text);
+            }
+
+            if (a.text_offset != b.text_offset) {
+                return a.text_offset - b.text_offset;
+            }
+
+            if (a.cursor_offset != b.cursor_offset) {
+                return a.cursor_offset - b.cursor_offset;
+            }
+
+            // Tags are different?
+            return -1;
+        }
+    }
+
     public class GrammarChecker {
         // TextView to attach to and buffer of view
         private Gtk.TextView view;
@@ -46,6 +81,13 @@ namespace ThiefMD.Enrichments {
         // scan sentences around it as well as new cursor location
         private int last_cursor;
 
+        // Threading State
+        private Thread<void> grammar_processor;
+        private Mutex processor_check;
+        private bool processor_running;
+        private Gee.ConcurrentSet<GrammarUpdateRequest> send_to_processor;
+        private Gee.ConcurrentSet<GrammarUpdateRequest> send_to_buffer;
+
         public GrammarChecker () {
             checking = Mutex ();
 
@@ -55,6 +97,11 @@ namespace ThiefMD.Enrichments {
             grammar_word = null;
             last_cursor = -1;
             checker = new GrammarThinking ();
+            processor_check = Mutex ();
+            processor_running = false;
+            grammar_processor = null;
+            send_to_processor = new Gee.ConcurrentSet<GrammarUpdateRequest> (GrammarUpdateRequest.compare_tag_requests);
+            send_to_buffer = new Gee.ConcurrentSet<GrammarUpdateRequest> (GrammarUpdateRequest.compare_tag_requests);
         }
 
         /**
@@ -93,15 +140,18 @@ namespace ThiefMD.Enrichments {
 
             // If last cursor isn't set, scan whole doc
             if (last_cursor == -1) {
-                Thinking worker = new Thinking (
-                    _("Checking Grammar"),
-                    () => {
-                        Gtk.TextIter t_start, t_end;
-                        buffer.get_bounds (out t_start, out t_end);
-                        run_between_start_and_end (t_start, t_end);
-                    },
-                    ThiefProperties.GRAMMAR_WINDOW_MESSAGES);
-                worker.run ();
+                //  Thinking worker = new Thinking (
+                //      _("Checking Grammar"),
+                //      () => {
+                //          Gtk.TextIter t_start, t_end;
+                //          buffer.get_bounds (out t_start, out t_end);
+                //          run_between_start_and_end (t_start, t_end);
+                //      },
+                //      ThiefProperties.GRAMMAR_WINDOW_MESSAGES);
+                //  worker.run ();
+                Gtk.TextIter t_start, t_end;
+                buffer.get_bounds (out t_start, out t_end);
+                run_worker_between_start_and_end (t_start, t_end);
             } else {
                 //
                 // Scan where we are
@@ -177,6 +227,161 @@ namespace ThiefMD.Enrichments {
             }
         }
 
+        // Check if worker queue is already running. If not,
+        // starts the worker thread.
+        private void start_worker () {
+            processor_check.lock ();
+            if (!processor_running) {
+                if (grammar_processor != null) {
+                    grammar_processor.join ();
+                }
+
+                grammar_processor = new Thread<void> ("grammar-processor", process_grammar);
+                processor_running = true;
+            }
+            processor_check.unlock ();
+        }
+
+        // Processes the queue to update the buffer if the sentence
+        // still matches.
+        private bool update_buffer () {
+            if (buffer == null) {
+                return false;
+            }
+
+            Gtk.TextIter buffer_start, buffer_end, cursor_location;
+            var cursor = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_location, cursor);
+
+            buffer.get_bounds (out buffer_start, out buffer_end);
+            while (send_to_buffer.size != 0) {
+                GrammarUpdateRequest requested = send_to_buffer.first ();
+                send_to_buffer.remove (requested);
+
+                // Check at the offset in the request
+                Gtk.TextIter check_start, check_end;
+                buffer.get_iter_at_offset (out check_start, requested.text_offset);
+                buffer.get_iter_at_offset (out check_end, requested.text_offset + requested.text.length);
+                if (check_start.in_range (buffer_start, buffer_end) && 
+                    check_end.in_range (buffer_start, buffer_end) && 
+                    check_start.get_text (check_end).chug ().chomp () == requested.text)
+                {
+                    tag_sentence (check_start, check_end, requested.words);
+                    continue;
+                }
+
+                int cursor_change = cursor_location.get_offset () - requested.cursor_offset;
+                if (check_start.forward_chars (cursor_change)) {
+                    buffer.get_iter_at_offset (out check_end, check_start.get_offset () + requested.text.length);
+                    if (check_start.in_range (buffer_start, buffer_end) && 
+                        check_end.in_range (buffer_start, buffer_end) && 
+                        check_start.get_text (check_end).chug ().chomp () == requested.text)
+                    {
+                        tag_sentence (check_start, check_end, requested.words);
+                        continue;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private void process_grammar () {
+            if (buffer == null) {
+                return;
+            }
+
+            while (send_to_processor.size != 0) {
+                GrammarUpdateRequest requested = send_to_processor.first ();
+                send_to_processor.remove (requested);
+                string sentence = strip_markdown (requested.text).chug ().chomp ();
+                if (!checker.sentence_check (sentence, requested.words)) {
+                    send_to_buffer.add (requested);
+                }
+            }
+            processor_running = false;
+            Thread.exit (0);
+            return;
+        }
+
+        //
+        // run_worker_between_start_and_end (Gtk.TextIter start, Gtk.TextIter end)
+        // Scans for sentences and requests the worker to process in a separate thread.
+        //
+        private void run_worker_between_start_and_end (Gtk.TextIter start, Gtk.TextIter end) {
+            if (grammar_word == null || grammar_line == null) {
+                return;
+            }
+
+            // Okay, we lied. Try to make sure the start starts at the start of a sentence
+            if (!start.starts_sentence ()) {
+                start.backward_sentence_start ();
+            }
+
+            // We move backward because forward could grab more lines
+            if (!end.ends_sentence ()) {
+                end.backward_sentence_start ();
+            }
+
+            // Make sure we have something to grab
+            if (end.get_offset () == start.get_offset ()) {
+                return;
+            }
+
+            // Remove grammar tags between scan area
+            buffer.remove_tag (grammar_line, start, end);
+            buffer.remove_tag (grammar_word, start, end);
+
+            // Grab the first sentence and move the end iterator
+            Gtk.TextIter check_end = start;
+            grab_sentence (ref start, ref check_end);
+            Gtk.TextIter check_start = start;
+
+            // So we don't grammar check in code
+            var code_block = buffer.tag_table.lookup ("code-block");
+
+            // Where something not quite as magical happens...
+            // loop over every sentence in range.
+            while (check_start.in_range (start, end) &&
+                    check_end.in_range (start, end) &&
+                    (check_end.get_offset () != check_start.get_offset ())) 
+            {
+                Gtk.TextIter cursor_iter;
+                var cursor = buffer.get_insert ();
+                buffer.get_iter_at_mark (out cursor_iter, cursor);
+
+                // If the cursor is in the sentence, don't tell the user their possibly
+                // incomplete sentence is grammatically incorrect. It's in progress, mmkay?
+                //
+                // Also make sure we're not in a code block.
+                if ((!cursor_iter.in_range (check_start, check_end)) &&
+                    (!(code_block != null && (check_start.has_tag (code_block) || check_end.has_tag (code_block)))))
+                {
+                    // Grab the sentence and prep for problem word tagging
+                    string sentence = buffer.get_text (check_start, check_end, false).chug ().chomp ();
+                    // Only run on full sentences
+                    if (sentence != "") {
+                        GrammarUpdateRequest request = new GrammarUpdateRequest () {
+                            cursor_offset = cursor_iter.get_offset (),
+                            text_offset = check_start.get_offset (),
+                            text = sentence
+                        };
+                        send_to_processor.add (request);
+                    }
+                }
+
+                // Move along to the next sentence (if possible)
+                check_start = check_end;
+                check_start.forward_char ();
+                if (!check_end.forward_sentence_end ()) {
+                    break;
+                }
+                grab_sentence (ref check_start, ref check_end);
+            }
+
+            start_worker ();
+        }
+
         //
         // run_between_start_and_end (Gtk.TextIter start, Gtk.TextIter end)
         // Scans for sentences and runs grammar checking on the sentences between
@@ -236,49 +441,7 @@ namespace ThiefMD.Enrichments {
                     Gee.List<string> problem_words = new Gee.LinkedList<string> ();
                     // Only run on full sentences
                     if (sentence != "" && !checker.sentence_check (sentence, problem_words)) {
-                        // Sentences may be surrounded by whitespace, move iters to prevent highlighting
-                        // whitespace
-                        while (check_start.get_char () == ' ' && check_start.forward_char ()) {
-                            if (check_start.get_char () != ' ') {
-                                break;
-                            }
-                        }
-
-                        // Highlight error line
-                        buffer.apply_tag (grammar_line, check_start, check_end);
-                        Gtk.TextIter word_start = check_start.copy ();
-                        Gtk.TextIter word_end = check_start.copy ();
-
-                        // If we have words we can highlight, highlight them.
-                        // Sadly note, we do not highlight punctuation, we also highlight
-                        // multiple occurrences of a matchin word even though one instance
-                        // may be incorrect
-                        if (!problem_words.is_empty) {
-                            while (word_end.forward_word_end () && word_end.get_offset () <= check_end.get_offset ()) {
-                                // Grab the word in the sentence and try to make it as basic as possible
-                                string check_word = strip_markdown (word_start.get_text (word_end)).chug ().chomp ();
-                                check_word = check_word.replace ("\"", "");
-
-                                // Check if the word is in the list of problematic words
-                                if (problem_words.contains (check_word) || // what's coding style?
-                                    problem_words.contains (check_word.down ()))
-                                {
-                                    // Strip whitespace in iter
-                                    while ((word_start.get_char () == ' ' || word_start.get_char () == '#' ||
-                                            word_start.get_char () == '>' || word_start.get_char () == '-') &&
-                                            word_start.forward_char ())
-                                    {
-                                        if (word_start.get_char () != ' ' && word_start.get_char () != '#' &&
-                                            word_start.get_char () != '>' && word_start.get_char () != '-')
-                                        {
-                                            break;
-                                        }
-                                    }
-                                    buffer.apply_tag (grammar_word, word_start, word_end);
-                                }
-                                word_start = word_end;
-                            }
-                        }
+                        tag_sentence (check_start, check_end, problem_words);
                     }
                 }
 
@@ -351,6 +514,50 @@ namespace ThiefMD.Enrichments {
             return false;
         }
 
+        private void tag_sentence (Gtk.TextIter check_start, Gtk.TextIter check_end, Gee.List<string> problem_words) {
+            while (check_start.get_char () == ' ' && check_start.forward_char ()) {
+                if (check_start.get_char () != ' ') {
+                    break;
+                }
+            }
+
+            // Highlight error line
+            buffer.apply_tag (grammar_line, check_start, check_end);
+            Gtk.TextIter word_start = check_start.copy ();
+            Gtk.TextIter word_end = check_start.copy ();
+
+            // If we have words we can highlight, highlight them.
+            // Sadly note, we do not highlight punctuation, we also highlight
+            // multiple occurrences of a matchin word even though one instance
+            // may be incorrect
+            if (!problem_words.is_empty) {
+                while (word_end.forward_word_end () && word_end.get_offset () <= check_end.get_offset ()) {
+                    // Grab the word in the sentence and try to make it as basic as possible
+                    string check_word = strip_markdown (word_start.get_text (word_end)).chug ().chomp ();
+                    check_word = check_word.replace ("\"", "");
+
+                    // Check if the word is in the list of problematic words
+                    if (problem_words.contains (check_word) || // what's coding style?
+                        problem_words.contains (check_word.down ()))
+                    {
+                        // Strip whitespace in iter
+                        while ((word_start.get_char () == ' ' || word_start.get_char () == '#' ||
+                                word_start.get_char () == '>' || word_start.get_char () == '-') &&
+                                word_start.forward_char ())
+                        {
+                            if (word_start.get_char () != ' ' && word_start.get_char () != '#' &&
+                                word_start.get_char () != '>' && word_start.get_char () != '-')
+                            {
+                                break;
+                            }
+                        }
+                        buffer.apply_tag (grammar_word, word_start, word_end);
+                    }
+                    word_start = word_end;
+                }
+            }
+        }
+
         //
         // attach (Gtk.TextView textview)
         //
@@ -385,6 +592,9 @@ namespace ThiefMD.Enrichments {
 
             last_cursor = -1; // reset to scan whole document on attach
 
+            GLib.Idle.add (update_buffer);
+            ThiefApp.get_instance ().destroy.connect (detach);
+
             return true;
         }
 
@@ -396,6 +606,24 @@ namespace ThiefMD.Enrichments {
         // Cache will not be cleared.
         //
         public void detach () {
+            // Drain queues
+            while (send_to_buffer.size != 0) {
+                GrammarUpdateRequest requested = send_to_buffer.first ();
+                send_to_buffer.remove (requested);
+            }
+            while (send_to_processor.size != 0) {
+                GrammarUpdateRequest requested = send_to_processor.first ();
+                send_to_processor.remove (requested);
+            }
+            if (grammar_processor != null) {
+                grammar_processor.join ();
+            }
+            ThiefApp.get_instance ().destroy.disconnect (detach);
+
+            if (buffer == null) {
+                return;
+            }
+
             Gtk.TextIter start, end;
             buffer.get_bounds (out start, out end);
 
