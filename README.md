@@ -159,7 +159,7 @@ $ sudo ninja install
 
 * [Contributors who help make ThiefMD awesome](https://github.com/kmwallio/ThiefMD/graphs/contributors)
 * Code ~~stolen~~ *forked* from [Quilter](https://github.com/lainsce/quilter)
-* Fonts are [iA Writer Duospace](https://github.com/iaolo/iA-Fonts) and [Courier Prime](https://quoteunquoteapps.com/courierprime)
+* Fonts are [Stolen Victory](https://github.com/ThiefMD/StolenVictoryDuo), [Victor Mono](https://rubjo.github.io/victor-mono/), [iA Writer Duospace](https://github.com/iaolo/iA-Fonts), and [Courier Prime](https://quoteunquoteapps.com/courierprime)
 * Inspired by [Ulysses](https://ulysses.app)
 * Preview CSS is [Splendor](http://markdowncss.github.io/splendor) + [Modest](http://markdowncss.github.io/modest)
 * Preview Scroll stolen from [this Stackoverflow](https://stackoverflow.com/questions/8922107/javascript-scrollintoview-middle-alignment) by [Rohan Orton](https://stackoverflow.com/users/2800005/rohan-orton)
