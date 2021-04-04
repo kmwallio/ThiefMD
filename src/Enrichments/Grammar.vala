@@ -230,13 +230,13 @@ namespace ThiefMD.Enrichments {
 
                 int start_pos = buffer_text.index_of (requested.text);
                 while (start_pos >= 0) {
-                    start_pos = buffer_text.char_count (start_pos);
-                    int end_pos = buffer_text.char_count (start_pos) + requested.text.char_count ();
+                    int char_pos = buffer_text.char_count (start_pos);
+                    int end_char_pos = char_pos + requested.text.char_count ();
 
                     // Check at the offset in the request
                     Gtk.TextIter check_start, check_end;
-                    buffer.get_iter_at_offset (out check_start, start_pos);
-                    buffer.get_iter_at_offset (out check_end, end_pos);
+                    buffer.get_iter_at_offset (out check_start, char_pos);
+                    buffer.get_iter_at_offset (out check_end, end_char_pos);
                     if (check_start.in_range (buffer_start, buffer_end) && 
                         check_end.in_range (buffer_start, buffer_end) && 
                         check_start.get_text (check_end).chug ().chomp () == requested.text)
