@@ -57,6 +57,7 @@ namespace ThiefMD {
             result = result.replace ("]", "");
             result = result.replace ("_", "");
             result = result.replace ("`", "");
+            result = result.replace ("~", "");
             while (result.has_prefix ("\n") || result.has_prefix ("#") || result.has_prefix (">") || result.has_prefix (" ") || result.has_prefix ("\t")) {
                 result = result.substring (1);
             }
