@@ -47,16 +47,24 @@
       <image>https://thiefmd.com/images/thief_window.png</image>
     </screenshot>
     <screenshot>
+      <caption>ThiefMD, a Markdown Editor, showing Fountain Screenplay support</caption>
+      <image>https://thiefmd.com/images/thiefmd-screenplay.png</image>
+    </screenshot>
+    <screenshot>
       <caption>ThiefMD, a Markdown Editor, rendering a live preview of markdown being modified</caption>
       <image>https://thiefmd.com/images/preview.png</image>
     </screenshot>
     <screenshot>
-      <caption>ThiefMD, a Markdown Editor, showing Theme selection preferences to change the user interface</caption>
-      <image>https://thiefmd.com/images/theme_preferences.png</image>
-    </screenshot>
-    <screenshot>
       <caption>ThiefMD, a Markdown Editor, showing Write-Good suggestions finding passive voice</caption>
       <image>https://thiefmd.com/images/write-good.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>ThiefMD, a Markdown Editor, showing Grammar Errors and Project Notes</caption>
+      <image>https://thiefmd.com/images/grammar-notes.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>ThiefMD, a Markdown Editor, showing Theme selection preferences to change the user interface</caption>
+      <image>https://thiefmd.com/images/theme_preferences.png</image>
     </screenshot>
   </screenshots>
   <releases>
@@ -65,6 +73,7 @@
         <p>Spell-Check, Check. Write-Good Check, Check. Grammar Check... Check! ThiefMD offers Spell Check, Write-Good Style Check, and now Grammar Check!</p>
         <ul>
           <li>Link-Grammar Checking</li>
+          <li>Improved List and Header Formatting</li>
         </ul>
       </description>
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.3-draftcheck</url>
