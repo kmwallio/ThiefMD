@@ -417,11 +417,10 @@ namespace ThiefMD.Enrichments {
         }
 
         private void tag_sentence (Gtk.TextIter check_start, Gtk.TextIter check_end, Gee.List<string> problem_words) {
-            while ((check_start.get_char () == ' ' || check_start.get_char () == '#' ||
+            while (check_start.get_char () == ' ' || check_start.get_char () == '#' ||
                     check_start.get_char () == '-' || check_start.get_char () == '*')
-                    && check_start.forward_char ())
             {
-                if (check_start.get_char () != ' ') {
+                if (!check_start.forward_char ()) {
                     break;
                 }
             }
@@ -446,12 +445,10 @@ namespace ThiefMD.Enrichments {
                         problem_words.contains (check_word.down ()))
                     {
                         // Strip whitespace in iter
-                        while ((word_start.get_char () == ' ' || word_start.get_char () == '#' ||
-                                word_start.get_char () == '>' || word_start.get_char () == '-') &&
-                                word_start.forward_char ())
+                        while (word_start.get_char () == ' ' || word_start.get_char () == '#' ||
+                                word_start.get_char () == '>' || word_start.get_char () == '-')
                         {
-                            if (word_start.get_char () != ' ' && word_start.get_char () != '#' &&
-                                word_start.get_char () != '>' && word_start.get_char () != '-')
+                            if (!word_start.forward_char ())
                             {
                                 break;
                             }
