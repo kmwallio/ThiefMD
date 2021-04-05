@@ -318,9 +318,6 @@ namespace ThiefMD.Enrichments {
             buffer.remove_tag (markdown_link, start_region, end_region);
             buffer.remove_tag (markdown_url, start_region, end_region);
 
-            if (!settings.experimental) {
-                return;
-            }
             try {
                 Gtk.TextIter start, end;
                 Gtk.TextIter cursor_location;
