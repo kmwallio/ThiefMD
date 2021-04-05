@@ -59,6 +59,13 @@ if libmarkdown.found() == false
     libmarkdown = cc.find_library('libmarkdown', required: true)
 endif
 
+# Find linkgrammar
+linkgrammar = dependency('liblink-grammar', version: '>= 5.8.0', required: false)
+if linkgrammar.found() == false
+    cc = meson.get_compiler('c')
+    linkgrammar = cc.find_library('liblink-grammar', required: true)
+endif
+
 # Let's define our executable
 add_project_arguments(['--vapidir', join_paths(meson.current_source_dir(), 'vapi')], language: 'vala')
 
@@ -143,11 +150,13 @@ executable(
         dependency('libxml-2.0'),
         dependency('libsecret-1'),
         dependency('libhandy-1'),
-        libmarkdown
+        libmarkdown,
+        linkgrammar
     ],
     vala_args: [
         meson.source_root() + '/vapi/config.vapi',
-        meson.source_root() + '/vapi/libmarkdown.vapi'
+        meson.source_root() + '/vapi/libmarkdown.vapi',
+        meson.source_root() + '/vapi/linkgrammar.vapi'
     ],
     install : true
 )

@@ -20,6 +20,7 @@
 using ThiefMD;
 using ThiefMD.Controllers;
 using ThiefMD.Widgets;
+using LinkGrammar;
 
 namespace ThiefMD.Enrichments {
     public class GrammarUpdateRequest {
@@ -328,7 +329,7 @@ namespace ThiefMD.Enrichments {
                     if (sentence != "") {
                         // Lines around cursor should hopefully stick around in cache allowing for
                         // real time update without flicker.
-                        string suggestion;
+                        /*string suggestion;
                         Gee.List<string> problem_words = new Gee.LinkedList<string> ();
                         if (checker.cache_check (sentence, out suggestion, problem_words)) {
                             // Separate if statement because we want to enter this, but not tag
@@ -336,7 +337,7 @@ namespace ThiefMD.Enrichments {
                             if (suggestion != "") {
                                 tag_sentence (check_start, check_end, problem_words);
                             }
-                        } else {
+                        } else */{
                             GrammarUpdateRequest request = new GrammarUpdateRequest () {
                                 text = sentence
                             };
@@ -405,7 +406,7 @@ namespace ThiefMD.Enrichments {
 
                     // Run the checker over the sentence to and show raw suggestion output
                     if (!checker.sentence_check_suggestion (strip_markdown (buffer.get_text (start, end, false)), out suggestion) && suggestion != "") {
-                        tooltip.set_markup (suggestion.replace ("&", "&amp;"));
+                        tooltip.set_markup (suggestion.replace ("&", "&amp;").replace ("<", "&lt;"). replace (">", "&gt;"));
                         return true; // Don't try to find other tooltips
                     }
                 }
@@ -555,24 +556,9 @@ namespace ThiefMD.Enrichments {
     // Class for running `link-parser` with timing constraints
     //
     public class GrammarThinking : GLib.Object {
-        // Time we are willing to wait and signal to cancel
-        private int wait_time;
-        private Cancellable cancellable;
-
-        // Variable to let watchdog know everything is fine...
-        private bool done;
-
-        // Sentence caches so if we scan while user is typing,
-        // it seems magically fast and non-disruptive.
-        private Gee.LinkedList<string> valid_cache;
-        private Gee.LinkedList<string> invalid_cache;
-        private Gee.LinkedList<string> invalid_suggestion;
-
-        // Max size of valid sentences to keep.
-        // Invalid = cache_size / 2 because we hope people fix it
-        // and sentences are more likely to change due to errors being
-        // fixed.
-        private int cache_size;
+        // Link Grammar State
+        private ParseOptions options;
+        private Dictionary dictionary;
         private string language;
 
         // Mutex for multiple threads...
@@ -580,24 +566,33 @@ namespace ThiefMD.Enrichments {
 
         public GrammarThinking (int cache_items = Constants.GRAMMAR_SENTENCE_CACHE_SIZE, int timeout_millseconds = Constants.GRAMMAR_SENTENCE_CHECK_TIMEOUT) {
             cache_mutex = Mutex ();
-            wait_time = timeout_millseconds;
-            cache_size = cache_items;
-            valid_cache = new Gee.LinkedList<string> ();
-            invalid_cache = new Gee.LinkedList<string> ();
-            invalid_suggestion = new Gee.LinkedList<string> ();
+            options = new ParseOptions ();
+            options.set_max_null_count (150);
+            options.set_verbosity (0);
+            options.set_linkage_limit (150);
+            options.set_max_parse_time (2);
             check_language_settings ();
+        }
+
+        public static bool language_supported (string lang) {
+            string check = lang;
+            if (lang.length > 2) {
+                check = lang.substring (0, 2);
+            }
+            var check_dict = new Dictionary (lang);
+            return check_dict != null;
         }
 
         //
         // Look at spellcheck settings, and attempt to use that.
         //
         public void check_language_settings () {
-            language = "en";
             var settings = AppSettings.get_default ();
             // @TODO could check file path and if this changes sometime
-            if (settings.spellcheck_language.length > 2) {
+            if (settings.spellcheck_language.length >= 2) {
                 language = settings.spellcheck_language.substring (0, 2);
-                if (!language_check (language)) {
+                dictionary = new Dictionary (language);
+                if (dictionary == null) {
                     language = "";
                 }
             }
@@ -606,101 +601,6 @@ namespace ThiefMD.Enrichments {
         // If we have a language we could use
         public bool language_detected () {
             return language != "";
-        }
-
-        // Keep caches within condigured range
-        private void resize_cache () {
-            while (valid_cache.size > cache_size) {
-                valid_cache.poll ();
-            }
-            while (invalid_cache.size > (cache_size / 2)) {
-                invalid_cache.poll ();
-                invalid_suggestion.poll ();
-            }
-        }
-
-        // Empty the caches
-        public void clear_cache () {
-            while (!valid_cache.is_empty) {
-                valid_cache.poll ();
-            }
-            while (!invalid_cache.is_empty) {
-                invalid_cache.poll ();
-                invalid_suggestion.poll ();
-            }
-        }
-
-        // Need to figure out how to do this in flatpak and native
-        // But currently check to see if `link-parser` is able to load
-        // the dictionary.
-        public bool language_check (string lang) {
-            bool have_language = false;
-            bool res = false;
-            done = false;
-
-            Subprocess grammar;
-            InputStream? output_stream = null;
-            try {
-                cancellable = new Cancellable ();
-                string[] command = {
-                    "link-parser",
-                    lang,
-                    "-batch"
-                };
-                grammar = new Subprocess.newv (command,
-                    SubprocessFlags.STDOUT_PIPE |
-                    SubprocessFlags.STDIN_PIPE |
-                    SubprocessFlags.STDERR_MERGE);
-
-                var input_stream = grammar.get_stdin_pipe ();
-                if (input_stream != null) {
-                    DataOutputStream flush_buffer = new DataOutputStream (input_stream);
-                    if (!flush_buffer.put_string ("thief were here")) {
-                        warning ("Could not set buffer");
-                    }
-                    flush_buffer.flush ();
-                    flush_buffer.close ();
-                }
-                output_stream = grammar.get_stdout_pipe ();
-
-                // Before we wait, setup watchdogs
-                Thread<void> watchdog = null;
-                if (Thread.supported ()) {
-                    watchdog = new Thread<void> ("grammar_watchdog", this.watch_dog);
-                } else {
-                    int now = 0;
-                    Timeout.add (5, () => {
-                        now += 5;
-                        if (now > wait_time && !done) {
-                            cancellable.cancel ();
-                        }
-                        return done;
-                    });
-                }
-
-                res = grammar.wait (cancellable);
-                done = true;
-                if (watchdog != null) {
-                    watchdog.join ();
-                }
-            } catch (Error e) {
-                warning ("Failed to run grammar: %s", e.message);
-            }
-
-            try {
-                if (output_stream != null) {
-                    var proc_input = new DataInputStream (output_stream);
-                    string line = "";
-                    while ((line = proc_input.read_line (null)) != null) {
-                        line = line.down ();
-                        have_language = have_language || line.contains ("dictionary found");
-                    }
-                }
-            } catch (Error e) {
-                warning ("Could not process output: %s", e.message);
-            }
-
-            return have_language;
         }
 
         // Check if sentence is valid or not, and get the raw error string
@@ -740,60 +640,17 @@ namespace ThiefMD.Enrichments {
             }
         }
 
-        // If there's a cache hit, this'll grab the item from the cache.
-        private bool grab_invalid_suggestion (string sentence, out string suggestion, Gee.List<string>? problem_words = null) {
-            int index = invalid_cache.index_of (sentence);
-            if (index != -1) {
-                parse_suggestion (invalid_suggestion.get (index), out suggestion, problem_words);
-            } else {
-                suggestion = "";
-            }
-            return false;
-        }
-
-        public bool cache_check (string sentence, out string suggestion, Gee.List<string> problem_words) {
-            if (!cache_mutex.trylock ()) {
-                return false;
-            }
-            bool res = false;
-
-            if (valid_cache.contains (sentence)) {
-                suggestion = "";
-                res = true;
-            } else if (invalid_cache.contains (sentence)) {
-                res = true;
-                grab_invalid_suggestion (sentence, out suggestion, problem_words);
-            }
-
-            cache_mutex.unlock ();
-            return res;
-        }
-
         // Check grammar in a sentence
         public bool sentence_check_ex (string sentence, out string suggestion, Gee.List<string>? problem_words = null) {
             suggestion = "";
             cache_mutex.lock ();
 
-            if (valid_cache.contains (sentence)) {
+            if (language == "" || dictionary == null) {
                 cache_mutex.unlock ();
                 return true;
             }
 
-            if (invalid_cache.contains (sentence)) {
-                bool res = grab_invalid_suggestion (sentence, out suggestion, problem_words);
-                cache_mutex.unlock ();
-                return res;
-            }
-
-            if (language == "") {
-                cache_mutex.unlock ();
-                return true;
-            }
-
-            bool error_free = false;
-            bool res = false;
-            done = false;
-            string raw_suggestion = "";
+            bool error_free = true;
             string check_sentence = strip_markdown (sentence).chug ().chomp ();
             // If it looks like we'd be noisy for HTML or random syntax
             if (check_sentence.contains ("[") || check_sentence.contains ("]") ||
@@ -803,115 +660,25 @@ namespace ThiefMD.Enrichments {
                 cache_mutex.unlock ();
                 return true;
             }
-
-            InputStream? output_stream = null;
-
-            try {
-                cancellable = new Cancellable ();
-                string[] command = {
-                    "link-parser",
-                    language
-                };
-                Subprocess grammar = new Subprocess.newv (command,
-                    SubprocessFlags.STDOUT_PIPE |
-                    SubprocessFlags.STDIN_PIPE |
-                    SubprocessFlags.STDERR_MERGE);
-
-                var input_stream = grammar.get_stdin_pipe ();
-                if (input_stream != null) {
-                    DataOutputStream flush_buffer = new DataOutputStream (input_stream);
-                    if (!flush_buffer.put_string (check_sentence)) {
-                        warning ("Could not set buffer");
+            var sent = new Sentence (check_sentence, dictionary);
+            sent.split (options);
+            var num_linkages = sent.parse (options);
+            if (num_linkages > 0) {
+                var linkage = new Linkage (0, sent, options);
+                string raw_suggestion = "";
+                var num_words = linkage.get_num_words ();
+                for (size_t w = 0; w < num_words; w++) {
+                    string word = linkage.get_word (w);
+                    if (word.has_prefix ("[")) {
+                        error_free = false;
                     }
-                    flush_buffer.flush ();
-                    flush_buffer.close ();
+                    raw_suggestion += word + " ";
                 }
-                output_stream = grammar.get_stdout_pipe ();
-
-                // Before we wait, setup watchdogs
-                Thread<void> watchdog = null;
-                if (Thread.supported ()) {
-                    watchdog = new Thread<void> ("grammar_watchdog", this.watch_dog);
-                } else {
-                    int now = 0;
-                    Timeout.add (5, () => {
-                        now += 5;
-                        if (now > wait_time && !done) {
-                            cancellable.cancel ();
-                        }
-                        return done;
-                    });
-                }
-
-                res = grammar.wait (cancellable);
-                done = true;
-                if (watchdog != null) {
-                    watchdog.join ();
-                }
-            } catch (Error e) {
-                warning ("Failed to run grammar: %s", e.message);
-                error_free = true;
+                parse_suggestion (raw_suggestion, out suggestion, problem_words);
             }
 
-            // output scan in separate try in case process gets killed
-            // killed process winds up in the first catch. It's possible
-            // STDOUT could have some output.
-            try {
-                if (output_stream != null) {
-                    var proc_input = new DataInputStream (output_stream);
-                    string line = "";
-                    while ((line = proc_input.read_line (null)) != null) {
-                        line = line.chomp ().chug ();
-                        error_free = error_free || line.down ().contains ("unused=0");
-                        if (line.has_prefix ("LEFT-WALL")) {
-                            raw_suggestion = line;
-                            parse_suggestion (raw_suggestion, out suggestion, problem_words);
-                        }
-                    }
-                } else {
-                    warning ("Got nothing");
-                }
-
-                if (!res || output_stream == null) {
-                    error_free = true;
-                }
-            } catch (Error e) {
-                warning ("Could not process output: %s", e.message);
-            }
-
-            // We got here meaning we processed something or we won't be able to process
-            // the output if passed it again.
-            // Cache the result.
-            if (error_free) {
-                valid_cache.add (sentence);
-                resize_cache ();
-            }
-            if (!error_free && raw_suggestion != "") {
-                invalid_cache.add (sentence);
-                invalid_suggestion.add (raw_suggestion);
-                resize_cache ();
-            }
             cache_mutex.unlock ();
-
             return error_free;
-        }
-
-        // Watchdog just hangs out until we need to terminate the
-        // process or bails out.
-        private void watch_dog () {
-            int now = 0;
-            while (now < wait_time && !done) {
-                Thread.usleep (5000);
-                now += 5;
-            }
-
-            if (!done) {
-                cancellable.cancel ();
-                warning ("Had to terminate grammar");
-            }
-
-            Thread.exit (0);
-            return;
         }
     }
 }
