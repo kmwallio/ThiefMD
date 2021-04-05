@@ -138,7 +138,11 @@ namespace ThiefMD.Controllers.UI {
             GLib.FileUtils.get_contents (file.get_path (), out old_text);
             string old_theme = Checksum.compute_for_string (ChecksumType.MD5, old_text);
 
-            return new_theme != old_theme;
+            FileInfo last_modified = file.query_info (FileAttribute.TIME_MODIFIED, FileQueryInfoFlags.NONE);
+            var scheme_modified_time = last_modified.get_modification_date_time ();
+            var six_days_ago = new DateTime.now_utc ().add_days (-6);
+
+            return new_theme != old_theme || scheme_modified_time.compare (six_days_ago) < 0;
         } catch (Error e) {
             return true;
         }
@@ -167,6 +171,9 @@ namespace ThiefMD.Controllers.UI {
                                 dark_file.delete ();
                                 FileManager.save_file (dark_file, dark_theme_data.data);
                             }
+                            if (!dark_file.query_exists ()) {
+                                FileManager.save_file (dark_file, dark_theme_data.data);
+                            }
                         } catch (Error e) {
                             warning ("Could not save local scheme: %s", e.message);
                         }
@@ -179,6 +186,9 @@ namespace ThiefMD.Controllers.UI {
                                 light_file.delete ();
                                 FileManager.save_file (light_file, light_theme_data.data);
                             }
+                            if (!light_file.query_exists ()) {
+                                FileManager.save_file (light_file, light_theme_data.data);
+                            }
                         } catch (Error e) {
                             warning ("Could not save local scheme: %s", e.message);
                         }
@@ -189,7 +199,7 @@ namespace ThiefMD.Controllers.UI {
             }
 
             // Clean outdated themes
-            var two_weeks = new DateTime.now_utc ().add_days (-7);
+            var one_week_ago = new DateTime.now_utc ().add_days (-7);
             Dir scheme_dir = Dir.open (UserData.scheme_path, 0);
             file_name = null;
             while ((file_name = scheme_dir.read_name()) != null) {
@@ -201,7 +211,7 @@ namespace ThiefMD.Controllers.UI {
                         var scheme_modified_time = last_modified.get_modification_date_time ();
                         // If the time is less than one week ago, it's older than
                         // one week ago and should be safe to delete.
-                        if (scheme_modified_time.compare (two_weeks) < 0) {
+                        if (scheme_modified_time.compare (one_week_ago) < 0) {
                             scheme_file.delete ();
                         }
                     }
