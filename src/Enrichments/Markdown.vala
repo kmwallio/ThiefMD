@@ -132,7 +132,6 @@ namespace ThiefMD.Enrichments {
         private Regex is_url;
         private Regex is_markdown_url;
         private Regex is_heading;
-        private Regex is_markdown_list;
         private Regex is_codeblock;
 
         private string checking_copy;
@@ -146,8 +145,7 @@ namespace ThiefMD.Enrichments {
 
         public MarkdownEnrichment () {
             try {
-                is_heading = new Regex ("(#+\\s[^\\n\\r]+?)\\r?\\n", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF | RegexCompileFlags.CASELESS, 0);
-                is_markdown_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+(\\.|\\))))\\s(\\.+?)$", RegexCompileFlags.CASELESS | RegexCompileFlags.MULTILINE, 0);
+                is_heading = new Regex ("(?:^|\\n)(#+\\s[^\\n\\r]+?)(?:$|\\r?\\n)", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF | RegexCompileFlags.CASELESS, 0);
                 is_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+(\\.|\\)))\\s)\\s*(.+)", RegexCompileFlags.CASELESS, 0);
                 is_partial_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+\\.))\\s+$", RegexCompileFlags.CASELESS, 0);
                 numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.CASELESS, 0);
@@ -492,40 +490,43 @@ namespace ThiefMD.Enrichments {
                 }
 
                 // Tag lists and make sure they're not in code blocks
-                //  if (is_markdown_list.match_full (checking_copy, checking_copy.length, 0, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
-                //      do {
-                //          int start_pos, end_pos;
-                //          string list_marker = match_info.fetch (1);
-                //          string list_line = match_info.fetch (0);
-                //          bool headify = match_info.fetch_pos (0, out start_pos, out end_pos) && (list_marker.index_of ("\n") < 0);
-                //          if (headify) {
-                //              warning (list_marker);
-                //              warning (list_line);
-                //              start_pos = copy_offset + checking_copy.char_count (start_pos);
-                //              end_pos = copy_offset + checking_copy.char_count (end_pos);
-                //              buffer.get_iter_at_offset (out start, start_pos);
-                //              buffer.get_iter_at_offset (out end, end_pos);
-                //              if (start.has_tag (code_block) || end.has_tag (code_block)) {
-                //                  continue;
-                //              }
-                //              int list_depth = list_marker.length;
-                //              if (list_depth >= 0) {
-                //                  int list_px_index = get_string_px_width (list_marker) + space_w;
-                //                  Gtk.TextTag? list_indent = buffer.tag_table.lookup ("list-" + list_px_index.to_string ());
-                //                  if (list_indent == null) {
-                //                      list_indent = buffer.create_tag ("list-" + list_px_index.to_string ());
-                //                  }
-                //                  warning ("Setting `%s` = %d", list_marker, list_px_index);
-                //                  list_indent.left_margin = view.left_margin;
-                //                  list_indent.left_margin_set = false;
-                //                  list_indent.accumulative_margin = false;
-                //                  list_indent.indent = -list_px_index;
-                //                  list_indent.indent_set = true;
-                //                  buffer.apply_tag (list_indent, start, end);
-                //              }
-                //          }
-                //      } while (match_info.next ());
-                //  }
+                Gtk.TextIter? line_start = start_region, line_end = null;
+                if (!line_start.starts_line ()) {
+                    line_start.backward_line ();
+                }
+                do {
+                    while (line_start.get_char () == '\r' || line_start.get_char () == '\n') {
+                        if (!line_start.forward_char ()) {
+                            break;
+                        }
+                    }
+                    line_end = line_start;
+                    if (!line_end.forward_line ()) {
+                        break;
+                    }
+                    string line = line_start.get_text (line_end);
+                    if (is_list.match_full (line, line.length, 0, 0, out match_info)) {
+                        string list_marker = match_info.fetch (1);
+                        if (!line_start.has_tag (code_block) && !line_end.has_tag (code_block)) {
+                            list_marker = list_marker.replace ("\t", "    ");
+                            int list_depth = list_marker.length;
+                            if (list_depth >= 0) {
+                                int list_px_index = get_string_px_width (list_marker);
+                                Gtk.TextTag? list_indent = buffer.tag_table.lookup ("list-" + list_px_index.to_string ());
+                                if (list_indent == null) {
+                                    list_indent = buffer.create_tag ("list-" + list_px_index.to_string ());
+                                }
+                                list_indent.left_margin = view.left_margin;
+                                list_indent.left_margin_set = false;
+                                list_indent.accumulative_margin = false;
+                                list_indent.indent = -list_px_index;
+                                list_indent.indent_set = true;
+                                buffer.apply_tag (list_indent, line_start, line_end);
+                            }
+                        }
+                    }
+                    line_start = line_end;
+                } while (true);
             } catch (Error e) {
                 warning ("Could not adjust headers: %s", e.message);
             }
@@ -947,7 +948,7 @@ namespace ThiefMD.Enrichments {
             int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
             if (view.get_realized ()) {
                 var font_desc = Pango.FontDescription.from_string (settings.font_family);
-                font_desc.set_size ((int)(f_w * Pango.SCALE * Pango.Scale.LARGE));
+                font_desc.set_size ((int)(f_w * Pango.SCALE * (str.has_prefix ("#") ? Pango.Scale.LARGE : 1)));
                 var font_context = view.get_pango_context ();
                 var font_layout = new Pango.Layout (font_context);
                 font_layout.set_font_description (font_desc);
