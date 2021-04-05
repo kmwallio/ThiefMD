@@ -417,7 +417,10 @@ namespace ThiefMD.Enrichments {
         }
 
         private void tag_sentence (Gtk.TextIter check_start, Gtk.TextIter check_end, Gee.List<string> problem_words) {
-            while (check_start.get_char () == ' ' && check_start.forward_char ()) {
+            while ((check_start.get_char () == ' ' || check_start.get_char () == '#' ||
+                    check_start.get_char () == '-' || check_start.get_char () == '*')
+                    && check_start.forward_char ())
+            {
                 if (check_start.get_char () != ' ') {
                     break;
                 }
