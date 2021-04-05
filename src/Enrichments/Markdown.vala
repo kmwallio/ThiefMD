@@ -38,7 +38,10 @@ namespace ThiefMD.Enrichments {
             if (context.get_iter (out start) && context.get_iter (out sanity)) {
                 if (start.backward_char ()) {
                     if (start.get_char () == '@') {
-                        return true;
+                        if (!start.backward_char ()) {
+                            return true;
+                        }
+                        return start.get_char ().isspace () || !start.get_char ().isalnum ();
                     }
                     unichar check = start.get_char ();
                     for (int i = 0; i < 10; i++) {
@@ -52,7 +55,10 @@ namespace ThiefMD.Enrichments {
                     }
 
                     if (start.get_char () == '@') {
-                        return true;
+                        if (!start.backward_char ()) {
+                            return true;
+                        }
+                        return start.get_char ().isspace () || !start.get_char ().isalnum ();
                     }
                 }
             }
