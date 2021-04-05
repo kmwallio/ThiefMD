@@ -138,11 +138,7 @@ namespace ThiefMD.Controllers.UI {
             GLib.FileUtils.get_contents (file.get_path (), out old_text);
             string old_theme = Checksum.compute_for_string (ChecksumType.MD5, old_text);
 
-            FileInfo last_modified = file.query_info (FileAttribute.TIME_MODIFIED, FileQueryInfoFlags.NONE);
-            var scheme_modified_time = last_modified.get_modification_date_time ();
-            var six_days_ago = new DateTime.now_utc ().add_days (-6);
-
-            return new_theme != old_theme || scheme_modified_time.compare (six_days_ago) < 0;
+            return new_theme != old_theme;
         } catch (Error e) {
             return true;
         }
@@ -152,9 +148,29 @@ namespace ThiefMD.Controllers.UI {
         // Load previous added themes
         debug ("Loading themes");
         try {
+            // Clean outdated themes
+            var one_week_ago = new DateTime.now_utc ().add_days (-7);
+            Dir scheme_dir = Dir.open (UserData.scheme_path, 0);
+            string? file_name = null;
+            while ((file_name = scheme_dir.read_name()) != null) {
+                if (!file_name.has_prefix(".")) {
+                    if (file_name.down ().has_suffix (".xml")) {
+                        string scheme_path = Path.build_filename (UserData.scheme_path, file_name);
+                        File scheme_file = File.new_for_path (scheme_path);
+                        FileInfo last_modified = scheme_file.query_info (FileAttribute.TIME_MODIFIED, FileQueryInfoFlags.NONE);
+                        var scheme_modified_time = last_modified.get_modification_date_time ();
+                        // If the time is less than one week ago, it's older than
+                        // one week ago and should be safe to delete.
+                        if (scheme_modified_time.compare (one_week_ago) < 0) {
+                            scheme_file.delete ();
+                        }
+                    }
+                }
+            }
+
             // Load schemes
             Dir theme_dir = Dir.open (UserData.style_path, 0);
-            string? file_name = null;
+            file_name = null;
             while ((file_name = theme_dir.read_name()) != null) {
                 if (!file_name.has_prefix(".")) {
                     if (file_name.down ().has_suffix ("ultheme")) {
@@ -194,26 +210,6 @@ namespace ThiefMD.Controllers.UI {
                         }
 
                         add_user_theme (theme);
-                    }
-                }
-            }
-
-            // Clean outdated themes
-            var one_week_ago = new DateTime.now_utc ().add_days (-7);
-            Dir scheme_dir = Dir.open (UserData.scheme_path, 0);
-            file_name = null;
-            while ((file_name = scheme_dir.read_name()) != null) {
-                if (!file_name.has_prefix(".")) {
-                    if (file_name.down ().has_suffix (".xml")) {
-                        string scheme_path = Path.build_filename (UserData.scheme_path, file_name);
-                        File scheme_file = File.new_for_path (scheme_path);
-                        FileInfo last_modified = scheme_file.query_info (FileAttribute.TIME_MODIFIED, FileQueryInfoFlags.NONE);
-                        var scheme_modified_time = last_modified.get_modification_date_time ();
-                        // If the time is less than one week ago, it's older than
-                        // one week ago and should be safe to delete.
-                        if (scheme_modified_time.compare (one_week_ago) < 0) {
-                            scheme_file.delete ();
-                        }
                     }
                 }
             }
