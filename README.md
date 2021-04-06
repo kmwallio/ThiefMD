@@ -119,6 +119,7 @@ libgee-0.8-dev
 libgtksourceview-4-dev
 libsecret-1-dev
 libhandy-1-dev
+liblink-grammar-dev
 ```
 
 ### Fedora
