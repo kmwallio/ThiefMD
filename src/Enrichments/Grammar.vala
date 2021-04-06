@@ -561,11 +561,7 @@ namespace ThiefMD.Enrichments {
         private Dictionary dictionary;
         private string language;
 
-        // Mutex for multiple threads...
-        private Mutex cache_mutex;
-
         public GrammarThinking (int cache_items = Constants.GRAMMAR_SENTENCE_CACHE_SIZE, int timeout_millseconds = Constants.GRAMMAR_SENTENCE_CHECK_TIMEOUT) {
-            cache_mutex = Mutex ();
             options = new ParseOptions ();
             options.set_max_null_count (150);
             options.set_verbosity (0);
@@ -588,7 +584,6 @@ namespace ThiefMD.Enrichments {
         //
         public void check_language_settings () {
             var settings = AppSettings.get_default ();
-            // @TODO could check file path and if this changes sometime
             if (settings.spellcheck_language.length >= 2) {
                 language = settings.spellcheck_language.substring (0, 2);
                 dictionary = new Dictionary (language);
@@ -643,10 +638,8 @@ namespace ThiefMD.Enrichments {
         // Check grammar in a sentence
         public bool sentence_check_ex (string sentence, out string suggestion, Gee.List<string>? problem_words = null) {
             suggestion = "";
-            cache_mutex.lock ();
 
             if (language == "" || dictionary == null) {
-                cache_mutex.unlock ();
                 return true;
             }
 
@@ -657,9 +650,9 @@ namespace ThiefMD.Enrichments {
                 sentence.contains ("<") || sentence.contains (">") || sentence.has_prefix ("!") ||
                 sentence.replace ("-", "").chug ().chomp () == "" || sentence.replace ("*", "").chug ().chomp () == "")
             {
-                cache_mutex.unlock ();
                 return true;
             }
+
             var sent = new Sentence (check_sentence, dictionary);
             sent.split (options);
             var num_linkages = sent.parse (options);
@@ -677,7 +670,6 @@ namespace ThiefMD.Enrichments {
                 parse_suggestion (raw_suggestion, out suggestion, problem_words);
             }
 
-            cache_mutex.unlock ();
             return error_free;
         }
     }
