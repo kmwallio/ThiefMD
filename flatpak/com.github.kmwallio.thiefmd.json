@@ -25,7 +25,8 @@
         "/share/man",
         "/share/vala",
         "/bin/vapi*",
-        "*.la"
+        "*.la",
+        "*grammar.a"
     ],
     "modules": [{
             "name": "gtksourceview",
@@ -100,8 +101,10 @@
         },
         {
             "name" : "link-grammar",
-            "cleanup": [
-                "*grammar.a"
+            "buildsystem": "simple",
+            "build-commands": [
+                "./configure --prefix=/app --disable-python-bindings --disable-java-bindings ",
+                "make install"
             ],
             "sources" : [
                 {
