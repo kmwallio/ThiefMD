@@ -140,6 +140,7 @@ libxml2-devel
 libgee-devel
 libsecret-devel
 libhandy1-devel
+link-grammar-devel
 ```
 
 ## Building
