@@ -576,10 +576,10 @@ namespace ThiefMD.Enrichments {
 
         public static bool language_supported (string lang) {
             string check = lang;
-            if (lang.length > 2) {
+            if (lang.length >= 2) {
                 check = lang.substring (0, 2);
             }
-            var check_dict = new Dictionary (lang);
+            var check_dict = new Dictionary (check);
             return check_dict != null;
         }
 

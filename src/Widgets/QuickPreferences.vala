@@ -143,7 +143,7 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.add (_spellcheck_button);
-            if (Environment.find_program_in_path ("link-parser") != null) {
+            if (GrammarThinking.language_supported (settings.spellcheck_language)) {
                 menu_grid.add (_grammar_button);
             }
             menu_grid.add (_writegood_button);
@@ -167,7 +167,7 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             menu_grid.remove (_typewriter_button);
             menu_grid.remove (_spellcheck_button);
-            if (Environment.find_program_in_path ("link-parser") != null) {
+            if (GrammarThinking.language_supported (settings.spellcheck_language)) {
                 menu_grid.remove (_grammar_button);
             }
             menu_grid.remove (_writegood_button);
@@ -227,7 +227,7 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.add (_spellcheck_button);
-            if (Environment.find_program_in_path ("link-parser") != null) {
+            if (GrammarThinking.language_supported (settings.spellcheck_language)) {
                 menu_grid.add (_grammar_button);
             }
             menu_grid.add (_writegood_button);
@@ -246,7 +246,7 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             menu_grid.remove (_typewriter_button);
             menu_grid.remove (_spellcheck_button);
-            if (Environment.find_program_in_path ("link-parser") != null) {
+            if (GrammarThinking.language_supported (settings.spellcheck_language)) {
                 menu_grid.remove (_grammar_button);
             }
             menu_grid.remove (_writegood_button);
@@ -306,7 +306,7 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.add (_spellcheck_button);
-            if (Environment.find_program_in_path ("link-parser") != null) {
+            if (GrammarThinking.language_supported (settings.spellcheck_language)) {
                 menu_grid.add (_grammar_button);
             }
             menu_grid.add (_writegood_button);
@@ -323,6 +323,7 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             _typewriter_button.set_active (settings.typewriter_scrolling);
             _spellcheck_button.set_active (settings.spellcheck);
+            _grammar_button.set_active (settings.grammar);
             _writegood_button.set_active (settings.writegood);
 
             if (_instance.show_touch_friendly && !am_mobile) {
