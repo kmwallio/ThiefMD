@@ -326,7 +326,7 @@ namespace ThiefMD.Enrichments {
                     // Grab the sentence and prep for problem word tagging
                     string sentence = buffer.get_text (check_start, check_end, false).chug ().chomp ();
                     // Only run on full sentences
-                    if (sentence != "") {
+                    if (sentence != "" && sentence.index_of_char (' ') != -1) {
                         // Lines around cursor should hopefully stick around in cache allowing for
                         // real time update without flicker.
                         /*string suggestion;
