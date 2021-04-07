@@ -155,6 +155,28 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
+                // Shrink font
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
+                    if (match_keycode (Gdk.Key.minus, keycode)) {
+                        int next_font_size = settings.font_size - 2;
+                        if (next_font_size >= 6) {
+                            settings.font_size = next_font_size;
+                            UI.load_font ();
+                        }
+                    }
+                }
+
+                // Enlarge font
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && is_main) {
+                    if (match_keycode (Gdk.Key.plus, keycode)) {
+                        int next_font_size = settings.font_size + 2;
+                        if (next_font_size <= 512) {
+                            settings.font_size = next_font_size;
+                            UI.load_font ();
+                        }
+                    }
+                }
+
                 // Save
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                     if (match_keycode (Gdk.Key.s, keycode)) {
