@@ -397,7 +397,7 @@ namespace ThiefMD.Controllers.FileManager {
 
         Regex headers = null;
         try {
-            headers = new Regex ("^\\s*(.+)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            headers = new Regex ("^\\s*(.+?)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
         } catch (Error e) {
             warning ("Could not compile regex: %s", e.message);
         }
@@ -499,7 +499,7 @@ namespace ThiefMD.Controllers.FileManager {
         string buffer = markdown;
         Regex headers = null;
         try {
-            headers = new Regex ("^\\s*(.+)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            headers = new Regex ("^\\s*(.+?)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
         } catch (Error e) {
             warning ("Could not compile regex: %s", e.message);
         }
@@ -620,7 +620,7 @@ namespace ThiefMD.Controllers.FileManager {
 
         try {
             var file = File.new_for_path (file_path);
-            Regex headers = new Regex ("^\\s*(.+)\\s*:\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex headers = new Regex ("^\\s*(.+?)\\s*:\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             MatchInfo matches;
 
             if (file.query_exists ()) {
