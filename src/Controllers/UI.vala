@@ -670,9 +670,4 @@ namespace ThiefMD.Controllers.UI {
         ThiefApp instance = ThiefApp.get_instance ();
         instance.library_pane.hide ();
     }
-
-    // @TODO: Until we fix logic for all references
-    public bool moving () {
-        return false;
-    }
 }

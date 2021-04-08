@@ -986,9 +986,7 @@ namespace ThiefMD.Widgets {
         bool header_redraw_scheduled = false;
         private void update_heading_margins () {
             bool try_later = false;
-            if (UI.moving ()) {
-                try_later = true;
-            } else if (!dynamic_margin_update.can_do_action ()) {
+            if (!dynamic_margin_update.can_do_action ()) {
                 try_later = true;
             }
 
@@ -1225,7 +1223,7 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             var cursor = buffer.get_insert ();
 
-            if (should_scroll && !UI.moving ()) {
+            if (should_scroll) {
                 this.scroll_to_mark(cursor, 0.0, true, 0.0, Constants.TYPEWRITER_POSITION);
                 should_scroll = false;
             }
@@ -1422,10 +1420,12 @@ namespace ThiefMD.Widgets {
             if (fountain != null) {
                 fountain.detach ();
                 fountain = null;
+                fountain.dispose ();
             }
             if (markdown != null) {
                 markdown.detach ();
                 markdown = null;
+                markdown.dispose ();
             }
             writegood.detach ();
             grammar.detach ();
@@ -1434,6 +1434,7 @@ namespace ThiefMD.Widgets {
             buffer.text = "";
             spell.dispose ();
             buffer.dispose ();
+            writegood.dispose ();
             file = null;
         }
     }

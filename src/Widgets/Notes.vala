@@ -29,7 +29,7 @@ namespace ThiefMD.Widgets {
         private Gtk.TextBuffer file_notes_buffer;
         private Gtk.TextBuffer project_notes_buffer;
 
-        public class Notes () {
+        public Notes () {
             this.orientation = Gtk.Orientation.VERTICAL;
             build_ui ();
         }

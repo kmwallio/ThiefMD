@@ -29,7 +29,7 @@ namespace ThiefMD.Widgets {
         private Gtk.Label word_label;
         private Gtk.Label reading_time;
 
-        public class ProjectStatitics (string path) {
+        public ProjectStatitics (string path) {
             monitor_path = path;
             build_ui ();
         }

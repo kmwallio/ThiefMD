@@ -27,14 +27,14 @@ using ThiefMD.Controllers;
 using ThiefMD.Exporters;
 
 namespace ThiefMD.Connections {
-    public class ConnectionData {
+    public class ConnectionData : Object {
         public string connection_type { get; set; }
         public string user { get; set; }
         public string auth { get; set; }
         public string endpoint { get; set; }
     }
 
-    public abstract class ConnectionBase {
+    public abstract class ConnectionBase : Object {
         // Name to show in Export Window Drop Down
         public abstract string export_name { get; protected set; }
 

@@ -40,7 +40,7 @@ namespace ThiefMD.Controllers {
         }
     }
 
-    public class SecretSchemas {
+    public class SecretSchemas : Object {
         private static SecretSchemas instance = null;
         public Secret.Schema thief_secret;
         private SecretAttributes stored_secrets;

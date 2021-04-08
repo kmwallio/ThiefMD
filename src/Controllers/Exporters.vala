@@ -26,7 +26,7 @@ using ThiefMD.Widgets;
 using ThiefMD.Exporters;
 
 namespace ThiefMD.Controllers {
-    public class Exporters {
+    public class Exporters : Object {
         public Gee.Map<string, ExportBase> exporters;
 
         public Exporters () {

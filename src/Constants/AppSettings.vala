@@ -26,7 +26,7 @@ namespace ThiefMD {
         WORD,
     }
 
-    public class Constants {
+    public class Constants : Object {
         public const string COLLECTION_THIEFMD = Secret.COLLECTION_DEFAULT;
         // Default exporter
         public const string DEFAULT_EXPORTER = "ePUB";

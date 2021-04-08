@@ -23,7 +23,7 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class KeyBindings { 
+    public class KeyBindings : Object { 
         private bool is_fullscreen = false;
         public KeyBindings (Gtk.Window window, bool is_main = true) {
             window.key_press_event.connect ((e) => {

@@ -22,11 +22,8 @@ using ThiefMD.Widgets;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Enrichments {
-    public class BibTexCompletionProvider : Gtk.SourceCompletionProvider, GLib.Object {
-        public Gee.HashSet<string> characters;
-
-        public class BibTexCompletionProvider () {
-            characters = new Gee.HashSet<string> ();
+    public class BibTexCompletionProvider : Gtk.SourceCompletionProvider, Object {
+        public BibTexCompletionProvider () {
         }
 
         public override string get_name () {
@@ -114,11 +111,11 @@ namespace ThiefMD.Enrichments {
         }
     }
 
-    public class MarkdownEnrichment {
+    public class MarkdownEnrichment : Object {
         private BibTexCompletionProvider citation_suggester = null;
         private Gtk.SourceCompletionWords source_completion;
-        private Gtk.SourceView view;
-        private Gtk.TextBuffer buffer;
+        private unowned Gtk.SourceView view;
+        private unowned Gtk.TextBuffer buffer;
         private Mutex checking;
         private bool markup_inserted_around_selection;
         private bool cursor_at_interesting_location = false;
@@ -958,6 +955,7 @@ namespace ThiefMD.Enrichments {
                 font_layout.set_text (str, str.length);
                 Pango.Rectangle ink, logical;
                 font_layout.get_pixel_extents (out ink, out logical);
+                font_layout.dispose ();
                 debug ("# Ink: %d, Logical: %d", ink.width, logical.width);
                 return int.max (ink.width, logical.width);
             }
@@ -985,6 +983,7 @@ namespace ThiefMD.Enrichments {
                 hashtag_w = int.max (ink.width, logical.width);
                 font_layout.set_text (" ", 1);
                 font_layout.get_pixel_extents (out ink, out logical);
+                font_layout.dispose ();
                 debug ("  Ink: %d, Logical: %d", ink.width, logical.width);
                 space_w = int.max (ink.width, logical.width);
                 if (space_w + hashtag_w <= 0) {

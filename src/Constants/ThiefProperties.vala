@@ -18,7 +18,7 @@
  */
 
 namespace ThiefMD {
-    public class ThiefProperties {
+    public class ThiefProperties : Object {
         public const string NAME = "ThiefMD";
         public const string URL = "https://thiefmd.com";
         public const string COPYRIGHT = "Copyright © 2020 kmwallio";

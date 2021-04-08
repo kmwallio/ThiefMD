@@ -785,7 +785,7 @@ namespace ThiefMD.Controllers.FileManager {
         return file_created;
     }
 
-    public class FileLock {
+    public class FileLock : Object {
         public FileLock () {
             FileManager.acquire_lock ();
         }

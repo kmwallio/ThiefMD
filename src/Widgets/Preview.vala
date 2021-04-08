@@ -316,10 +316,12 @@ namespace ThiefMD.Widgets {
             }
 
             bool render_citations = false;
-            BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
-            bib_parser.parse_file ();
-            foreach (var label in bib_parser.get_labels ()) {
-                render_citations = render_citations || processed_mk.contains ("@" + label);
+            if (bib_file != "") {
+                BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
+                bib_parser.parse_file ();
+                foreach (var label in bib_parser.get_labels ()) {
+                    render_citations = render_citations || processed_mk.contains ("@" + label);
+                }
             }
 
             if (need_pandoc || render_citations) {

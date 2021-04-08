@@ -22,7 +22,7 @@ using ThiefMD.Widgets;
 
 namespace ThiefMD.Controllers.SheetManager {
     private SheetPair? _currentSheet;
-    private weak Sheets? _current_sheets;
+    private unowned Sheets? _current_sheets;
     private Gee.LinkedList<Widgets.Editor> _editor_pool;
     private Gee.LinkedList<SheetPair> _editors;
     private Gee.LinkedList<SheetPair> _active_editors;
@@ -627,8 +627,8 @@ namespace ThiefMD.Controllers.SheetManager {
         }
     }
 
-    private class SheetPair {
-        public weak Sheet sheet;
+    private class SheetPair : Object {
+        public unowned Sheet sheet;
         public Widgets.Editor editor;
     }
 }

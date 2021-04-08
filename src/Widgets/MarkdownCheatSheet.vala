@@ -24,7 +24,7 @@ namespace ThiefMD.Widgets {
     public class MarkdownCheatSheet : Hdy.Window {
         Hdy.HeaderBar headerbar;
 
-        public class MarkdownCheatSheet () {
+        public MarkdownCheatSheet () {
             build_ui ();
         }
 
