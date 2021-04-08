@@ -23,7 +23,7 @@ using ThiefMD.Widgets;
 using LinkGrammar;
 
 namespace ThiefMD.Enrichments {
-    public class GrammarUpdateRequest {
+    public class GrammarUpdateRequest : Object {
         public string text;
         public Gee.List<string> words;
 
@@ -36,10 +36,10 @@ namespace ThiefMD.Enrichments {
         }
     }
 
-    public class GrammarChecker {
+    public class GrammarChecker : Object {
         // TextView to attach to and buffer of view
-        private Gtk.TextView view;
-        private Gtk.TextBuffer buffer;
+        private unowned Gtk.TextView view;
+        private unowned Gtk.TextBuffer buffer;
 
         // Mutex to prevent multiple scans at same time
         private Mutex checking;
@@ -50,7 +50,8 @@ namespace ThiefMD.Enrichments {
         // Class for scanning setences for grammar,
         // we do this to have watchdog thread to kill
         // link-parser if taking too long
-        private GrammarThinking checker;
+        private static GrammarThinking? checker;
+        private static Mutex checker_init = Mutex ();
 
         // Tags to style grammar errors
         public Gtk.TextTag grammar_line;
@@ -75,7 +76,7 @@ namespace ThiefMD.Enrichments {
             grammar_line = null;
             grammar_word = null;
             last_cursor = -1;
-            checker = new GrammarThinking ();
+            checker = null;
             processor_check = Mutex ();
             processor_running = false;
             grammar_processor = null;
@@ -109,6 +110,14 @@ namespace ThiefMD.Enrichments {
 
             if (!checking.trylock ()) {
                 return;
+            }
+
+            if (checker == null) {
+                checker_init.lock ();
+                if (checker == null) {
+                    checker = new GrammarThinking ();
+                }
+                checker_init.unlock ();
             }
 
             // Remove any previous tags
@@ -327,22 +336,10 @@ namespace ThiefMD.Enrichments {
                     string sentence = buffer.get_text (check_start, check_end, false).chug ().chomp ();
                     // Only run on full sentences
                     if (sentence != "" && sentence.index_of_char (' ') != -1) {
-                        // Lines around cursor should hopefully stick around in cache allowing for
-                        // real time update without flicker.
-                        /*string suggestion;
-                        Gee.List<string> problem_words = new Gee.LinkedList<string> ();
-                        if (checker.cache_check (sentence, out suggestion, problem_words)) {
-                            // Separate if statement because we want to enter this, but not tag
-                            // if the sentence is valid.
-                            if (suggestion != "") {
-                                tag_sentence (check_start, check_end, problem_words);
-                            }
-                        } else */{
-                            GrammarUpdateRequest request = new GrammarUpdateRequest () {
-                                text = sentence
-                            };
-                            send_to_processor.add (request);
-                        }
+                        GrammarUpdateRequest request = new GrammarUpdateRequest () {
+                            text = sentence
+                        };
+                        send_to_processor.add (request);
                     }
                 }
 
