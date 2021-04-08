@@ -485,6 +485,14 @@ namespace ThiefMD.Enrichments {
             grammar_word.foreground_rgba = Gdk.RGBA () { red = 0.9, green = 0.9, blue = 0.9, alpha = 1.0 };
             grammar_word.background_set = true;
             grammar_word.foreground_set = true;
+
+            if (checker == null) {
+                checker_init.lock ();
+                if (checker == null) {
+                    checker = new GrammarThinking ();
+                }
+                checker_init.unlock ();
+            }
             checker.check_language_settings ();
 
             view.set_has_tooltip (true);

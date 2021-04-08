@@ -1420,12 +1420,10 @@ namespace ThiefMD.Widgets {
             if (fountain != null) {
                 fountain.detach ();
                 fountain = null;
-                fountain.dispose ();
             }
             if (markdown != null) {
                 markdown.detach ();
                 markdown = null;
-                markdown.dispose ();
             }
             writegood.detach ();
             grammar.detach ();
@@ -1434,7 +1432,6 @@ namespace ThiefMD.Widgets {
             buffer.text = "";
             spell.dispose ();
             buffer.dispose ();
-            writegood.dispose ();
             file = null;
         }
     }
