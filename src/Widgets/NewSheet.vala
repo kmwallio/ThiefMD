@@ -29,7 +29,12 @@ namespace ThiefMD.Widgets {
 
         public NewSheet () {
             _file_name = new Gtk.Entry ();
-            _file_name.set_placeholder_text (_("Sheet name"));
+            Sheets? check = SheetManager.get_sheets ();
+            string suggested_extension = ".md";
+            if (check != null) {
+                suggested_extension = check.guess_extension ();
+            }
+            _file_name.set_placeholder_text (_("Sheet name") + suggested_extension);
             _file_name.activate.connect (new_file);
 
             _create = new Gtk.Button.with_label (_("Create"));

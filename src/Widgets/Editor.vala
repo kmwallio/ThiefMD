@@ -862,6 +862,10 @@ namespace ThiefMD.Widgets {
                     res = true;
                     buffer.set_language (UI.get_source_language (opened_filename));
                     if (is_fountain (filename)) {
+                        if (text.contains ("\r\n")) {
+                            text.replace ("\r\n", "\n");
+                            set_text (text, true);
+                        }
                         fountain = new FountainEnrichment ();
                         fountain.attach (this);
                     }
