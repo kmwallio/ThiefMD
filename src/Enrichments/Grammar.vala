@@ -217,6 +217,7 @@ namespace ThiefMD.Enrichments {
 
                 processor_running = true;
                 grammar_processor = new Thread<void> ("grammar-processor", process_grammar);
+                GLib.Idle.add (update_buffer);
             }
             processor_check.unlock ();
         }
@@ -257,7 +258,7 @@ namespace ThiefMD.Enrichments {
                 }
             }
 
-            return true;
+            return processor_running;
         }
 
         private void process_grammar () {
