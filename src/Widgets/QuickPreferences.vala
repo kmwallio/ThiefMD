@@ -59,7 +59,7 @@ namespace ThiefMD.Widgets {
             });
 
             _writegood_button = new Gtk.ToggleButton.with_label ((_("Write Good")));
-            _writegood_button.set_image (new Gtk.Image.from_icon_name ("edit-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
+            _writegood_button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/thiefmd-symbolic.svg"));
             _writegood_button.set_always_show_image (true);
             _writegood_button.tooltip_text = _("Toggle Write Good");
             _writegood_button.set_active (settings.writegood);
