@@ -363,6 +363,10 @@ namespace ThiefMD.Enrichments {
         // who didn't code this will totally understand how to interpret it...
         //
         public bool handle_tooltip (int x, int y, bool keyboard_tooltip, Gtk.Tooltip tooltip) {
+            if (buffer == null) {
+                return false;
+            }
+
             Gtk.TextIter? iter;
 
             // Determine if user requested a tooltip via mouse or keyboard
