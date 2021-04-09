@@ -422,7 +422,7 @@ namespace ThiefMD.Controllers.Pandoc {
                 {
                     result.append ("(");
                     var url = match_info.fetch (1);
-                    result.append (find_file (url, path));
+                    result.append (find_file (url, path).replace ("(", "\\(").replace (")", "\\)"));
                     result.append (")");
                     return false;
                 },
