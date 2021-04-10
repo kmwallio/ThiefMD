@@ -2,19 +2,11 @@
 layout: page
 title: Details
 ---
-
-[Prefer a list](/deets/list)?
-
-## Keyboard Shortcuts
-
-[Learn all our keyboard shortcuts](/shortcuts)
-
-Some of our favorites:
-
-* `Ctrl + ,` Access preferences window
-* `F11` Toggle Full Screen
-* `Ctrl + 1` Editor Only
-* `Ctrl + 3` Editor, Folder, and Library View
+<div class="jumbotron">
+  <h1>ThiefMD isn't your average text editor</h1>
+  <p><a href="https://blog.thiefmd.com/introducing-fountain-support/">Fountain Support</a>, <a href="/tips/blogging-with-ghost/">Blog Publishing</a>, and so much more. It's too much for one page.</p>
+  <p><a class="btn btn-primary btn-lg" href="/deets/list" role="button">Check out a List of Features</a> <a class="btn btn-primary btn-lg" href="/shortcuts" role="button">Learn our Keyboard Shortcuts</a></p>
+</div>
 
 ## Live Preview
 
@@ -65,13 +57,29 @@ Toggle it on, or toggle it off. They're <span style="background: #20528c; color:
 
 <div class="clear"></div>
 
+## Grammar Check and Notes
+
+<div class="responsive-left marcel"><img src="/images/grammar-notes.png" alt="ThiefMD highlighting potential grammar issues with notes pane open" /></div>
+
+Not all of us are whoever the Picaso of the writing world would be, but with Write-Good + Grammar Check, your writing can look like a Picaso! None of us here have an English Degree, but ThiefMD will attempt to highlight what's potentially wrong.
+
+Our grammar checker uses the revolutionary [Link Grammar Parser](https://www.abisource.com/projects/link-grammar/), the same grammar checking in [AbiWord](http://www.abisource.com/), so you know it's good.
+
+With Link Grammar, you'll be saying "*[Hyah!](https://www.youtube.com/watch?v=q7IfOwcaxwc)*" to bad Grammar in no time[^fn-link-joke].
+
+[^fn-link-joke]: *Link* Grammar... Grammar check is always green... get it...? I don't know why they let me update the site. These are the jokes kid 😼.
+
+**Noted.** ThiefMD also lets you take notes for the file you working on, or for the project you are in. Notes aren't part of you work but are great for keeping track on it.
+
+<div class="clear"></div>
+
 ## Typewriter Scrolling
 
 ![ThiefMD's typewriter scrolling feature](/images/typewriter_scrolling.gif)
 
 Stay centered and stay focused. Type writer scrolling keeps your active line fixed, both in the editor and the preview.
 
-No longer look for where you're typing keep your eye muscles on what matters most.
+No longer look for where you're typing, keep your eye muscles on what matters most.
 
 ## Focus Mode
 

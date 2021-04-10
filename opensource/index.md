@@ -14,6 +14,7 @@ We're making ThiefMD components reusable. You can find the components in at [Git
 - [BibTeX-vala](#BibTeX-vala)
 - [Theme Generator](#theme-generator)
 - [ultheme-vala](#ultheme-vala)
+- [Stolen Victory Duo](#stolen-victory-duo)
 - [ThiefMD](https://github.com/kmwallio/ThiefMD)
 
 ## libwritegood
@@ -111,3 +112,23 @@ public static int main (string[] args) {
     return 0;
 }
 ```
+
+## Stolen Victory Duo
+
+[Stolen Victory Duo](https://github.com/ThiefMD/StolenVictoryDuo) is a mashup of [iA Writer Duospace](https://github.com/iaolo/iA-Fonts/tree/master/iA%20Writer%20Duospace) with [Victor Mono](https://rubjo.github.io/victor-mono/). It aims to be digitally authentic with human approachability.
+
+You can try it here:
+
+<textarea id="stolen-text" class="duo">
+# Stolen Victory Duo
+Is a mash up of **iA Writer Duospace** and *Victor Mono* with adjustments to have more curvature and wider spacing for certain characters.
+
+The quick brown fox jumped over the lazy dog.
+*The quick brown fox jumped over the lazy dog.*
+THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.
+*THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.*
+</textarea>
+
+<script>
+    var simplemde = new SimpleMDE({ element: $("#stolen-text")[0] });
+</script>

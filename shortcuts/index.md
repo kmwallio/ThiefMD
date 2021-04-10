@@ -6,6 +6,8 @@ title: Shortcuts
 # Changing the UI
 
 * `Ctrl + ,` - Access Preferences Window
+* `Ctrl + +` - Enlarge Editor Font
+* `Ctrl + -` - Shrink Editor Font
 * `Ctrl + Shift + H` - Toggle hiding the Toolbar
 * `Ctrl + Shift + R` - Toggle Focus Mode
 * `Ctrl + Shift + T` - Toggle Typewriter Scrolling

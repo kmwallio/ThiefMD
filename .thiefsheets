@@ -1,0 +1,35 @@
+{
+  "sheet-order" : [
+    "lang-check.md",
+    "Preview.md",
+    "index.md"
+  ],
+  "hidden-folders" : [
+    "_includes",
+    "_site",
+    "images"
+  ],
+  "folder-order" : [
+    "deets",
+    "_deets",
+    "_includes",
+    "opensource",
+    "_layouts",
+    "_drafts",
+    "_posts",
+    "about",
+    "_site",
+    "help",
+    "sponsors",
+    "_help",
+    "images",
+    "tips",
+    "css",
+    "_tips",
+    "download",
+    "shortcuts",
+    "changeblog"
+  ],
+  "notes" : "",
+  "icon" : ""
+}
