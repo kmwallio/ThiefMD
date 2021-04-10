@@ -60,15 +60,12 @@ if libmarkdown.found() == false
 endif
 
 # Find linkgrammar
-linkgrammar = dependency('liblink-grammar', version: '>= 5.8.0', required: false)
+cc = meson.get_compiler('c')
+linkgrammar = cc.find_library('liblink-grammar', required: false)
+# and it just keeps going
 if linkgrammar.found() == false
     cc = meson.get_compiler('c')
-    linkgrammar = cc.find_library('liblink-grammar', required: false)
-    # and it just keeps going
-    if linkgrammar.found() == false
-        cc = meson.get_compiler('c')
-        linkgrammar = cc.find_library('link-grammar', required: true)
-    endif
+    linkgrammar = cc.find_library('link-grammar', required: true)
 endif
 
 # Let's define our executable
