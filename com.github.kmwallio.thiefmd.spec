@@ -313,12 +313,15 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 "/usr/share/fonts/truetype/thiefmd/Courier Prime-BoldItalic.ttf"
 "/usr/share/fonts/truetype/thiefmd/Courier Prime-Italic.ttf"
 "/usr/share/fonts/truetype/thiefmd/Courier Prime-Regular.ttf"
+"/usr/share/fonts/truetype/thiefmd/Stolen Victory Sans-Italic.ttf"
+"/usr/share/fonts/truetype/thiefmd/Stolen Victory Sans-Regular.ttf"
 "/usr/share/fonts/truetype/thiefmd/Stolen Victory Duo-Italic.ttf"
 "/usr/share/fonts/truetype/thiefmd/Stolen Victory Duo-Regular.ttf"
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-Bold.ttf
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-BoldItalic.ttf
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-Italic.ttf
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/README.md
+/usr/share/locale/cs/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
 /usr/share/locale/en_GB/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
 /usr/share/locale/es/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
 /usr/share/locale/fr/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
