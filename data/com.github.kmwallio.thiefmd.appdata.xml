@@ -47,19 +47,39 @@
       <image>https://thiefmd.com/images/thief_window.png</image>
     </screenshot>
     <screenshot>
-      <caption>ThiefMD, a Markdown Editor, rendering a live preview of markdown being modified</caption>
-      <image>https://thiefmd.com/images/preview.png</image>
+      <caption>ThiefMD, a Markdown Editor, showing Fountain Screenplay support</caption>
+      <image>https://thiefmd.com/images/thiefmd-screenplay.png</image>
     </screenshot>
     <screenshot>
-      <caption>ThiefMD, a Markdown Editor, showing Theme selection preferences to change the user interface</caption>
-      <image>https://thiefmd.com/images/theme_preferences.png</image>
+      <caption>ThiefMD, a Markdown Editor, rendering a live preview of markdown being modified</caption>
+      <image>https://thiefmd.com/images/preview.png</image>
     </screenshot>
     <screenshot>
       <caption>ThiefMD, a Markdown Editor, showing Write-Good suggestions finding passive voice</caption>
       <image>https://thiefmd.com/images/write-good.png</image>
     </screenshot>
+    <screenshot>
+      <caption>ThiefMD, a Markdown Editor, showing Grammar Errors and Project Notes</caption>
+      <image>https://thiefmd.com/images/grammar-notes.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>ThiefMD, a Markdown Editor, showing Theme selection preferences to change the user interface</caption>
+      <image>https://thiefmd.com/images/theme_preferences.png</image>
+    </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.3" date="2021-04-10" urgency="low">
+      <description>
+        <p>Check, 1, 2. Check 1, 2. Does this look right to you?</p>
+        <p>Spell-Check, Check. Write-Good Check, Check. Grammar Check... Check! ThiefMD offers Spell Check, Write-Good Style Check, and now Grammar Check!</p>
+        <ul>
+          <li>Link-Grammar Checking</li>
+          <li>Improved List and Header Formatting (List item spanning more than one line now lines up with the bullet)</li>
+          <li>Bug fixes</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.3-draftcheck</url>
+    </release>
     <release version="0.2.2" date="2021-03-27" urgency="low">
       <description>
         <p>This one's for the creators, the note takers, and the plain-text savers. Notes support, screen play support, citation insertion, and more.</p>

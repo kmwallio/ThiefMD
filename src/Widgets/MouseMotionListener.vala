@@ -26,7 +26,7 @@ using Gdk;
 using Gtk;
 
 namespace ThiefMD.Widgets {
-    public class MouseMotionListener {
+    public class MouseMotionListener : Object {
         private ThiefApp instance;
         public MouseMotionListener (ThiefApp thiefapp) {
             instance = thiefapp;

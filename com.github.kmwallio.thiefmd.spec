@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.2.2
+Version: 0.2.3
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
@@ -313,10 +313,15 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 "/usr/share/fonts/truetype/thiefmd/Courier Prime-BoldItalic.ttf"
 "/usr/share/fonts/truetype/thiefmd/Courier Prime-Italic.ttf"
 "/usr/share/fonts/truetype/thiefmd/Courier Prime-Regular.ttf"
+"/usr/share/fonts/truetype/thiefmd/Stolen Victory Sans-Italic.ttf"
+"/usr/share/fonts/truetype/thiefmd/Stolen Victory Sans-Regular.ttf"
+"/usr/share/fonts/truetype/thiefmd/Stolen Victory Duo-Italic.ttf"
+"/usr/share/fonts/truetype/thiefmd/Stolen Victory Duo-Regular.ttf"
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-Bold.ttf
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-BoldItalic.ttf
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-Italic.ttf
 /usr/share/com.github.kmwallio.thiefmd/gtksourceview-4/language-specs/README.md
+/usr/share/locale/cs/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
 /usr/share/locale/en_GB/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
 /usr/share/locale/es/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
 /usr/share/locale/fr/LC_MESSAGES/com.github.kmwallio.thiefmd.mo
@@ -327,6 +332,10 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sat Apr 10 2021 kmwallio <mwallio@gmail.com> - 0.2.3
+- Add Link Grammar Checking
+- Improved List and Header Formatting
+- Fix bugs
 * Sun Mar 28 2021 kmwallio <mwallio@gmail.com> - 0.2.2
 - Fix image upload support when blogging
 - Add watchdog for pandoc preview

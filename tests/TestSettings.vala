@@ -17,6 +17,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+//////////////////////////////////////////////////////////////////////
+//
+//
+//
+//     THIS IS A SET OF MOCKS/STUBS SO TESTS CAN COMPILE AND RUN
+//
+//
+//
+//////////////////////////////////////////////////////////////////////
 using ThiefMD.Controllers;
 
 namespace ThiefMD {
@@ -30,7 +39,7 @@ namespace ThiefMD {
 
         public class Thinking {
             public delegate void ThinkingCallback ();
-            public Thinking (string set_title, ThinkingCallback callback) { }
+            public Thinking (string set_title, ThinkingCallback callback, Gee.List<string>? custom_messages = null) { }
 
             public void run () { }
         }
@@ -240,6 +249,10 @@ namespace ThiefMD {
 
         // Citation length limit
         public const int CITATION_TITLE_MAX_LEN = 30;
+
+        // Some Grammar settings
+        public const int GRAMMAR_SENTENCE_CACHE_SIZE = 50;
+        public const int GRAMMAR_SENTENCE_CHECK_TIMEOUT = 500;
 
         // Visual Settings
         public const double MINIMUM_CONTRAST_RATIO = 1.2;

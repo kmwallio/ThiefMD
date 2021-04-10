@@ -15,11 +15,13 @@
     "flatpak",
     "src",
     "meson",
-    "po"
+    "po",
+    "tests"
   ],
   "folder-order" : [
     "docs",
-    "po"
+    "po",
+    "tests"
   ],
   "notes" : "",
   "icon" : ""

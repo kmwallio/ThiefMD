@@ -18,14 +18,14 @@
  */
 
 namespace ThiefMD {
-    public class ThiefProperties {
+    public class ThiefProperties : Object {
         public const string NAME = "ThiefMD";
         public const string URL = "https://thiefmd.com";
         public const string COPYRIGHT = "Copyright © 2020 kmwallio";
         public const string TAGLINE = _("The Markdown editor worth stealing");
         public const string THIEF_MARK_CONST = "THIEFMDa63471e6ec1b4f35b7ca635f3ca39a85";
         public const string THIEF_MARK = "<span id='thiefmark'></span>";
-        public const string SUPPORTED_IMPORT_FILES = "*.docx;*.odt;*.html;*.tex;*.epub;*.textile;*.html;*.fb2;*.dbk;*.xml;*.opml;*.rst;";
+        public const string SUPPORTED_IMPORT_FILES = "*.docx;*.odt;*.html;*.tex;*.epub;*.textile;*.html;*.fb2;*.dbk;*.xml;*.opml;*.rst;*.md;*.markdown;*.fountain;*.fou;*.spmd";
         public const string VERSION = Build.VERSION;
         public const Gtk.License LICENSE_TYPE = Gtk.License.GPL_3_0;
 
@@ -74,10 +74,14 @@ namespace ThiefMD {
           if (instance == null) {
             giants = new Gee.LinkedList<string> ();
             giants.add ("<a href='https://github.com/kmwallio/ThiefMD/graphs/contributors'>" + _("Contributors who help make ThiefMD awesome") + "</a>\n");
+            giants.add (_("Czech Translation Contributors") + ":\n<a href='https://github.com/pervoj'>Vojtěch Perník</a>\n");
             giants.add (_("French Translation Contributors") + ":\n<a href='https://github.com/davidbosman'>David Bosman</a>\n");
             giants.add (_("Slovak Translation Contributors") + ":\n<a href='https://github.com/marek-lach'>Marek L'ach</a>\n");
             giants.add (_("Swedish Translation Contributors") + ":\n<a href='https://github.com/eson57'>Åke Engelbrektson</a>\n");
             giants.add (_("Original Code") + ":\n" + _("Based on <a href='https://github.com/lainsce/quilter'>Quilter</a>") + "\n" + _("Copyright") + " © 2017 Lains.\n<a href='https://github.com/lainsce/quilter/blob/master/LICENSE'>" + _("GNU General Public License v3.0") + "</a>" + "\n");
+            giants.add (_("Stolen Victory Font") + ":\nModified <a href='https://github.com/iaolo/iA-Fonts'>iA Writer Duospace</a>\n" + _("Copyright") + " © 2018 Information Architects Inc.\nwith Reserved Font Name \"iA Writer\"\n<a href='https://github.com/iaolo/iA-Fonts/blob/master/iA%20Writer%20Duospace/LICENSE.md'>" + _("SIL OPEN FONT LICENSE Version 1.1") + "</a>");
+            giants.add ("Modified <a href='https://rubjo.github.io/victor-mono/'>Victor Mono</a>\n" + _("Copyright") + " © 2019 Rune Bjørnerås\n<a href='https://github.com/rubjo/victor-mono/blob/master/LICENSE'>" + _("MIT License") + "</a>");
+            giants.add ("Modified <a href='https://github.com/IBM/plex'>IBM Plex Sans</a>\n" + _("Copyright") + " © 2017 IBM Corp.\nwith Reserved Font Name \"Plex\"\n<a href='https://github.com/IBM/plex/blob/master/LICENSE.txt'>" + _("SIL OPEN FONT LICENSE Version 1.1") + "</a>\n");
             giants.add (_("Font") + ":\n<a href='https://github.com/iaolo/iA-Fonts'>iA Writer Duospace</a>\n" + _("Copyright") + " © 2018 Information Architects Inc.\nwith Reserved Font Name \"iA Writer\"\n<a href='https://github.com/iaolo/iA-Fonts/blob/master/iA%20Writer%20Duospace/LICENSE.md'>" + _("SIL OPEN FONT LICENSE Version 1.1") + "</a>\n");
             giants.add (_("Font") + ":\n<a href='https://quoteunquoteapps.com/courierprime'>Courier Prime</a>\n" + _("Copyright") + " © 2013 Quote-Unquote Apps\n<a href='https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;id=OFL'>" + _("SIL OPEN FONT LICENSE Version 1.1") + "</a>\n");
             giants.add (_("Preview CSS") + ":\n<a href='https://github.com/markdowncss'>" + _("Mash up of Splendor and Modest") + "</a>\n" + _("Copyright") + " © 2014-2015 John Otander.\n<a href='https://github.com/markdowncss/splendor/blob/master/LICENSE'>" + _("The MIT License (MIT)") + "</a>\n");
@@ -87,8 +91,10 @@ namespace ThiefMD {
             giants.add (_("Math Rendering") + ":\n<a href='https://katex.org/'>KaTeX</a>\n" + _("Copyright") + " © 2013-2020 " + _("Khan Academy and other contributors.") + "\n<a href='https://github.com/KaTeX/KaTeX/blob/master/LICENSE'>" + _("MIT License") + "</a>\n");
             giants.add (_("XML Parsing") + ":\n<a href='http://xmlsoft.org/'>libxml2</a>\n" + _("Copyright") + " © 1998-2012 Daniel Veillard.\n<a href='https://gitlab.gnome.org/GNOME/libxml2/-/blob/master/Copyright'>" + _("MIT License") + "</a>\n");
             giants.add (_("Pandoc Export") + ":\n<a href='https://pandoc.org/'>Pandoc</a>\n" + _("Copyright") + " © 2006-2020 " + _("John MacFarlane and others") + "\n<a href='https://github.com/jgm/pandoc/blob/master/COPYRIGHT'>" + _("GNU General Public License v2.0") + "</a>\n");
+            giants.add (_("Grammar Check") + ":\n<a href='https://www.abisource.com/projects/link-grammar/'>Link Grammar Parser</a>\n" + _("Copyright") + " © 1998-2017 " + _("the AbiSource Community") + "\n<a href='https://github.com/opencog/link-grammar/blob/master/LICENSE'>" + _("GNU Lesser General Public License v2.1") + "</a>\n");
             giants.add (_("libwritegood-vala based on") + ":\n<a href='https://github.com/btford/write-good'>" + _("write-good: Naive linter for English prose") + "</a>\n" + _("Copyright") + " © 2014-2019 Brian Ford\n<a href='https://github.com/btford/write-good/blob/master/LICENSE'>" + _("The MIT License (MIT)") + "</a>\n");
 
+            // Needs to be kept in sync with PAPER_SIZES_GTK_NAME
             friendly_paper = new Gee.ArrayList<string>();
             friendly_paper.add (_("A3 (11.7 x 16.5 inches)"));
             friendly_paper.add (_("A4 (8 x 11 inches)"));
@@ -289,7 +295,8 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         public const string NO_CSS_CSS = """
         @media print {
           tr,
-          img {
+          img,
+          figure {
             page-break-inside: avoid;
             max-width: 100%;
           }
@@ -299,12 +306,13 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
           }
         }
 
-        img {
+        img,
+        figure {
           max-width: 100%;
         }
         """;
 
-        public const string PRINT_CSS = """@media print {
+        public const string PRINT_CSS = """
             *,
             *:before,
             *:after {
@@ -325,7 +333,7 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
 
             a[href^="#"]:after,
             a[href^="javascript:"]:after {
-              content: "";
+              content: " (" attr(href) ")";
             }
 
             pre,
@@ -359,9 +367,9 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             h3 {
               page-break-after: avoid;
             }
-          }
 
-          img {
+          img,
+          figure {
             max-width: 100%;
           }""";
     }

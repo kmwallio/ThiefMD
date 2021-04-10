@@ -26,7 +26,7 @@ using ThiefMD.Widgets;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Exporters {
-    public abstract class ExportBase {
+    public abstract class ExportBase : Object {
         // Name to show in Export Window Drop Down
         public abstract string export_name { get; protected set; }
 

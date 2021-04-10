@@ -35,6 +35,7 @@ namespace ThiefMD.Controllers.Pandoc {
 
         public bool run_pandoc_std_in_out_command (ref string[] command, ref string input, out string output) {
             bool res = false;
+            output = "";
             done = false;
             StringBuilder output_builder = new StringBuilder ();
             try {
@@ -145,35 +146,31 @@ namespace ThiefMD.Controllers.Pandoc {
         bool res = false;
         bool work_bib = citation_file != "" || needs_bibtex (markdown);
         if (mk_input != "") {
-            try {
-                string[] command = {
-                    "pandoc",
-                };
-                if (work_bib) {
-                    debug ("Activating citations %s", citation_file);
-                    command +=  has_citeproc () ? "--citeproc" : "--filter=pandoc-citeproc";
+            string[] command = {
+                "pandoc",
+            };
+            if (work_bib) {
+                debug ("Activating citations %s", citation_file);
+                command +=  has_citeproc () ? "--citeproc" : "--filter=pandoc-citeproc";
+            }
+            if (settings.preview_css != "") {
+                File css_file = null;
+                if (settings.preview_css == "modest-splendor") {
+                    css_file = File.new_for_path (Path.build_filename(Build.PKGDATADIR, "styles", "preview.css"));
+                } else if (settings.preview_css != "") {
+                    css_file = File.new_for_path (Path.build_filename(UserData.css_path, settings.preview_css,"preview.css"));
                 }
-                if (settings.preview_css != "") {
-                    File css_file = null;
-                    if (settings.preview_css == "modest-splendor") {
-                        css_file = File.new_for_path (Path.build_filename(Build.PKGDATADIR, "styles", "preview.css"));
-                    } else if (settings.preview_css != "") {
-                        css_file = File.new_for_path (Path.build_filename(UserData.css_path, settings.preview_css,"preview.css"));
-                    }
-                    if (css_file != null && css_file.query_exists ()) {
-                        command += "--css";
-                        command += css_file.get_path ();
-                    }
+                if (css_file != null && css_file.query_exists ()) {
+                    command += "--css";
+                    command += css_file.get_path ();
                 }
-                if (citation_file != "") {
-                    command += "--bibliography=" + citation_file;
-                }
-                PandocThinking runner = new PandocThinking (300);
-                if (!runner.run_pandoc_std_in_out_command (ref command, ref mk_input, out output)) {
-                    generate_discount_html (mk_input, out output);
-                }
-            } catch (Error e) {
-                warning ("Could not generate preview: %s", e.message);
+            }
+            if (citation_file != "") {
+                command += "--bibliography=" + citation_file;
+            }
+            PandocThinking runner = new PandocThinking (300);
+            if (!runner.run_pandoc_std_in_out_command (ref command, ref mk_input, out output)) {
+                generate_discount_html (mk_input, out output);
             }
         }
 
@@ -425,7 +422,7 @@ namespace ThiefMD.Controllers.Pandoc {
                 {
                     result.append ("(");
                     var url = match_info.fetch (1);
-                    result.append (find_file (url, path));
+                    result.append (find_file (url, path).replace ("(", "\\(").replace (")", "\\)"));
                     result.append (")");
                     return false;
                 },

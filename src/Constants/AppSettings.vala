@@ -26,7 +26,7 @@ namespace ThiefMD {
         WORD,
     }
 
-    public class Constants {
+    public class Constants : Object {
         public const string COLLECTION_THIEFMD = Secret.COLLECTION_DEFAULT;
         // Default exporter
         public const string DEFAULT_EXPORTER = "ePUB";
@@ -92,6 +92,10 @@ namespace ThiefMD {
 
         // Citation length limit
         public const int CITATION_TITLE_MAX_LEN = 30;
+
+        // Some Grammar settings
+        public const int GRAMMAR_SENTENCE_CACHE_SIZE = 50;
+        public const int GRAMMAR_SENTENCE_CHECK_TIMEOUT = 500;
 
         // Visual Settings
         public const double MINIMUM_CONTRAST_RATIO = 1.2;
@@ -190,6 +194,19 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             }
             get {
                 return writegood_enabled;
+            }
+        }
+
+        private bool grammar_enabled = false;
+        public bool grammar {
+            set {
+                if (value != grammar_enabled) {
+                    grammar_enabled = value;
+                    changed ();
+                }
+            }
+            get {
+                return grammar_enabled;
             }
         }
 

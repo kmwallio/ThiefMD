@@ -1,7 +1,7 @@
 {
     "app-id": "com.github.kmwallio.thiefmd",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "3.38",
+    "runtime-version": "40",
     "sdk": "org.gnome.Sdk",
     "command": "com.github.kmwallio.thiefmd",
     "finish-args": [
@@ -25,12 +25,15 @@
         "/share/man",
         "/share/vala",
         "/bin/vapi*",
-        "*.a",
-        "*.la"
+        "*.la",
+        "*grammar.a"
     ],
     "modules": [{
             "name": "gtksourceview",
             "buildsystem": "meson",
+            "cleanup": [
+                "*.a"
+            ],
             "sources": [{
                 "type": "archive",
                 "url": "https://download.gnome.org/sources/gtksourceview/4.8/gtksourceview-4.8.1.tar.xz",
@@ -39,6 +42,9 @@
         },
         {
             "name": "gtkspell",
+            "cleanup": [
+                "*.a"
+            ],
             "sources": [{
                 "type": "archive",
                 "url": "https://sourceforge.net/projects/gtkspell/files/3.0.10/gtkspell3-3.0.10.tar.xz",
@@ -46,6 +52,9 @@
             }],
             "modules": [{
                     "name": "enchant",
+                    "cleanup": [
+                        "*.a"
+                    ],
                     "sources": [{
                         "type": "archive",
                         "url": "https://github.com/AbiWord/enchant/releases/download/v2.2.11/enchant-2.2.11.tar.gz",
@@ -58,6 +67,9 @@
         {
             "name": "discount",
             "buildsystem": "simple",
+            "cleanup": [
+                "*.a"
+            ],
             "build-commands": [
                 "./configure.sh --prefix=/app --enable-all-features --github-checkbox --with-fenced-code --shared",
                 "sed -e 's|/sbin/ldconfig|/sbin/ldconfig -n|' -i librarian.sh",
@@ -71,6 +83,9 @@
         },
         {
             "name": "pandoc",
+            "cleanup": [
+                "*.a"
+            ],
             "only-arches": [
                 "x86_64"
             ],
@@ -84,10 +99,28 @@
                 "sha256": "b15ce6009ab833fb51fc472bf8bb9683cd2bd7f8ac948f3ddeb6b8f9a366d69a"
             }]
         },
+        {
+            "name" : "link-grammar",
+            "buildsystem": "simple",
+            "build-commands": [
+                "./configure --prefix=/app --disable-python-bindings --disable-java-bindings ",
+                "make install"
+            ],
+            "sources" : [
+                {
+                    "type" : "archive",
+                    "url" : "https://www.abisource.com/downloads/link-grammar/5.8.1/link-grammar-5.8.1.tar.gz",
+                    "sha256" : "11c4ff551fa5169257dacc575080c63b075c790edac29984a94641a0993b505b"
+                }
+            ]
+        },
         "shared-modules/libsecret/libsecret.json",
         {
             "name" : "libhandy",
             "buildsystem" : "meson",
+            "cleanup": [
+                "*.a"
+            ],
             "config-opts" : [
                 "-Dexamples=false",
                 "-Dprofiling=false",
@@ -106,6 +139,9 @@
         },
         {
             "name": "thiefmd",
+            "cleanup": [
+                "*.a"
+            ],
             "buildsystem": "meson",
             "sources": [{
                 "type": "dir",

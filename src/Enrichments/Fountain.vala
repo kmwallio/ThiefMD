@@ -21,10 +21,10 @@ using ThiefMD;
 using ThiefMD.Widgets;
 
 namespace ThiefMD.Enrichments {
-    public class FountainCharacterSuggestor : Gtk.SourceCompletionProvider, GLib.Object {
+    public class FountainCharacterSuggestor : Gtk.SourceCompletionProvider, Object {
         public Gee.HashSet<string> characters;
 
-        public class FountainCharacterSuggestor () {
+        public FountainCharacterSuggestor () {
             characters = new Gee.HashSet<string> ();
         }
 
@@ -75,7 +75,7 @@ namespace ThiefMD.Enrichments {
         }
     }
 
-    public class FountainEnrichment {
+    public class FountainEnrichment : Object {
         private FountainCharacterSuggestor character_suggester;
         private Gtk.SourceCompletionWords source_completion;
         private Gtk.SourceView view;
@@ -129,8 +129,6 @@ namespace ThiefMD.Enrichments {
             if (!checking.trylock ()) {
                 return;
             }
-
-            var settings = AppSettings.get_default ();
 
             calculate_margins ();
 
@@ -319,9 +317,6 @@ namespace ThiefMD.Enrichments {
             var settings = AppSettings.get_default ();
             view.destroy.connect (detach);
 
-            // Margin things
-            int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
-
             // Bold Scene Headings
             tag_scene_heading = buffer.create_tag ("scene_heading");
             tag_scene_heading.weight = Pango.Weight.BOLD;
@@ -351,14 +346,22 @@ namespace ThiefMD.Enrichments {
         private void settings_changed () {
             var settings = AppSettings.get_default ();
             if (settings.experimental && source_completion == null) {
-                var completion = view.get_completion ();
-                completion.add_provider (character_suggester);
-                source_completion = new Gtk.SourceCompletionWords ("Character Suggestor", null);
-                source_completion.register (buffer);
+                try {
+                    var completion = view.get_completion ();
+                    completion.add_provider (character_suggester);
+                    source_completion = new Gtk.SourceCompletionWords ("Character Suggestor", null);
+                    source_completion.register (buffer);
+                } catch (Error e) {
+                    warning ("Cannot add autocompletion: %s", e.message);
+                }
             } else if (!settings.experimental && source_completion != null) {
-                var completion = view.get_completion ();
-                source_completion.unregister (buffer);
-                completion.remove_provider (character_suggester);
+                try {
+                    var completion = view.get_completion ();
+                    source_completion.unregister (buffer);
+                    completion.remove_provider (character_suggester);
+                } catch (Error e) {
+                    warning ("Could not add autocompletion: %s", e.message);
+                }
             }
         }
 
@@ -382,6 +385,7 @@ namespace ThiefMD.Enrichments {
                 hashtag_w = int.max (ink.width, logical.width);
                 font_layout.set_text (" ", 1);
                 font_layout.get_pixel_extents (out ink, out logical);
+                font_layout.dispose ();
                 debug ("  Ink: %d, Logical: %d", ink.width, logical.width);
                 space_w = int.max (ink.width, logical.width);
                 if (space_w + hashtag_w <= 0) {

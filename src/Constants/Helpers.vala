@@ -28,6 +28,54 @@ namespace ThiefMD {
         FILE_NOT_VALID_THEME
     }
 
+    //
+    // A quick stripper for Markdown. Tries to turn
+    // [This website](https://thiefmd.com) is **super** _cool_.
+    //             into:
+    // This website is super cool.
+    //
+    // For grammar checking and whatnot.
+    //
+    public string strip_markdown (string sentence) {
+        string result = sentence;
+        try {
+            Regex is_url = new Regex ("(?<text_group>\\[(?>[^\\[\\]]+|(?&text_group))+\\])(?:\\((?<url>\\S+?)(?:[ ]\"(?<title>(?:[^\"]|(?<=\\\\)\")*?)\")?\\))", RegexCompileFlags.CASELESS, 0);
+            result = is_url.replace_eval (
+                result,
+                (ssize_t) result.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                (match_info, result) =>
+                {
+                    var title = match_info.fetch (1);
+                    result.append (title);
+                    return false;
+                });
+
+            result = result.replace ("*", "");
+            result = result.replace ("[", "");
+            result = result.replace ("]", "");
+            result = result.replace ("_", "");
+            result = result.replace ("`", "");
+            result = result.replace ("~", "");
+            while (result.has_prefix ("\n") || result.has_prefix ("#") || result.has_prefix (">") || result.has_prefix (" ") || result.has_prefix ("\t")) {
+                result = result.substring (1);
+            }
+        } catch (Error e) {
+            warning ("Could not strip markdown: %s", e.message);
+        }
+
+        return result;
+    }
+
+    //
+    // generate_html
+    //
+    // Generates HTML in memory. Uses PanDoc if pandoc functionality appears to be needed.
+    // Discount otherwise.
+    //
+    // If pandoc hits a timeout, discount is used.
+    //
     public bool generate_html (string raw_mk, out string processed_mk) {
         if (Pandoc.needs_bibtex (raw_mk)) {
             return Pandoc.make_preview (out processed_mk, raw_mk);
@@ -36,6 +84,7 @@ namespace ThiefMD {
         }
     }
 
+    // Scans the library for a possible BibTeX file associated with the sheet
     private string find_bibtex_for_sheet (string path = "") {
         string result = "";
         string search_path = Path.get_dirname (path);
@@ -192,14 +241,15 @@ namespace ThiefMD {
         return found;
     }
 
-    public Gtk.ImageMenuItem set_icon_option (string name, string icon, Sheets project) {
-        Gtk.ImageMenuItem set_icon = new Gtk.ImageMenuItem.with_label (name);
-        set_icon.set_image (new Gtk.Image.from_pixbuf (get_pixbuf_for_value (icon)));
-        set_icon.always_show_image = true;
-        set_icon.activate.connect (() => {
-            project.metadata.icon = icon;
-        });
-
+    public Gtk.MenuItem set_icon_option (string name, string icon, Sheets project) {
+        var box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+        var image = new Gtk.Image.from_pixbuf (get_pixbuf_for_value (icon));
+        var label = new Gtk.Label (name);
+        var set_icon = new Gtk.MenuItem ();
+        box.add (image);
+        box.add (label);
+        set_icon.add (box);
+        box.show_all ();
         return set_icon;
     }
 
@@ -442,7 +492,7 @@ namespace ThiefMD {
         return "";
     }
 
-    public class TimedMutex {
+    public class TimedMutex : Object {
         private bool can_action;
         private Mutex droptex;
         private int delay;

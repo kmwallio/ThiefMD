@@ -19,6 +19,7 @@
 
 using ThiefMD;
 using ThiefMD.Controllers;
+using ThiefMD.Enrichments;
 
 namespace ThiefMD.Widgets {
     public class QuickPreferences : Gtk.Popover {
@@ -27,6 +28,7 @@ namespace ThiefMD.Widgets {
         public Gtk.Button _create;
         public Gtk.ToggleButton _spellcheck_button;
         public Gtk.ToggleButton _writegood_button;
+        public Gtk.ToggleButton _grammar_button;
         public Gtk.ToggleButton _typewriter_button;
         private ThiefApp _instance;
         private bool am_mobile = false;
@@ -57,13 +59,34 @@ namespace ThiefMD.Widgets {
             });
 
             _writegood_button = new Gtk.ToggleButton.with_label ((_("Write Good")));
-            _writegood_button.set_image (new Gtk.Image.from_icon_name ("edit-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
+            _writegood_button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/thiefmd-symbolic.svg"));
             _writegood_button.set_always_show_image (true);
             _writegood_button.tooltip_text = _("Toggle Write Good");
             _writegood_button.set_active (settings.writegood);
 
             _writegood_button.toggled.connect (() => {
                 settings.writegood = _writegood_button.active;
+            });
+
+            _grammar_button = new Gtk.ToggleButton.with_label ((_("Check Grammar")));
+            _grammar_button.set_image (new Gtk.Image.from_icon_name ("tools-check-spelling-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
+            _grammar_button.set_always_show_image (true);
+            _grammar_button.tooltip_text = _("Toggle Grammar Checking");
+            _grammar_button.set_active (settings.grammar);
+
+            _grammar_button.toggled.connect (() => {
+                GrammarThinking gram = new GrammarThinking ();
+                if (gram.language_detected ()) {
+                    settings.grammar = _grammar_button.active;
+                } else {
+                    var dialog = new Gtk.MessageDialog (
+                        ThiefApp.get_instance (),
+                        Gtk.DialogFlags.MODAL,
+                        Gtk.MessageType.ERROR,
+                        Gtk.ButtonsType.CLOSE,
+                        _("Grammar check is not available for your language"));
+                    dialog.run ();
+                }
             });
 
             var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
@@ -120,6 +143,9 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.add (_spellcheck_button);
+            if (GrammarThinking.language_supported (settings.spellcheck_language)) {
+                menu_grid.add (_grammar_button);
+            }
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
@@ -141,6 +167,9 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             menu_grid.remove (_typewriter_button);
             menu_grid.remove (_spellcheck_button);
+            if (GrammarThinking.language_supported (settings.spellcheck_language)) {
+                menu_grid.remove (_grammar_button);
+            }
             menu_grid.remove (_writegood_button);
             remove (menu_grid);
 
@@ -198,6 +227,9 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.add (_spellcheck_button);
+            if (GrammarThinking.language_supported (settings.spellcheck_language)) {
+                menu_grid.add (_grammar_button);
+            }
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
@@ -213,8 +245,10 @@ namespace ThiefMD.Widgets {
         private void build_desktopmenu () {
             var settings = AppSettings.get_default ();
             menu_grid.remove (_typewriter_button);
-            // menu_grid.add (separator);
             menu_grid.remove (_spellcheck_button);
+            if (GrammarThinking.language_supported (settings.spellcheck_language)) {
+                menu_grid.remove (_grammar_button);
+            }
             menu_grid.remove (_writegood_button);
             remove (menu_grid);
 
@@ -272,6 +306,9 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_typewriter_button);
             // menu_grid.add (separator);
             menu_grid.add (_spellcheck_button);
+            if (GrammarThinking.language_supported (settings.spellcheck_language)) {
+                menu_grid.add (_grammar_button);
+            }
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
@@ -286,6 +323,7 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             _typewriter_button.set_active (settings.typewriter_scrolling);
             _spellcheck_button.set_active (settings.spellcheck);
+            _grammar_button.set_active (settings.grammar);
             _writegood_button.set_active (settings.writegood);
 
             if (_instance.show_touch_friendly && !am_mobile) {

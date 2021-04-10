@@ -23,7 +23,7 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class KeyBindings { 
+    public class KeyBindings : Object { 
         private bool is_fullscreen = false;
         public KeyBindings (Gtk.Window window, bool is_main = true) {
             window.key_press_event.connect ((e) => {
@@ -152,6 +152,28 @@ namespace ThiefMD.Widgets {
                     if (match_keycode (Gdk.Key.k, keycode)) {
                         SheetManager.link ();
                         return true;
+                    }
+                }
+
+                // Shrink font
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
+                    if (match_keycode (Gdk.Key.minus, keycode)) {
+                        int next_font_size = settings.font_size - 2;
+                        if (next_font_size >= 6) {
+                            settings.font_size = next_font_size;
+                            UI.load_font ();
+                        }
+                    }
+                }
+
+                // Enlarge font
+                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && is_main) {
+                    if (match_keycode (Gdk.Key.plus, keycode)) {
+                        int next_font_size = settings.font_size + 2;
+                        if (next_font_size <= 512) {
+                            settings.font_size = next_font_size;
+                            UI.load_font ();
+                        }
                     }
                 }
 

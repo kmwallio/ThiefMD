@@ -9,6 +9,18 @@ if libmarkdown.found() == false
     libmarkdown = cc.find_library('libmarkdown', required: true)
 endif
 
+# Find linkgrammar
+linkgrammar = dependency('liblink-grammar', version: '>= 5.8.0', required: false)
+if linkgrammar.found() == false
+    cc = meson.get_compiler('c')
+    linkgrammar = cc.find_library('liblink-grammar', required: false)
+    # and it just keeps going
+    if linkgrammar.found() == false
+        cc = meson.get_compiler('c')
+        linkgrammar = cc.find_library('link-grammar', required: true)
+    endif
+endif
+
 testing = executable('tests',
     'ThiefTests.vala',
     'ImageExtractionTests.vala',
@@ -20,6 +32,7 @@ testing = executable('tests',
     meson.source_root() + '/src/Controllers/UserData.vala',
     meson.source_root() + '/src/Constants/ThiefProperties.vala',
     meson.source_root() + '/src/Constants/Helpers.vala',
+    meson.source_root() + '/src/Enrichments/Grammar.vala',
     dependencies: [
         dependency('gobject-2.0'),
         dependency('gtksourceview-4'),
@@ -33,11 +46,12 @@ testing = executable('tests',
         dependency('libxml-2.0'),
         dependency('libsecret-1'),
         dependency('libhandy-1'),
-        libmarkdown
+        libmarkdown,
+        linkgrammar
     ],
     vala_args: [
-        '--pkg=posix',
-        '--vapidir=' + meson.source_root() + '/vapi'
+        meson.source_root() + '/vapi/libmarkdown.vapi',
+        meson.source_root() + '/vapi/linkgrammar.vapi'
         ],
     install: false
 )

@@ -21,7 +21,7 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class SearchResult {
+    public class SearchResult : Object {
         public string search_term;
         public string file_path;
         public Sheet file_sheet;
@@ -71,7 +71,7 @@ namespace ThiefMD.Widgets {
         }
     }
 
-    public class SearchThread {
+    public class SearchThread : Object {
         string search_term;
         Sheets to_check;
         SearchBase to_update;
@@ -119,7 +119,7 @@ namespace ThiefMD.Widgets {
         }
     }
 
-    public class SearchBase {
+    public class SearchBase : Object {
         public Gtk.ScrolledWindow scrolled_results;
         public Gee.ConcurrentList<SearchResult> results;
         Gee.ConcurrentList<SearchDisplay> displayed;
@@ -136,7 +136,7 @@ namespace ThiefMD.Widgets {
         TimedMutex one_click;
         private string scoped_folder;
 
-        public class SearchBase (string local_result = "") {
+        public SearchBase (string local_result = "") {
             ui_update = Mutex ();
             ui_remove = Mutex ();
             thread_update = Mutex ();
@@ -200,7 +200,7 @@ namespace ThiefMD.Widgets {
                 foreach (var search in searchable) {
                     SearchThread thread = new SearchThread (active_search_term, search, this);
                     add_thread ();
-                    var nt = new Thread<void> ("search_thread" + search.get_sheets_path (), thread.search);
+                    new Thread<void> ("search_thread" + search.get_sheets_path (), thread.search);
                 }
             }
         }
@@ -313,7 +313,6 @@ namespace ThiefMD.Widgets {
 
         public void update_terms () {
             debug ("Updating search term");
-            bool respawn = active_search_term != search.text;
             active_search_term = search.text;
 
             start_search.lock ();
@@ -375,7 +374,7 @@ namespace ThiefMD.Widgets {
         public SearchBase searcher;
         string scoped_folder;
 
-        public class SearchWidget (string local_result = "") {
+        public SearchWidget (string local_result = "") {
             searcher = new SearchBase (local_result);
             this.orientation = Gtk.Orientation.VERTICAL;
             scoped_folder = local_result;
@@ -407,7 +406,7 @@ namespace ThiefMD.Widgets {
         SearchBase searcher;
         string scoped_folder;
 
-        public class SearchWindow (string local_result = "") {
+        public SearchWindow (string local_result = "") {
             searcher = new SearchBase (local_result);
             scoped_folder = local_result;
             build_ui ();

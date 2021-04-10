@@ -22,11 +22,8 @@ using ThiefMD.Widgets;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Enrichments {
-    public class BibTexCompletionProvider : Gtk.SourceCompletionProvider, GLib.Object {
-        public Gee.HashSet<string> characters;
-
-        public class BibTexCompletionProvider () {
-            characters = new Gee.HashSet<string> ();
+    public class BibTexCompletionProvider : Gtk.SourceCompletionProvider, Object {
+        public BibTexCompletionProvider () {
         }
 
         public override string get_name () {
@@ -38,7 +35,10 @@ namespace ThiefMD.Enrichments {
             if (context.get_iter (out start) && context.get_iter (out sanity)) {
                 if (start.backward_char ()) {
                     if (start.get_char () == '@') {
-                        return true;
+                        if (!start.backward_char ()) {
+                            return true;
+                        }
+                        return start.get_char ().isspace () || !start.get_char ().isalnum ();
                     }
                     unichar check = start.get_char ();
                     for (int i = 0; i < 10; i++) {
@@ -52,7 +52,10 @@ namespace ThiefMD.Enrichments {
                     }
 
                     if (start.get_char () == '@') {
-                        return true;
+                        if (!start.backward_char ()) {
+                            return true;
+                        }
+                        return start.get_char ().isspace () || !start.get_char ().isalnum ();
                     }
                 }
             }
@@ -108,11 +111,11 @@ namespace ThiefMD.Enrichments {
         }
     }
 
-    public class MarkdownEnrichment {
+    public class MarkdownEnrichment : Object {
         private BibTexCompletionProvider citation_suggester = null;
         private Gtk.SourceCompletionWords source_completion;
-        private Gtk.SourceView view;
-        private Gtk.TextBuffer buffer;
+        private unowned Gtk.SourceView view;
+        private unowned Gtk.TextBuffer buffer;
         private Mutex checking;
         private bool markup_inserted_around_selection;
         private bool cursor_at_interesting_location = false;
@@ -145,7 +148,7 @@ namespace ThiefMD.Enrichments {
 
         public MarkdownEnrichment () {
             try {
-                is_heading = new Regex ("(#+\\s[^\\n\\r]+?)\\r?\\n", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF | RegexCompileFlags.CASELESS, 0);
+                is_heading = new Regex ("(?:^|\\n)(#+\\s[^\\n\\r]+?)(?:$|\\r?\\n)", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF | RegexCompileFlags.CASELESS, 0);
                 is_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+(\\.|\\)))\\s)\\s*(.+)", RegexCompileFlags.CASELESS, 0);
                 is_partial_list = new Regex ("^(\\s*([\\*\\-\\+\\>]|[0-9]+\\.))\\s+$", RegexCompileFlags.CASELESS, 0);
                 numerical_list = new Regex ("^(\\s*)([0-9]+)((\\.|\\))\\s+)$", RegexCompileFlags.CASELESS, 0);
@@ -312,9 +315,6 @@ namespace ThiefMD.Enrichments {
             buffer.remove_tag (markdown_link, start_region, end_region);
             buffer.remove_tag (markdown_url, start_region, end_region);
 
-            if (!settings.experimental) {
-                return;
-            }
             try {
                 Gtk.TextIter start, end;
                 Gtk.TextIter cursor_location;
@@ -461,6 +461,12 @@ namespace ThiefMD.Enrichments {
                     buffer.remove_tag (heading_text[h], start_region, end_region);
                 }
 
+                buffer.tag_table.foreach ((tag) => {
+                    if (tag.name != null && tag.name.has_prefix ("list-")) {
+                        buffer.remove_tag (tag, start_region, end_region);
+                    }
+                });
+
                 // Tag headings and make sure they're not in code blocks
                 if (is_heading.match_full (checking_copy, checking_copy.length, 0, RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
                     do {
@@ -475,13 +481,52 @@ namespace ThiefMD.Enrichments {
                             if (start.has_tag (code_block) || end.has_tag (code_block)) {
                                 continue;
                             }
-                            int heading_depth = heading.index_of (" ") - 1;
+                            int heading_depth = heading.index_of_char (' ') - 1;
                             if (heading_depth >= 0 && heading_depth < 6) {
                                 buffer.apply_tag (heading_text[heading_depth], start, end);
                             }
                         }
                     } while (match_info.next ());
                 }
+
+                // Tag lists and make sure they're not in code blocks
+                Gtk.TextIter? line_start = start_region, line_end = null;
+                if (!line_start.starts_line ()) {
+                    line_start.backward_line ();
+                }
+                do {
+                    while (line_start.get_char () == '\r' || line_start.get_char () == '\n') {
+                        if (!line_start.forward_char ()) {
+                            break;
+                        }
+                    }
+                    line_end = line_start;
+                    if (!line_end.forward_line ()) {
+                        break;
+                    }
+                    string line = line_start.get_text (line_end);
+                    if (is_list.match_full (line, line.length, 0, 0, out match_info)) {
+                        string list_marker = match_info.fetch (1);
+                        if (!line_start.has_tag (code_block) && !line_end.has_tag (code_block)) {
+                            list_marker = list_marker.replace ("\t", "    ");
+                            int list_depth = list_marker.length;
+                            if (list_depth >= 0) {
+                                int list_px_index = get_string_px_width (list_marker);
+                                Gtk.TextTag? list_indent = buffer.tag_table.lookup ("list-" + list_px_index.to_string ());
+                                if (list_indent == null) {
+                                    list_indent = buffer.create_tag ("list-" + list_px_index.to_string ());
+                                }
+                                list_indent.left_margin = view.left_margin;
+                                list_indent.left_margin_set = false;
+                                list_indent.accumulative_margin = false;
+                                list_indent.indent = -list_px_index;
+                                list_indent.indent_set = true;
+                                buffer.apply_tag (list_indent, line_start, line_end);
+                            }
+                        }
+                    }
+                    line_start = line_end;
+                } while (true);
             } catch (Error e) {
                 warning ("Could not adjust headers: %s", e.message);
             }
@@ -874,20 +919,47 @@ namespace ThiefMD.Enrichments {
             }
 
             if (settings.experimental && citation_suggester == null) {
-                citation_suggester = new BibTexCompletionProvider ();
-                var completion = view.get_completion ();
-                completion.add_provider (citation_suggester);
-                source_completion = new Gtk.SourceCompletionWords ("Citation Suggestor", null);
-                source_completion.register (buffer);
+                try {
+                    citation_suggester = new BibTexCompletionProvider ();
+                    var completion = view.get_completion ();
+                    completion.add_provider (citation_suggester);
+                    source_completion = new Gtk.SourceCompletionWords ("Citation Suggestor", null);
+                    source_completion.register (buffer);
+                } catch (Error e) {
+                    warning ("Could not add suggestions: %s", e.message);
+                }
             } else if (!settings.experimental && citation_suggester != null) {
-                var completion = view.get_completion ();
-                completion.remove_provider (citation_suggester);
-                source_completion.unregister (buffer);
-                source_completion = null;
-                citation_suggester = null;
+                try {
+                    var completion = view.get_completion ();
+                    completion.remove_provider (citation_suggester);
+                    source_completion.unregister (buffer);
+                    source_completion = null;
+                    citation_suggester = null;
+                } catch (Error e) {
+                    warning ("Could not remove suggestions: %s", e.message);
+                }
             }
 
             recalculate_margins ();
+        }
+
+        private int get_string_px_width (string str) {
+            var settings = AppSettings.get_default ();
+            int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
+            if (view.get_realized ()) {
+                var font_desc = Pango.FontDescription.from_string (settings.font_family);
+                font_desc.set_size ((int)(f_w * Pango.SCALE * (str.has_prefix ("#") ? Pango.Scale.LARGE : 1)));
+                var font_context = view.get_pango_context ();
+                var font_layout = new Pango.Layout (font_context);
+                font_layout.set_font_description (font_desc);
+                font_layout.set_text (str, str.length);
+                Pango.Rectangle ink, logical;
+                font_layout.get_pixel_extents (out ink, out logical);
+                font_layout.dispose ();
+                debug ("# Ink: %d, Logical: %d", ink.width, logical.width);
+                return int.max (ink.width, logical.width);
+            }
+            return f_w;
         }
 
         private void recalculate_margins () {
@@ -911,6 +983,7 @@ namespace ThiefMD.Enrichments {
                 hashtag_w = int.max (ink.width, logical.width);
                 font_layout.set_text (" ", 1);
                 font_layout.get_pixel_extents (out ink, out logical);
+                font_layout.dispose ();
                 debug ("  Ink: %d, Logical: %d", ink.width, logical.width);
                 space_w = int.max (ink.width, logical.width);
                 if (space_w + hashtag_w <= 0) {
@@ -930,6 +1003,12 @@ namespace ThiefMD.Enrichments {
                     heading_text[3].left_margin = m;
                     heading_text[4].left_margin = m;
                     heading_text[5].left_margin = m;
+                    heading_text[0].indent_set = false;
+                    heading_text[1].indent_set = false;
+                    heading_text[2].indent_set = false;
+                    heading_text[3].indent_set = false;
+                    heading_text[4].indent_set = false;
+                    heading_text[5].indent_set = false;
                 } else {
                     heading_text[0].left_margin = m - ((hashtag_w * 1) + space_w);
                     heading_text[1].left_margin = m - ((hashtag_w * 2) + space_w);
@@ -937,6 +1016,18 @@ namespace ThiefMD.Enrichments {
                     heading_text[3].left_margin = m - ((hashtag_w * 4) + space_w);
                     heading_text[4].left_margin = m - ((hashtag_w * 5) + space_w);
                     heading_text[5].left_margin = m - ((hashtag_w * 6) + space_w);
+                    heading_text[0].indent = -((hashtag_w * 1) + space_w);
+                    heading_text[1].indent = -((hashtag_w * 2) + space_w);
+                    heading_text[2].indent = -((hashtag_w * 3) + space_w);
+                    heading_text[3].indent = -((hashtag_w * 4) + space_w);
+                    heading_text[4].indent = -((hashtag_w * 5) + space_w);
+                    heading_text[5].indent = -((hashtag_w * 6) + space_w);
+                    heading_text[0].indent_set = true;
+                    heading_text[1].indent_set = true;
+                    heading_text[2].indent_set = true;
+                    heading_text[3].indent_set = true;
+                    heading_text[4].indent_set = true;
+                    heading_text[5].indent_set = true;
                 }
             }
         }

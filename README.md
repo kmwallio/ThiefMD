@@ -36,13 +36,14 @@ yay -S thiefmd
  * Search `Ctrl+F` for the current file, and `Ctrl+Shift+F` for the *entire* library
  * Writing Statistics
  * Focus Mode (Word, Sentence, and Paragraph)
+ * Spell Check, Write-Good Style Suggestions, and Grammar Check
  * Basic Bibtex Support
      * Open File & Syntax Highlighting
      * Right-Click Insert Citation Support in Markdown Documents
  * Basic Screenwriting Support
      * Open Fountain Files
      * Export to HTML & PDF
- 
+
 # Translating
 
 [Poeditor](https://poeditor.com/join/project?hash=iQkE5oTIOV) can be used to help translate ThiefMD.
@@ -50,6 +51,7 @@ yay -S thiefmd
  * French Translation by [David Bosman](https://github.com/davidbosman)
  * Slovak Translation by [Marek L'ach](https://github.com/marek-lach)
  * Swedish Translation by [Åke Engelbrektson](https://github.com/eson57)
+ * Czech Translation by [Vojtěch Perník](https://github.com/pervoj)
 
 ## Planning
 
@@ -68,31 +70,31 @@ yay -S thiefmd
 
 ## Screenshots
 
-![](docs/images/theme_preferences.png)
+![](https://thiefmd.com/images/theme_preferences.png)
 
 Download themes from [https://themes.thiefmd.com](https://themes.thiefmd.com) or [make your own](https://themes.thiefmd.com/howto). [Ulysses Themes](https://styles.ulysses.app/themes) can also be imported through the preferences `Ctrl+,`.
 
-![](docs/images/drag_n_drop_sheets.gif)
+![](https://thiefmd.com/images/drag_n_drop_sheets.gif)
 
 Drag and Drop organizing of the library.
 
-![](docs/images/epub-export.png)
+![](https://thiefmd.com/images/epub-export.png)
 
 Live Preview & Export Preview
 
-![](docs/images/typewriter_scrolling.gif)
+![](https://thiefmd.com/images/typewriter_scrolling.gif)
 
 Typewriter Scrolling.
 
-![](docs/images/focus_mode.png)
+![](https://thiefmd.com/images/focus_mode.png)
 
 Focus Mode
 
-![](docs/images/write-good.png)
+![](https://thiefmd.com/images/write-good.png)
 
 [Write-Good](https://github.com/ThiefMD/libwritegood-vala) recommendations and highlighting.
 
-![](docs/images/thiefmd-screenplay.png)
+![](https://thiefmd.com/images/thiefmd-screenplay.png)
 
 [Fountain](https://fountain.io) syntax highlighting.
 
@@ -118,6 +120,7 @@ libgee-0.8-dev
 libgtksourceview-4-dev
 libsecret-1-dev
 libhandy-1-dev
+liblink-grammar-dev
 ```
 
 ### Fedora
@@ -138,6 +141,7 @@ libxml2-devel
 libgee-devel
 libsecret-devel
 libhandy1-devel
+link-grammar-devel
 ```
 
 ## Building
@@ -158,7 +162,7 @@ $ sudo ninja install
 
 * [Contributors who help make ThiefMD awesome](https://github.com/kmwallio/ThiefMD/graphs/contributors)
 * Code ~~stolen~~ *forked* from [Quilter](https://github.com/lainsce/quilter)
-* Fonts are [iA Writer Duospace](https://github.com/iaolo/iA-Fonts) and [Courier Prime](https://quoteunquoteapps.com/courierprime)
+* Fonts are [Stolen Victory](https://github.com/ThiefMD/StolenVictoryDuo), [Victor Mono](https://rubjo.github.io/victor-mono/), [iA Writer Duospace](https://github.com/iaolo/iA-Fonts), and [Courier Prime](https://quoteunquoteapps.com/courierprime)
 * Inspired by [Ulysses](https://ulysses.app)
 * Preview CSS is [Splendor](http://markdowncss.github.io/splendor) + [Modest](http://markdowncss.github.io/modest)
 * Preview Scroll stolen from [this Stackoverflow](https://stackoverflow.com/questions/8922107/javascript-scrollintoview-middle-alignment) by [Rohan Orton](https://stackoverflow.com/users/2800005/rohan-orton)
@@ -167,3 +171,4 @@ $ sudo ninja install
 * Fountain Rendering by [Fountain.js](https://github.com/thombruce/fountain.js/)
 * Multi-format Export & Import by [Pandoc](https://pandoc.org)
 * Write-Good based on [btford/write-good](https://github.com/btford/write-good)
+* Grammar Checked with [Link Grammar Parser](https://www.abisource.com/projects/link-grammar/)

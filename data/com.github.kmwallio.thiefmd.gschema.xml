@@ -166,7 +166,7 @@
             <description>CSS to use for PDF Export</description>
         </key>
         <key name="font-family" type="s">
-            <default>"iA Writer Duospace"</default>
+            <default>"Stolen Victory Duo"</default>
             <summary>Font Family to use</summary>
             <description>Font Family for editor to use</description>
         </key>

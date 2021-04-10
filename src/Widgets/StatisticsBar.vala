@@ -27,7 +27,7 @@ namespace ThiefMD.Widgets {
         private Gtk.Label active_file;
         string last_file;
 
-        public class StatisticsBar () {
+        public StatisticsBar () {
             build_ui ();
         }
 

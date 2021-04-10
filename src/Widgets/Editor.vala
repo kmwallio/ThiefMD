@@ -51,6 +51,7 @@ namespace ThiefMD.Widgets {
 
         public GtkSpell.Checker spell = null;
         public WriteGood.Checker writegood = null;
+        public GrammarChecker grammar = null;
         private TimedMutex writegood_limit;
         public Gtk.TextTag warning_tag;
         public Gtk.TextTag error_tag;
@@ -60,6 +61,7 @@ namespace ThiefMD.Widgets {
         private bool spellcheck_active = false;
         private bool writecheck_active;
         private bool typewriter_active;
+        private bool grammar_active = false;
 
         private Gtk.TextTag focus_text;
         private Gtk.TextTag outoffocus_text;
@@ -153,6 +155,8 @@ namespace ThiefMD.Widgets {
             writegood.show_tooltip = true;
             markdown = new MarkdownEnrichment ();
             markdown.attach (this);
+            grammar = new GrammarChecker ();
+            grammar_active = false;
 
             focus_text = buffer.create_tag ("focus-text");
             outoffocus_text = buffer.create_tag ("outoffocus-text");
@@ -384,6 +388,8 @@ namespace ThiefMD.Widgets {
 
         public bool disk_matches_buffer (out string disk_text, out DateTime disk_time) {
             bool match = false;
+            disk_text = "";
+            disk_time = new DateTime.now_utc ().add_years (-1);
             
             try {
                 if (file_mutex.trylock ()) {
@@ -483,6 +489,12 @@ namespace ThiefMD.Widgets {
                         write_good_recheck ();
                     }
 
+                    if (settings.grammar && !grammar_active) {
+                        grammar_active = true;
+                        grammar.attach (this);
+                        GLib.Idle.add (grammar_recheck);
+                    }
+
                     if (settings.spellcheck) {
                         spell.attach (this);
                         spellcheck_active = true;
@@ -507,12 +519,7 @@ namespace ThiefMD.Widgets {
                         debug ("Cursor saved at: %d", cursor_location);
 
                         preview_markdown = "";
-                        try {
-                            save ();
-                        } catch (Error e) {
-                            warning ("Unable to save file " + file.get_basename () + ": " + e.message);
-                            SheetManager.show_error ("Unable to save file " + file.get_basename () + ": " + e.message);
-                        }
+                        save ();
 
                         buffer.changed.disconnect (on_change_notification);
                         size_allocate.disconnect (dynamic_margins);
@@ -521,6 +528,11 @@ namespace ThiefMD.Widgets {
                         if (settings.writegood) {
                             writecheck_active = false;
                             writegood.detach ();
+                        }
+
+                        if (settings.grammar) {
+                            grammar_active = false;
+                            grammar.detach ();
                         }
 
                         if (settings.spellcheck) {
@@ -612,7 +624,7 @@ namespace ThiefMD.Widgets {
                 if (target != null) {
                     file_mutex.lock ();
                     try {
-                        DateTime now = new DateTime.now_local ();
+                        DateTime now = new DateTime.now_utc ();
                         string buff_text = get_buffer_text ();
                         string first_words = get_some_words (buff_text);
                         string new_text = (first_words != "") ? now.format ("%Y-%m-%d") : now.format ("%Y-%m-%d_%H-%M-%S");
@@ -722,6 +734,10 @@ namespace ThiefMD.Widgets {
 
             if (writecheck_active) {
                 write_good_recheck ();
+            }
+
+            if (grammar_active) {
+                grammar_recheck ();
             }
 
             // Move the preview if present
@@ -846,6 +862,10 @@ namespace ThiefMD.Widgets {
                     res = true;
                     buffer.set_language (UI.get_source_language (opened_filename));
                     if (is_fountain (filename)) {
+                        if (text.contains ("\r\n")) {
+                            text.replace ("\r\n", "\n");
+                            set_text (text, true);
+                        }
                         fountain = new FountainEnrichment ();
                         fountain.attach (this);
                     }
@@ -970,9 +990,7 @@ namespace ThiefMD.Widgets {
         bool header_redraw_scheduled = false;
         private void update_heading_margins () {
             bool try_later = false;
-            if (UI.moving ()) {
-                try_later = true;
-            } else if (!dynamic_margin_update.can_do_action ()) {
+            if (!dynamic_margin_update.can_do_action ()) {
                 try_later = true;
             }
 
@@ -1081,6 +1099,17 @@ namespace ThiefMD.Widgets {
                 write_good_recheck ();
             }
 
+            if (!settings.grammar && grammar_active) {
+                grammar_active = false;
+                grammar.detach ();
+            } else if (settings.grammar && !grammar_active) {
+                grammar_active = true;
+                grammar.attach (this);
+                if (am_active) {
+                    GLib.Idle.add (grammar_recheck);
+                }
+            }
+
             if (!header_redraw_scheduled) {
                 update_heading_margins ();
             }
@@ -1089,6 +1118,17 @@ namespace ThiefMD.Widgets {
         private void spellcheck_enable () {
             var settings = AppSettings.get_default ();
             spellcheck = settings.spellcheck;
+        }
+
+        private bool grammar_recheck () {
+            var settings = AppSettings.get_default ();
+            if (settings.grammar) {
+                if (editable) {
+                    grammar.recheck_all ();
+                }
+            }
+
+            return false;
         }
 
         public void set_scheme (string id) {
@@ -1187,7 +1227,7 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             var cursor = buffer.get_insert ();
 
-            if (should_scroll && !UI.moving ()) {
+            if (should_scroll) {
                 this.scroll_to_mark(cursor, 0.0, true, 0.0, Constants.TYPEWRITER_POSITION);
                 should_scroll = false;
             }
@@ -1390,6 +1430,7 @@ namespace ThiefMD.Widgets {
                 markdown = null;
             }
             writegood.detach ();
+            grammar.detach ();
 
             preview_markdown = "";
             buffer.text = "";

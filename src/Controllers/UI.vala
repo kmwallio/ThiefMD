@@ -108,8 +108,12 @@ namespace ThiefMD.Controllers.UI {
         border_provider = new Gtk.CssProvider ();
         var font_color = style_context.get_color (0);
         string border_css = ThiefProperties.BUTTON_CSS.printf (font_color.to_string ());
-        border_provider.load_from_data (border_css);
-        Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default(), border_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        try {
+            border_provider.load_from_data (border_css);
+            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default(), border_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        } catch (Error e) {
+            warning ("Could not add accessibility css: %s", e.message);
+        }
     }
 
     public void load_user_themes_and_connections () {
@@ -144,8 +148,29 @@ namespace ThiefMD.Controllers.UI {
         // Load previous added themes
         debug ("Loading themes");
         try {
-            Dir theme_dir = Dir.open (UserData.style_path, 0);
+            // Clean outdated themes
+            var one_week_ago = new DateTime.now_utc ().add_days (-7);
+            Dir scheme_dir = Dir.open (UserData.scheme_path, 0);
             string? file_name = null;
+            while ((file_name = scheme_dir.read_name()) != null) {
+                if (!file_name.has_prefix(".")) {
+                    if (file_name.down ().has_suffix (".xml")) {
+                        string scheme_path = Path.build_filename (UserData.scheme_path, file_name);
+                        File scheme_file = File.new_for_path (scheme_path);
+                        FileInfo last_modified = scheme_file.query_info (FileAttribute.TIME_MODIFIED, FileQueryInfoFlags.NONE);
+                        var scheme_modified_time = last_modified.get_modification_date_time ();
+                        // If the time is less than one week ago, it's older than
+                        // one week ago and should be safe to delete.
+                        if (scheme_modified_time.compare (one_week_ago) < 0) {
+                            scheme_file.delete ();
+                        }
+                    }
+                }
+            }
+
+            // Load schemes
+            Dir theme_dir = Dir.open (UserData.style_path, 0);
+            file_name = null;
             while ((file_name = theme_dir.read_name()) != null) {
                 if (!file_name.has_prefix(".")) {
                     if (file_name.down ().has_suffix ("ultheme")) {
@@ -162,6 +187,9 @@ namespace ThiefMD.Controllers.UI {
                                 dark_file.delete ();
                                 FileManager.save_file (dark_file, dark_theme_data.data);
                             }
+                            if (!dark_file.query_exists ()) {
+                                FileManager.save_file (dark_file, dark_theme_data.data);
+                            }
                         } catch (Error e) {
                             warning ("Could not save local scheme: %s", e.message);
                         }
@@ -172,6 +200,9 @@ namespace ThiefMD.Controllers.UI {
                             string light_theme_data = theme.get_light_theme ();
                             if (light_file.query_exists () && need_to_update_theme (light_theme_data, light_file)) {
                                 light_file.delete ();
+                                FileManager.save_file (light_file, light_theme_data.data);
+                            }
+                            if (!light_file.query_exists ()) {
                                 FileManager.save_file (light_file, light_theme_data.data);
                             }
                         } catch (Error e) {
@@ -638,10 +669,5 @@ namespace ThiefMD.Controllers.UI {
     public void hide_sheets () {
         ThiefApp instance = ThiefApp.get_instance ();
         instance.library_pane.hide ();
-    }
-
-    // @TODO: Until we fix logic for all references
-    public bool moving () {
-        return false;
     }
 }

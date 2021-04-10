@@ -170,7 +170,12 @@ namespace ThiefMD.Widgets {
             }
 
             if (print_css == "modest-splendor") {
-                style += ThiefProperties.PRINT_CSS.printf ("""content: " (" attr(href) ")";""");
+                if (print_only) {
+                    style += "\n" + ThiefProperties.PRINT_CSS + "\n";
+                }
+                style += "\n@media print {\n";
+                style += ThiefProperties.PRINT_CSS;
+                style += "}\n";
             } else if (print_css != "") {
                 File css_file = File.new_for_path (Path.build_filename(UserData.css_path, print_css,"print.css"));
                 if (css_file.query_exists ()) {
@@ -213,6 +218,8 @@ namespace ThiefMD.Widgets {
                             launch_browser (policy.request.get_uri ());
                             return false;
                         }
+                    break;
+                    case WebKit.PolicyDecisionType.NAVIGATION_ACTION:
                     break;
                 }
 
@@ -309,10 +316,12 @@ namespace ThiefMD.Widgets {
             }
 
             bool render_citations = false;
-            BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
-            bib_parser.parse_file ();
-            foreach (var label in bib_parser.get_labels ()) {
-                render_citations = render_citations || processed_mk.contains ("@" + label);
+            if (bib_file != "") {
+                BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
+                bib_parser.parse_file ();
+                foreach (var label in bib_parser.get_labels ()) {
+                    render_citations = render_citations || processed_mk.contains ("@" + label);
+                }
             }
 
             if (need_pandoc || render_citations) {

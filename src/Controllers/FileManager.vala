@@ -38,10 +38,21 @@ namespace ThiefMD.Controllers.FileManager {
             Thinking worker = new Thinking (_("Importing File"), () => {
                 string dest_name = import_f.get_basename ();
                 dest_name = dest_name.substring (0, dest_name.last_index_of ("."));
-                dest_name += ".md";
+                if (is_fountain (import_f.get_basename ())) {
+                    dest_name += ".fountain";
+                } else {
+                    dest_name += ".md";
+                }
                 debug ("Attempt to create: %s", dest_name);
                 string dest_path = Path.build_filename (parent.get_sheets_path (), dest_name);
-                if (Pandoc.make_md_from_file (dest_path, import_f.get_path ())) {
+                if (can_open_file (import_f.get_basename ())) {
+                    File copy_to = File.new_for_path (dest_path);
+                    try {
+                        import_f.copy (copy_to, FileCopyFlags.NONE);
+                    } catch (Error e) {
+                        warning ("Could not add file to library: %s", e.message);
+                    }
+                } else if (Pandoc.make_md_from_file (dest_path, import_f.get_path ())) {
                     if (ext == "docx" || ext == "odt" || ext == "epub" || ext == "fb2") {
                         string new_markdown = get_file_contents (dest_path);
                         Gee.LinkedList<string> files_to_find = Pandoc.file_import_paths (new_markdown);
@@ -397,7 +408,7 @@ namespace ThiefMD.Controllers.FileManager {
 
         Regex headers = null;
         try {
-            headers = new Regex ("^\\s*(.+)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            headers = new Regex ("^\\s*(.+?)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
         } catch (Error e) {
             warning ("Could not compile regex: %s", e.message);
         }
@@ -499,7 +510,7 @@ namespace ThiefMD.Controllers.FileManager {
         string buffer = markdown;
         Regex headers = null;
         try {
-            headers = new Regex ("^\\s*(.+)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            headers = new Regex ("^\\s*(.+?)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
         } catch (Error e) {
             warning ("Could not compile regex: %s", e.message);
         }
@@ -620,7 +631,7 @@ namespace ThiefMD.Controllers.FileManager {
 
         try {
             var file = File.new_for_path (file_path);
-            Regex headers = new Regex ("^\\s*(.+)\\s*:\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex headers = new Regex ("^\\s*(.+?)\\s*:\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             MatchInfo matches;
 
             if (file.query_exists ()) {
@@ -785,7 +796,7 @@ namespace ThiefMD.Controllers.FileManager {
         return file_created;
     }
 
-    public class FileLock {
+    public class FileLock : Object {
         public FileLock () {
             FileManager.acquire_lock ();
         }
