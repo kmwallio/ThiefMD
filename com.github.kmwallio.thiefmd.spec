@@ -313,6 +313,8 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 "/usr/share/fonts/truetype/thiefmd/Courier Prime-BoldItalic.ttf"
 "/usr/share/fonts/truetype/thiefmd/Courier Prime-Italic.ttf"
 "/usr/share/fonts/truetype/thiefmd/Courier Prime-Regular.ttf"
+"/usr/share/fonts/truetype/thiefmd/Stolen Victory Duo-Italic.ttf"
+"/usr/share/fonts/truetype/thiefmd/Stolen Victory Duo-Regular.ttf"
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-Bold.ttf
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-BoldItalic.ttf
 /usr/share/fonts/truetype/thiefmd/iAWriterDuospace-Italic.ttf
@@ -327,6 +329,10 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sat Apr 10 2021 kmwallio <mwallio@gmail.com> - 0.2.3
+- Add Link Grammar Checking
+- Improved List and Header Formatting
+- Fix bugs
 * Sun Mar 28 2021 kmwallio <mwallio@gmail.com> - 0.2.2
 - Fix image upload support when blogging
 - Add watchdog for pandoc preview

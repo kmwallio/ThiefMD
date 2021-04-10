@@ -1,3 +1,11 @@
+com.github.kmwallio.thiefmd (0.2.3) groovy; urgency=low
+
+  * Add Link Grammar Checking
+  * Improved List and Header Formatting
+  * Bug fixes
+
+ -- kmwallio <mwallio@gmail.com>  Sat, 10 Apr 2021 10:36:34 -0700
+
 com.github.kmwallio.thiefmd (0.2.2) groovy; urgency=low
 
   * Add watchdog for pandoc

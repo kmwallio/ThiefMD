@@ -70,10 +70,12 @@
   <releases>
     <release version="0.2.3" date="2021-04-10" urgency="low">
       <description>
+        <p>Check, 1, 2. Check 1, 2. Does this look right to you?</p>
         <p>Spell-Check, Check. Write-Good Check, Check. Grammar Check... Check! ThiefMD offers Spell Check, Write-Good Style Check, and now Grammar Check!</p>
         <ul>
           <li>Link-Grammar Checking</li>
-          <li>Improved List and Header Formatting</li>
+          <li>Improved List and Header Formatting (List item spanning more than one line now lines up with the bullet)</li>
+          <li>Bug fixes</li>
         </ul>
       </description>
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.3-draftcheck</url>
