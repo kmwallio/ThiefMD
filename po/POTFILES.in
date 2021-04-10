@@ -18,6 +18,7 @@ src/Connections/GhostConnection.vala
 src/Connections/WordpressConnection.vala
 src/Enrichments/Fountain.vala
 src/Enrichments/Markdown.vala
+src/Enrichments/Grammar.vala
 src/Exporters/ExportBase.vala
 src/Exporters/ExportDocx.vala
 src/Exporters/ExportEpub.vala

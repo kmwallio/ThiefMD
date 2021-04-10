@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-10 10:38-0700\n"
+"POT-Creation-Date: 2021-04-10 10:44-0700\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -187,9 +187,8 @@ msgid "the AbiSource Community"
 msgstr ""
 
 #: src/Constants/ThiefProperties.vala:93
-#, fuzzy
 msgid "GNU Lesser General Public License v2.1"
-msgstr "Licencia pública general GNU v2.0"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:94
 msgid "libwritegood-vala based on"
@@ -448,9 +447,8 @@ msgid "Characters"
 msgstr ""
 
 #: src/Enrichments/Markdown.vala:30
-#, fuzzy
 msgid "Citations"
-msgstr "Insertar citación"
+msgstr ""
 
 #: src/Exporters/ExportDocx.vala:60
 msgid "Export DocX"
@@ -1117,9 +1115,8 @@ msgid "Check Grammar"
 msgstr ""
 
 #: src/Widgets/QuickPreferences.vala:74
-#, fuzzy
 msgid "Toggle Grammar Checking"
-msgstr "Alternar el tema de la interfaz"
+msgstr ""
 
 #: src/Widgets/QuickPreferences.vala:87
 msgid "Grammar check is not available for your language"
