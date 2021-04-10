@@ -74,6 +74,7 @@ namespace ThiefMD {
           if (instance == null) {
             giants = new Gee.LinkedList<string> ();
             giants.add ("<a href='https://github.com/kmwallio/ThiefMD/graphs/contributors'>" + _("Contributors who help make ThiefMD awesome") + "</a>\n");
+            giants.add (_("Czech Translation Contributors") + ":\n<a href='https://github.com/pervoj'>Vojtěch Perník</a>\n");
             giants.add (_("French Translation Contributors") + ":\n<a href='https://github.com/davidbosman'>David Bosman</a>\n");
             giants.add (_("Slovak Translation Contributors") + ":\n<a href='https://github.com/marek-lach'>Marek L'ach</a>\n");
             giants.add (_("Swedish Translation Contributors") + ":\n<a href='https://github.com/eson57'>Åke Engelbrektson</a>\n");
