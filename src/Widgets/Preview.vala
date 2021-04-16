@@ -164,14 +164,17 @@ namespace ThiefMD.Widgets {
             if (exporting) {
                 style += FileManager.get_file_contents (Build.PKGDATADIR + "/styles/highlight.css");
                 if (print_only) {
-                    style += "\n\n@page {\n";
-                    style += "    margin: %fin %fin %fin %fin;\n".printf (
-                        settings.export_top_bottom_margins,
-                        settings.export_side_margins,
-                        settings.export_top_bottom_margins,
-                        settings.export_side_margins);
-                    style += "    size: %s;\n".printf (ThiefProperties.PAPER_SIZES_CSS_NAME[array_index_of (ThiefProperties.PAPER_SIZES_GTK_NAME, settings.export_paper_size)]);
-                    style += "}\n\n";
+                    string? weasyprint_loc = Environment.find_program_in_path ("weasyprint");
+                    if (weasyprint_loc != null && weasyprint_loc != "") {
+                        style += "\n\n@page {\n";
+                        style += "    margin: %fin %fin %fin %fin;\n".printf (
+                            settings.export_top_bottom_margins,
+                            settings.export_side_margins,
+                            settings.export_top_bottom_margins,
+                            settings.export_side_margins);
+                        style += "    size: %s;\n".printf (ThiefProperties.PAPER_SIZES_CSS_NAME[array_index_of (ThiefProperties.PAPER_SIZES_GTK_NAME, settings.export_paper_size)]);
+                        style += "}\n\n";
+                    }
                 }
             } else {
                 if (settings.typewriter_scrolling && override_css == null) {
