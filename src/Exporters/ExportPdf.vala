@@ -102,28 +102,115 @@ namespace ThiefMD.Exporters {
                 _("Working PDF Magic"),
                 new Gtk.Label (_("Making sure your hard work looks purrfect...")));
 
-            var print_operation = new WebKit.PrintOperation (publisher_instance.preview);
-            var print_settings = new Gtk.PrintSettings ();
-            print_settings.set_printer (_("Print to File"));
-            var page_size = new Gtk.PaperSize(settings.export_paper_size);
-            var page_setup = new Gtk.PageSetup();
-            print_settings[Gtk.PRINT_SETTINGS_OUTPUT_URI] = new_novel.get_uri ();
-            page_setup.set_paper_size_and_default_margins(page_size);
-            page_setup.set_left_margin (settings.export_side_margins, Gtk.Unit.INCH);
-            page_setup.set_right_margin (settings.export_side_margins, Gtk.Unit.INCH);
-            page_setup.set_top_margin (settings.export_top_bottom_margins, Gtk.Unit.INCH);
-            page_setup.set_bottom_margin (settings.export_top_bottom_margins, Gtk.Unit.INCH);
-            print_operation.set_print_settings (print_settings);
-            print_operation.set_page_setup (page_setup);
-            print_operation.finished.connect (() => {
-                status.destroy ();
-            });
-            print_operation.failed.connect (() => {
-                status.destroy ();
-            });
-            print_operation.print ();
+            string? weasyprint_loc = Environment.find_program_in_path ("weasyprint");
+            if (weasyprint_loc != null && weasyprint_loc != "") {
+                status.show_all ();
 
-            status.run ();
+                // string resolved_mkd = Pandoc.resolve_paths (publisher_instance.get_export_markdown ());
+                // string temp_file = FileManager.save_temp_file (resolved_mkd);
+                string temp_html_file = FileManager.save_temp_file (publisher_instance.preview.html, "html");
+                // string css_file_path = "";
+                bool res = false;
+                if (temp_html_file != "") {
+                    try {
+                        // Phase 1. Pandoc to Html
+                        //  {
+                        //      File temp_html = File.new_for_path (temp_html_file);
+                        //      temp_html.delete ();
+                        //      bool work_bib =  Pandoc.needs_bibtex (publisher_instance.get_original_markdown ());
+                        //      string[] command = {
+                        //          "pandoc",
+                        //          temp_file,
+                        //          "-o",
+                        //          temp_html_file
+                        //      };
+                        //      if (work_bib) {
+                        //          command +=  Pandoc.has_citeproc () ? "--citeproc" : "--filter=pandoc-citeproc";
+                        //      }
+                        //      if (settings.print_css != "") {
+                        //          File css_file = null;
+                        //          if (settings.print_css == "modest-splendor") {
+                        //              css_file = File.new_for_path (Path.build_filename(Build.PKGDATADIR, "styles", "preview.css"));
+                        //          } else if (settings.print_css != "") {
+                        //              css_file = File.new_for_path (Path.build_filename(UserData.css_path, settings.print_css, "print.css"));
+                        //          }
+                        //          if (css_file != null && css_file.query_exists ()) {
+                        //              command += "--css";
+                        //              command += css_file.get_path ();
+                        //              css_file_path = css_file.get_path ();
+                        //          }
+                        //      }
+                        //      Subprocess pandoc = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
+                        //      res = pandoc.wait ();
+                        //      File temp = File.new_for_path (temp_file);
+                        //      temp.delete ();
+                        //  }
+
+                        if (res && new_novel.query_exists ()) {
+                            new_novel.delete ();
+                        }
+
+                        // Phase 2 weasyprint
+                        {
+                            string[] command;
+                            //  if (css_file_path != null && css_file_path != "") {
+                            //      command = {
+                            //          "weasyprint",
+                            //          "-f",
+                            //          "pdf",
+                            //          "-s",
+                            //          css_file_path,
+                            //          temp_html_file,
+                            //          new_novel.get_path ()
+                            //      };
+                            //  } else {
+                                command = {
+                                    "weasyprint",
+                                    "-f",
+                                    "pdf",
+                                    temp_html_file,
+                                    new_novel.get_path ()
+                                };
+                            //  }
+
+                            // Run PDF conversion
+                            Subprocess weasyprint = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
+                            res = weasyprint.wait ();
+
+                            // Clean up intermediate files
+                            File temp_html = File.new_for_path (temp_html_file);
+                            temp_html.delete ();
+                        }
+                    } catch (Error e) {
+                        warning ("Could not generate epub: %s", e.message);
+                    }
+                }
+
+                status.destroy ();
+            } else {
+                var print_operation = new WebKit.PrintOperation (publisher_instance.preview);
+                var print_settings = new Gtk.PrintSettings ();
+                print_settings.set_printer (_("Print to File"));
+                var page_size = new Gtk.PaperSize(settings.export_paper_size);
+                var page_setup = new Gtk.PageSetup();
+                print_settings[Gtk.PRINT_SETTINGS_OUTPUT_URI] = new_novel.get_uri ();
+                page_setup.set_paper_size_and_default_margins(page_size);
+                page_setup.set_left_margin (settings.export_side_margins, Gtk.Unit.INCH);
+                page_setup.set_right_margin (settings.export_side_margins, Gtk.Unit.INCH);
+                page_setup.set_top_margin (settings.export_top_bottom_margins, Gtk.Unit.INCH);
+                page_setup.set_bottom_margin (settings.export_top_bottom_margins, Gtk.Unit.INCH);
+                print_operation.set_print_settings (print_settings);
+                print_operation.set_page_setup (page_setup);
+                print_operation.finished.connect (() => {
+                    status.destroy ();
+                });
+                print_operation.failed.connect (() => {
+                    status.destroy ();
+                });
+                print_operation.print ();
+                status.run ();
+            }
+
             if (new_novel.query_exists ()) {
                 return true;
             } else {

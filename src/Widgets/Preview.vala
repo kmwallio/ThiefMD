@@ -163,6 +163,16 @@ namespace ThiefMD.Widgets {
 
             if (exporting) {
                 style += FileManager.get_file_contents (Build.PKGDATADIR + "/styles/highlight.css");
+                if (print_only) {
+                    style += "\n\n@page {\n";
+                    style += "    margin: %fin %fin %fin %fin;\n".printf (
+                        settings.export_top_bottom_margins,
+                        settings.export_side_margins,
+                        settings.export_top_bottom_margins,
+                        settings.export_side_margins);
+                    style += "    size: %s;\n".printf (ThiefProperties.PAPER_SIZES_CSS_NAME[array_index_of (ThiefProperties.PAPER_SIZES_GTK_NAME, settings.export_paper_size)]);
+                    style += "}\n\n";
+                }
             } else {
                 if (settings.typewriter_scrolling && override_css == null) {
                     style += "\n.markdown-body{padding-top:60%;padding-bottom:50%}\n";
@@ -324,7 +334,7 @@ namespace ThiefMD.Widgets {
                 }
             }
 
-            if (need_pandoc || render_citations) {
+            if (exporting || need_pandoc || render_citations) {
                 return Pandoc.make_preview (out processed_mk, raw_mk, bib_file);
             } else {
                 string title, date;

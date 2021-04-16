@@ -69,6 +69,16 @@ namespace ThiefMD {
           Gtk.PAPER_NAME_LETTER
         };
 
+        public const string [] PAPER_SIZES_CSS_NAME = {
+          "A3",
+          "A4",
+          "A5",
+          "B5",
+          "Executive",
+          "Legal",
+          "Letter"
+        };
+
         private static ThiefProperties instance;
         public ThiefProperties () {
           if (instance == null) {
