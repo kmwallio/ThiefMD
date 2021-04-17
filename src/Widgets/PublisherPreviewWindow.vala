@@ -229,6 +229,15 @@ namespace ThiefMD.Widgets {
             vbox.show ();
         }
 
+        public void refresh_preview () {
+            if (exporter != null) {
+                e_markdown = exporter.update_markdown (_markdown);
+            } else {
+                e_markdown = _markdown;
+            }
+            preview.update_html_view (false, e_markdown, render_fountain);
+        }
+
         public void show_advanced_options () {
             options_pane.get_child1 ().show ();
             options_pane.set_position (250);

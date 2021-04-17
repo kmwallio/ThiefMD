@@ -337,8 +337,8 @@ namespace ThiefMD.Widgets {
                 }
             }
 
-            if (exporting || need_pandoc || render_citations) {
-                return Pandoc.make_preview (out processed_mk, raw_mk, bib_file);
+            if (need_pandoc || render_citations) {
+                return Pandoc.make_preview (out processed_mk, raw_mk, bib_file, exporting);
             } else {
                 string title, date;
                 processed_mk = FileManager.get_yamlless_markdown(
@@ -349,8 +349,12 @@ namespace ThiefMD.Widgets {
                     true,   // Include empty lines
                     settings.export_include_yaml_title, // H1 title:
                     false); // Include date
-
-                Pandoc.generate_discount_html (processed_mk, out processed_mk);
+                    
+                if (exporting) {
+                    return Pandoc.make_preview (out processed_mk, processed_mk, "", exporting);
+                } else {
+                    Pandoc.generate_discount_html (processed_mk, out processed_mk);
+                }
             }
 
             return (processed_mk.chomp () != "");

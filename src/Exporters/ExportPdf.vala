@@ -56,6 +56,7 @@ namespace ThiefMD.Exporters {
                 if (option >= 0 && option < ThiefProperties.PAPER_SIZES_GTK_NAME.length) {
                     settings.export_paper_size = ThiefProperties.PAPER_SIZES_GTK_NAME[option];
                 }
+                publisher_instance.refresh_preview ();
             });
         }
 
@@ -104,8 +105,6 @@ namespace ThiefMD.Exporters {
 
             string? weasyprint_loc = Environment.find_program_in_path ("weasyprint");
             if (weasyprint_loc != null && weasyprint_loc != "") {
-                status.show_all ();
-
                 // string resolved_mkd = Pandoc.resolve_paths (publisher_instance.get_export_markdown ());
                 // string temp_file = FileManager.save_temp_file (resolved_mkd);
                 string temp_html_file = FileManager.save_temp_file (publisher_instance.preview.html, "html");
@@ -173,20 +172,29 @@ namespace ThiefMD.Exporters {
                                 };
                             //  }
 
-                            // Run PDF conversion
-                            Subprocess weasyprint = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
-                            res = weasyprint.wait ();
+                            var pdf_thread = new Thread<void> ("pdf_thread", () => {
+                                // Run PDF conversion
+                                Subprocess weasyprint = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
+                                res = weasyprint.wait ();
+                                status.destroy ();
 
-                            // Clean up intermediate files
-                            File temp_html = File.new_for_path (temp_html_file);
-                            temp_html.delete ();
+                                // Clean up intermediate files
+                                try {
+                                    File temp_html = File.new_for_path (temp_html_file);
+                                    temp_html.delete ();
+                                } catch (Error e) {
+                                    warning ("Could not delete cache file %s, %s", temp_html_file, e.message);
+                                }
+
+                                return;
+                            });
+                            status.run ();
+                            pdf_thread.join ();
                         }
                     } catch (Error e) {
-                        warning ("Could not generate epub: %s", e.message);
+                        warning ("Could not generate pdf: %s", e.message);
                     }
                 }
-
-                status.destroy ();
             } else {
                 var print_operation = new WebKit.PrintOperation (publisher_instance.preview);
                 var print_settings = new Gtk.PrintSettings ();
