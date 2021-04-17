@@ -138,6 +138,33 @@
             ]
         },
         {
+            "name": "python-setuptools_scm",
+            "buildsystem": "simple",
+            "build-commands": [
+                "python3 setup.py install --prefix=/app --root=/"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://pypi.io/packages/source/s/setuptools_scm/setuptools_scm-3.4.3.tar.gz",
+                    "sha256": "26b8a108783cd88f4b15ff1f0f347d6b476db25d0c226159b835d713f9487320"
+                },
+                {
+                    "type": "shell",
+                    "commands": [
+                        "sed -i 's/if not platform_/if not dirs/' setup.py"
+                    ]
+                }
+            ]
+        },
+        "python3-pytest-runner.json",
+        "python3-cffi.json",
+        "python3-flit_core.json",
+        "python3-flit.json",
+        "python3-webencodings.json",
+        "python3-tinycss2.json",
+        "python3-weasyprint.json",
+        {
             "name": "thiefmd",
             "cleanup": [
                 "*.a"
