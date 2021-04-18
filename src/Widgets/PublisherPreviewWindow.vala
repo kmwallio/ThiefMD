@@ -31,7 +31,7 @@ namespace ThiefMD.Widgets {
         private string _markdown;
         private string e_markdown;
         private ExportBase exporter;
-        private bool render_fountain;
+        public bool render_fountain;
 
         public PublisherPreviewWindow (string markdown, bool generate_fountain = false) {
             preview = new Preview ();

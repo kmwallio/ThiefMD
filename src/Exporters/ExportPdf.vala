@@ -104,7 +104,11 @@ namespace ThiefMD.Exporters {
                 new Gtk.Label (_("Making sure your hard work looks purrfect...")));
 
             string? weasyprint_loc = Environment.find_program_in_path ("weasyprint");
-            if (weasyprint_loc != null && weasyprint_loc != "") {
+            if (weasyprint_loc != null &&
+                weasyprint_loc != "" &&
+                !publisher_instance.render_fountain &&
+                !publisher_instance.preview.html.contains ("<pre class"))
+            {
                 // string resolved_mkd = Pandoc.resolve_paths (publisher_instance.get_export_markdown ());
                 // string temp_file = FileManager.save_temp_file (resolved_mkd);
                 string temp_html_file = FileManager.save_temp_file (publisher_instance.preview.html, "html");

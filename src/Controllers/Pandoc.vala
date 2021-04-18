@@ -408,7 +408,12 @@ namespace ThiefMD.Controllers.Pandoc {
                 {
                     result.append ("(");
                     var url = match_info.fetch (1);
-                    result.append (find_file (url, path).replace ("(", "\\(").replace (")", "\\)"));
+                    string found_file = find_file (url, path);
+                    if (FileUtils.test (found_file, FileTest.EXISTS)) {
+                        result.append (found_file.replace ("(", "\\(").replace (")", "\\)"));
+                    } else {
+                        result.append (found_file);
+                    }
                     result.append (")");
                     return false;
                 },
