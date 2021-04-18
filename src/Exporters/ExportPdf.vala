@@ -171,7 +171,6 @@ namespace ThiefMD.Exporters {
                                 return;
                             });
                             status.run ();
-                            pdf_thread.join ();
                         }
                     } catch (Error e) {
                         warning ("Could not generate pdf: %s", e.message);
