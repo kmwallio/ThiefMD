@@ -18,3 +18,9 @@ Feel free to reach out through [GitHub Issues](https://github.com/kmwallio/Thief
 ### Exporting
 
 * [Publishing Workflow](/tips/novel-writing/#sharing-your-work)
+* [Why doesn't my font load in my eReader?](/help/ereader-font)
+
+#### Export CSS
+
+* [Advanced PDF Generation](/help/advanced-pdf)
+

@@ -20,6 +20,8 @@ The zip file can contain:
 
 Will be used for PDF export. There's no need to use `@media print`, ThiefMD will insert and format the CSS for you. This will also allow ThiefMD to render a preview as accurately as it can.
 
+When [WeasyPrint](https://weasyprint.org) generates the PDF, the [@page CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/@page) can be used. See [advanced PDF CSS](/help/advanced-pdf).
+
 ### Preview.css
 
 Preview.css specifies the CSS to use for [ePUB](https://en.wikipedia.org/wiki/EPUB) export and the Live Preview.
