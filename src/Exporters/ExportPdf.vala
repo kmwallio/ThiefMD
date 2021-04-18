@@ -104,7 +104,9 @@ namespace ThiefMD.Exporters {
                 new Gtk.Label (_("Making sure your hard work looks purrfect...")));
 
             string? weasyprint_loc = Environment.find_program_in_path ("weasyprint");
-            if (weasyprint_loc != null &&
+            string pagedjs_loc = Environment.find_program_in_path ("pagedjs-cli");
+            if ((pagedjs_loc != null && pagedjs_loc != "" && !publisher_instance.preview.html.contains ("<img")) ||
+                weasyprint_loc != null &&
                 weasyprint_loc != "" &&
                 !publisher_instance.render_fountain &&
                 !publisher_instance.preview.html.contains ("<pre class") &&
@@ -123,18 +125,36 @@ namespace ThiefMD.Exporters {
 
                         // Phase 2 weasyprint
                         {
-                            string[] command = {
-                                "weasyprint",
-                                "-f",
-                                "pdf",
-                                temp_html_file,
-                                new_novel.get_path ()
-                            };
+                            string[] command;
+                            if (pagedjs_loc == null ||
+                                pagedjs_loc == "" ||
+                                publisher_instance.preview.html.contains ("<img"))
+                            {
+                                command = {
+                                    "weasyprint",
+                                    "-f",
+                                    "pdf",
+                                    temp_html_file,
+                                    new_novel.get_path ()
+                                };
+                            } else {
+                                command = {
+                                    "pagedjs-cli",
+                                    temp_html_file,
+                                    "-o",
+                                    new_novel.get_path ()
+                                };
+                                warning ("Using pagedjs");
+                            }
 
                             var pdf_thread = new Thread<void> ("pdf_thread", () => {
                                 // Run PDF conversion
-                                Subprocess weasyprint = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
-                                res = weasyprint.wait ();
+                                try {
+                                    Subprocess weasyprint = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
+                                    res = weasyprint.wait ();
+                                } catch (Error e) {
+                                    warning ("Error converting PDF, %s", e.message);
+                                }
                                 status.destroy ();
 
                                 // Clean up intermediate files
@@ -148,7 +168,6 @@ namespace ThiefMD.Exporters {
                                 return;
                             });
                             status.run ();
-                            pdf_thread.join ();
                         }
                     } catch (Error e) {
                         warning ("Could not generate pdf: %s", e.message);
