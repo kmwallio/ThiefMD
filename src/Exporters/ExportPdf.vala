@@ -107,7 +107,8 @@ namespace ThiefMD.Exporters {
             if (weasyprint_loc != null &&
                 weasyprint_loc != "" &&
                 !publisher_instance.render_fountain &&
-                !publisher_instance.preview.html.contains ("<pre class"))
+                !publisher_instance.preview.html.contains ("<pre class") &&
+                !publisher_instance.preview.html.contains ("$$"))
             {
                 // string resolved_mkd = Pandoc.resolve_paths (publisher_instance.get_export_markdown ());
                 // string temp_file = FileManager.save_temp_file (resolved_mkd);

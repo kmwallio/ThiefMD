@@ -350,7 +350,11 @@ namespace ThiefMD.Widgets {
                     settings.export_include_yaml_title, // H1 title:
                     false); // Include date
                     
-                Pandoc.generate_discount_html (processed_mk, out processed_mk);
+                if (exporting) {
+                    return Pandoc.make_preview (out processed_mk, processed_mk, "", exporting);
+                } else {
+                    Pandoc.generate_discount_html (processed_mk, out processed_mk);
+                }
             }
 
             return (processed_mk.chomp () != "");
