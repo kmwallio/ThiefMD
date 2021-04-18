@@ -137,6 +137,7 @@ namespace ThiefMD.Exporters {
                                     temp_html_file,
                                     new_novel.get_path ()
                                 };
+                                debug ("Using weasyprint");
                             } else {
                                 command = {
                                     "pagedjs-cli",
@@ -144,7 +145,7 @@ namespace ThiefMD.Exporters {
                                     "-o",
                                     new_novel.get_path ()
                                 };
-                                warning ("Using pagedjs");
+                                debug ("Using pagedjs");
                             }
 
                             var pdf_thread = new Thread<void> ("pdf_thread", () => {
@@ -152,6 +153,7 @@ namespace ThiefMD.Exporters {
                                 try {
                                     Subprocess weasyprint = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
                                     res = weasyprint.wait ();
+                                    weasyprint.force_exit ();
                                 } catch (Error e) {
                                     warning ("Error converting PDF, %s", e.message);
                                 }
@@ -165,15 +167,18 @@ namespace ThiefMD.Exporters {
                                     warning ("Could not delete cache file %s, %s", temp_html_file, e.message);
                                 }
 
+                                Thread.exit (0);
                                 return;
                             });
                             status.run ();
+                            pdf_thread.join ();
                         }
                     } catch (Error e) {
                         warning ("Could not generate pdf: %s", e.message);
                     }
                 }
             } else {
+                debug ("Using webkit2gtk2pdf");
                 var print_operation = new WebKit.PrintOperation (publisher_instance.preview);
                 var print_settings = new Gtk.PrintSettings ();
                 print_settings.set_printer (_("Print to File"));
