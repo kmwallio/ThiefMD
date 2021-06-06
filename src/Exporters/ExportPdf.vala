@@ -180,7 +180,7 @@ namespace ThiefMD.Exporters {
                 debug ("Using webkit2gtk2pdf");
                 var print_operation = new WebKit.PrintOperation (publisher_instance.preview);
                 var print_settings = new Gtk.PrintSettings ();
-                print_settings.set_printer (_("Print to File"));
+                print_settings.set_printer ("Print to File");
                 var page_size = new Gtk.PaperSize(settings.export_paper_size);
                 var page_setup = new Gtk.PageSetup();
                 print_settings[Gtk.PRINT_SETTINGS_OUTPUT_URI] = new_novel.get_uri ();
