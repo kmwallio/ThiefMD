@@ -332,6 +332,10 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sat Sep 04 2021 kmwallio <mwallio@gmail.com> - 0.2.4
+- WestPrint PDF Export support
+- Change UI to blend in with rest of OS
+- Fix bugs
 * Sat Apr 10 2021 kmwallio <mwallio@gmail.com> - 0.2.3
 - Add Link Grammar Checking
 - Improved List and Header Formatting
