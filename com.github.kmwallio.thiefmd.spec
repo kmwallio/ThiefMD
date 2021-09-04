@@ -333,7 +333,7 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 
 %changelog
 * Sat Sep 04 2021 kmwallio <mwallio@gmail.com> - 0.2.4
-- WestPrint PDF Export support
+- WeasyPrint PDF Export support
 - Change UI to blend in with rest of OS
 - Fix bugs
 * Sat Apr 10 2021 kmwallio <mwallio@gmail.com> - 0.2.3
