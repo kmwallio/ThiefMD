@@ -36,11 +36,9 @@ namespace ThiefMD.Widgets {
             the_bar = new Hdy.HeaderBar ();
             _instance = instance;
             var header_context = the_bar.get_style_context ();
-            header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-toolbar");
 
             header_context = this.get_style_context ();
-            header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-toolbar");
 
             build_ui ();
@@ -86,7 +84,7 @@ namespace ThiefMD.Widgets {
             new_sheet_widget = new NewSheet ();
             new_sheet.has_tooltip = true;
             new_sheet.tooltip_text = (_("New Sheet"));
-            new_sheet.set_image (new Gtk.Image.from_icon_name ("document-new-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            new_sheet.set_image (new Gtk.Image.from_icon_name ("document-new-symbolic", Gtk.IconSize.BUTTON));
             new_sheet.popover = new_sheet_widget;
             new_sheet.clicked.connect(() => {
                 settings.menu_active = true;
@@ -98,7 +96,7 @@ namespace ThiefMD.Widgets {
             change_view_button = new Gtk.Button ();
             change_view_button.has_tooltip = true;
             change_view_button.tooltip_text = (_("Change View"));
-            change_view_button.set_image (new Gtk.Image.from_icon_name("document-page-setup-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            change_view_button.set_image (new Gtk.Image.from_icon_name("document-page-setup-symbolic", Gtk.IconSize.BUTTON));
             change_view_button.clicked.connect (() => {
                 UI.toggle_view();
             });
@@ -106,7 +104,7 @@ namespace ThiefMD.Widgets {
             add_library_button = new Gtk.Button ();
             add_library_button.has_tooltip = true;
             add_library_button.tooltip_text = (_("Add Folder to Library"));
-            add_library_button.set_image (new Gtk.Image.from_icon_name ("folder-new-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            add_library_button.set_image (new Gtk.Image.from_icon_name ("folder-new-symbolic", Gtk.IconSize.BUTTON));
             add_library_button.clicked.connect (() => {
                 settings.menu_active = true;
                 string new_lib = Dialogs.select_folder_dialog ();
@@ -129,7 +127,7 @@ namespace ThiefMD.Widgets {
             menu_button = new Gtk.MenuButton ();
             menu_button.has_tooltip = true;
             menu_button.tooltip_text = (_("Settings"));
-            menu_button.set_image (new Gtk.Image.from_icon_name ("open-menu-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            menu_button.set_image (new Gtk.Image.from_icon_name ("open-menu-symbolic", Gtk.IconSize.BUTTON));
             menu_button.popover = new QuickPreferences (_instance);
             menu_button.clicked.connect (() => {
                 settings.menu_active = true;
@@ -144,7 +142,7 @@ namespace ThiefMD.Widgets {
             sidebar_button = new Gtk.Button ();
             sidebar_button.has_tooltip = true;
             sidebar_button.tooltip_text = (_("Show Notes"));
-            sidebar_button.set_image (new Gtk.Image.from_icon_name ("sidebar-hide-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            sidebar_button.set_image (new Gtk.Image.from_icon_name ("sidebar-hide-symbolic", Gtk.IconSize.BUTTON));
             sidebar_button.clicked.connect (() => {
                 if (!ThiefApp.get_instance ().notes.child_revealed) {
                     ThiefApp.get_instance ().notes_widget.show ();
@@ -160,7 +158,7 @@ namespace ThiefMD.Widgets {
             the_bar.pack_start (change_view_button);
             the_bar.pack_start (add_library_button);
             // @TODO: Need to find a better way to do this
-            the_bar.pack_start (spacer);
+            // the_bar.pack_start (spacer);
             the_bar.pack_start (new_sheet);
 
             the_bar.pack_end (sidebar_button);
