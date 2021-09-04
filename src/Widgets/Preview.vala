@@ -163,6 +163,19 @@ namespace ThiefMD.Widgets {
 
             if (exporting) {
                 style += FileManager.get_file_contents (Build.PKGDATADIR + "/styles/highlight.css");
+                if (print_only) {
+                    string? weasyprint_loc = Environment.find_program_in_path ("weasyprint");
+                    if (weasyprint_loc != null && weasyprint_loc != "") {
+                        style += "\n\n@page {\n";
+                        style += "    margin: %fin %fin %fin %fin;\n".printf (
+                            settings.export_top_bottom_margins,
+                            settings.export_side_margins,
+                            settings.export_top_bottom_margins,
+                            settings.export_side_margins);
+                        style += "    size: %s;\n".printf (ThiefProperties.PAPER_SIZES_CSS_NAME[array_index_of (ThiefProperties.PAPER_SIZES_GTK_NAME, settings.export_paper_size)]);
+                        style += "}\n\n";
+                    }
+                }
             } else {
                 if (settings.typewriter_scrolling && override_css == null) {
                     style += "\n.markdown-body{padding-top:60%;padding-bottom:50%}\n";
@@ -325,7 +338,7 @@ namespace ThiefMD.Widgets {
             }
 
             if (need_pandoc || render_citations) {
-                return Pandoc.make_preview (out processed_mk, raw_mk, bib_file);
+                return Pandoc.make_preview (out processed_mk, raw_mk, bib_file, exporting);
             } else {
                 string title, date;
                 processed_mk = FileManager.get_yamlless_markdown(
@@ -336,8 +349,12 @@ namespace ThiefMD.Widgets {
                     true,   // Include empty lines
                     settings.export_include_yaml_title, // H1 title:
                     false); // Include date
-
-                Pandoc.generate_discount_html (processed_mk, out processed_mk);
+                    
+                if (exporting) {
+                    return Pandoc.make_preview (out processed_mk, processed_mk, "", exporting);
+                } else {
+                    Pandoc.generate_discount_html (processed_mk, out processed_mk);
+                }
             }
 
             return (processed_mk.chomp () != "");

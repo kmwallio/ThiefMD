@@ -1,3 +1,11 @@
+com.github.kmwallio.thiefmd (0.2.4) groovy; urgency=low
+
+  * WeasyPrint PDF Export support
+  * Change UI to blend in with rest of OS
+  * Fix bugs
+
+ -- kmwallio <mwallio@gmail.com>  Sat, 04 Sep 2021 10:32:06 -0700
+
 com.github.kmwallio.thiefmd (0.2.3) groovy; urgency=low
 
   * Add Link Grammar Checking

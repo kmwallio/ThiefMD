@@ -82,7 +82,7 @@
             }]
         },
         {
-            "name": "pandoc",
+            "name": "pandoc-amd64",
             "cleanup": [
                 "*.a"
             ],
@@ -95,8 +95,26 @@
             ],
             "sources": [{
                 "type": "archive",
-                "url": "https://github.com/jgm/pandoc/releases/download/2.11.4/pandoc-2.11.4-linux-amd64.tar.gz",
-                "sha256": "b15ce6009ab833fb51fc472bf8bb9683cd2bd7f8ac948f3ddeb6b8f9a366d69a"
+                "url": "https://github.com/jgm/pandoc/releases/download/2.13/pandoc-2.13-linux-amd64.tar.gz",
+                "sha256": "7404aa88a6eb9fbb99d9803b80170a3a546f51959230cc529c66a2ce6b950d4c"
+            }]
+        },
+        {
+            "name": "pandoc-arm64",
+            "cleanup": [
+                "*.a"
+            ],
+            "only-arches": [
+                "aarch64"
+            ],
+            "buildsystem": "simple",
+            "build-commands": [
+                "mv -v bin/pandoc /app/bin/pandoc"
+            ],
+            "sources": [{
+                "type": "archive",
+                "url": "https://github.com/jgm/pandoc/releases/download/2.13/pandoc-2.13-linux-arm64.tar.gz",
+                "sha256": "4f87bfe8a0a626ad0e17d26d42e99a1c0ed7d369cca00366c1b3d97525f57db5"
             }]
         },
         {
@@ -137,6 +155,33 @@
                 }
             ]
         },
+        {
+            "name": "python-setuptools_scm",
+            "buildsystem": "simple",
+            "build-commands": [
+                "python3 setup.py install --prefix=/app --root=/"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://pypi.io/packages/source/s/setuptools_scm/setuptools_scm-3.4.3.tar.gz",
+                    "sha256": "26b8a108783cd88f4b15ff1f0f347d6b476db25d0c226159b835d713f9487320"
+                },
+                {
+                    "type": "shell",
+                    "commands": [
+                        "sed -i 's/if not platform_/if not dirs/' setup.py"
+                    ]
+                }
+            ]
+        },
+        "python3-pytest-runner.json",
+        "python3-cffi.json",
+        "python3-flit_core.json",
+        "python3-flit.json",
+        "python3-webencodings.json",
+        "python3-tinycss2.json",
+        "python3-weasyprint.json",
         {
             "name": "thiefmd",
             "cleanup": [

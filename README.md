@@ -8,7 +8,7 @@ ThiefMD is a [Markdown](https://en.wikipedia.org/wiki/Markdown) & [Fountain](htt
 
 ## Installation from Flatpak
 
-![ThiefMD](https://flathub.org/apps/details/com.github.kmwallio.thiefmd) is now available on Flathub. Make sure you've added [flathub](https://flatpak.org/setup) to your system.
+[ThiefMD](https://flathub.org/apps/details/com.github.kmwallio.thiefmd) is now available on Flathub. Make sure you've added [flathub](https://flatpak.org/setup) to your system.
 
 ```bash
 flatpak install flathub com.github.kmwallio.thiefmd

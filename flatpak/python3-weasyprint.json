@@ -1,0 +1,69 @@
+{
+    "name": "python3-weasyprint",
+    "buildsystem": "simple",
+    "build-commands": [
+        "pip3 install --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"weasyprint\" --no-build-isolation"
+    ],
+    "sources": [
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/61/8d/95a258a74cd44b2d5fce469e3fb2d774741778babbac35cf030ab32642b4/Pyphen-0.10.0.tar.gz",
+            "sha256": "719b21dfb4b04fbc11cc0f6112418535fe35474021120cccfffc43a25fe63128"
+        },
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/84/ca/0bffed5116d21251469df200448667e90acaa5131edea869b44a3fbc73d0/cairocffi-1.2.0.tar.gz",
+            "sha256": "9a979b500c64c8179fec286f337e8fe644eca2f2cd05860ce0b62d25f22ea140"
+        },
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/0f/86/e19659527668d70be91d0369aeaa055b4eb396b0f387a4f92293a20035bd/pycparser-2.20.tar.gz",
+            "sha256": "2d475327684562c3a96cc71adf7dc8c4f0565175cf86b6d7a404ff4c771f15f0"
+        },
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/21/23/af6bac2a601be6670064a817273d4190b79df6f74d8012926a39bc7aa77f/Pillow-8.2.0.tar.gz",
+            "sha256": "a787ab10d7bb5494e5f76536ac460741788f1fbce851068d73a87ca7c35fc3e1"
+        },
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/0e/8a/618700c8d6a1dbef8bbe6da97d57c47363aa14b486140a4df9f75f31ba4f/CairoSVG-2.5.2.tar.gz",
+            "sha256": "b0b9929cf5dba005178d746a8036fcf0025550f498ca54db61873322384783bc"
+        },
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/a8/20/025f59f929bbcaa579704f443a438135918484fffaacfaddba776b374563/cffi-1.14.5.tar.gz",
+            "sha256": "fd78e5fee591709f32ef6edb9a015b4aa1a5022598e36227500c8f4e02328d9c"
+        },
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/ac/b6/b55c3f49042f1df3dcd422b7f224f939892ee94f22abcf503a9b7339eaf2/html5lib-1.1.tar.gz",
+            "sha256": "b2e5b40261e20f354d198eae92afc10d750afb487ed5e50f9c4eaf07c184146f"
+        },
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/ce/d3/ece7a98d5826bd134e269a3a3030153d30482194fca71d95a3041812aab8/tinycss2-1.1.0.tar.gz",
+            "sha256": "fbdcac3044d60eb85fdb2aa840ece43cf7dbe798e373e6ee0be545d4d134e18a"
+        },
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/0f/d5/c66da9b79e5bdb124974bfe172b4daf3c984ebd9c2a06e2b8a4dc7331c72/defusedxml-0.7.1.tar.gz",
+            "sha256": "1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69"
+        },
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/ad/3d/fb764303deb34cbc1a32fcecdfd239367cb16323920c88390b2f5ad751f0/cssselect2-0.4.1.tar.gz",
+            "sha256": "93fbb9af860e95dd40bf18c3b2b6ed99189a07c0f29ba76f9c5be71344664ec8"
+        },
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/0b/02/ae6ceac1baeda530866a85075641cec12989bd8d31af6d5ab4a3e8c92f47/webencodings-0.5.1.tar.gz",
+            "sha256": "b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923"
+        },
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/43/ec/fa31efd398ed2c0f2a327e273dbb2a58a41ad55b6f0f84b11c05503ee518/WeasyPrint-52.5.tar.gz",
+            "sha256": "b37ea02d75ca04babd7becad7341426be332ae560d8f02d664bfa1e9afb18481"
+        }
+    ]
+}

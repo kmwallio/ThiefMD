@@ -46,15 +46,15 @@ namespace ThiefMD.Widgets {
             next = new Gtk.Button ();
             header_context = next.get_style_context ();
             header_context.add_class ("thief-search-button");
-            next.set_image (new Gtk.Image.from_icon_name ("go-next-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            next.set_image (new Gtk.Image.from_icon_name ("go-next-symbolic", Gtk.IconSize.BUTTON));
             prev = new Gtk.Button ();
             header_context = prev.get_style_context ();
             header_context.add_class ("thief-search-button");
-            prev.set_image (new Gtk.Image.from_icon_name ("go-next-rtl-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            prev.set_image (new Gtk.Image.from_icon_name ("go-next-rtl-symbolic", Gtk.IconSize.BUTTON));
             var close = new Gtk.ModelButton ();
             header_context = close.get_style_context ();
             header_context.add_class ("thief-search-button");
-            close.set_image (new Gtk.Image.from_icon_name ("window-close-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            close.set_image (new Gtk.Image.from_icon_name ("window-close-symbolic", Gtk.IconSize.BUTTON));
             close.clicked.connect (() => {
                 if (child_revealed) {
                     deactivate_search ();

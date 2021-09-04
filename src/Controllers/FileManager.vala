@@ -254,7 +254,7 @@ namespace ThiefMD.Controllers.FileManager {
             written += output.write (buffer[written:buffer.length]);
     }
 
-    public string save_temp_file (string text) {
+    public string save_temp_file (string text, string ext = "md") {
         string res_file = "";
         string cache_path = Path.build_filename (Environment.get_user_cache_dir (), "com.github.kmwallio.thiefmd");
         var cache_folder = File.new_for_path (cache_path);
@@ -267,7 +267,7 @@ namespace ThiefMD.Controllers.FileManager {
         }
 
         Rand probably_a_better_solution_than_this = new Rand ();
-        string random_name = "%d.md".printf (probably_a_better_solution_than_this.int_range (100000, 999999));
+        string random_name = "%d.%s".printf (probably_a_better_solution_than_this.int_range (100000, 999999), ext);
         File tmp_file = cache_folder.get_child (random_name);
 
         try {

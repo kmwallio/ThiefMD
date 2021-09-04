@@ -81,7 +81,7 @@ namespace ThiefMD.Widgets {
 
             refresh = new Gtk.Button ();
             refresh.tooltip_text = _("Refresh Statistics");
-            refresh.set_image (new Gtk.Image.from_icon_name ("view-refresh-symbolic", Gtk.IconSize.LARGE_TOOLBAR));
+            refresh.set_image (new Gtk.Image.from_icon_name ("view-refresh-symbolic", Gtk.IconSize.BUTTON));
 
             refresh.activate.connect (update_wordcount);
             headerbar.set_show_close_button (true);

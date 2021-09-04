@@ -31,7 +31,7 @@ namespace ThiefMD.Widgets {
         private string _markdown;
         private string e_markdown;
         private ExportBase exporter;
-        private bool render_fountain;
+        public bool render_fountain;
 
         public PublisherPreviewWindow (string markdown, bool generate_fountain = false) {
             preview = new Preview ();
@@ -227,6 +227,15 @@ namespace ThiefMD.Widgets {
             preview.show_all ();
             headerbar.show_all ();
             vbox.show ();
+        }
+
+        public void refresh_preview () {
+            if (exporter != null) {
+                e_markdown = exporter.update_markdown (_markdown);
+            } else {
+                e_markdown = _markdown;
+            }
+            preview.update_html_view (false, e_markdown, render_fountain);
         }
 
         public void show_advanced_options () {

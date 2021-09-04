@@ -403,6 +403,17 @@ namespace ThiefMD {
         return b.str;
     }
 
+    public int array_index_of (string[] haystack, string needle) {
+        int res = 0;
+        for (int i = 0; i < haystack.length; i++) {
+            if (haystack[i] == needle) {
+                res = i;
+            }
+        }
+
+        return res;
+    }
+
     public string get_possible_markdown_url (string url) {
         if (url.index_of_char (':') > 0 && url.index_of_char (':') <= 7) {
             string protocol = url.substring (0, url.index_of_char (':'));
