@@ -104,13 +104,21 @@ namespace ThiefMD.Exporters {
                 new Gtk.Label (_("Making sure your hard work looks purrfect...")));
 
             string? weasyprint_loc = Environment.find_program_in_path ("weasyprint");
+            if (weasyprint_loc == null || weasyprint_loc == "")
+            {
+                if (FileUtils.test("/app/bin/weasyprint", FileTest.EXISTS))
+                {
+                    weasyprint_loc = "/app/bin/weasyprint";
+                }
+            }
+
             string pagedjs_loc = Environment.find_program_in_path ("pagedjs-cli");
             if ((pagedjs_loc != null && pagedjs_loc != "" && !publisher_instance.preview.html.contains ("<img")) ||
                 weasyprint_loc != null &&
                 weasyprint_loc != "" &&
                 !publisher_instance.render_fountain &&
                 !publisher_instance.preview.html.contains ("<pre class") &&
-                !publisher_instance.preview.html.contains ("$$"))
+                !publisher_instance.get_original_markdown ().contains ("$$"))
             {
                 // string resolved_mkd = Pandoc.resolve_paths (publisher_instance.get_export_markdown ());
                 // string temp_file = FileManager.save_temp_file (resolved_mkd);
@@ -131,7 +139,7 @@ namespace ThiefMD.Exporters {
                                 publisher_instance.preview.html.contains ("<img"))
                             {
                                 command = {
-                                    "weasyprint",
+                                    weasyprint_loc,
                                     "-f",
                                     "pdf",
                                     temp_html_file,
@@ -157,7 +165,6 @@ namespace ThiefMD.Exporters {
                                 } catch (Error e) {
                                     warning ("Error converting PDF, %s", e.message);
                                 }
-                                status.destroy ();
 
                                 // Clean up intermediate files
                                 try {
@@ -167,6 +174,7 @@ namespace ThiefMD.Exporters {
                                     warning ("Could not delete cache file %s, %s", temp_html_file, e.message);
                                 }
 
+                                status.destroy ();
                                 Thread.exit (0);
                                 return;
                             });
