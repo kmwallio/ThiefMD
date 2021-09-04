@@ -68,6 +68,17 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.4" date="2021-09-04" urgency="low">
+      <description>
+        <p>You made this PDF using Markdown? And it was easy? Like WeasyPrint?</p>
+        <ul>
+          <li>WeasyPrint for PDF Export</li>
+          <li>Some changes to make the UI fit in more with the rest of the system</li>
+          <li>Bug fixes</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.4-easypdf</url>
+    </release>
     <release version="0.2.3" date="2021-04-10" urgency="low">
       <description>
         <p>Check, 1, 2. Check 1, 2. Does this look right to you?</p>
