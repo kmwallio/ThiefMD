@@ -402,9 +402,11 @@ namespace ThiefMD.Widgets {
                             _view.add (sheet);
                             metadata.add_sheet (file_name);
 
-                            if (settings.last_file == path) {
-                                sheet.active_sheet = true;
-                                SheetManager.load_sheet (sheet);
+                            if (!settings.dont_show_tips){
+                                if (settings.last_file == path) {
+                                    sheet.active_sheet = true;
+                                    SheetManager.load_sheet (sheet);
+                                }
                             }
                         }
                     }
