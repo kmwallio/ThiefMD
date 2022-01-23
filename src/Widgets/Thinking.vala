@@ -29,8 +29,8 @@ namespace ThiefMD.Widgets {
         private Mutex running;
         private string message;
 
-        public Thinking (string set_title, owned ThinkingCallback callback, Gee.List<string>? messages = null) {
-            set_transient_for (ThiefApp.get_instance ());
+        public Thinking (string set_title, owned ThinkingCallback callback, Gee.List<string>? messages = null, Gtk.Window parent = null) {
+            set_transient_for ((parent == null) ? ThiefApp.get_instance () : parent);
             resizable = false;
             deletable = false;
             modal = true;

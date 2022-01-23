@@ -92,7 +92,7 @@ namespace ThiefMD.Widgets {
                 preview_type.set_active (exporters.index_of ("PDF"));
                 exporter = ThiefApp.get_instance ().exporters.get_exporter ("PDF");
             }
-            
+
             exporter.attach (this);
             e_markdown = exporter.update_markdown (_markdown);
 

@@ -39,7 +39,7 @@ namespace ThiefMD {
 
         public class Thinking {
             public delegate void ThinkingCallback ();
-            public Thinking (string set_title, ThinkingCallback callback, Gee.List<string>? custom_messages = null) { }
+            public Thinking (string set_title, ThinkingCallback callback, Gee.List<string>? custom_messages = null, Gtk.Window parent = null) { }
 
             public void run () { }
         }
