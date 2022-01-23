@@ -9,6 +9,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        
+      - name: Add vala next
+        run: sudo add-apt-repository ppa:vala-team/daily
 
       - name: Add libhandy-1 for focal
         run: sudo add-apt-repository ppa:apandada1/libhandy-1
