@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.2.4
+Version: 0.2.5
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
@@ -332,6 +332,10 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
+* Wed Feb 16 2022 kmwallio <mwallio@gmail.com> - 0.2.5
+- Fix race condition in PDF Export
+- Fix issue when multiple exporter windows are opened
+- Fix bugs
 * Sat Sep 04 2021 kmwallio <mwallio@gmail.com> - 0.2.4
 - WeasyPrint PDF Export support
 - Change UI to blend in with rest of OS
