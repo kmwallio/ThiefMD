@@ -31,8 +31,6 @@ namespace ThiefMD {
         public Gtk.ScrolledWindow library_view;
         public SearchBar search_bar;
         public StatisticsBar stats_bar;
-        public Controllers.Exporters exporters;
-        public Gee.ConcurrentList<Connections.ConnectionBase> connections;
         public bool ready = false;
         public Gtk.Revealer notes;
         public Gtk.Box editor_notes_pane;
@@ -238,20 +236,6 @@ namespace ThiefMD {
 
             UserData.create_data_directories ();
 
-            // Load exporters
-            exporters = new Controllers.Exporters ();
-            exporters.register (Constants.DEFAULT_EXPORTER, new Exporters.ExportEpub ());
-            exporters.register (_("HTML"), new Exporters.ExportHtml ());
-            exporters.register (_("PDF"), new Exporters.ExportPdf ());
-            exporters.register (_("MHTML"), new Exporters.ExportMhtml ());
-            exporters.register (_("Markdown"), new Exporters.ExportMarkdown ());
-            exporters.register (_("LaTeX"), new Exporters.ExportLatex ());
-            exporters.register (_("DocX"), new Exporters.ExportDocx ());
-            exporters.register (_("Fountain"), new Exporters.ExportFountain ());
-
-            // Load connections
-            connections = new Gee.ConcurrentList<Connections.ConnectionBase> ();
-
             // Restore preview view
             UI.show_view ();
             UI.set_sheets (start_sheet);
@@ -309,9 +293,6 @@ namespace ThiefMD {
             destroy.connect (() => {
                 SheetManager.save_active ();
                 notes_widget.save_notes ();
-                foreach (var c in _instance.connections) {
-                    c.connection_close ();
-                }
             });
 
             // Go go go!

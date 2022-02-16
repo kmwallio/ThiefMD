@@ -258,22 +258,6 @@ namespace ThiefMD.Widgets {
 
                 menu.add (new Gtk.SeparatorMenuItem ());
 
-                Gtk.MenuItem menu_preview_sheet = new Gtk.MenuItem.with_label (_("Preview"));
-                menu.add (menu_preview_sheet);
-                menu_preview_sheet.activate.connect (() => {
-                    this.clicked ();
-                    PreviewWindow pvw = PreviewWindow.get_instance ();
-                    pvw.show_all ();
-                });
-
-                Gtk.MenuItem menu_export_sheet = new Gtk.MenuItem.with_label (_("Export"));
-                menu.add (menu_export_sheet);
-                menu_export_sheet.activate.connect (() => {
-                    string preview_markdown = FileManager.get_file_contents (_sheet_path);
-                    PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown, is_fountain (_sheet_path));
-                    ppw.show ();
-                });
-
                 Gtk.MenuItem copy_file_path = new Gtk.MenuItem.with_label (_("Copy File Path"));
                 menu.add (copy_file_path);
                 copy_file_path.activate.connect (() => {

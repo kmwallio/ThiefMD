@@ -31,17 +31,8 @@ namespace ThiefMD.Controllers.UI {
     //
     // Sheets Management
     //
-    TimedMutex preview_mutex;
     public void update_preview () {
-        if (preview_mutex == null) {
-            preview_mutex = new TimedMutex (250);
-        }
-
-        if (preview_mutex.can_do_action ()) {
-            var settings = AppSettings.get_default ();
-            Preview.get_instance ().update_html_view (true, SheetManager.get_markdown (), is_fountain (settings.last_file));
-            settings.writing_changed ();
-        }
+        
     }
 
     // Switches Sheets shown in the Library view with the
@@ -217,13 +208,6 @@ namespace ThiefMD.Controllers.UI {
             warning ("Could not load themes: %s", e.message);
         }
         debug ("Themes loaded");
-
-        debug ("Loading user connections");
-        GLib.Idle.add (() => {
-            SecretSchemas.get_instance ().load_secrets ();
-            debug ("Connections loaded");
-            return false;
-        }, GLib.Priority.LOW);
 
         return false;
     }

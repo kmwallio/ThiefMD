@@ -535,16 +535,6 @@ namespace ThiefMD.Widgets {
                 var settings = AppSettings.get_default ();
                 Gtk.Menu menu = new Gtk.Menu ();
 
-                Gtk.MenuItem menu_preview_item = new Gtk.MenuItem.with_label (_("Export Preview"));
-                menu_preview_item.activate.connect (() => {
-                    if (_selected != null && _all_sheets.find (_selected) != null) {
-                        string preview_markdown = build_novel (_selected, settings.export_include_metadata_file);
-                        PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown, render_fountain (_selected));
-                        ppw.show ();
-                    }
-                });
-                menu.add (menu_preview_item);
-
                 Gtk.MenuItem menu_writing_stats = new Gtk.MenuItem.with_label (_("Writing Statistics"));
                 menu_writing_stats.activate.connect (() => {
                     if (_selected != null && _all_sheets.find (_selected) != null) {

@@ -91,24 +91,6 @@ namespace ThiefMD.Widgets {
 
             var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
 
-            var preview_button = new Gtk.ModelButton ();
-            preview_button.text = (_("Preview"));
-            preview_button.has_tooltip = true;
-            preview_button.tooltip_text = _("Launch Preview");
-            preview_button.clicked.connect (() => {
-                PreviewWindow pvw = PreviewWindow.get_instance ();
-                pvw.show ();
-            });
-
-            var export_button = new Gtk.ModelButton ();
-            export_button.text = (_("Publishing Preview"));
-            export_button.has_tooltip = true;
-            export_button.tooltip_text = _("Open Export Window");
-            export_button.clicked.connect (() => {
-                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
-                ppw.show ();
-            });
-
             var search_button = new Gtk.ModelButton ();
             search_button.text = (_("Search Library"));
             search_button.has_tooltip = true;
@@ -148,9 +130,7 @@ namespace ThiefMD.Widgets {
             }
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
-            menu_grid.add (preview_button);
             if (_instance.show_touch_friendly) {
-                menu_grid.add (export_button);
                 menu_grid.add (search_button);
                 am_mobile = true;
             }
@@ -175,24 +155,6 @@ namespace ThiefMD.Widgets {
 
             var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
 
-            var preview_button = new Gtk.ModelButton ();
-            preview_button.text = (_("Preview"));
-            preview_button.has_tooltip = true;
-            preview_button.tooltip_text = _("Launch Preview");
-            preview_button.clicked.connect (() => {
-                PreviewWindow pvw = PreviewWindow.get_instance ();
-                pvw.show_all ();
-            });
-
-            var export_button = new Gtk.ModelButton ();
-            export_button.text = (_("Publishing Preview"));
-            export_button.has_tooltip = true;
-            export_button.tooltip_text = _("Open Export Window");
-            export_button.clicked.connect (() => {
-                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
-                ppw.show ();
-            });
-
             var search_button = new Gtk.ModelButton ();
             search_button.text = (_("Search Library"));
             search_button.has_tooltip = true;
@@ -232,8 +194,6 @@ namespace ThiefMD.Widgets {
             }
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
-            menu_grid.add (preview_button);
-            menu_grid.add (export_button);
             menu_grid.add (search_button);
             menu_grid.add (preferences_button);
             menu_grid.add (about_button);
@@ -254,24 +214,6 @@ namespace ThiefMD.Widgets {
 
             var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
 
-            var preview_button = new Gtk.ModelButton ();
-            preview_button.text = (_("Preview"));
-            preview_button.has_tooltip = true;
-            preview_button.tooltip_text = _("Launch Preview");
-            preview_button.clicked.connect (() => {
-                PreviewWindow pvw = PreviewWindow.get_instance ();
-                pvw.show_all ();
-            });
-
-            var export_button = new Gtk.ModelButton ();
-            export_button.text = (_("Publishing Preview"));
-            export_button.has_tooltip = true;
-            export_button.tooltip_text = _("Open Export Window");
-            export_button.clicked.connect (() => {
-                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
-                ppw.show ();
-            });
-
             var search_button = new Gtk.ModelButton ();
             search_button.text = (_("Search Library"));
             search_button.has_tooltip = true;
@@ -311,7 +253,6 @@ namespace ThiefMD.Widgets {
             }
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
-            menu_grid.add (preview_button);
             menu_grid.add (preferences_button);
             menu_grid.add (about_button);
             menu_grid.show_all ();

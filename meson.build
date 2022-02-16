@@ -59,15 +59,6 @@ if libmarkdown.found() == false
     libmarkdown = cc.find_library('libmarkdown', required: true)
 endif
 
-# Find linkgrammar
-cc = meson.get_compiler('c')
-linkgrammar = cc.find_library('liblink-grammar', required: false)
-# and it just keeps going
-if linkgrammar.found() == false
-    cc = meson.get_compiler('c')
-    linkgrammar = cc.find_library('link-grammar', required: true)
-endif
-
 # Let's define our executable
 add_project_arguments(['--vapidir', join_paths(meson.current_source_dir(), 'vapi')], language: 'vala')
 
@@ -85,21 +76,6 @@ executable(
     'src/Controllers/UI.vala',
     'src/Controllers/UserData.vala',
     'src/Controllers/Pandoc.vala',
-    'src/Controllers/Exporters.vala',
-    'src/Controllers/ConnectionManager.vala',
-    'src/Connections/ConnectionBase.vala',
-    'src/Connections/WriteFreelyConnection.vala',
-    'src/Connections/GhostConnection.vala',
-    'src/Connections/WordpressConnection.vala',
-    'src/Exporters/ExportBase.vala',
-    'src/Exporters/ExportDocx.vala',
-    'src/Exporters/ExportEpub.vala',
-    'src/Exporters/ExportHtml.vala',
-    'src/Exporters/ExportLatex.vala',
-    'src/Exporters/ExportMarkdown.vala',
-    'src/Exporters/ExportFountain.vala',
-    'src/Exporters/ExportMhtml.vala',
-    'src/Exporters/ExportPdf.vala',
     'src/Enrichments/Grammar.vala',
     'src/Enrichments/Fountain.vala',
     'src/Enrichments/Markdown.vala',
@@ -113,19 +89,16 @@ executable(
     'src/Widgets/NewFolder.vala',
     'src/Widgets/NewSheet.vala',
     'src/Widgets/Preferences.vala',
-    'src/Widgets/Preview.vala',
-    'src/Widgets/PreviewWindow.vala',
-    'src/Widgets/PublisherPreviewWindow.vala',
     'src/Widgets/KeyBindings.vala',
     'src/Widgets/ProjectStatistics.vala',
     'src/Widgets/QuickPreferences.vala',
+    'src/Widgets/ThemePreview.vala',
     'src/Widgets/ThemeSelector.vala',
     'src/Widgets/DefaultTheme.vala',
     'src/Widgets/SearchBar.vala',
     'src/Widgets/StatisticsBar.vala',
     'src/Widgets/SearchWindow.vala',
     'src/Widgets/MouseMotionListener.vala',
-    'src/Widgets/ThemePreview.vala',
     'src/Widgets/Thinking.vala',
     'src/Widgets/MarkdownCheatSheet.vala',
     'src/ultheme/src/HexColors.vala',
@@ -144,7 +117,6 @@ executable(
         dependency('gtksourceview-4'),
         dependency('gtk+-3.0'),
         dependency('gtkspell3-3.0'),
-        dependency('webkit2gtk-4.0'),
         dependency('clutter-1.0'),
         dependency('json-glib-1.0'),
         dependency('gee-0.8'),
@@ -152,13 +124,14 @@ executable(
         dependency('libxml-2.0'),
         dependency('libsecret-1'),
         dependency('libhandy-1'),
+        dependency('libsoup-2.4'),
         libmarkdown,
-        linkgrammar
+        dependency('link-grammar')
     ],
     vala_args: [
         meson.source_root() + '/vapi/config.vapi',
         meson.source_root() + '/vapi/libmarkdown.vapi',
-        meson.source_root() + '/vapi/linkgrammar.vapi'
+        meson.source_root() + '/vapi/link-grammar.vapi'
     ],
     install : true
 )

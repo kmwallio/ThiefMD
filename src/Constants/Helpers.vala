@@ -18,7 +18,7 @@
  */
 
 using ThiefMD.Controllers;
-using ThiefMD.Connections;
+
 using ThiefMD.Widgets;
 
 namespace ThiefMD {

@@ -61,20 +61,12 @@ namespace ThiefMD.Widgets {
             grid.attach (word_label, 0, 0, 2, 1);
             grid.attach (reading_time, 0, 1, 2, 1);
 
-            Gtk.Button export_button = new Gtk.Button.with_label (_("Export"));
-            export_button.clicked.connect (() => {
-                string novel = ThiefApp.get_instance ().library.get_novel (monitor_path);
-                PublisherPreviewWindow ppw = new PublisherPreviewWindow (novel);
-                ppw.show ();
-            });
-
             Gtk.Button close_button = new Gtk.Button.with_label (_("Close"));
             close_button.clicked.connect (() => {
                 settings.writing_changed.disconnect (update_wordcount);
                 destroy ();
             });
 
-            grid.attach (export_button, 0, 3, 1, 1);
             grid.attach (close_button, 1, 3, 1, 1);
 
             grid.show_all ();

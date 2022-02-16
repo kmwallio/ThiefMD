@@ -85,14 +85,6 @@ namespace ThiefMD.Widgets {
                     }
                 }
 
-                // Preview
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
-                    if (match_keycode (Gdk.Key.p, keycode)) {
-                        PreviewWindow pvw = PreviewWindow.get_instance ();
-                        pvw.show_all ();
-                    }
-                }
-
                 // Focus
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
                     if (match_keycode (Gdk.Key.r, keycode)) {
