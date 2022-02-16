@@ -106,9 +106,6 @@ executable(
     'src/writegood/src/language.vala',
     'src/writegood/src/writegood.vala',
     'src/writegood/src/en_us.vala',
-    'src/writeas/src/Writeas.vala',
-    'src/ghost/src/Ghost.vala',
-    'src/wordpress/src/Wordpress.vala',
     'src/bibtex/src/BibTex.vala',
     asresources,
     c_args: c_args,
@@ -124,7 +121,6 @@ executable(
         dependency('libxml-2.0'),
         dependency('libsecret-1'),
         dependency('libhandy-1'),
-        dependency('libsoup-2.4'),
         libmarkdown,
         dependency('link-grammar')
     ],
