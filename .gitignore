@@ -9,3 +9,4 @@ subprojects/writegood
 subprojects/writegood/*
 flatpak/.flatpak-builder/*
 flatpak/build*
+.DS_Store
