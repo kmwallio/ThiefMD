@@ -144,6 +144,26 @@ libhandy1-devel
 link-grammar-devel
 ```
 
+### macOS
+
+Installed with [Homebrew](https://brew.sh)
+
+```
+vala
+meson
+ninja
+clutter-gtk
+cmake
+gettext
+gtkspell3
+link-grammar
+libgee
+libsecret
+gtksourceview4
+gtk+3
+adwaita-icon-theme
+```
+
 ## Building
 
 ```bash
