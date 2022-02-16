@@ -146,7 +146,7 @@ link-grammar-devel
 
 ### macOS
 
-Installed with [Homebrew](https://brew.sh)
+Installed with [Homebrew](https://brew.sh).
 
 ```
 vala
