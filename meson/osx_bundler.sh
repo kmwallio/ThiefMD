@@ -1,5 +1,18 @@
 #!/bin/bash
 
+PROJECTDIR="$( cd "$(dirname "$0")/../" ; pwd -P )"
+APP="ThiefMD.app"
+APP_TOP_DIR=${MESON_INSTALL_PREFIX}
+APP_CON_DIR=$APP_TOP_DIR/Contents
+APP_RES_DIR=$APP_CON_DIR/Resources
+APP_EXE_DIR=$APP_CON_DIR/bin
+APP_ETC_DIR=$APP_CON_DIR/etc
+APP_LIB_DIR=$APP_CON_DIR/Frameworks
+APP_SHARE_DIR=$APP_CON_DIR/share
+CONTENTS=$APP_CON_DIR
+LIB="${APP_LIB_DIR}"
+ETC="${APP_EXE_DIR}"
+
 function lib_dependency_copy
 {
   # This function use otool to analyze library dependency.
