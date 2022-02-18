@@ -156,7 +156,10 @@ clutter-gtk
 cmake
 gettext
 gtkspell3
+discount
+libarchive
 link-grammar
+libhandy
 libgee
 libsecret
 gtksourceview4

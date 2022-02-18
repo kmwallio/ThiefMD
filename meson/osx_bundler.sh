@@ -172,8 +172,8 @@ cp -rf /opt/homebrew/share/fontconfig "${MESON_INSTALL_PREFIX}/share/"
 cp -rf /opt/homebrew/share/themes/Mac "${MESON_INSTALL_PREFIX}/share/themes/"
 cp -rf /opt/homebrew/share/themes/Default "${MESON_INSTALL_PREFIX}/share/themes/"
 cp -rf /opt/homebrew/share/gtksourceview-4 "${MESON_INSTALL_PREFIX}/share/"
-glib-compile-schemas /opt/homebrew/share/glib-2.0/schemas
 cp -f /opt/homebrew/share/glib-2.0/schemas/gschema* "${MESON_INSTALL_PREFIX}/share/glib-2.0/schemas"
+glib-compile-schemas ${MESON_INSTALL_PREFIX}/share/glib-2.0/schemas
 # find "${TARGETDIR}/bin" -type f -path '*.dll.a' -exec rm '{}' \;
 lib_dependency_analyze ${MESON_INSTALL_PREFIX}/lib ${MESON_INSTALL_PREFIX}/bin
 lib_dependency_analyze ${MESON_INSTALL_PREFIX}/bin ${MESON_INSTALL_PREFIX}/bin
