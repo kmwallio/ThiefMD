@@ -136,7 +136,7 @@ executable(
 # Add in a post install script
 if host_machine.system() == 'darwin' and get_option('prefix').contains('.app')
     meson.add_install_script('meson/osx_bundler.sh')
-elif host_machine.system() != 'darwin'
+else
     meson.add_install_script('meson/post_install.py')
 endif
 
