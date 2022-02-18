@@ -128,89 +128,139 @@ function lib_reset_id
   install_name_tool -id $(basename $lib) $lib
 }
 
-PROJECTDIR="$( cd "$(dirname "$0")/../" ; pwd -P )"
-APP_TOP_DIR=${MESON_INSTALL_PREFIX}
-APP_CON_DIR=$APP_TOP_DIR/Contents
-APP_RES_DIR=$APP_CON_DIR/Resources
-APP_EXE_DIR=$APP_CON_DIR/MacOS
-APP_ETC_DIR=$APP_RES_DIR/etc
-APP_LIB_DIR=$APP_RES_DIR/lib
+# Formatting
+fNormal="$(tput sgr0)"
+fBold="$(tput bold)"
+# Colors depend upon the user's terminal emulator color scheme - what is readable for you may be not readable for someone else.
+fMagenta="$(tput setaf 5)"
+fRed="$(tput setaf 1)"
+
+function msg {
+    printf "\\n${fBold}-- %s${fNormal}\\n" "${@}"
+}
+
+function msgError {
+    printf "\\n${fBold}Error:${fNormal}\\n%s\\n" "${@}"
+}
+
+function GetDependencies {
+    otool -L "$1" | awk 'NR >= 2 && $1 !~ /^(\/usr\/lib|\/System|@executable_path|@rpath)\// { print $1 }'
+}
+
+function ModifyInstallNames {
+    find -E "${CONTENTS}" -type f -regex '.*/(com\.github\.kmwallio\.thiefmd|.*\.(dylib|so))' | while read -r x; do
+        msg "Modifying install names: ${x}"
+        {
+            # id
+            if [[ ${x:(-6)} == ".dylib" ]] || [[ f${x:(-3)} == ".so" ]]; then
+                install_name_tool -id "${LIB}"/$(basename ${x}) ${x}
+            fi
+            GetDependencies "${x}" | while read -r y
+            do
+                install_name_tool -change ${y} "${LIB}"/$(basename ${y}) ${x}
+            done
+        } | bash -v
+    done
+}
+
 echo -n "Copy app dependency library......"
-mkdir -p ${MESON_INSTALL_PREFIX}/bin
-mkdir -p ${MESON_INSTALL_PREFIX}/lib
-mkdir -p "${MESON_INSTALL_PREFIX}/etc/"
-mkdir -p "${MESON_INSTALL_PREFIX}/lib/plugin"
-mkdir -p "${MESON_INSTALL_PREFIX}/share/doc"
-mkdir -p "${MESON_INSTALL_PREFIX}/share/themes"
-mkdir -p "${MESON_INSTALL_PREFIX}/share/glib-2.0/schemas"
-mkdir -p "${MESON_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps"
-lib_dependency_copy ${PROJECTDIR}/build/com.github.kmwallio.thiefmd "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libglib-2.0.0.dylib "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libgee-0.8.2.dylib "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libgobject-2.0.0.dylib "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libgio-2.0.0.dylib "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libgtk-3.0.dylib "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libclutter-1.0.0.dylib "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libjson-glib-1.0.0.dylib "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libgtksourceview-4.0.dylib "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libgtkspell3-3.0.dylib "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/liblink-grammar.5.dylib "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libarchive.13.dylib "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libhandy-1.0.dylib "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libpango-1.0.0.dylib "${MESON_INSTALL_PREFIX}/bin"
-cp -f "${PROJECTDIR}/data/icons//128/com.github.kmwallio.thiefmd.svg" "${TARGETDIR}/share/icons/hicolor/scalable/apps"
+mkdir -p "${APP_CON_DIR}/MacOs/"
+mkdir -p ${APP_EXE_DIR}
+mkdir -p ${APP_LIB_DIR}
+mkdir -p ${APP_EXE_DIR}
+mkdir -p "${APP_SHARE_DIR}/themes"
+mkdir -p "${APP_SHARE_DIR}/glib-2.0/schemas"
+mkdir -p "${APP_SHARE_DIR}/icons/hicolor/scalable/apps"
+lib_dependency_copy ${PROJECTDIR}/build/com.github.kmwallio.thiefmd "${APP_LIB_DIR}"
+lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libglib-2.0.0.dylib "${APP_LIB_DIR}"
+lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libgee-0.8.2.dylib "${APP_LIB_DIR}"
+lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libgobject-2.0.0.dylib "${APP_LIB_DIR}"
+lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libgio-2.0.0.dylib "${APP_LIB_DIR}"
+lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libgtk-3.0.dylib "${APP_LIB_DIR}"
+lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libclutter-1.0.0.dylib "${APP_LIB_DIR}"
+lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libjson-glib-1.0.0.dylib "${APP_LIB_DIR}"
+lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libgtksourceview-4.0.dylib "${APP_LIB_DIR}"
+lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libgtkspell3-3.0.dylib "${APP_LIB_DIR}"
+lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/liblink-grammar.5.dylib "${APP_LIB_DIR}"
+lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libarchive.13.dylib "${APP_LIB_DIR}"
+lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libhandy-1.0.dylib "${APP_LIB_DIR}"
+lib_dependency_copy ${MESON_INSTALL_PREFIX}/bin/libpango-1.0.0.dylib "${APP_LIB_DIR}"
+cp -f "${PROJECTDIR}/data/icons/128/com.github.kmwallio.thiefmd.svg" "${TARGETDIR}/share/icons/hicolor/scalable/apps"
+cp -f "${PROJECTDIR}/build/com.github.kmwallio.thiefmd" "${APP_EXE_DIR}/com.github.kmwallio.thiefmd"
 
 echo -n "Copy GDBus/Helper and dependencies......"
-cp /opt/homebrew/bin/gdbus "${MESON_INSTALL_PREFIX}/bin"
-cp /opt/homebrew/bin/gdk-pixbuf-query-loaders "${MESON_INSTALL_PREFIX}/bin"
-cp /opt/homebrew/bin/gdbus "${MESON_INSTALL_PREFIX}/bin"
-cp /opt/homebrew/bin/gdk-pixbuf-query-loaders "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/Contents/MacOS/gdbus "${MESON_INSTALL_PREFIX}/bin"
-lib_dependency_copy ${MESON_INSTALL_PREFIX}/Contents/MacOS/gdk-pixbuf-query-loaders "${MESON_INSTALL_PREFIX}/bin"
-echo "[done]"
+cp /opt/homebrew/bin/gdbus "${APP_EXE_DIR}/"
+cp /opt/homebrew/bin/gdk-pixbuf-query-loaders "${APP_EXE_DIR}/"
+lib_dependency_copy ${APP_EXE_DIR}/gdbus "${APP_LIB_DIR}"
+lib_dependency_copy ${APP_EXE_DIR}/gdk-pixbuf-query-loaders "${APP_LIB_DIR}"
+echo -n "[done]"
 
 # copy GTK runtime dependencies resource
 echo -n "Copy GTK runtime resource......"
-cp /opt/homebrew/bin/gdbus "${MESON_INSTALL_PREFIX}/bin"
-cp -rf /opt/homebrew/lib/gio "${MESON_INSTALL_PREFIX}/lib/"
-cp -rf /opt/homebrew/lib/gtk-3.0 "${MESON_INSTALL_PREFIX}/lib/"
-cp -rf /opt/homebrew/lib/gdk-pixbuf-2.0 "${MESON_INSTALL_PREFIX}/lib/"
-cp -rf /opt/homebrew/lib/girepository-1.0 "${MESON_INSTALL_PREFIX}/lib/"
-cp -rf /opt/homebrew/lib/libgda-5.0 "${MESON_INSTALL_PREFIX}/lib/"
-cp -rf /opt/homebrew/etc/gtk-3.0 "${MESON_INSTALL_PREFIX}/etc/"
+cp -rf /opt/homebrew/lib/gio "${APP_LIB_DIR}"
+cp -rf /opt/homebrew/lib/gtk-3.0 "${APP_LIB_DIR}"
+cp -rf /opt/homebrew/lib/gdk-pixbuf-2.0 "${APP_LIB_DIR}"
+cp -rf /opt/homebrew/lib/girepository-1.0 "${APP_LIB_DIR}"
+cp -rf /opt/homebrew/lib/libgda-5.0 "${APP_LIB_DIR}"
+cp -rf /opt/homebrew/etc/gtk-3.0 "${APP_ETC_DIR}"
 # Avoid override the latest locale file
-cp -r /opt/homebrew/share/locale "${MESON_INSTALL_PREFIX}/share/"
-cp -rf /opt/homebrew/share/icons "${MESON_INSTALL_PREFIX}/share/"
-cp -rf /opt/homebrew/share/fontconfig "${MESON_INSTALL_PREFIX}/share/"
-cp -rf /opt/homebrew/share/themes/Mac "${MESON_INSTALL_PREFIX}/share/themes/"
-cp -rf /opt/homebrew/share/themes/Default "${MESON_INSTALL_PREFIX}/share/themes/"
-cp -rf /opt/homebrew/share/gtksourceview-4 "${MESON_INSTALL_PREFIX}/share/"
-cp -f /opt/homebrew/share/glib-2.0/schemas/gschema* "${MESON_INSTALL_PREFIX}/share/glib-2.0/schemas"
-glib-compile-schemas ${MESON_INSTALL_PREFIX}/share/glib-2.0/schemas
-# find "${TARGETDIR}/bin" -type f -path '*.dll.a' -exec rm '{}' \;
-lib_dependency_analyze ${MESON_INSTALL_PREFIX}/lib ${MESON_INSTALL_PREFIX}/bin
-lib_dependency_analyze ${MESON_INSTALL_PREFIX}/bin ${MESON_INSTALL_PREFIX}/bin
+cp -r /opt/homebrew/share/locale "${APP_SHARE_DIR}"
+cp -rf /opt/homebrew/share/icons "${APP_SHARE_DIR}"
+cp -rf /opt/homebrew/share/fontconfig "${APP_SHARE_DIR}"
+cp -rf /opt/homebrew/share/themes/Mac "${APP_SHARE_DIR}/themes/"
+cp -rf /opt/homebrew/share/themes/Default "${APP_SHARE_DIR}/themes/"
+cp -rf /opt/homebrew/share/themes/Adwaita "${APP_SHARE_DIR}/themes/"
+cp -rf /opt/homebrew/share/themes/Adwaita-dark "${APP_SHARE_DIR}/themes/"
+cp -rf /opt/homebrew/share/gtksourceview-4 "${APP_SHARE_DIR}"
+cp -f /opt/homebrew/share/glib-2.0/schemas/gschema* "${APP_SHARE_DIR}/glib-2.0/schemas"
+glib-compile-schemas ${APP_SHARE_DIR}/glib-2.0/schemas
 
-if ls $APP_BUILD/bin/*.so 1> /dev/null 2>&1; then
-  for sofile in $APP_BUILD/bin/*.so; do
-    cp $sofile $APP_LIB_DIR
-  done
-fi
-cp $APP_BUILD/bin/*.dylib $APP_LIB_DIR
+msg "Removing static libraries and cache files:"
+find -E "${LIB}" -type f -regex '.*\.(a|la|cache)$' | while read -r; do rm "${REPLY}"; done
+
+# Make Frameworks folder flat
+msg "Flattening the Frameworks folder"
+cp -RL "${LIB}"/gdk-pixbuf-2.0/2*/loaders/* "${LIB}"
+cp "${LIB}"/gtk-3.0/3*/immodules/*.{dylib,so} "${LIB}"
+cp "${LIB}"/gio/modules/*.{dylib,so} "${LIB}"
+rm -r "${LIB}"/gtk-3.0
+rm -r "${LIB}"/gdk-pixbuf-2.0
+rm -r "${LIB}"/gio
+
+# ModifyInstallNames
+
+# find "${TARGETDIR}/bin" -type f -path '*.dll.a' -exec rm '{}' \;
+lib_dependency_analyze ${APP_LIB_DIR} ${APP_LIB_DIR}
+lib_dependency_analyze ${APP_EXE_DIR} ${APP_LIB_DIR}
+
 chmod -R 766 $APP_LIB_DIR
 
+# Build GTK3 pixbuf loaders & immodules database
+msg "Build GTK3 databases:"
+/opt/homebrew/bin/gdk-pixbuf-query-loaders "${LIB}"/libpixbufloader-*.so > "${ETC}"/gtk-3.0/gdk-pixbuf.loaders
+/opt/homebrew/bin/gtk-query-immodules-3.0 "${LIB}"/im-* > "${ETC}"/gtk-3.0/gtk.immodules || /opt/homebrew/bin/gtk-query-immodules "${LIB}"/im-* > "${ETC}"/gtk-3.0/gtk.immodules
+sed -i.bak -e "s|${PWD}/ThiefMD.app/Contents/|/Applications/ThiefMD.app/Contents/|" "${ETC}"/gtk-3.0/gdk-pixbuf.loaders "${ETC}/gtk-3.0/gtk.immodules"
+sed -i.bak -e "s|/opt/homebrew/share/|/Applications/ThiefMD.app/Contents/share/|" "${ETC}"/gtk-3.0/gtk.immodules
+sed -i.bak -e "s|/opt/homebrew/|/Applications/ThiefMD.app/Contents/Frameworks/|" "${ETC}"/gtk-3.0/gtk.immodules
+rm "${ETC}"/*.bak
+
 lib_change_paths \
-  @executable_path/../Resources/lib \
+  @executable_path/../Frameworks \
   $APP_LIB_DIR \
   $APP_EXE_DIR/com.github.kmwallio.thiefmd
 
 lib_change_paths \
-  @executable_path/../Resources/lib \
+  @executable_path/../Frameworks \
+  $APP_LIB_DIR \
+  $APP_CON_DIR/MacOs/com.github.kmwallio.thiefmd
+
+lib_change_paths \
+  @executable_path/../Frameworks \
   $APP_LIB_DIR \
   $APP_EXE_DIR/gdbus
 
 lib_change_paths \
-  @executable_path/../Resources/lib \
+  @executable_path/../Frameworks \
   $APP_LIB_DIR \
   $APP_EXE_DIR/gdk-pixbuf-query-loaders
 
@@ -220,7 +270,7 @@ lib_change_siblings $APP_LIB_DIR @loader_path
 gio_modules="$(find $APP_LIB_DIR/gio/modules/ -name \*.dylib -o -name \*.so -type f)"
 for gio_module in $gio_modules; do
   lib_change_paths \
-    @executable_path/../Resources/lib \
+    @executable_path/../Frameworks \
     $APP_LIB_DIR \
     $gio_module
 done
@@ -229,7 +279,7 @@ done
 pixbuf_plugins="$(find $APP_LIB_DIR/gdk-pixbuf-2.0/2.10.0/loaders/ -name \*.dylib -o -name \*.so -type f)"
 for pixbuf_plugin in $pixbuf_plugins; do
   lib_change_paths \
-    @executable_path/../Resources/lib \
+    @executable_path/../Frameworks \
     $APP_LIB_DIR \
     $pixbuf_plugin
 done
@@ -238,7 +288,7 @@ done
 gtk_im_modules="$(find $APP_LIB_DIR/gtk-3.0/3.0.0/immodules/ -name \*.dylib -o -name \*.so -type f)"
 for gtk_immodule in $gtk_im_modules; do
   lib_change_paths \
-    @executable_path/../Resources/lib \
+    @executable_path/../Frameworks \
     $APP_LIB_DIR \
     $gtk_immodule
 done
@@ -246,7 +296,7 @@ done
 gtk_print_modules="$(find $APP_LIB_DIR/gtk-3.0/3.0.0/printbackends/ -name \*.dylib -o -name \*.so -type f)"
 for print_module in $gtk_print_modules; do
   lib_change_paths \
-    @executable_path/../Resources/lib \
+    @executable_path/../Frameworks \
     $APP_LIB_DIR \
     $print_module
 done
@@ -255,7 +305,7 @@ done
 db_plugins="$(find $APP_LIB_DIR/plugin/ -name \*.dylib -o -name \*.so -type f)"
 for db_plugin in $db_plugins; do
   lib_change_paths \
-    @executable_path/../Resources/lib \
+    @executable_path/../Frameworks \
     $APP_LIB_DIR \
     $db_plugin
 done
@@ -264,9 +314,26 @@ done
 gda_providers="$(find $APP_LIB_DIR/libgda-5.0/providers/ -name \*.dylib -o -name \*.so -type f)"
 for gda_provider in $gda_providers; do
   lib_change_paths \
-    @executable_path/../Resources/lib \
+    @executable_path/../Frameworks \
     $APP_LIB_DIR \
     $gda_provider
 done
 
-echo "[done]"
+# msg "Registering @rpath in Frameworks folder."
+# for frameworklibs in "${LIB}"/*{dylib,so,cli}; do
+#     install_name_tool -delete_rpath ${LOCAL_PREFIX}/lib "${frameworklibs}"
+#     install_name_tool -add_rpath /Applications/"${LIB}" "${frameworklibs}"
+# done
+
+# ModifyInstallNames
+
+echo "\n--------\n" >> "${APP_RES_DIR}/AboutThisBuild.txt"
+echo "Bundle system: $(sysctl -n machdep.cpu.brand_string)" >> "${APP_RES_DIR}/AboutThisBuild.txt"
+echo "Bundle OS:     $(sw_vers -productName) $(sw_vers -productVersion) $(sw_vers -buildVersion) $(uname -mrs)" >> "${APP_RES_DIR}/AboutThisBuild.txt"
+echo "Bundle date:   $(date -Ru) UTC" >> "${APP_RES_DIR}/AboutThisBuild.txt"
+echo "Bundle epoch:  $(date +%s)" >> "${APP_RES_DIR}/AboutThisBuild.txt"
+echo "Bundle UUID:   $(uuidgen|tr 'A-Z' 'a-z')" >> "${APP_RES_DIR}/AboutThisBuild.txt"
+
+echo -n "[done]"
+
+codesign -s "4E21403E16CC5E305EBEF5A0D879499068382877" "${APP_TOP_DIR}"
