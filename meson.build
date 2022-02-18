@@ -118,6 +118,7 @@ executable(
         dependency('json-glib-1.0'),
         dependency('gee-0.8'),
         dependency('libarchive'),
+        dependency('libsoup-3.0'),
         dependency('libxml-2.0'),
         dependency('libsecret-1'),
         dependency('libhandy-1'),
@@ -133,7 +134,11 @@ executable(
 )
 
 # Add in a post install script
-meson.add_install_script('meson/post_install.py')
+if host_machine.system() == 'darwin'
+    meson.add_install_script('meson/osx_bundler.sh')
+else
+    meson.add_install_script('meson/post_install.py')
+endif
 
 # Add subfolders for Meson to look
 subdir('data')

@@ -93,4 +93,10 @@ install_data(
     install_dir: join_paths([ get_option('prefix'), get_option('datadir'), 'com.github.kmwallio.thiefmd', 'scripts' ])
 )
 
+if host_machine.system() == 'darwin'
+    install_data('icons/macos/AppIcon.icns', install_dir : 'Contents/Resources')
+    install_data('Info.plist', install_dir : 'Contents')
+    install_data('myapp.sh', install_dir : 'Contents/MacOS')
+endif
+
 gnome.compile_schemas()

@@ -4,7 +4,8 @@
     "CONTRIBUTING.md",
     "DEB-Packaging.md",
     "RPM-Packaging.md",
-    "flatpak-packaging.md"
+    "flatpak-packaging.md",
+    "packaging-macos.md"
   ],
   "hidden-folders" : [
     "subprojects",
@@ -21,7 +22,9 @@
   "folder-order" : [
     "docs",
     "po",
-    "tests"
+    "tests",
+    "Assets.xcassets",
+    "builddir"
   ],
   "notes" : "",
   "icon" : ""

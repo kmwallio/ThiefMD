@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>LSEnvironment</key>
+  <dict>
+      <key>XDG_DATA_DIRS</key>
+      <string>/Applications/ThiefMD.app/share</string>
+      <key>GTK_PATH</key>
+      <string>/Applications/ThiefMD.app/bin:/Applications/ThiefMD.app/lib:/Applications/ThiefMD.app/share</string>
+      <key>GTK_IM_MODULE_FILE</key>
+      <string>/Applications/ThiefMD.app/etc/gtk-3.0/gtk.immodules</string>
+      <key>XDG_DATA_HOME</key>
+      <string>/Applications/ThiefMD.app/share</string>
+      <key>GSETTINGS_SCHEMA_DIR</key>
+      <string>/Applications/ThiefMD.app/share/glib-2.0/schemas</string>
+      <key>GDK_PIXBUF_MODULE_FILE</key>
+      <string>/Applications/ThiefMD.app/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache</string>
+      <key>GDK_PIXBUF_MODULEDIR</key>
+      <string>/Applications/ThiefMD.app/lib/gdk-pixbuf-2.0/2.10.0/loaders</string>
+      <key>LIBDIR</key>
+      <string>/Applications/ThiefMD.app/lib</string>
+      <key>DATADIR</key>
+      <string>/Applications/ThiefMD.app/share</string>
+      <key>GDK_RENDERING</key>
+      <string>similar</string>
+      <key>GTK_OVERLAY_SCROLLING</key>
+      <string>0</string>
+  </dict>
+  <key>LSMultipleInstancesProhibited</key>
+    <true />
+  <key>CFBundleGetInfoString</key>
+  <string>ThiefMD</string>
+  <key>CFBundleExecutable</key>
+  <string>myapp.sh</string>
+  <key>CFBundleIdentifier</key>
+  <string>com.github.kmwallio.thiefmd</string>
+  <key>CFBundleName</key>
+  <string>ThiefMD</string>
+  <key>CFBundleIconFile</key>
+  <string>AppIcon.icns</string>
+  <key>CFBundleShortVersionString</key>
+  <string>1.0</string>
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>IFMajorVersion</key>
+  <integer>0</integer>
+  <key>IFMinorVersion</key>
+  <integer>1</integer>
+</dict>
+</plist>
