@@ -32,12 +32,12 @@ export GIO_MODULE_DIR="$bundle_lib/gio/modules"
 export PANGO_RC_FILE="$bundle_etc/pango/pangorc"
 export PANGO_SYSCONFDIR="$bundle_etc"
 export PANGO_LIBDIR="$bundle_lib"
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pwd`/lib"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pwd`/lib:$bundle_lib"
 APP=$name
 # Pixbuf plugins and update cache
-export GDK_PIXBUF_MODULEDIR="$bundle_lib/gdk-pixbuf-2.0/2.10.0/loaders"
-export GDK_PIXBUF_MODULE_FILE="$bundle_lib/gdk-pixbuf-2.0/2.10.0/loaders.cache"
-$bundle_contents/MacOS/gdk-pixbuf-query-loaders --update-cache $GDK_PIXBUF_MODULEDIR/*.so
+export GDK_PIXBUF_MODULEDIR="$bundle_lib"
+export GDK_PIXBUF_MODULE_FILE="$bundle_lib"
+$bundle_contents/MacOS/bin --update-cache $GDK_PIXBUF_MODULEDIR/*.so
 if [ `uname -r | cut -d . -f 1` -ge 10 ]; then
     export GTK_IM_MODULE_FILE="$bundle_etc/gtk-3.0/gtk.immodules"
 fi

@@ -150,6 +150,7 @@ cp -RL {"${GDK_PREFIX}/lib","${LIB}"}/gdk-pixbuf-2.0
 msg "Copying library modules from ${GTK_PREFIX}:"
 cp -RL {"${GDK_PREFIX}/lib","${LIB}"}/gdk-pixbuf-2.0
 ditto --arch "${arch}" {"${GTK_PREFIX}/lib","${LIB}"}/gtk-3.0
+cp -RL {"${GDK_PREFIX}/lib","${LIB}"}/enchant-2
 msg "Removing static libraries and cache files:"
 find -E "${LIB}" -type f -regex '.*\.(a|la|cache)$' | while read -r; do rm "${REPLY}"; done
 
@@ -157,8 +158,10 @@ find -E "${LIB}" -type f -regex '.*\.(a|la|cache)$' | while read -r; do rm "${RE
 msg "Flattening the Frameworks folder"
 cp -RL "${LIB}"/gdk-pixbuf-2.0/2*/loaders/* "${LIB}"
 cp "${LIB}"/gtk-3.0/3*/immodules/*.{dylib,so} "${LIB}"
+cp "${LIB}"/enchant-2/*.{dylib,so} "${LIB}"
 yes | rm -r "${LIB}/gtk-3.0"
 yes | rm -r "${LIB}/gdk-pixbuf-2.0"
+yes | rm -r "${LIB}/enchant-2"
 
 # GTK+3 themes
 msg "Copy GTK+3 theme and icon resources:"
@@ -215,8 +218,11 @@ ModifyInstallNames
 # Mime directory
 msg "Copying shared files from ${GTK_PREFIX}:"
 ditto {"${LOCAL_PREFIX}","${RESOURCES}"}/share/mime
+
+# GTKSpell
 ditto {"${LOCAL_PREFIX}","${RESOURCES}"}/share/enchant
 ditto {"${LOCAL_PREFIX}","${RESOURCES}"}/share/locale
+ditto {"${LOCAL_PREFIX}/lib","${LIB}"}/aspell-0.60
 
 # App bundle resources
 update-mime-database -V  "${RESOURCES}/share/mime"
@@ -256,9 +262,10 @@ ditto "${EXECUTABLE}" "${APP}"/..
 if [[ -n $CODESIGNID ]]; then
     msg "Codesigning Application."
     codesign --force --deep --timestamp --strict -v -s "${CODESIGNID}" -i com.github.kmwallio.thiefmd -o runtime "${APP}"
-    pushd $LIB
     ls | xargs codesign -f --deep -s "${CODESIGNID}"
-    popd
+    for frameworklibs in "${LIB}"/*{dylib,so,cli}; do
+        codesign -f --deep -s "${CODESIGNID}" -i com.github.kmwallio.thiefmd "${frameworklibs}"
+    done
     spctl -a -vvvv "${APP}"
 fi
 
