@@ -264,36 +264,7 @@ namespace ThiefMD {
                     UI.shrink_sheets ();
                     settings.changed ();
                 }
-                if (Build.HOST == "darwin") {
-                    Gtk.OSXApplication osxApp = Gtk.OSXApplication.get_instance();
-                    Gtk.MenuBar menushell = new Gtk.MenuBar ();
 
-                    Gtk.MenuItem menu_file = new Gtk.MenuItem.with_label (_("File"));
-                    Gtk.Menu file_menu = new Gtk.Menu ();
-                    {
-                        Gtk.MenuItem file_add_folder = new Gtk.MenuItem.with_label (_("Add Folder to Library"));
-                        file_add_folder.activate.connect (() => {
-                            add_folder_to_library ();
-                        });
-                        file_menu.add (file_add_folder);
-                    }
-                    menu_file.submenu = file_menu;
-                    menushell.add (menu_file);
-
-                    menushell.show_all ();
-
-                    Gtk.MenuItem menu_about = new Gtk.MenuItem.with_label (_("About ThiefMD"));
-                    menu_about.activate.connect (() => {
-                        About abt = new About();
-                    });
-                    menu_about.show ();
-
-                    osxApp.set_menu_bar (menushell);
-                    osxApp.set_use_quartz_accelerators (true);
-                    osxApp.set_about_item (menu_about);
-                    osxApp.sync_menu_bar ();
-                    osxApp.ready ();
-                }
                 return false;
             });
 
