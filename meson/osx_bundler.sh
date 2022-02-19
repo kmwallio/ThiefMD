@@ -180,8 +180,13 @@ rsync -aL "${LOCAL_PREFIX}/share/icons/hicolor/" "${RESOURCES}/share/icons/hicol
 
 "${LOCAL_PREFIX}/bin/gtk-update-icon-cache" "${RESOURCES}/share/icons/Adwaita" || "${LOCAL_PREFIX}/bin/gtk-update-icon-cache-3.0" "${RESOURCES}/share/icons/Adwaita"
 
-cp /opt/homebrew/bin/gdbus "${BIN_DIR}/"
-cp /opt/homebrew/bin/gdk-pixbuf-query-loaders "${BIN_DIR}/"
+cp ${LOCAL_PREFIX}/bin/gdbus "${BIN_DIR}/"
+cp ${LOCAL_PREFIX}/bin/gdk-pixbuf-query-loaders "${BIN_DIR}/"
+cp ${LOCAL_PREFIX}/bin/enchant-2 "${BIN_DIR}/"
+
+CheckLink "${BIN_DIR}/gdbus"
+CheckLink "${BIN_DIR}/gdk-pixbuf-query-loaders"
+CheckLink "${BIN_DIR}/enchant-2"
 
 # fix libfreetype install name
 for lib in "${LIB}"/*; do
@@ -210,6 +215,8 @@ ModifyInstallNames
 # Mime directory
 msg "Copying shared files from ${GTK_PREFIX}:"
 ditto {"${LOCAL_PREFIX}","${RESOURCES}"}/share/mime
+ditto {"${LOCAL_PREFIX}","${RESOURCES}"}/share/enchant
+ditto {"${LOCAL_PREFIX}","${RESOURCES}"}/share/locale
 
 # App bundle resources
 update-mime-database -V  "${RESOURCES}/share/mime"
