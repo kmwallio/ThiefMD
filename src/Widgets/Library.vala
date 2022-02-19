@@ -623,61 +623,64 @@ namespace ThiefMD.Widgets {
                 });
                 menu.add (menu_reveal_items);
 
-                if (_selected != null && _all_sheets.find (_selected) != null) {
-                    menu.add (new Gtk.SeparatorMenuItem ());
-                    Gtk.MenuItem set_icon = new Gtk.MenuItem.with_label (_("Set Project Icon"));
-                    Gtk.Menu icon_menu = new Gtk.Menu ();
-                    {
-                        var no_icon = set_icon_option (_("None"), "", _selected._sheets);
-                        icon_menu.add (no_icon);
 
-                        var folder_icon = set_icon_option (_("Folder"), "folder", _selected._sheets);
-                        icon_menu.add (folder_icon);
+                if (Build.HOST != "darwin") {
+                    if (_selected != null && _all_sheets.find (_selected) != null) {
+                        menu.add (new Gtk.SeparatorMenuItem ());
+                        Gtk.MenuItem set_icon = new Gtk.MenuItem.with_label (_("Set Project Icon"));
+                        Gtk.Menu icon_menu = new Gtk.Menu ();
+                        {
+                            var no_icon = set_icon_option (_("None"), "", _selected._sheets);
+                            icon_menu.add (no_icon);
 
-                        var reader_icon = set_icon_option (_("Reader"), "ephy-reader-mode-symbolic", _selected._sheets);
-                        icon_menu.add (reader_icon);
+                            var folder_icon = set_icon_option (_("Folder"), "folder", _selected._sheets);
+                            icon_menu.add (folder_icon);
 
-                        var love_icon = set_icon_option (_("Love"), "emote-love-symbolic", _selected._sheets);
-                        icon_menu.add (love_icon);
+                            var reader_icon = set_icon_option (_("Reader"), "ephy-reader-mode-symbolic", _selected._sheets);
+                            icon_menu.add (reader_icon);
 
-                        var game_icon = set_icon_option (_("Game"), "applications-games-symbolic", _selected._sheets);
-                        icon_menu.add (game_icon);
-                        
-                        var art_icon = set_icon_option (_("Art"), "applications-graphics-symbolic", _selected._sheets);
-                        icon_menu.add (art_icon);
+                            var love_icon = set_icon_option (_("Love"), "emote-love-symbolic", _selected._sheets);
+                            icon_menu.add (love_icon);
 
-                        var nature_icon = set_icon_option (_("Nature"), "emoji-nature-symbolic", _selected._sheets);
-                        icon_menu.add (nature_icon);
+                            var game_icon = set_icon_option (_("Game"), "applications-games-symbolic", _selected._sheets);
+                            icon_menu.add (game_icon);
+                            
+                            var art_icon = set_icon_option (_("Art"), "applications-graphics-symbolic", _selected._sheets);
+                            icon_menu.add (art_icon);
 
-                        var food_icon = set_icon_option (_("Food"), "emoji-food-symbolic", _selected._sheets);
-                        icon_menu.add (food_icon);
+                            var nature_icon = set_icon_option (_("Nature"), "emoji-nature-symbolic", _selected._sheets);
+                            icon_menu.add (nature_icon);
 
-                        var help_icon = set_icon_option (_("Help"), "system-help-symbolic", _selected._sheets);
-                        icon_menu.add (help_icon);
+                            var food_icon = set_icon_option (_("Food"), "emoji-food-symbolic", _selected._sheets);
+                            icon_menu.add (food_icon);
 
-                        var cool_icon = set_icon_option (_("Cool"), "face-cool-symbolic", _selected._sheets);
-                        icon_menu.add (cool_icon);
+                            var help_icon = set_icon_option (_("Help"), "system-help-symbolic", _selected._sheets);
+                            icon_menu.add (help_icon);
 
-                        var angel_icon = set_icon_option (_("Angel"), "face-angel-symbolic", _selected._sheets);
-                        icon_menu.add (angel_icon);
+                            var cool_icon = set_icon_option (_("Cool"), "face-cool-symbolic", _selected._sheets);
+                            icon_menu.add (cool_icon);
 
-                        var monkey_icon = set_icon_option (_("Monkey"), "face-monkey-symbolic", _selected._sheets);
-                        icon_menu.add (monkey_icon);
+                            var angel_icon = set_icon_option (_("Angel"), "face-angel-symbolic", _selected._sheets);
+                            icon_menu.add (angel_icon);
 
-                        var wordpress_icon = set_icon_option (_("WordPress"), "/com/github/kmwallio/thiefmd/icons/wordpress.png", _selected._sheets);
-                        icon_menu.add (wordpress_icon);
+                            var monkey_icon = set_icon_option (_("Monkey"), "face-monkey-symbolic", _selected._sheets);
+                            icon_menu.add (monkey_icon);
 
-                        var ghost_icon = set_icon_option (_("Ghost"), "/com/github/kmwallio/thiefmd/icons/ghost.png", _selected._sheets);
-                        icon_menu.add (ghost_icon);
+                            var wordpress_icon = set_icon_option (_("WordPress"), "/com/github/kmwallio/thiefmd/icons/wordpress.png", _selected._sheets);
+                            icon_menu.add (wordpress_icon);
 
-                        var writefreely_icon = set_icon_option (_("Write Freely"), "/com/github/kmwallio/thiefmd/icons/wf.png", _selected._sheets);
-                        icon_menu.add (writefreely_icon);
+                            var ghost_icon = set_icon_option (_("Ghost"), "/com/github/kmwallio/thiefmd/icons/ghost.png", _selected._sheets);
+                            icon_menu.add (ghost_icon);
 
-                        var trash_icon = set_icon_option (_("Trash"), "user-trash-symbolic", _selected._sheets);
-                        icon_menu.add (trash_icon);
+                            var writefreely_icon = set_icon_option (_("Write Freely"), "/com/github/kmwallio/thiefmd/icons/wf.png", _selected._sheets);
+                            icon_menu.add (writefreely_icon);
+
+                            var trash_icon = set_icon_option (_("Trash"), "user-trash-symbolic", _selected._sheets);
+                            icon_menu.add (trash_icon);
+                        }
+                        set_icon.submenu = icon_menu;
+                        menu.add (set_icon);
                     }
-                    set_icon.submenu = icon_menu;
-                    menu.add (set_icon);
                 }
 
                 if (_selected != null && settings.is_in_library (_selected._path)) {

@@ -7,7 +7,6 @@ foreach i : icon_sizes
     )
 endforeach
 
-
 font_types = ['Bold', 'Italic', 'BoldItalic', 'Regular']
 fonts = ['Courier Prime', 'iAWriterDuospace', 'Stolen Victory Duo', 'Stolen Victory Sans']
 

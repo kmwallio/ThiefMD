@@ -107,14 +107,7 @@ namespace ThiefMD.Widgets {
             add_library_button.set_image (new Gtk.Image.from_icon_name ("folder-new-symbolic", Gtk.IconSize.BUTTON));
             add_library_button.clicked.connect (() => {
                 settings.menu_active = true;
-                string new_lib = Dialogs.select_folder_dialog ();
-                if (FileUtils.test(new_lib, FileTest.IS_DIR)) {
-                    if (settings.add_to_library (new_lib)) {
-                        // Refresh
-                        ThiefApp instance = ThiefApp.get_instance ();
-                        instance.refresh_library ();
-                    }
-                }
+                add_folder_to_library ();
                 settings.menu_active = false;
             });
 

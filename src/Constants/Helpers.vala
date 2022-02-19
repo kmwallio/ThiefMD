@@ -28,6 +28,18 @@ namespace ThiefMD {
         FILE_NOT_VALID_THEME
     }
 
+    public void add_folder_to_library () {
+        var settings = AppSettings.get_default ();
+        string new_lib = Dialogs.select_folder_dialog ();
+        if (FileUtils.test(new_lib, FileTest.IS_DIR)) {
+            if (settings.add_to_library (new_lib)) {
+                // Refresh
+                ThiefApp instance = ThiefApp.get_instance ();
+                instance.refresh_library ();
+            }
+        }
+    }
+
     //
     // A quick stripper for Markdown. Tries to turn
     // [This website](https://thiefmd.com) is **super** _cool_.
@@ -270,7 +282,7 @@ namespace ThiefMD {
             }
 
             if (ret_val == null) {
-                return new Gdk.Pixbuf.from_resource ("/com/github/kmwallio/thiefmd/icons/empty.svg");
+                return new Gdk.Pixbuf (Gdk.Colorspace.RGB, true, 1, 1, 1);
             } else if (ret_val.get_height () != 16) {
                 double percent = (16) / ((double) ret_val.get_height ());
                 int new_w = (int)(percent * ret_val.get_width ());

@@ -164,8 +164,8 @@ yes | rm -r "${LIB}/gdk-pixbuf-2.0"
 msg "Copy GTK+3 theme and icon resources:"
 ditto {"${LOCAL_PREFIX}","${RESOURCES}"}/share/themes/Mac/gtk-3.0/gtk-keys.css
 ditto {"${LOCAL_PREFIX}","${RESOURCES}"}/share/themes/Default/gtk-3.0/gtk-keys.css
-cp -RL {"${LOCAL_PREFIX}/share/themes/Adwaita","${LIB}"}/share/themes/Adwaita
-cp -RL {"${LOCAL_PREFIX}/share/themes/Adwaita-dark","${LIB}"}/share/themes/Adwaita-dark
+ditto {"${LOCAL_PREFIX}","${RESOURCES}"}/share/themes/Adwaita
+ditto {"${LOCAL_PREFIX}","${RESOURCES}"}/share/themes/Adwaita-dark
 
 # Adwaita icons
 msg "Copy Adwaita icons"
@@ -175,8 +175,10 @@ for f in "${iconfolders[@]}"; do
     cp -RL ${LOCAL_PREFIX}/share/icons/Adwaita/${f}/* "${RESOURCES}"/share/icons/Adwaita/${f}
 done
 cp -RL {"${LOCAL_PREFIX}","${RESOURCES}"}/share/icons/Adwaita/index.theme
+rsync -aL "${LOCAL_PREFIX}/share/icons/hicolor/" "${RESOURCES}/share/icons/hicolor/"
+"${LOCAL_PREFIX}/bin/gtk-update-icon-cache" "${RESOURCES}/share/icons/hicolor" || "${LOCAL_PREFIX}/bin/gtk-update-icon-cache-3.0" "${RESOURCES}/share/icons/hicolor"
+
 "${LOCAL_PREFIX}/bin/gtk-update-icon-cache" "${RESOURCES}/share/icons/Adwaita" || "${LOCAL_PREFIX}/bin/gtk-update-icon-cache-3.0" "${RESOURCES}/share/icons/Adwaita"
-cp -RL "${LOCAL_PREFIX}/share/icons/hicolor" "${RESOURCES}/share/icons/hicolor"
 
 cp /opt/homebrew/bin/gdbus "${BIN_DIR}/"
 cp /opt/homebrew/bin/gdk-pixbuf-query-loaders "${BIN_DIR}/"
@@ -215,7 +217,7 @@ cp -RL "${LOCAL_PREFIX}/share/locale" "${RESOURCES}/share/locale"
 
 msg "Build glib database:"
 mkdir -p ${RESOURCES}/share/glib-2.0
-cp -LR {"${LOCAL_PREFIX}","${RESOURCES}"}/share/glib-2.0/schemas
+cp -RL "${LOCAL_PREFIX}/share/glib-2.0/schemas/" "${RESOURCES}/share/glib-2.0/schemas/"
 "${LOCAL_PREFIX}/bin/glib-compile-schemas" "${RESOURCES}/share/glib-2.0/schemas"
 
 # Append an LC_RPATH
