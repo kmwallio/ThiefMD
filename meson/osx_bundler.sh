@@ -2,7 +2,7 @@
 
 # Required variables, must be set in rtdata/CMakeLists.txt
 PROJECT_NAME="ThiefMD"
-PROJECT_SOURCE_DIR=${PROJECTDIR}
+PROJECT_SOURCE_DIR="$( cd "$(dirname "$0")/../" ; pwd -P )"
 GTK_PREFIX=/opt/homebrew/etc/
 LOCAL_PREFIX=/opt/homebrew
 arch="arm64"
@@ -113,7 +113,6 @@ install -d "${ETC}"
 install -d "${BIN_DIR}"
 
 msg "Copying binary executable files."
-cp "${PROJECTDIR}/build/com.github.kmwallio.thiefmd" "${MACOS}/"
 
 echo "\n--------\n" >> "${RESOURCES}/AboutThisBuild.txt"
 echo "Bundle system: $(sysctl -n machdep.cpu.brand_string)" >> "${RESOURCES}/AboutThisBuild.txt"
@@ -180,7 +179,6 @@ done
 cp -RL {"${LOCAL_PREFIX}","${RESOURCES}"}/share/icons/Adwaita/index.theme
 rsync -aL "${LOCAL_PREFIX}/share/icons/hicolor/" "${RESOURCES}/share/icons/hicolor/"
 "${LOCAL_PREFIX}/bin/gtk-update-icon-cache" "${RESOURCES}/share/icons/hicolor" || "${LOCAL_PREFIX}/bin/gtk-update-icon-cache-3.0" "${RESOURCES}/share/icons/hicolor"
-
 "${LOCAL_PREFIX}/bin/gtk-update-icon-cache" "${RESOURCES}/share/icons/Adwaita" || "${LOCAL_PREFIX}/bin/gtk-update-icon-cache-3.0" "${RESOURCES}/share/icons/Adwaita"
 
 cp ${LOCAL_PREFIX}/bin/gdbus "${BIN_DIR}/"
@@ -205,6 +203,7 @@ done
 
 # Build GTK3 pixbuf loaders & immodules database
 msg "Build GTK3 databases:"
+install -d "${ETC}/gtk-3.0"
 "${LOCAL_PREFIX}"/bin/gdk-pixbuf-query-loaders "${LIB}"/libpixbufloader-*.so > "${ETC}"/gtk-3.0/gdk-pixbuf.loaders
 "${LOCAL_PREFIX}"/bin/gtk-query-immodules-3.0 "${LIB}"/im-* > "${ETC}"/gtk-3.0/gtk.immodules || "${LOCAL_PREFIX}"/bin/gtk-query-immodules "${LIB}"/im-* > "${ETC}"/gtk-3.0/gtk.immodules
 sed -i.bak -e "s|${PWD}/${PROJECT_NAME}.app/Contents/|/Applications/${PROJECT_NAME}.app/Contents/|" "${ETC}"/gtk-3.0/gdk-pixbuf.loaders "${ETC}/gtk-3.0/gtk.immodules"

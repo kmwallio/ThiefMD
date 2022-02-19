@@ -22,6 +22,7 @@ bundle_etc="$APP_ETC_DIR"
 export DYLD_LIBRARY_PATH="$bundle_lib"
 export XDG_CONFIG_DIRS="$bundle_etc"/xdg
 export XDG_DATA_DIRS="$bundle_data"
+export XDG_DATA_HOME="/Users/`whoami`/.local/"
 export GTK_DATA_PREFIX="$bundle_res"
 export GTK_EXE_PREFIX="$bundle_res"
 export GTK_PATH="$bundle_res:$bundle_lib:$bundle_bin:$bundle_data"
@@ -35,8 +36,8 @@ export PANGO_LIBDIR="$bundle_lib"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pwd`/lib:$bundle_lib"
 APP=$name
 # Pixbuf plugins and update cache
-export GDK_PIXBUF_MODULEDIR="$bundle_lib"
-export GDK_PIXBUF_MODULE_FILE="$bundle_lib"
+export GDK_PIXBUF_MODULEDIR="$bundle_etc/gtk-3.0/"
+export GDK_PIXBUF_MODULE_FILE="$bundle_etc/gtk-3.0/gdk-pixbuf.loaders"
 $bundle_contents/MacOS/bin --update-cache $GDK_PIXBUF_MODULEDIR/*.so
 if [ `uname -r | cut -d . -f 1` -ge 10 ]; then
     export GTK_IM_MODULE_FILE="$bundle_etc/gtk-3.0/gtk.immodules"
