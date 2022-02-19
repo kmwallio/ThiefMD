@@ -5,27 +5,27 @@
   <key>LSEnvironment</key>
   <dict>
       <key>XDG_DATA_DIRS</key>
-      <string>/Applications/ThiefMD.app/share</string>
+      <string>/Applications/ThiefMD.app/Contents/Resources/share</string>
       <key>GTK_PATH</key>
-      <string>/Applications/ThiefMD.app/bin:/Applications/ThiefMD.app/lib:/Applications/ThiefMD.app/share</string>
+      <string>/Applications/RawTherapee.app/Contents/Frameworks:/Applications/ThiefMD.app/Contents/bin:/Applications/ThiefMD.app/Contents/Resources/share</string>
       <key>GTK_IM_MODULE_FILE</key>
-      <string>/Applications/ThiefMD.app/etc/gtk-3.0/gtk.immodules</string>
+      <string>/Applications/ThiefMD.app/Contents/Resources/etc/gtk-3.0/gtk.immodules</string>
       <key>XDG_DATA_HOME</key>
-      <string>/Applications/ThiefMD.app/share</string>
+      <string>/Applications/ThiefMD.app/Contents/Resources/share</string>
       <key>GSETTINGS_SCHEMA_DIR</key>
-      <string>/Applications/ThiefMD.app/share/glib-2.0/schemas</string>
+      <string>/Applications/ThiefMD.app/Contents/Resources/share/glib-2.0/schemas</string>
       <key>GDK_PIXBUF_MODULE_FILE</key>
-      <string>/Applications/ThiefMD.app/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache</string>
+      <string>/Applications/ThiefMD.app/Resources/etc/gtk-3.0/gdk-pixbuf.loaders</string>
       <key>GDK_PIXBUF_MODULEDIR</key>
-      <string>/Applications/ThiefMD.app/lib/gdk-pixbuf-2.0/2.10.0/loaders</string>
+      <string>/Applications/ThiefMD.app/Contents/Frameworks</string>
       <key>LIBDIR</key>
-      <string>/Applications/ThiefMD.app/lib</string>
+      <string>/Applications/ThiefMD.app/Contents/Frameworks</string>
       <key>DATADIR</key>
-      <string>/Applications/ThiefMD.app/share</string>
+      <string>/Applications/ThiefMD.app/Contents/Resources</string>
       <key>GDK_RENDERING</key>
       <string>similar</string>
       <key>GTK_OVERLAY_SCROLLING</key>
-      <string>0</string>
+      <string>1</string>
   </dict>
   <key>LSMultipleInstancesProhibited</key>
     <true />

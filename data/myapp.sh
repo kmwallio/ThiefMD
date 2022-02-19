@@ -3,11 +3,21 @@
 name=`basename "$0"`
 bundle_app="$( cd "$( dirname "$0" )/../.." >/dev/null 2>&1 && pwd )"
 bundle_contents="$bundle_app"/Contents
-bundle_res="$bundle_app"
-bundle_lib="$bundle_res"/lib
-bundle_bin="$bundle_res"/bin
-bundle_data="$bundle_res"/share
-bundle_etc="$bundle_res"/etc
+
+APP_TOP_DIR=$bundle_app
+APP_CON_DIR=$APP_TOP_DIR/Contents
+APP_RES_DIR=$APP_CON_DIR/Resources
+APP_EXE_DIR=$APP_CON_DIR/bin
+APP_ETC_DIR=$APP_RES_DIR/etc
+APP_LIB_DIR=$APP_CON_DIR/Frameworks
+APP_SHARE_DIR=$APP_RES_DIR/share
+CONTENTS=$APP_CON_DIR
+
+bundle_res="$APP_RES_DIR"
+bundle_lib="$APP_LIB_DIR"
+bundle_bin="$APP_EXE_DIR"
+bundle_data="$APP_SHARE_DIR"
+bundle_etc="$APP_ETC_DIR"
 
 export DYLD_LIBRARY_PATH="$bundle_lib"
 export XDG_CONFIG_DIRS="$bundle_etc"/xdg
