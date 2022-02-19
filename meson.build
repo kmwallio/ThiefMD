@@ -39,6 +39,11 @@ conf.set_quoted('GETTEXT_PACKAGE', meson.project_name())
 conf.set_quoted('RELEASE_NAME', thief_app_id)
 conf.set_quoted('VERSION', meson.project_version())
 conf.set_quoted('PACKAGE_LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))
+if host_machine.system() == 'darwin'
+    conf.set_quoted('HOST', 'darwin')
+else
+    conf.set_quoted('HOST', 'linux')
+endif
 add_global_arguments('-DDATADIR="' + get_option('datadir') + '"', language: 'c')
 configure_file(output: 'config.h', configuration: conf)
 config_h_dir = include_directories('.')
@@ -122,13 +127,15 @@ executable(
         dependency('libxml-2.0'),
         dependency('libsecret-1'),
         dependency('libhandy-1'),
+        dependency('gtk-mac-integration-gtk3'),
         libmarkdown,
         dependency('link-grammar')
     ],
     vala_args: [
         meson.source_root() + '/vapi/config.vapi',
         meson.source_root() + '/vapi/libmarkdown.vapi',
-        meson.source_root() + '/vapi/link-grammar.vapi'
+        meson.source_root() + '/vapi/link-grammar.vapi',
+        meson.source_root() + '/vapi/gtk-mac-integration-gtk3.vapi'
     ],
     install : true
 )
