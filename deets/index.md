@@ -69,7 +69,7 @@ With Link Grammar, you'll be saying "*[Hyah!](https://www.youtube.com/watch?v=q7
 
 [^fn-link-joke]: *Link* Grammar... Grammar check is always green... get it...? I don't know why they let me update the site. These are the jokes kid 😼.
 
-**Noted.** ThiefMD also lets you take notes for the file you working on, or for the project you are in. Notes aren't part of you work but are great for keeping track on it.
+**Noted.** ThiefMD also lets you take notes for the file you are working on or for the project you are in. Notes aren't part of your work but are great for keeping track on it.
 
 <div class="clear"></div>
 
