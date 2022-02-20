@@ -35,6 +35,11 @@ namespace ThiefMD.Controllers.FileManager {
 
         // Supported import file extensions
         if (ThiefProperties.SUPPORTED_IMPORT_FILES.index_of (match_ext) >= 0) {
+            Gee.List<string> importSayings = new Gee.LinkedList<string> ();
+            importSayings.add(_("Stealing file contents..."));
+            importSayings.add(_("This isn't plagiarism, it's a remix!"));
+            importSayings.add(_("NYT Best Seller, here we come!"));
+
             Thinking worker = new Thinking (_("Importing File"), () => {
                 string dest_name = import_f.get_basename ();
                 dest_name = dest_name.substring (0, dest_name.last_index_of ("."));
@@ -68,7 +73,9 @@ namespace ThiefMD.Controllers.FileManager {
                         }
                     }
                 }
-            });
+            },
+            importSayings,
+            ThiefApp.get_instance ());
             worker.run ();
         }
 

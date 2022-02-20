@@ -187,9 +187,13 @@ namespace ThiefMD.Connections {
 
             debug ("Exporting");
 
+            Gee.List<string> wordpressSayings = new Gee.LinkedList<string> ();
+            wordpressSayings.add(_("Taking it to the internet!"));
+            wordpressSayings.add(_("Don't forget to share on reddit."));
+            wordpressSayings.add(_("Pressing words together..."));
+
             Gee.Map<string, string> images_to_upload = Pandoc.file_image_map (publisher_instance.get_export_markdown ());
             Gee.HashMap<string, string> replacements = new Gee.HashMap<string, string> ();
-
             if (images_to_upload.keys.size > 0) {
                 Thinking worker = new Thinking (_("Uploading images"), () => {
                     foreach (var images in images_to_upload) {
@@ -206,7 +210,7 @@ namespace ThiefMD.Connections {
                             }
                         }
                     }
-                });
+                }, wordpressSayings, publisher_instance);
                 worker.run ();
             }
 

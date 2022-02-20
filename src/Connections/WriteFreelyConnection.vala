@@ -229,6 +229,11 @@ namespace ThiefMD.Connections {
             Gee.Map<string, string> images_to_upload = Pandoc.file_image_map (publisher_instance.get_export_markdown ());
             Gee.HashMap<string, string> replacements = new Gee.HashMap<string, string> ();
 
+            Gee.List<string> writefreelySayings = new Gee.LinkedList<string> ();
+            writefreelySayings.add(_("Taking your words, and letting them go... to the internet!"));
+            writefreelySayings.add(_("Mhm... I see and I ship."));
+            writefreelySayings.add(_("Is this a selfie, and you're happy to see me?"));
+
             if (images_to_upload.keys.size > 0 && connection.endpoint.has_prefix ("https://write.as/")) {
                 Thinking worker = new Thinking (_("Uploading images"), () => {
                     foreach (var images in images_to_upload) {
@@ -245,7 +250,9 @@ namespace ThiefMD.Connections {
                             }
                         }
                     }
-                });
+                },
+                writefreelySayings,
+                publisher_instance);
                 worker.run ();
             }
 
