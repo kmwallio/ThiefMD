@@ -127,15 +127,13 @@ executable(
         dependency('libxml-2.0'),
         dependency('libsecret-1'),
         dependency('libhandy-1'),
-        dependency('gtk-mac-integration-gtk3'),
         libmarkdown,
         dependency('link-grammar')
     ],
     vala_args: [
         meson.source_root() + '/vapi/config.vapi',
         meson.source_root() + '/vapi/libmarkdown.vapi',
-        meson.source_root() + '/vapi/link-grammar.vapi',
-        meson.source_root() + '/vapi/gtk-mac-integration-gtk3.vapi'
+        meson.source_root() + '/vapi/link-grammar.vapi'
     ],
     install : true
 )
