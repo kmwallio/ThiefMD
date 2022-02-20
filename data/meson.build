@@ -96,6 +96,7 @@ if host_machine.system() == 'darwin'
     install_data('icons/macos/AppIcon.icns', install_dir : 'Contents/Resources')
     install_data('Info.plist', install_dir : 'Contents')
     install_data('myapp.sh', install_dir : 'Contents/MacOS')
+    install_data('aspell.conf', install_dir : 'Contents/Resources/etc')
 endif
 
 gnome.compile_schemas()

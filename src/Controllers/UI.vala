@@ -452,6 +452,14 @@ namespace ThiefMD.Controllers.UI {
 
             // Set dark theme
             Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = (lum < 0.5);
+
+            if (Build.HOST == "darwin") {
+                if (lum < 0.5) {
+                    Environment.set_variable ("GTK_THEME", "Adwaita-dark", true);
+                } else {
+                    Environment.set_variable ("GTK_THEME", "Adwaita", true);
+                }
+            }
         } else {
             if (settings.theme_id != "thiefmd") {
                 Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_mode;

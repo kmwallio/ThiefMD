@@ -184,6 +184,7 @@ rsync -aL "${LOCAL_PREFIX}/share/icons/hicolor/" "${RESOURCES}/share/icons/hicol
 cp ${LOCAL_PREFIX}/bin/gdbus "${BIN_DIR}/"
 cp ${LOCAL_PREFIX}/bin/gdk-pixbuf-query-loaders "${BIN_DIR}/"
 cp ${LOCAL_PREFIX}/bin/enchant-2 "${BIN_DIR}/"
+cp ${LOCAL_PREFIX}/share/enchant "${BIN_DIR}/"
 
 CheckLink "${BIN_DIR}/gdbus"
 CheckLink "${BIN_DIR}/gdk-pixbuf-query-loaders"
@@ -221,7 +222,7 @@ ditto {"${LOCAL_PREFIX}","${RESOURCES}"}/share/mime
 # GTKSpell
 ditto {"${LOCAL_PREFIX}","${RESOURCES}"}/share/enchant
 ditto {"${LOCAL_PREFIX}","${RESOURCES}"}/share/locale
-ditto {"${LOCAL_PREFIX}/lib","${LIB}"}/aspell-0.60
+ditto {"${LOCAL_PREFIX}/lib","${RESOURCES}"}/aspell-0.60
 
 # App bundle resources
 update-mime-database -V  "${RESOURCES}/share/mime"

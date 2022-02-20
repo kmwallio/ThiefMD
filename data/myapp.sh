@@ -20,13 +20,15 @@ bundle_data="$APP_SHARE_DIR"
 bundle_etc="$APP_ETC_DIR"
 
 export DYLD_LIBRARY_PATH="$bundle_lib"
-export XDG_CONFIG_DIRS="$bundle_etc"/xdg
-export XDG_DATA_DIRS="$bundle_data"
+export XDG_CONFIG_DIRS="$bundle_etc/xdg:$bundle_etc:$bundle_res"
+export XDG_DATA_DIRS="$bundle_data:$bundle_lib:$bundle_etc:$bundle_res"
 export XDG_DATA_HOME="/Users/`whoami`/.local/"
 export GTK_DATA_PREFIX="$bundle_res"
 export GTK_EXE_PREFIX="$bundle_res"
 export GTK_PATH="$bundle_res:$bundle_lib:$bundle_bin:$bundle_data"
+export PATH="$PATH:$APP_EXE_DIR"
 export GTK_THEME="Adwaita"
+export ASPELL_CONF="data-dir $APP_RES_DIR/aspell-0.60;dict-dir $APP_RES_DIR/aspell-0.60;local-data-dir $APP_RES_DIR/aspell-0.60"
 # GIO modules
 export GIO_MODULE_DIR="$bundle_lib/gio/modules"
 # PANGO_* is no longer needed for pango >= 1.38
