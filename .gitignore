@@ -2,4 +2,5 @@
 _site
 .jekyll-cache
 .buildconfig
-
+.DS_Store
+.DSStore
