@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-10 10:44-0700\n"
+"POT-Creation-Date: 2022-03-29 20:26-0700\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -56,212 +56,241 @@ msgstr ""
 msgid "The Markdown editor worth stealing"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:76
+#: src/Constants/ThiefProperties.vala:86
 msgid "Contributors who help make ThiefMD awesome"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:77
+#: src/Constants/ThiefProperties.vala:87
+msgid "Czech Translation Contributors"
+msgstr ""
+
+#: src/Constants/ThiefProperties.vala:88
 msgid "French Translation Contributors"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:78
+#: src/Constants/ThiefProperties.vala:89
 msgid "Slovak Translation Contributors"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:79
+#: src/Constants/ThiefProperties.vala:90
 msgid "Swedish Translation Contributors"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:80
+#: src/Constants/ThiefProperties.vala:91
 msgid "Original Code"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:80
+#: src/Constants/ThiefProperties.vala:91
 msgid "Based on <a href='https://github.com/lainsce/quilter'>Quilter</a>"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:80 src/Constants/ThiefProperties.vala:81
-#: src/Constants/ThiefProperties.vala:82 src/Constants/ThiefProperties.vala:83
-#: src/Constants/ThiefProperties.vala:84 src/Constants/ThiefProperties.vala:85
-#: src/Constants/ThiefProperties.vala:86 src/Constants/ThiefProperties.vala:87
-#: src/Constants/ThiefProperties.vala:88 src/Constants/ThiefProperties.vala:89
-#: src/Constants/ThiefProperties.vala:90 src/Constants/ThiefProperties.vala:91
-#: src/Constants/ThiefProperties.vala:92 src/Constants/ThiefProperties.vala:93
-#: src/Constants/ThiefProperties.vala:94
+#: src/Constants/ThiefProperties.vala:91 src/Constants/ThiefProperties.vala:92
+#: src/Constants/ThiefProperties.vala:93 src/Constants/ThiefProperties.vala:94
+#: src/Constants/ThiefProperties.vala:95 src/Constants/ThiefProperties.vala:96
+#: src/Constants/ThiefProperties.vala:97 src/Constants/ThiefProperties.vala:98
+#: src/Constants/ThiefProperties.vala:99 src/Constants/ThiefProperties.vala:100
+#: src/Constants/ThiefProperties.vala:101
+#: src/Constants/ThiefProperties.vala:102
+#: src/Constants/ThiefProperties.vala:103
+#: src/Constants/ThiefProperties.vala:104
+#: src/Constants/ThiefProperties.vala:105
+#: src/Constants/ThiefProperties.vala:106
 msgid "Copyright"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:80
+#: src/Constants/ThiefProperties.vala:91
 msgid "GNU General Public License v3.0"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:81
+#: src/Constants/ThiefProperties.vala:92
 msgid "Stolen Victory Font"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:81 src/Constants/ThiefProperties.vala:83
-#: src/Constants/ThiefProperties.vala:84 src/Constants/ThiefProperties.vala:85
+#: src/Constants/ThiefProperties.vala:92 src/Constants/ThiefProperties.vala:94
+#: src/Constants/ThiefProperties.vala:95 src/Constants/ThiefProperties.vala:96
 msgid "SIL OPEN FONT LICENSE Version 1.1"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:82 src/Constants/ThiefProperties.vala:87
-#: src/Constants/ThiefProperties.vala:90 src/Constants/ThiefProperties.vala:91
+#: src/Constants/ThiefProperties.vala:93 src/Constants/ThiefProperties.vala:98
+#: src/Constants/ThiefProperties.vala:101
+#: src/Constants/ThiefProperties.vala:102
 msgid "MIT License"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:84 src/Constants/ThiefProperties.vala:85
+#: src/Constants/ThiefProperties.vala:95 src/Constants/ThiefProperties.vala:96
 #: src/Widgets/ThemeSelector.vala:50
 msgid "Font"
 msgstr "Písmo"
 
-#: src/Constants/ThiefProperties.vala:86
+#: src/Constants/ThiefProperties.vala:97
 msgid "Preview CSS"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:86
+#: src/Constants/ThiefProperties.vala:97
 msgid "Mash up of Splendor and Modest"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:86 src/Constants/ThiefProperties.vala:94
+#: src/Constants/ThiefProperties.vala:97 src/Constants/ThiefProperties.vala:106
 msgid "The MIT License (MIT)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:87
+#: src/Constants/ThiefProperties.vala:98
 msgid "Fountain Preview and Export"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:88
+#: src/Constants/ThiefProperties.vala:99
 msgid "Markdown Parsing"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:88
+#: src/Constants/ThiefProperties.vala:99
 msgid "BSD-style License"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:89
+#: src/Constants/ThiefProperties.vala:100
 msgid "Syntax Highlighting"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:89
+#: src/Constants/ThiefProperties.vala:100
+#: src/Constants/ThiefProperties.vala:104
 msgid "BSD-3-Clause License"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:90
+#: src/Constants/ThiefProperties.vala:101
 msgid "Math Rendering"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:90
+#: src/Constants/ThiefProperties.vala:101
 msgid "Khan Academy and other contributors."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:91
+#: src/Constants/ThiefProperties.vala:102
 msgid "XML Parsing"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:92
+#: src/Constants/ThiefProperties.vala:103
 msgid "Pandoc Export"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:92
+#: src/Constants/ThiefProperties.vala:103
 msgid "John MacFarlane and others"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:92
+#: src/Constants/ThiefProperties.vala:103
 msgid "GNU General Public License v2.0"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:93
+#: src/Constants/ThiefProperties.vala:104
+#, fuzzy
+msgid "PDF Export"
+msgstr "Exportovať PDF"
+
+#: src/Constants/ThiefProperties.vala:104
+msgid "Simon Sapin and contributors"
+msgstr ""
+
+#: src/Constants/ThiefProperties.vala:105
 msgid "Grammar Check"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:93
+#: src/Constants/ThiefProperties.vala:105
 msgid "the AbiSource Community"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:93
+#: src/Constants/ThiefProperties.vala:105
 msgid "GNU Lesser General Public License v2.1"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:94
+#: src/Constants/ThiefProperties.vala:106
 msgid "libwritegood-vala based on"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:94
+#: src/Constants/ThiefProperties.vala:106
 msgid "write-good: Naive linter for English prose"
 msgstr ""
 
 #. Needs to be kept in sync with PAPER_SIZES_GTK_NAME
-#: src/Constants/ThiefProperties.vala:98
+#: src/Constants/ThiefProperties.vala:110
 msgid "A3 (11.7 x 16.5 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:99
+#: src/Constants/ThiefProperties.vala:111
 msgid "A4 (8 x 11 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:100
+#: src/Constants/ThiefProperties.vala:112
 msgid "A5 (5.8 x 8.3 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:101
+#: src/Constants/ThiefProperties.vala:113
 msgid "B5 (6.93 x 9.84 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:102
+#: src/Constants/ThiefProperties.vala:114
 msgid "Executive (7 x 10 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:103
+#: src/Constants/ThiefProperties.vala:115
 msgid "Legal (8.5 x 14 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:104
+#: src/Constants/ThiefProperties.vala:116
 msgid "Letter (8.5 x 11 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:107
+#: src/Constants/ThiefProperties.vala:119
 msgid "Don't like what you see? Hit `Ctrl+,` to access the preferences."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:108
+#: src/Constants/ThiefProperties.vala:120
 msgid ""
 "No built in dark mode? Dark themes are available at https://themes.thiefmd."
 "com. Add more in the Preferences (`Ctrl+,`)."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:109
+#: src/Constants/ThiefProperties.vala:121
 msgid ""
 "Don't like how the preview looks? Hit `Ctrl+,` to access the preferences and "
 "click Export."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:110
+#: src/Constants/ThiefProperties.vala:122
 msgid ""
 "Want to import a ePub, HTML, or DocX? Click Import from the New Sheet prompt."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:111
+#: src/Constants/ThiefProperties.vala:123
 msgid ""
 "Ready to publish your great work? Right-click on the folder and choose "
 "\"Export Preview\""
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:112
+#: src/Constants/ThiefProperties.vala:124
 msgid "Want to block out distractions? Full-screen is just an `F11` away."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:113
+#: src/Constants/ThiefProperties.vala:125
 msgid "Quickly switch view modes with `Ctrl+1`, `Ctrl+2`, and `Ctrl+3`."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:114
+#: src/Constants/ThiefProperties.vala:126
 msgid ""
 "Working with a lot of links? Turn on Experimental Mode to make your markdown "
 "more readable `Ctrl+Shift+M`."
 msgstr ""
 
-#. Supported import file extensions
-#: src/Controllers/FileManager.vala:38
+#: src/Controllers/FileManager.vala:39
+msgid "Stealing file contents..."
+msgstr ""
+
+#: src/Controllers/FileManager.vala:40
+msgid "This isn't plagiarism, it's a remix!"
+msgstr ""
+
+#: src/Controllers/FileManager.vala:41
+msgid "NYT Best Seller, here we come!"
+msgstr ""
+
+#: src/Controllers/FileManager.vala:43
 msgid "Importing File"
 msgstr ""
 
@@ -284,7 +313,7 @@ msgstr "_Otvoriť"
 msgid "_Add to Library"
 msgstr "_Pridať do knižnice"
 
-#: src/Controllers/Dialogs.vala:70 src/Exporters/ExportPdf.vala:87
+#: src/Controllers/Dialogs.vala:70 src/Exporters/ExportPdf.vala:88
 msgid "PDF file"
 msgstr "Súbor PDF"
 
@@ -355,7 +384,7 @@ msgid "No file opened"
 msgstr "Žiadný súbor nieje otvorený"
 
 #: src/Connections/ConnectionBase.vala:85 src/Widgets/About.vala:59
-#: src/Widgets/PublisherPreviewWindow.vala:286
+#: src/Widgets/PublisherPreviewWindow.vala:295
 #: src/Widgets/ProjectStatistics.vala:71
 msgid "Close"
 msgstr "Zavrieť"
@@ -388,21 +417,33 @@ msgid "_Add Account"
 msgstr "_Pridať účet"
 
 #: src/Connections/WriteFreelyConnection.vala:233
-#: src/Connections/GhostConnection.vala:192
-#: src/Connections/WordpressConnection.vala:194
+msgid "Taking your words, and letting them go... to the internet!"
+msgstr ""
+
+#: src/Connections/WriteFreelyConnection.vala:234
+msgid "Mhm... I see and I ship."
+msgstr ""
+
+#: src/Connections/WriteFreelyConnection.vala:235
+msgid "Is this a selfie, and you're happy to see me?"
+msgstr ""
+
+#: src/Connections/WriteFreelyConnection.vala:238
+#: src/Connections/GhostConnection.vala:197
+#: src/Connections/WordpressConnection.vala:198
 msgid "Uploading images"
 msgstr "Nahrávanie obrázkov"
 
-#: src/Connections/WriteFreelyConnection.vala:311
-#: src/Connections/GhostConnection.vala:281
-#: src/Connections/WordpressConnection.vala:282 src/Widgets/Preferences.vala:83
+#: src/Connections/WriteFreelyConnection.vala:318
+#: src/Connections/GhostConnection.vala:288
+#: src/Connections/WordpressConnection.vala:286 src/Widgets/Preferences.vala:83
 #: src/Widgets/Preferences.vala:117 src/Widgets/Preferences.vala:151
 msgid " Published"
 msgstr " Zverejnené"
 
-#: src/Connections/WriteFreelyConnection.vala:311
-#: src/Connections/GhostConnection.vala:281
-#: src/Connections/WordpressConnection.vala:282 src/Widgets/Preferences.vala:83
+#: src/Connections/WriteFreelyConnection.vala:318
+#: src/Connections/GhostConnection.vala:288
+#: src/Connections/WordpressConnection.vala:286 src/Widgets/Preferences.vala:83
 #: src/Widgets/Preferences.vala:117 src/Widgets/Preferences.vala:151
 msgid "Post Published"
 msgstr "Príspevok zverejnený"
@@ -415,8 +456,32 @@ msgstr ""
 msgid "New ghost Connection"
 msgstr ""
 
+#: src/Connections/GhostConnection.vala:192
+msgid "Your words are like Casper... Friendly!"
+msgstr ""
+
+#: src/Connections/GhostConnection.vala:193
+msgid "I see your words, and I'm taking them to the internet!"
+msgstr ""
+
+#: src/Connections/GhostConnection.vala:194
+msgid "Booooooooooo! (That's Ghost speak for Great Work!)"
+msgstr ""
+
 #: src/Connections/WordpressConnection.vala:109
 msgid "New Wordpress Connection"
+msgstr ""
+
+#: src/Connections/WordpressConnection.vala:191
+msgid "Taking it to the internet!"
+msgstr ""
+
+#: src/Connections/WordpressConnection.vala:192
+msgid "Don't forget to share on reddit."
+msgstr ""
+
+#: src/Connections/WordpressConnection.vala:193
+msgid "Pressing words together..."
 msgstr ""
 
 #: src/Enrichments/Fountain.vala:32
@@ -459,21 +524,29 @@ msgstr ""
 msgid "Export MHTML"
 msgstr "Exportovať MHTML"
 
-#: src/Exporters/ExportPdf.vala:92
+#: src/Exporters/ExportPdf.vala:93
 msgid "Export PDF"
 msgstr "Exportovať PDF"
 
-#: src/Exporters/ExportPdf.vala:102
+#: src/Exporters/ExportPdf.vala:155
+msgid "Simply Shakespearean."
+msgstr ""
+
+#: src/Exporters/ExportPdf.vala:156
+msgid "Hmm... that's interesting..."
+msgstr ""
+
+#: src/Exporters/ExportPdf.vala:157
+msgid "Your writing is insightful."
+msgstr ""
+
+#: src/Exporters/ExportPdf.vala:159 src/Exporters/ExportPdf.vala:189
 msgid "Working PDF Magic"
 msgstr ""
 
-#: src/Exporters/ExportPdf.vala:103
+#: src/Exporters/ExportPdf.vala:190
 msgid "Making sure your hard work looks purrfect..."
 msgstr ""
-
-#: src/Exporters/ExportPdf.vala:107
-msgid "Print to File"
-msgstr "Vytlačiť do súboru"
 
 #: src/Widgets/About.vala:44 src/Widgets/QuickPreferences.vala:132
 #: src/Widgets/QuickPreferences.vala:216 src/Widgets/QuickPreferences.vala:295
@@ -505,23 +578,23 @@ msgid ""
 "Public License, version 3 or later</a> for details."
 msgstr ""
 
-#: src/Widgets/HeaderBar.vala:88
+#: src/Widgets/HeaderBar.vala:86
 msgid "New Sheet"
 msgstr "Nový list"
 
-#: src/Widgets/HeaderBar.vala:100
+#: src/Widgets/HeaderBar.vala:98
 msgid "Change View"
 msgstr "Zmeniť zobrazenie"
 
-#: src/Widgets/HeaderBar.vala:108
+#: src/Widgets/HeaderBar.vala:106
 msgid "Add Folder to Library"
 msgstr "Pridať zložku do knižnice"
 
-#: src/Widgets/HeaderBar.vala:131
+#: src/Widgets/HeaderBar.vala:129
 msgid "Settings"
 msgstr "Nastavenia"
 
-#: src/Widgets/HeaderBar.vala:146
+#: src/Widgets/HeaderBar.vala:144
 msgid "Show Notes"
 msgstr ""
 
@@ -1195,6 +1268,9 @@ msgstr ""
 #: src/Widgets/MarkdownCheatSheet.vala:52
 msgid "Heading"
 msgstr "Nadpis"
+
+#~ msgid "Print to File"
+#~ msgstr "Vytlačiť do súboru"
 
 #~ msgid " Search"
 #~ msgstr " Hľadanie"

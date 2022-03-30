@@ -98,11 +98,6 @@ namespace ThiefMD.Exporters {
                 return true;
             }
 
-            PublishedStatusWindow status = new PublishedStatusWindow (
-                publisher_instance,
-                _("Working PDF Magic"),
-                new Gtk.Label (_("Making sure your hard work looks purrfect...")));
-
             string? weasyprint_loc = Environment.find_program_in_path ("weasyprint");
             if (weasyprint_loc == null || weasyprint_loc == "")
             {
@@ -156,7 +151,12 @@ namespace ThiefMD.Exporters {
                                 debug ("Using pagedjs");
                             }
 
-                            var pdf_thread = new Thread<void> ("pdf_thread", () => {
+                            Gee.List<string> pdfSayings = new Gee.LinkedList<string> ();
+                            pdfSayings.add(_("Simply Shakespearean."));
+                            pdfSayings.add(_("Hmm... that's interesting..."));
+                            pdfSayings.add(_("Your writing is insightful."));
+
+                            Thinking worker = new Thinking (_("Working PDF Magic"), () => {
                                 // Run PDF conversion
                                 try {
                                     Subprocess weasyprint = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
@@ -173,18 +173,22 @@ namespace ThiefMD.Exporters {
                                 } catch (Error e) {
                                     warning ("Could not delete cache file %s, %s", temp_html_file, e.message);
                                 }
-
-                                status.destroy ();
-                                Thread.exit (0);
                                 return;
-                            });
-                            status.run ();
+                            },
+                            pdfSayings,
+                            publisher_instance);
+                            worker.run ();
                         }
                     } catch (Error e) {
                         warning ("Could not generate pdf: %s", e.message);
                     }
                 }
             } else {
+                PublishedStatusWindow status = new PublishedStatusWindow (
+                    publisher_instance,
+                    _("Working PDF Magic"),
+                    new Gtk.Label (_("Making sure your hard work looks purrfect...")));
+
                 debug ("Using webkit2gtk2pdf");
                 var print_operation = new WebKit.PrintOperation (publisher_instance.preview);
                 var print_settings = new Gtk.PrintSettings ();

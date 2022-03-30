@@ -39,7 +39,7 @@ namespace ThiefMD {
 
         public class Thinking {
             public delegate void ThinkingCallback ();
-            public Thinking (string set_title, ThinkingCallback callback, Gee.List<string>? custom_messages = null) { }
+            public Thinking (string set_title, ThinkingCallback callback, Gee.List<string>? custom_messages = null, Gtk.Window? parent = null) { }
 
             public void run () { }
         }
@@ -163,23 +163,19 @@ namespace ThiefMD {
         }
     }
 
-    public class ThiefApp {
+    public class ThiefApp : Hdy.ApplicationWindow {
         public int pane_position = 200;
         public Notes notes;
         public Library library;
         public Folder main_content;
         public bool ready = true;
+        public static ThiefApp _instance = null;
         public ThiefApp () {
             notes = new Notes ();
         }
 
         public static ThiefApp get_instance () {
-            return new ThiefApp ();
-        }
-
-        public void get_size (out int w, out int h) {
-            w = 800;
-            h = 400;
+            return _instance;
         }
     }
 
