@@ -332,10 +332,10 @@ rm -vf %{buildroot}%{_libdir}/libultheme.a
 %postun -p /sbin/ldconfig
 
 %changelog
-* Wed Feb 16 2022 kmwallio <mwallio@gmail.com> - 0.2.5
+* Tue Mar 29 2022 kmwallio <mwallio@gmail.com> - 0.2.5
 - Fix race condition in PDF Export
-- Fix issue when multiple exporter windows are opened
-- Fix bugs
+- Updated for latest Vala compiler
+- Fixed bugs
 * Sat Sep 04 2021 kmwallio <mwallio@gmail.com> - 0.2.4
 - WeasyPrint PDF Export support
 - Change UI to blend in with rest of OS

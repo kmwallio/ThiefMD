@@ -1,3 +1,10 @@
+com.github.kmwallio.thiefmd (0.2.5) hirsute; urgency=medium
+
+  * Fixed race condition in PDF export
+  * Additional bug fixes
+
+ -- kmwallio <mwallio@gmail.com>  Tue, 29 Mar 2022 20:06:48 -0700
+
 com.github.kmwallio.thiefmd (0.2.4) groovy; urgency=low
 
   * WeasyPrint PDF Export support

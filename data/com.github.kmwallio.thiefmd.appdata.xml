@@ -68,6 +68,17 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.5" date="2022-03-29" urgency="low">
+      <description>
+        <p>Need some stability?</p>
+        <ul>
+          <li>Fixed racecondition in Thinking Widget</li>
+          <li>Updated for new Vala compiler</li>
+          <li>Bug fixes</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.5-stability</url>
+    </release>
     <release version="0.2.4" date="2021-09-04" urgency="low">
       <description>
         <p>You made this PDF using Markdown? And it was easy? Like WeasyPrint?</p>
