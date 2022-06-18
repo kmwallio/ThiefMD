@@ -235,37 +235,16 @@ namespace ThiefMD.Controllers.UI {
         } else {
             return (current_palette.global.foreground == current_palette.link.foreground) &&
                     (current_palette.global.background == current_palette.link.background);
-            //  Clutter.Color text_color = Clutter.Color.from_string (current_palette.global.foreground);
-            //  Clutter.Color link_color = Clutter.Color.from_string (current_palette.link.foreground);
-            //  float m1, lum1, lum2, m2;
-            //  text_color.to_hls (out m1, out lum1, out m2);
-            //  link_color.to_hls (out m1, out lum2, out m2);
-            //  m1 = float.max (lum1, lum2);
-            //  m2 = float.min (lum1, lum2);
-
-            //  // Make sure contrast ratio differentiates links from normal text
-            //  if (((m1 + 0.05) / (m2 + 0.05)) > Constants.MINIMUM_CONTRAST_RATIO) {
-            //      return false;
-            //  } else {
-            //      text_color = Clutter.Color.from_string (current_palette.global.background);
-            //      link_color = Clutter.Color.from_string (current_palette.link.background);
-            //      text_color.to_hls (out m1, out lum1, out m2);
-            //      link_color.to_hls (out m1, out lum2, out m2);
-            //      m1 = float.max (lum1, lum2);
-            //      m2 = float.min (lum1, lum2);
-
-            //      return ((m1 + 0.05) / (m2 + 0.05)) < Constants.MINIMUM_CONTRAST_RATIO;
-            //  }
         }
     }
 
     public void get_focus_bg_color (out double r, out double g, out double b) {
         var settings = AppSettings.get_default ();
-        Clutter.Color background;
+        Ultheme.Color background;
         if (current_palette == null || settings.theme_id == "thiefmd") {
-            background = Clutter.Color.from_string ("#FAFAFA");
+            background = Ultheme.Color.from_string ("#FAFAFA");
         } else {
-            background = Clutter.Color.from_string (current_palette.global.background);
+            background = Ultheme.Color.from_string (current_palette.global.background);
         }
         r = background.red / 255.0;
         g = background.green / 255.0;
@@ -274,11 +253,11 @@ namespace ThiefMD.Controllers.UI {
 
     public void get_focus_color (out double r, out double g, out double b) {
         var settings = AppSettings.get_default ();
-        Clutter.Color focus;
+        Ultheme.Color focus;
         if (current_palette == null || settings.theme_id == "thiefmd") {
-            focus = Clutter.Color.from_string ("#191919");
+            focus = Ultheme.Color.from_string ("#191919");
         } else {
-            focus = Clutter.Color.from_string (current_palette.global.foreground);
+            focus = Ultheme.Color.from_string (current_palette.global.foreground);
         }
         r = focus.red / 255.0;
         g = focus.green / 255.0;
@@ -287,11 +266,11 @@ namespace ThiefMD.Controllers.UI {
 
     public void get_codeblock_bg_color (out double r, out double g, out double b) {
         var settings = AppSettings.get_default ();
-        Clutter.Color code_bg;
+        Ultheme.Color code_bg;
         if (current_palette == null || settings.theme_id == "thiefmd") {
-            code_bg = Clutter.Color.from_string ("#FAFAFA");
+            code_bg = Ultheme.Color.from_string ("#FAFAFA");
         } else {
-            code_bg = Clutter.Color.from_string (current_palette.code_block.background);
+            code_bg = Ultheme.Color.from_string (current_palette.code_block.background);
         }
         r = code_bg.red / 255.0;
         g = code_bg.green / 255.0;
@@ -300,16 +279,16 @@ namespace ThiefMD.Controllers.UI {
 
     public void get_out_of_focus_color (out double r, out double g, out double b) {
         var settings = AppSettings.get_default ();
-        Clutter.Color background;
-        Clutter.Color foreground;
+        Ultheme.Color background;
+        Ultheme.Color foreground;
         if (current_palette == null || settings.theme_id == "thiefmd") {
-            background = Clutter.Color.from_string ("#FAFAFA");
-            foreground = Clutter.Color.from_string ("#191919");
+            background = Ultheme.Color.from_string ("#FAFAFA");
+            foreground = Ultheme.Color.from_string ("#191919");
         } else {
-            background = Clutter.Color.from_string (current_palette.global.background);
-            foreground = Clutter.Color.from_string (current_palette.global.foreground);
+            background = Ultheme.Color.from_string (current_palette.global.background);
+            foreground = Ultheme.Color.from_string (current_palette.global.foreground);
         }
-        Clutter.Color out_of_focus = foreground.interpolate (background, 0.82);
+        Ultheme.Color out_of_focus = foreground.interpolate (background, 0.82);
         r = out_of_focus.red / 255.0;
         g = out_of_focus.green / 255.0;
         b = out_of_focus.blue / 255.0;
@@ -462,8 +441,8 @@ namespace ThiefMD.Controllers.UI {
         if (current_palette != null && settings.theme_id != "thiefmd") {
             // Use luminance to determine if the background is dark or light as some themes
             // include 2 dark themes or 2 light themes
-            Clutter.Color color = Clutter.Color.from_string (current_palette.global.background);
-            float hue, lum, sat;
+            Ultheme.Color color = Ultheme.Color.from_string (current_palette.global.background);
+            double hue, lum, sat;
             color.to_hls (out hue, out lum, out sat);
 
             // Set dark theme

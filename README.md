@@ -113,7 +113,6 @@ libgtkspell3-3-dev
 libwebkit2gtk-4.0-dev
 libmarkdown2-dev
 libxml2-dev
-libclutter-1.0-dev
 libarchive-dev
 libgtk-3-dev
 libgee-0.8-dev
@@ -131,7 +130,6 @@ meson
 ninja-build
 cmake
 libmarkdown-devel
-clutter-gtk-devel
 webkit2gtk3-devel
 gtk3-devel
 gtksourceview4-devel
