@@ -127,8 +127,8 @@
             "sources" : [
                 {
                     "type" : "archive",
-                    "url" : "https://www.abisource.com/downloads/link-grammar/5.8.1/link-grammar-5.8.1.tar.gz",
-                    "sha256" : "11c4ff551fa5169257dacc575080c63b075c790edac29984a94641a0993b505b"
+                    "url" : "https://www.abisource.com/downloads/link-grammar/5.10.5/link-grammar-5.10.5.tar.gz",
+                    "sha256" : "324710cd8132975ff9ccb53509732f7558473b1c19f17892000a3dedb8618aed"
                 }
             ]
         },

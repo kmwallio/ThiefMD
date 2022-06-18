@@ -37,10 +37,12 @@ namespace ThiefMD.Controllers.UI {
             preview_mutex = new TimedMutex (250);
         }
 
-        if (preview_mutex.can_do_action ()) {
-            var settings = AppSettings.get_default ();
-            Preview.get_instance ().update_html_view (true, SheetManager.get_markdown (), is_fountain (settings.last_file));
-            settings.writing_changed ();
+        if (PreviewWindow.has_instance ()) {
+            if (preview_mutex.can_do_action ()) {
+                var settings = AppSettings.get_default ();
+                PreviewWindow.get_instance ().update ();
+                settings.writing_changed ();
+            }
         }
     }
 
