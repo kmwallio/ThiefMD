@@ -24,3 +24,6 @@
 [submodule "src/bibtex"]
 	path = src/bibtex
 	url = https://github.com/ThiefMD/BiBtex-vala.git
+[submodule "src/medium"]
+	path = src/medium
+	url = https://github.com/ThiefMD/medium-vala.git

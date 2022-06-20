@@ -80,7 +80,7 @@ namespace ThiefMD.Widgets {
                         label.use_markup = true;
                         ConnectionError status = new ConnectionError (
                             this,
-                            (title != "") ? title + _(" Published") : _("Post Published"),
+                            (title != "") ? title + " " + _("Connection Error") : _("Connection Error"),
                             label);
                         status.run ();
                     }
@@ -114,7 +114,7 @@ namespace ThiefMD.Widgets {
                         label.use_markup = true;
                         ConnectionError status = new ConnectionError (
                             this,
-                            (title != "") ? title + _(" Published") : _("Post Published"),
+                            (title != "") ? title + " " + _("Connection Error") : _("Connection Error"),
                             label);
                         status.run ();
                     }
@@ -148,13 +148,47 @@ namespace ThiefMD.Widgets {
                         label.use_markup = true;
                         ConnectionError status = new ConnectionError (
                             this,
-                            (title != "") ? title + _(" Published") : _("Post Published"),
+                            (title != "") ? title + " " + _("Connection Error") : _("Connection Error"),
                             label);
                         status.run ();
                     }
                 }
             });
             connection_options.add (wordpress_connection);
+
+            var medium_connection = new Gtk.Button.with_label (_("  Medium"));
+            medium_connection.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/medium.png"));
+            medium_connection.hexpand = true;
+            medium_connection.always_show_image = true;
+            medium_connection.show_all ();
+            medium_connection.clicked.connect (() => {
+                ConnectionData? data = MediumConnection.create_connection (this);
+                if (data != null) {
+                    if (data.endpoint.chug ().chomp () == "") {
+                        data.endpoint = "https://api.medium.com/v1/";
+                    }
+                    debug ("Connecting new medium account: %s", data.user);
+                    MediumConnection connection = new MediumConnection (data.user, data.auth, data.endpoint);
+                    if (connection.connection_valid ()) {
+                        SecretSchemas.get_instance ().add_medium_secret (data.endpoint, data.user, data.auth);
+                        ThiefApp.get_instance ().connections.add (connection);
+                        ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
+                        display_options.add (connection_button (connection, display_options));
+                    } else {
+                        Gtk.Label label = new Gtk.Label (
+                            "<b>Could not connect:</b> Please check your Integration Token.");
+    
+                        label.xalign = 0;
+                        label.use_markup = true;
+                        ConnectionError status = new ConnectionError (
+                            this,
+                            (title != "") ? title + " " + _("Connection Error") : _("Connection Error"),
+                            label);
+                        status.run ();
+                    }
+                }
+            });
+            connection_options.add (medium_connection);
 
             foreach (var c in ThiefApp.get_instance ().connections) {
                 display_options.add (connection_button (c, display_options));
@@ -194,6 +228,14 @@ namespace ThiefMD.Widgets {
                 alias = gc.conf_alias;
                 endpoint = gc.conf_endpoint;
                 button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/wordpress.png"));
+                button.always_show_image = true;
+                button.show_all ();
+            } else if (connection is MediumConnection) {
+                MediumConnection gc = (MediumConnection) connection;
+                type = MediumConnection.CONNECTION_TYPE;
+                alias = gc.conf_alias;
+                endpoint = gc.conf_endpoint;
+                button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/medium.png"));
                 button.always_show_image = true;
                 button.show_all ();
             }
