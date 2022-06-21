@@ -11,6 +11,8 @@ We're making ThiefMD components reusable. You can find the components in at [Git
 - [writeas-vala](#writeas-vala)
 - [ghost-vala](#ghost-vala)
 - [wordpress-vala](#wordpress-vala)
+- [medium-vala](#medium-vala)
+- [forem-vala](#forem-vala)
 - [BibTeX-vala](#BibTeX-vala)
 - [Theme Generator](#theme-generator)
 - [ultheme-vala](#ultheme-vala)
@@ -70,6 +72,14 @@ buffer.paste_done.connect ((clipboard) => {
 ## WordPress-vala
 
 [WordPress-vala](https://github.com/ThiefMD/wordpress-vala) is a simple library for publishing posts to [WordPress](https://wordpress.org) blogs. It contains some workarounds and retries for some common issues.
+
+## Medium-vala
+
+[Medium-vala](https://github.com/ThiefMD/medium-vala) is a simple library for publishing posts to [Medium](https://medium.com).
+
+## Forem-vala
+
+[Forem-vala](https://github.com/ThiefMD/forem-vala) is a simple library for publishing posts to [Forem](https://www.forem.com) communities (like [dev.to](https://dev.to)).
 
 ## BibTeX-vala
 

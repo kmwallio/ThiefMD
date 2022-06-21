@@ -32,6 +32,8 @@ ThiefMD supports [exporting your work](/tips/novel-writing#sharing-your-work) fr
 
 Publish to PDF to send to friends over e-mail. [ePub](https://en.wikipedia.org/wiki/EPUB) if you want to preview your novel in your favorite e-Reader. docx or LaTeX if you're getting ready to turn in that report or dissertation.
 
+Make a [Connection](/tips/blogging-with-ghost/), and you can publish to [Ghost](https://ghost.org), [WordPress](https://wordpress.org), [Medium](https://medium.com), [Forem](https://forem.com), or [WriteFreely](https://writefreely.org).
+
 However large the task and wherever you need to take it, ThiefMD has you covered[^okay-its-pandoc].
 
 [^okay-its-pandoc]: Export powered by [Pandoc](https://pandoc.org). [Let us know](https://github.com/kmwallio/ThiefMD/issues) if we don't have you covered.
