@@ -119,6 +119,16 @@ namespace ThiefMD.Controllers {
                 try {
                     string? the_secret = Secret.password_lookup.end (async_res);
                     if (the_secret != null) {
+                        // Put the secret back in before connecting (connections may block if not online)
+                        if (!have_secret (attributes["connectiontype"], attributes["alias"], attributes["endpoint"])) {
+                            SecretAttr new_sec = new SecretAttr ();
+                            new_sec.connection_type = attributes["connectiontype"];
+                            new_sec.user = attributes["alias"];
+                            new_sec.endpoint = attributes["endpoint"];
+                            stored_secrets.secrets.add (new_sec);
+                            serialize_secrets ();
+                        }
+
                         debug ("Loaded secret: %s : %s", attributes["connectiontype"], attributes["alias"]);
                         if (attributes["connectiontype"] == WriteFreelyConnection.CONNECTION_TYPE) {
                             WriteFreelyConnection writeas_connection = new WriteFreelyConnection (attributes["alias"], the_secret, attributes["endpoint"]);
@@ -144,15 +154,12 @@ namespace ThiefMD.Controllers {
                                 ThiefApp.get_instance ().exporters.register (medium_connection.export_name, medium_connection.exporter);
                             }
                             ThiefApp.get_instance ().connections.add (medium_connection);
-                        }
-
-                        if (!have_secret (attributes["connectiontype"], attributes["alias"], attributes["endpoint"])) {
-                            SecretAttr new_sec = new SecretAttr ();
-                            new_sec.connection_type = attributes["connectiontype"];
-                            new_sec.user = attributes["alias"];
-                            new_sec.endpoint = attributes["endpoint"];
-                            stored_secrets.secrets.add (new_sec);
-                            serialize_secrets ();
+                        } else if (attributes["connectiontype"] == ForemConnection.CONNECTION_TYPE) {
+                            ForemConnection forem_connection = new ForemConnection (attributes["alias"], the_secret, attributes["endpoint"]);
+                            if (forem_connection.connection_valid ()) {
+                                ThiefApp.get_instance ().exporters.register (forem_connection.export_name, forem_connection.exporter);
+                            }
+                            ThiefApp.get_instance ().connections.add (forem_connection);
                         }
                     }
                     Secret.password_wipe (the_secret);
@@ -296,6 +303,11 @@ namespace ThiefMD.Controllers {
 
         public bool add_medium_secret (string url, string alias, string password) {
             SecretSchemas.get_instance ().save_secret (MediumConnection.CONNECTION_TYPE, alias, url, password);
+            return true;
+        }
+
+        public bool add_forem_secret (string url, string alias, string password) {
+            SecretSchemas.get_instance ().save_secret (ForemConnection.CONNECTION_TYPE, alias, url, password);
             return true;
         }
     }

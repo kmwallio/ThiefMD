@@ -27,22 +27,26 @@ using ThiefMD.Controllers;
 using ThiefMD.Exporters;
 
 namespace ThiefMD.Connections {
-    public class MediumConnection : ConnectionBase {
-        public const string CONNECTION_TYPE = "medium";
+    public class ForemConnection : ConnectionBase {
+        public const string CONNECTION_TYPE = "forem";
         public override string export_name { get; protected set; }
         public override ExportBase exporter { get; protected  set; }
-        public Medium.Client connection;
+        public Forem.Client connection;
         private string access_token;
         private string alias;
         public string conf_endpoint;
         public string conf_alias;
 
-        public MediumConnection (string username, string password, string endpoint = "https://api.medium.com/v1/") {
+        public ForemConnection (string username, string password, string endpoint = "https://dev.to/") {
             conf_alias = username;
             conf_endpoint = endpoint;
             string api_endpoint = conf_endpoint;
 
-            connection = new Medium.Client ();
+            if (api_endpoint.has_suffix ("api") || api_endpoint.has_suffix ("api/")) {
+                api_endpoint = api_endpoint.substring (0, api_endpoint.last_index_of ("api"));
+            }
+
+            connection = new Forem.Client (api_endpoint);
             alias = "";
 
             try {
@@ -50,8 +54,19 @@ namespace ThiefMD.Connections {
                 string temp;
                 if (connection.get_authenticated_user (out temp)) {
                     alias = temp;
-                    export_name = "https://medium.com/" + alias;
-                    exporter = new MediumExporter (connection);
+                    string label = endpoint.down ();
+                    if (label.has_prefix ("https://")) {
+                        label = endpoint.substring (8);
+                    } else if (endpoint.has_prefix ("http://")) {
+                        label = endpoint.substring (7);
+                    }
+
+                    label = label.substring (0, 1).up () + label.substring (1).down ();
+                    if (!label.has_suffix ("/")) {
+                        label = label + "/";
+                    }
+                    export_name = label + username;
+                    exporter = new ForemExporter (connection);
                 }
             } catch (Error e) {
                 warning ("Could not establish connection: %s", e.message);
@@ -82,21 +97,28 @@ namespace ThiefMD.Connections {
             username_label.xalign = 0;
             Gtk.Entry username_entry = new Gtk.Entry ();
 
-            Gtk.Label password_label = new Gtk.Label ("<a href='https://medium.com/me/settings'>" + _("Integration Token") + "</a>");
-            password_label.use_markup = true;
+            Gtk.Label password_label = new Gtk.Label ("<a href='https://dev.to/settings/extensions'>" + _("API Key") + "</a>");
             password_label.xalign = 0;
+            password_label.use_markup = true;
             Gtk.Entry password_entry = new Gtk.Entry ();
             password_entry.set_visibility (false);
+
+            Gtk.Label endpoint_label = new Gtk.Label (_("Endpoint"));
+            endpoint_label.xalign = 0;
+            Gtk.Entry endpoint_entry = new Gtk.Entry ();
+            endpoint_entry.placeholder_text = "https://dev.to/";
 
             grid.attach (username_label, 1, 1, 1, 1);
             grid.attach (username_entry, 2, 1, 2, 1);
             grid.attach (password_label, 1, 2, 1, 1);
             grid.attach (password_entry, 2, 2, 2, 1);
+            grid.attach (endpoint_label, 1, 3, 1, 1);
+            grid.attach (endpoint_entry, 2, 3, 2, 1);
 
             grid.show_all ();
 
             var dialog = new Gtk.Dialog.with_buttons (
-                            _("New Medium Connection"),
+                            _("New Forem Connection"),
                             (parent != null) ? parent : ThiefApp.get_instance (),
                             Gtk.DialogFlags.MODAL,
                             _("_Add Account"),
@@ -116,7 +138,7 @@ namespace ThiefMD.Connections {
                     data.connection_type = CONNECTION_TYPE;
                     data.user = username_entry.text;
                     data.auth = password_entry.text;
-                    data.endpoint = "https://api.medium.com/v1/";
+                    data.endpoint = endpoint_entry.text;
                 }
                 dialog.destroy ();
             });
@@ -126,29 +148,28 @@ namespace ThiefMD.Connections {
                 data.connection_type = CONNECTION_TYPE;
                 data.user = username_entry.text;
                 data.auth = password_entry.text;
-                data.endpoint = "https://api.medium.com/v1/";
+                data.endpoint = endpoint_entry.text;
             }
 
             return data;
         }
     }
 
-    private class MediumExporter : ExportBase {
+    private class ForemExporter : ExportBase {
         public override string export_name { get; protected set; }
         public override string export_css { get; protected set; }
         private PublisherPreviewWindow publisher_instance;
-        public Medium.Client connection;
+        public Forem.Client connection;
         private Gtk.ComboBoxText publish_state;
 
-        public MediumExporter (Medium.Client connected) {
-            export_name = "medium";
+        public ForemExporter (Forem.Client connected) {
+            export_name = "forem";
             export_css = "preview";
             connection = connected;
 
             publish_state = new Gtk.ComboBoxText ();
-            publish_state.append_text ("draft");
-            publish_state.append_text ("public");
-            publish_state.append_text ("unlisted");
+            publish_state.append_text ("Draft");
+            publish_state.append_text ("Published");
             publish_state.set_active (0);
         }
 
@@ -172,91 +193,92 @@ namespace ThiefMD.Connections {
             bool non_collected_post = true;
             bool published = true;
             string temp;
-            string title;
+            string title = "";
             string date;
             string url = "";
             string id = "";
-            Gee.Map<string, string> metadata = FileManager.get_yaml_kvp (publisher_instance.get_export_markdown ());
             string body = FileManager.get_yamlless_markdown (
                 publisher_instance.get_export_markdown (),
                 0,
                 out title,
                 out date,
                 true,
-                false, // Override as theme will probably display?
+                false, // Override instead of use settings as theme will display
                 false);
 
-            if (metadata.has_key ("bibliography")) {
-                body = publisher_instance.get_export_markdown ();
-            }
-
-            if (metadata.has_key ("title")) {
-                title = metadata.get ("title");
-            }
+            // Forem supports YAML frontmatter
+            body = publisher_instance.get_export_markdown ();
 
             Gee.Map<string, string> images_to_upload = Pandoc.file_image_map (publisher_instance.get_export_markdown ());
             Gee.HashMap<string, string> replacements = new Gee.HashMap<string, string> ();
 
-            Gee.List<string> mediumSaying = new Gee.LinkedList<string> ();
-            mediumSaying.add(_("You're writing is kind of... medium..."));
-            mediumSaying.add(_("So hip, so cool, so medium"));
-            mediumSaying.add(_("Taking your writing to the mainstream"));
-
+            bool good_to_go = true;
             if (images_to_upload.keys.size > 0) {
-                Thinking worker = new Thinking (_("Uploading images"), () => {
-                    foreach (var images in images_to_upload) {
-                        File img_file = File.new_for_path (images.value);
-                        if (img_file.query_exists () && !FileUtils.test (images.value, FileTest.IS_DIR)) {
-                            string upload_url;
-                            if (connection.upload_image_simple (
-                                out upload_url,
-                                img_file.get_path ()))
-                            {
-                                replacements.set (images.key, upload_url);
-                            } else {
-                                warning ("Could not upload image %s", img_file.get_basename ());
-                            }
-                        }
+                foreach (var images in images_to_upload) {
+                    File img_file = File.new_for_path (images.value);
+                    if (img_file.query_exists () && !FileUtils.test (images.value, FileTest.IS_DIR)) {
+                        good_to_go = false;
                     }
-                },
-                mediumSaying,
-                publisher_instance);
-                worker.run ();
+                }
             }
 
-            foreach (var replacement in replacements) {
-                body = body.replace ("(" + replacement.key, "(" + replacement.value);
-                body = body.replace ("\"" + replacement.key, "\"" + replacement.value);
-                body = body.replace ("'" + replacement.key, "'" + replacement.value);
-                warning ("Replaced %s with %s", replacement.key, replacement.value);
-            }
+            if (good_to_go) {
+                Gee.Map<string, string> metadata = FileManager.get_yaml_kvp (publisher_instance.get_export_markdown ());
+                string featured_image = "";
+                string series = "";
+                if (metadata.has_key ("cover-image")) { // Consistency for ePub cover-image
+                    featured_image = metadata.get ("cover-image");
+                } else if (metadata.has_key ("feature_image")) { // What ghost API documents
+                    featured_image = metadata.get ("feature_image");
+                } else if (metadata.has_key ("coverimage")) { // Misc. things I'll try and wonder why they didn't work
+                    featured_image = metadata.get ("coverimage");
+                } else if (metadata.has_key ("featureimage")) {
+                    featured_image = metadata.get ("featureimage");
+                } else if (metadata.has_key ("featuredimage")) {
+                    featured_image = metadata.get ("featureimage");
+                } else if (metadata.has_key ("featured-image")) {
+                    featured_image = metadata.get ("featureimage");
+                }
+                featured_image = featured_image.chomp ().chug ();
+                if (!featured_image.has_prefix ("http")) {
+                    featured_image = "";
+                }
 
-            string published_state = publish_state.get_active_text ();
+                if (metadata.has_key ("series")) {
+                    series = metadata.get ("series").chomp ().chug ();
+                }
 
-            if (metadata.has_key ("bibliography")) {
-                string html = "";
-                generate_html (body, out html);
-                body = html;
-            }
+                int published_state = publish_state.get_active ();
+                bool immediately_publish = (published_state == 1);
 
-            // Unauthenticated post
-            if (connection.publish_post (
-                out url,
-                out id,
-                body,
-                title,
-                published_state,
-                metadata.has_key ("bibliography") ? "html" : "markdown"))
-            {
-                published = true;
+                if (connection.publish_post (
+                    out url,
+                    out id,
+                    body,
+                    title,
+                    series,
+                    featured_image,
+                    immediately_publish))
+                {
+                    published = true;
+                }
+            } else {
+                Gtk.Label label = new Gtk.Label (
+                    _("Image uploads are not supported by Forem."));
+
+                PublishedStatusWindow status = new PublishedStatusWindow (
+                    publisher_instance,
+                    _("Unsupported Format"),
+                    label);
+
+                status.run ();
             }
 
             if (published) {
                 Gtk.Label label = new Gtk.Label (
-                    "<b>Post URL:</b> <a href='%s'>%s</a>\nID: %s\n".printf (
+                    "<b>Post URL:</b> <a href='%s'>%s</a>".printf (
                         url,
-                        url,
-                        id));
+                        url));
 
                 label.xalign = 0;
                 label.use_markup = true;
