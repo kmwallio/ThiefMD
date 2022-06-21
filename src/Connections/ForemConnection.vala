@@ -238,6 +238,8 @@ namespace ThiefMD.Connections {
                     featured_image = metadata.get ("featureimage");
                 } else if (metadata.has_key ("featured-image")) {
                     featured_image = metadata.get ("featureimage");
+                } else if (metadata.has_key ("cover_image")) { // What ghost API documents
+                    featured_image = metadata.get ("cover_image");
                 }
                 featured_image = featured_image.chomp ().chug ();
                 if (!featured_image.has_prefix ("http")) {
