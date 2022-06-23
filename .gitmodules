@@ -30,3 +30,6 @@
 [submodule "src/forem"]
 	path = src/forem
 	url = https://github.com/ThiefMD/forem-vala.git
+[submodule "src/hashnode"]
+	path = src/hashnode
+	url = https://github.com/TwiRp/hashnode-vala.git

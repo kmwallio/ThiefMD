@@ -160,6 +160,12 @@ namespace ThiefMD.Controllers {
                                 ThiefApp.get_instance ().exporters.register (forem_connection.export_name, forem_connection.exporter);
                             }
                             ThiefApp.get_instance ().connections.add (forem_connection);
+                        } else if (attributes["connectiontype"] == HashnodeConnection.CONNECTION_TYPE) {
+                            HashnodeConnection hashnode_connection = new HashnodeConnection (attributes["alias"], the_secret, attributes["endpoint"]);
+                            if (hashnode_connection.connection_valid ()) {
+                                ThiefApp.get_instance ().exporters.register (hashnode_connection.export_name, hashnode_connection.exporter);
+                            }
+                            ThiefApp.get_instance ().connections.add (hashnode_connection);
                         }
                     }
                     Secret.password_wipe (the_secret);
@@ -308,6 +314,11 @@ namespace ThiefMD.Controllers {
 
         public bool add_forem_secret (string url, string alias, string password) {
             SecretSchemas.get_instance ().save_secret (ForemConnection.CONNECTION_TYPE, alias, url, password);
+            return true;
+        }
+
+        public bool add_hashnode_secret (string url, string alias, string password) {
+            SecretSchemas.get_instance ().save_secret (HashnodeConnection.CONNECTION_TYPE, alias, url, password);
             return true;
         }
     }

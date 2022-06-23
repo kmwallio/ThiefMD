@@ -224,6 +224,51 @@ namespace ThiefMD.Widgets {
             });
             connection_options.add (forem_connection);
 
+            var hashnode_connection = new Gtk.Button.with_label (_("  Hashnode"));
+            hashnode_connection.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/hashnode.png"));
+            hashnode_connection.hexpand = true;
+            hashnode_connection.always_show_image = true;
+            hashnode_connection.show_all ();
+            hashnode_connection.clicked.connect (() => {
+                ConnectionData? data = HashnodeConnection.create_connection (this);
+                if (data != null) {
+                    bool connection_valid = true;
+                    Hashnode.Client client = new Hashnode.Client();
+                    if (data.user.chug ().chomp () == "" || data.auth.chug ().chomp () == "") {
+                        connection_valid = false;
+                    }
+                    if (data.endpoint.chug ().chomp () == "") {
+                        string domain = "";
+                        string pub_id = "";
+                        if (client.get_user_information (data.user, out pub_id, out domain)) {
+                            data.endpoint = "%s/%s".printf(domain, data.user);
+                        } else {
+                            data.endpoint = "%s@hashnode".printf(data.user);
+                        }
+                    }
+                    debug ("Connecting new hashnode account: %s", data.user);
+                    if (connection_valid) {
+                        HashnodeConnection connection = new HashnodeConnection (data.user, data.auth, data.endpoint);
+                        SecretSchemas.get_instance ().add_hashnode_secret (data.endpoint, data.user, data.auth);
+                        ThiefApp.get_instance ().connections.add (connection);
+                        ThiefApp.get_instance ().exporters.register (connection.export_name, connection.exporter);
+                        display_options.add (connection_button (connection, display_options));
+                    } else {
+                        Gtk.Label label = new Gtk.Label (
+                            "<b>Could not connect:</b> Please check your username and access token.");
+
+                        label.xalign = 0;
+                        label.use_markup = true;
+                        ConnectionError status = new ConnectionError (
+                            this,
+                            (title != "") ? title + " " + _("Connection Error") : _("Connection Error"),
+                            label);
+                        status.run ();
+                    }
+                }
+            });
+            connection_options.add (hashnode_connection);
+
             foreach (var c in ThiefApp.get_instance ().connections) {
                 display_options.add (connection_button (c, display_options));
             }
@@ -278,6 +323,14 @@ namespace ThiefMD.Widgets {
                 alias = gc.conf_alias;
                 endpoint = gc.conf_endpoint;
                 button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/forem.png"));
+                button.always_show_image = true;
+                button.show_all ();
+            } else if (connection is HashnodeConnection) {
+                HashnodeConnection gc = (HashnodeConnection) connection;
+                type = HashnodeConnection.CONNECTION_TYPE;
+                alias = gc.conf_alias;
+                endpoint = gc.conf_endpoint;
+                button.set_image (new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/hashnode.png"));
                 button.always_show_image = true;
                 button.show_all ();
             }

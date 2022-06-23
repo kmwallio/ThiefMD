@@ -27,58 +27,43 @@ using ThiefMD.Controllers;
 using ThiefMD.Exporters;
 
 namespace ThiefMD.Connections {
-    public class ForemConnection : ConnectionBase {
-        public const string CONNECTION_TYPE = "forem";
+    public class HashnodeConnection : ConnectionBase {
+        public const string CONNECTION_TYPE = "hashnode";
         public override string export_name { get; protected set; }
         public override ExportBase exporter { get; protected  set; }
-        public Forem.Client connection;
+        public Hashnode.Client connection;
         private string access_token;
         private string alias;
         public string conf_endpoint;
         public string conf_alias;
 
-        public ForemConnection (string username, string password, string endpoint = "https://dev.to/") {
-            conf_alias = username;
-            conf_endpoint = endpoint;
-            string api_endpoint = conf_endpoint;
+        public HashnodeConnection (string username, string password, string domain) {
+            conf_alias = domain;
+            conf_endpoint = domain;
 
-            if (api_endpoint.has_suffix ("api") || api_endpoint.has_suffix ("api/")) {
-                api_endpoint = api_endpoint.substring (0, api_endpoint.last_index_of ("api"));
+            connection = new Hashnode.Client ();
+
+            if (conf_alias.chug ().chomp () == "") {
+                string q_domain = "";
+                string pub_id = "";
+                if (connection.get_user_information (username, out pub_id, out q_domain)) {
+                    conf_alias = "%s/%s".printf(q_domain, username);
+                } else {
+                    conf_alias = "%s@hashnode".printf(username);
+                }
             }
 
-            connection = new Forem.Client (api_endpoint);
-            alias = "";
-
             try {
-                connection.authenticate (username, password, out access_token);
-                string temp;
-                if (connection.get_authenticated_user (out temp)) {
-                    alias = temp;
-                    string label = endpoint.down ();
-                    if (label.has_prefix ("https://")) {
-                        label = endpoint.substring (8);
-                    } else if (endpoint.has_prefix ("http://")) {
-                        label = endpoint.substring (7);
-                    }
-
-                    label = label.substring (0, 1).up () + label.substring (1).down ();
-                    if (!label.has_suffix ("/")) {
-                        label = label + "/";
-                    }
-                    export_name = label + username;
-                    exporter = new ForemExporter (connection);
-                }
+                connection.authenticate (username, password);
+                export_name = conf_alias;
+                exporter = new HashnodeExporter (connection);
             } catch (Error e) {
                 warning ("Could not establish connection: %s", e.message);
             }
         }
 
         public override bool connection_valid () {
-            if (connection.get_authenticated_user (out alias)) {
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
         public override void connection_close () {
@@ -93,20 +78,35 @@ namespace ThiefMD.Connections {
             grid.hexpand = true;
             grid.vexpand = true;
 
-            Gtk.Label username_label = new Gtk.Label (_("Username"));
+            Gtk.Label username_label = new Gtk.Label (_("Username or Publication ID"));
             username_label.xalign = 0;
             Gtk.Entry username_entry = new Gtk.Entry ();
 
-            Gtk.Label password_label = new Gtk.Label ("<a href='https://dev.to/settings/extensions'>" + _("API Key") + "</a>");
+            Gtk.Label password_label = new Gtk.Label ("<a href='https://hashnode.com/settings/developer'>" + _("Access Token") + "</a>");
             password_label.xalign = 0;
             password_label.use_markup = true;
             Gtk.Entry password_entry = new Gtk.Entry ();
             password_entry.set_visibility (false);
 
-            Gtk.Label endpoint_label = new Gtk.Label (_("Endpoint"));
+            Gtk.Label endpoint_label = new Gtk.Label (_("Display Name"));
             endpoint_label.xalign = 0;
             Gtk.Entry endpoint_entry = new Gtk.Entry ();
-            endpoint_entry.placeholder_text = "https://dev.to/";
+            endpoint_entry.placeholder_text = "username.hashnode.com";
+
+            username_entry.editing_done.connect (() => {
+                if (endpoint_entry.text.chug ().chomp () == "") {
+                    Hashnode.Client client = new Hashnode.Client();
+                    if (username_entry.text.chug ().chomp () == "") {
+                        string domain = "";
+                        string pub_id = "";
+                        if (client.get_user_information (username_entry.text, out pub_id, out domain)) {
+                            endpoint_entry.placeholder_text = "%s/%s".printf(domain, username_entry.text);
+                        } else {
+                            endpoint_entry.placeholder_text = "%s@hashnode".printf(username_entry.text);
+                        }
+                    }
+                }
+            });
 
             grid.attach (username_label, 1, 1, 1, 1);
             grid.attach (username_entry, 2, 1, 2, 1);
@@ -118,7 +118,7 @@ namespace ThiefMD.Connections {
             grid.show_all ();
 
             var dialog = new Gtk.Dialog.with_buttons (
-                            _("New Forem Connection"),
+                            _("New Hashnode Connection"),
                             (parent != null) ? parent : ThiefApp.get_instance (),
                             Gtk.DialogFlags.MODAL,
                             _("_Add Account"),
@@ -155,22 +155,16 @@ namespace ThiefMD.Connections {
         }
     }
 
-    private class ForemExporter : ExportBase {
+    private class HashnodeExporter : ExportBase {
         public override string export_name { get; protected set; }
         public override string export_css { get; protected set; }
         private PublisherPreviewWindow publisher_instance;
-        public Forem.Client connection;
-        private Gtk.ComboBoxText publish_state;
+        public Hashnode.Client connection;
 
-        public ForemExporter (Forem.Client connected) {
-            export_name = "forem";
+        public HashnodeExporter (Hashnode.Client connected) {
+            export_name = "hashnode";
             export_css = "preview";
             connection = connected;
-
-            publish_state = new Gtk.ComboBoxText ();
-            publish_state.append_text ("Draft");
-            publish_state.append_text ("Published");
-            publish_state.set_active (0);
         }
 
         public override string update_markdown (string markdown) {
@@ -179,12 +173,10 @@ namespace ThiefMD.Connections {
 
         public override void attach (PublisherPreviewWindow ppw) {
             publisher_instance = ppw;
-            publisher_instance.headerbar.pack_end (publish_state);
             return;
         }
 
         public override void detach () {
-            publisher_instance.headerbar.remove (publish_state);
             publisher_instance = null;
             return;
         }
@@ -206,8 +198,7 @@ namespace ThiefMD.Connections {
                 false, // Override instead of use settings as theme will display
                 false);
 
-            // Forem supports YAML frontmatter
-            body = publisher_instance.get_export_markdown ();
+            warning ("Hashnode exporting");
 
             Gee.Map<string, string> images_to_upload = Pandoc.file_image_map (publisher_instance.get_export_markdown ());
             Gee.HashMap<string, string> replacements = new Gee.HashMap<string, string> ();
@@ -225,7 +216,6 @@ namespace ThiefMD.Connections {
             if (good_to_go) {
                 Gee.Map<string, string> metadata = FileManager.get_yaml_kvp (publisher_instance.get_export_markdown ());
                 string featured_image = "";
-                string series = "";
                 if (metadata.has_key ("cover-image")) { // Consistency for ePub cover-image
                     featured_image = metadata.get ("cover-image");
                 } else if (metadata.has_key ("feature_image")) { // What ghost API documents
@@ -246,27 +236,26 @@ namespace ThiefMD.Connections {
                     featured_image = "";
                 }
 
-                if (metadata.has_key ("series")) {
-                    series = metadata.get ("series").chomp ().chug ();
-                }
+                Gee.List<string> hashnodeSayings = new Gee.LinkedList<string> ();
+                hashnodeSayings.add(_("Hashing words and nodes together."));
+                hashnodeSayings.add(_("Don't forget to share on reddit."));
+                hashnodeSayings.add(_("This looks like something worth sharing"));
 
-                int published_state = publish_state.get_active ();
-                bool immediately_publish = (published_state == 1);
-
-                if (connection.publish_post (
-                    out url,
-                    out id,
-                    body,
-                    title,
-                    series,
-                    featured_image,
-                    immediately_publish))
-                {
-                    published = true;
-                }
+                Thinking worker = new Thinking (_("Beaming to the Internet"), () => {
+                    if (connection.publish_post (
+                        out url,
+                        out id,
+                        body,
+                        title,
+                        featured_image))
+                    {
+                        published = true;
+                    }
+                }, hashnodeSayings, publisher_instance);
+                worker.run ();
             } else {
                 Gtk.Label label = new Gtk.Label (
-                    _("Image uploads are not supported by Forem."));
+                    _("Image uploads are not supported by Hashnode."));
 
                 PublishedStatusWindow status = new PublishedStatusWindow (
                     publisher_instance,

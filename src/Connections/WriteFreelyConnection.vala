@@ -210,7 +210,7 @@ namespace ThiefMD.Connections {
 
         public override bool export () {
             bool non_collected_post = true;
-            bool published = true;
+            bool published = false;
             string temp;
             string title;
             string date;

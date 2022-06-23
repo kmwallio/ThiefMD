@@ -12,5 +12,6 @@
         <file alias="wordpress.png" compressed="false" preprocess="">icons/connections/wordpress.png</file>
         <file alias="medium.png" compressed="false" preprocess="">icons/connections/medium.png</file>
         <file alias="forem.png" compressed="false" preprocess="">icons/connections/forem.png</file>
+        <file alias="hashnode.png" compressed="false" preprocess="">icons/connections/hashnode.png</file>
     </gresource>
 </gresources>
