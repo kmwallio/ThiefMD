@@ -115,22 +115,64 @@ namespace ThiefMD.Widgets {
      * 
      * Sheets View keeps track of *.md files in a provided directory
      */
-    public class Sheets : Gtk.ScrolledWindow {
+    public class Sheets : Gtk.Box {
         public ThiefSheets metadata;
         private string _sheets_dir;
         private Gee.HashMap<string, Sheet> _sheets;
+        private Gtk.ScrolledWindow _scroller;
         private Gtk.Box _view;
         private PreventDelayedDrop _reorderable;
         private FileMonitor _monitor;
+        private NewSheet new_sheet_widget;
+        public Gtk.MenuButton new_sheet;
         Gtk.Label _empty;
 
         public Sheets (string path) {
+            orientation = Gtk.Orientation.VERTICAL;
+
             var settings = AppSettings.get_default ();
             _sheets_dir = path;
             _view = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            _scroller = new Gtk.ScrolledWindow (null, null);
 
-            set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
-            add (_view);
+            _scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+            _scroller.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+            _scroller.add (_view);
+            _scroller.vexpand = true;
+            _scroller.hexpand = true;
+
+            string title = "";
+            if (path != "") {
+                title = make_title (path.substring (path.last_index_of (Path.DIR_SEPARATOR_S) + 1));
+            }
+
+            var bar = new Hdy.HeaderBar ();
+            bar.set_title ("");
+            var bar_label = new Gtk.Label ("<b>" + title + "</b>");
+            bar_label.use_markup = true;
+            bar.pack_start (bar_label);
+            bar.set_show_close_button (false);
+
+            new_sheet = new Gtk.MenuButton ();
+            new_sheet_widget = new NewSheet ();
+            new_sheet.has_tooltip = true;
+            new_sheet.tooltip_text = (_("New Sheet"));
+            new_sheet.set_image (new Gtk.Image.from_icon_name ("document-new-symbolic", Gtk.IconSize.BUTTON));
+            new_sheet.popover = new_sheet_widget;
+            new_sheet.clicked.connect(() => {
+                settings.menu_active = true;
+                new_sheet.popover.hide.connect (() => {
+                    settings.menu_active = false;
+                });
+            });
+
+            bar.pack_end (new_sheet);
+
+            var header_context = bar.get_style_context ();
+            header_context.add_class ("thief-toolbar");
+
+            add (bar);
+            add (_scroller);
 
             debug ("Got %s\n", _sheets_dir);
             if (_sheets_dir == "" || !FileUtils.test(path, FileTest.IS_DIR)) {
@@ -139,8 +181,8 @@ namespace ThiefMD.Widgets {
                 load_sheets ();
             }
 
-            var header_context = this.get_style_context ();
-            header_context.add_class ("thief-sheets");
+            var sheets_context = this.get_style_context ();
+            sheets_context.add_class ("thief-sheets");
             _reorderable = new PreventDelayedDrop ();
 
             File current_directory = File.new_for_path (_sheets_dir);
@@ -156,7 +198,6 @@ namespace ThiefMD.Widgets {
                 }
             }
             width_request = settings.view_sheets_width;
-            set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
         }
 
         public void folder_changed (File file, File? other_file, FileMonitorEvent event_type) {

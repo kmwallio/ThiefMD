@@ -175,7 +175,6 @@ namespace ThiefMD {
             notes.set_reveal_child (false);
 
             desktop_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            desktop_box.add (toolbar);
             desktop_box.add (editor_notes_pane);
             desktop_box.add (stats_bar);
 
