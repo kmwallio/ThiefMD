@@ -422,7 +422,7 @@ namespace ThiefMD.Widgets {
             }
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
-            header_context.add_class ("thief-toolbar");
+            header_context.add_class ("thiefmd-toolbar");
             
 
             Gtk.Box vbox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);

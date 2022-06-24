@@ -118,7 +118,7 @@ namespace ThiefMD.Widgets {
                 if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.n, keycode)) {
                         if (window is ThiefApp) {
-                            ((ThiefApp)window).toolbar.make_new_sheet ();
+                            SheetManager.get_sheets ().make_new_sheet ();
                         }
                     }
                 }

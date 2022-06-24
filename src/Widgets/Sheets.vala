@@ -150,8 +150,11 @@ namespace ThiefMD.Widgets {
             bar.set_title ("");
             var bar_label = new Gtk.Label ("<b>" + title + "</b>");
             bar_label.use_markup = true;
+            bar_label.wrap_mode = Pango.WrapMode.WORD_CHAR;
             bar.pack_start (bar_label);
             bar.set_show_close_button (false);
+            bar.width_request = settings.view_sheets_width;
+            bar_label.width_request = settings.view_sheets_width;
 
             new_sheet = new Gtk.MenuButton ();
             new_sheet_widget = new NewSheet ();
@@ -169,7 +172,7 @@ namespace ThiefMD.Widgets {
             bar.pack_end (new_sheet);
 
             var header_context = bar.get_style_context ();
-            header_context.add_class ("thief-toolbar");
+            header_context.add_class ("thiefmd-toolbar");
 
             add (bar);
             add (_scroller);
@@ -198,6 +201,10 @@ namespace ThiefMD.Widgets {
                 }
             }
             width_request = settings.view_sheets_width;
+        }
+
+        public void make_new_sheet () {
+            new_sheet_widget.popup ();
         }
 
         public void folder_changed (File file, File? other_file, FileMonitorEvent event_type) {

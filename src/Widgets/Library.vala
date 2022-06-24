@@ -70,11 +70,12 @@ namespace ThiefMD.Widgets {
             library_item_display.add_attribute (library_item_text, "text", 0);
             library_item_display.add_attribute (library_item_icon, "pixbuf", 2);
             // insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
-            library_item_display.set_title (_("Library"));
             append_column (library_item_display);
             get_selection ().changed.connect (on_selection);
             folder_popup = new NewFolder ();
             _droppable = new PreventDelayedDrop ();
+
+            headers_visible = false;
 
             // Drop Support
             enable_model_drag_dest (target_list, DragAction.MOVE);

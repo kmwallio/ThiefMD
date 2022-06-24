@@ -287,17 +287,24 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             background: darker(@colorPrimary);
             color: @textColorPrimary;
         }
-        
-        placessidebar, treeview {
+
+        placessidebar, treeview, .thief-library-header {
             background: lighter(@colorPrimaryActive);
             color: @textColorGlobal;
         }
-        
-        treeview.view header button {
-            background: @colorPrimary;
+
+        .thief-library-header button:active,
+        .thief-library-header button:hover,
+        .thief-library-header button:hover:active {
+          background: lighter(lighter(@colorPrimaryActive));
+          color: @textColorGlobal;
+        }
+
+        treeview.view header button, .thief-library-header button {
+            background: lighter(@colorPrimaryActive);
             color: @textColorGlobal;
         }
-        
+
         placessidebar *:selected, treeview.view:selected {
             background: lighter(@colorPrimary);
             color: @textColorGlobal;

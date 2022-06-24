@@ -149,7 +149,39 @@ namespace ThiefMD {
             main_content.set_homogeneous (true, Gtk.Orientation.HORIZONTAL, false);
             main_content.set_orientation (Gtk.Orientation.HORIZONTAL);
 
-            library_view.add (library);
+            var library_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            var library_header = new Hdy.HeaderBar ();
+            library_header.set_title ("");
+            library_header.pack_start (new Gtk.Label (_("Library")));
+
+            var add_library_button = new Gtk.Button ();
+            add_library_button.has_tooltip = true;
+            add_library_button.tooltip_text = (_("Add Folder to Library"));
+            add_library_button.set_image (new Gtk.Image.from_icon_name ("folder-new-symbolic", Gtk.IconSize.BUTTON));
+            add_library_button.clicked.connect (() => {
+                settings.menu_active = true;
+                string new_lib = Dialogs.select_folder_dialog ();
+                if (FileUtils.test(new_lib, FileTest.IS_DIR)) {
+                    if (settings.add_to_library (new_lib)) {
+                        // Refresh
+                        ThiefApp instance = ThiefApp.get_instance ();
+                        instance.refresh_library ();
+                    }
+                }
+                settings.menu_active = false;
+            });
+
+            library_header.pack_end (add_library_button);
+
+            var library_header_context = library_header.get_style_context ();
+            library_header_context.add_class ("thief-library-header");
+
+            library_box.add (library_header);
+            library_box.add (library);
+            library.vexpand = true;
+            library.hexpand = true;
+
+            library_view.add (library_box);
             library_view.width_request = settings.view_library_width;
             stats_bar = new StatisticsBar ();
             start_sheet = library.get_sheets (start_dir);
