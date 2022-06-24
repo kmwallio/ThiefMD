@@ -414,9 +414,17 @@ namespace ThiefMD.Controllers.UI {
             return;
         }
 
+        Ultheme.Color bg_active = Ultheme.Color.from_string (palette.global_active.background);
+        Ultheme.Color bg_lighter = bg_active.lighten ().lighten ();
+        warning ("Comparing %s to %s", palette.global.foreground, bg_lighter.to_string ());
+        if (bg_lighter.to_string ().has_prefix (palette.global.foreground)) {
+            bg_active = bg_active.darken ().darken ();
+        }
+        warning ("Setting %s", bg_active.to_string ());
+
         string new_css = ThiefProperties.DYNAMIC_CSS.printf (
             palette.global.background,
-            palette.global_active.background,
+            bg_active.to_string ().substring (0, 7),
             palette.headers.foreground,
             palette.global_active.foreground,
             palette.global.foreground

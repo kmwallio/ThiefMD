@@ -151,6 +151,7 @@ namespace ThiefMD.Widgets {
             var bar_label = new Gtk.Label ("<b>" + title + "</b>");
             bar_label.use_markup = true;
             bar_label.wrap_mode = Pango.WrapMode.WORD_CHAR;
+            bar_label.xalign = 0;
             bar.pack_start (bar_label);
             bar.set_show_close_button (false);
             bar.width_request = settings.view_sheets_width;
