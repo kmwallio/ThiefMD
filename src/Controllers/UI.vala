@@ -416,11 +416,10 @@ namespace ThiefMD.Controllers.UI {
 
         Ultheme.Color bg_active = Ultheme.Color.from_string (palette.global_active.background);
         Ultheme.Color bg_lighter = bg_active.lighten ().lighten ();
-        warning ("Comparing %s to %s", palette.global.foreground, bg_lighter.to_string ());
+        debug ("Comparing %s to %s", palette.global.foreground, bg_lighter.to_string ());
         if (bg_lighter.to_string ().has_prefix (palette.global.foreground)) {
             bg_active = bg_active.darken ().darken ();
         }
-        warning ("Setting %s", bg_active.to_string ());
 
         string new_css = ThiefProperties.DYNAMIC_CSS.printf (
             palette.global.background,
