@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-29 20:26-0700\n"
+"POT-Creation-Date: 2022-06-26 10:56-0700\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -462,15 +462,13 @@ msgstr "Subiendo imágenes"
 
 #: src/Connections/WriteFreelyConnection.vala:318
 #: src/Connections/GhostConnection.vala:288
-#: src/Connections/WordpressConnection.vala:286 src/Widgets/Preferences.vala:83
-#: src/Widgets/Preferences.vala:117 src/Widgets/Preferences.vala:151
+#: src/Connections/WordpressConnection.vala:288
 msgid " Published"
 msgstr " Publicado"
 
 #: src/Connections/WriteFreelyConnection.vala:318
 #: src/Connections/GhostConnection.vala:288
-#: src/Connections/WordpressConnection.vala:286 src/Widgets/Preferences.vala:83
-#: src/Widgets/Preferences.vala:117 src/Widgets/Preferences.vala:151
+#: src/Connections/WordpressConnection.vala:288
 msgid "Post Published"
 msgstr "Publicación publicada"
 
@@ -554,23 +552,23 @@ msgstr "Exportar MHTML"
 msgid "Export PDF"
 msgstr "Exportar PDF"
 
-#: src/Exporters/ExportPdf.vala:155
+#: src/Exporters/ExportPdf.vala:149
 msgid "Simply Shakespearean."
 msgstr ""
 
-#: src/Exporters/ExportPdf.vala:156
+#: src/Exporters/ExportPdf.vala:150
 msgid "Hmm... that's interesting..."
 msgstr ""
 
-#: src/Exporters/ExportPdf.vala:157
+#: src/Exporters/ExportPdf.vala:151
 msgid "Your writing is insightful."
 msgstr ""
 
-#: src/Exporters/ExportPdf.vala:159 src/Exporters/ExportPdf.vala:189
+#: src/Exporters/ExportPdf.vala:153 src/Exporters/ExportPdf.vala:183
 msgid "Working PDF Magic"
 msgstr "Trabajando PDF Magic"
 
-#: src/Exporters/ExportPdf.vala:190
+#: src/Exporters/ExportPdf.vala:184
 msgid "Making sure your hard work looks purrfect..."
 msgstr "Asegurándose de que su arduo trabajo se vea perfecto ..."
 
@@ -659,7 +657,7 @@ msgstr "Ordenar por fecha descendente"
 msgid "Preview"
 msgstr "Avance"
 
-#: src/Widgets/Sheet.vala:269 src/Widgets/Preferences.vala:345
+#: src/Widgets/Sheet.vala:269 src/Widgets/Preferences.vala:482
 #: src/Widgets/PublisherPreviewWindow.vala:155
 #: src/Widgets/ProjectStatistics.vala:64
 msgid "Export"
@@ -738,7 +736,7 @@ msgstr "Mostrar elementos ocultos"
 msgid "Set Project Icon"
 msgstr "Establecer icono de proyecto"
 
-#: src/Widgets/Library.vala:641 src/Widgets/Preferences.vala:252
+#: src/Widgets/Library.vala:641 src/Widgets/Preferences.vala:389
 msgid "None"
 msgstr "Ninguna"
 
@@ -854,6 +852,13 @@ msgstr "Elija su software de blogs."
 msgid "  WriteFreely"
 msgstr "  Escribe libremente"
 
+#: src/Widgets/Preferences.vala:83 src/Widgets/Preferences.vala:117
+#: src/Widgets/Preferences.vala:151 src/Widgets/Preferences.vala:185
+#: src/Widgets/Preferences.vala:219 src/Widgets/Preferences.vala:264
+#, fuzzy
+msgid "Connection Error"
+msgstr "Conexiones"
+
 #: src/Widgets/Preferences.vala:91
 msgid "  ghost"
 msgstr "  fantasma"
@@ -862,71 +867,83 @@ msgstr "  fantasma"
 msgid "  WordPress"
 msgstr "  WordPress"
 
-#: src/Widgets/Preferences.vala:166
+#: src/Widgets/Preferences.vala:159
+msgid "  Medium"
+msgstr ""
+
+#: src/Widgets/Preferences.vala:193
+msgid "  Forem"
+msgstr ""
+
+#: src/Widgets/Preferences.vala:227
+msgid "  Hashnode"
+msgstr ""
+
+#: src/Widgets/Preferences.vala:279
 msgid "Connections"
 msgstr "Conexiones"
 
-#: src/Widgets/Preferences.vala:203
+#: src/Widgets/Preferences.vala:340
 msgid "Remove "
 msgstr "Eliminar "
 
-#: src/Widgets/Preferences.vala:206
+#: src/Widgets/Preferences.vala:343
 msgid "_Remove"
 msgstr "_Eliminar"
 
-#: src/Widgets/Preferences.vala:208
+#: src/Widgets/Preferences.vala:345
 msgid "_Keep"
 msgstr "_Mantener"
 
-#: src/Widgets/Preferences.vala:236
+#: src/Widgets/Preferences.vala:373
 msgid "Display"
 msgstr "Mostrar"
 
-#: src/Widgets/Preferences.vala:240
+#: src/Widgets/Preferences.vala:377
 msgid "Display Options"
 msgstr "Opciones de pantalla"
 
-#: src/Widgets/Preferences.vala:241
+#: src/Widgets/Preferences.vala:378
 msgid "Make ThiefMD feel like home."
 msgstr "Haga que ThiefMD se sienta como en casa."
 
-#: src/Widgets/Preferences.vala:247
+#: src/Widgets/Preferences.vala:384
 msgid "Focus"
 msgstr "Atención"
 
-#: src/Widgets/Preferences.vala:253
+#: src/Widgets/Preferences.vala:390
 msgid "Paragraph"
 msgstr "Párrafo"
 
-#: src/Widgets/Preferences.vala:254
+#: src/Widgets/Preferences.vala:391
 msgid "Sentence"
 msgstr "Frase"
 
-#: src/Widgets/Preferences.vala:255
+#: src/Widgets/Preferences.vala:392
 msgid "Word"
 msgstr "Palabra"
 
-#: src/Widgets/Preferences.vala:294
+#: src/Widgets/Preferences.vala:431
 msgid "Number of Lines to Preview in Sheets View"
 msgstr "Número de líneas para previsualizar en la vista hojas"
 
-#: src/Widgets/Preferences.vala:303
+#: src/Widgets/Preferences.vala:440
 msgid "Add New Theme"
 msgstr "Agregar nuevo tema"
 
-#: src/Widgets/Preferences.vala:350
+#: src/Widgets/Preferences.vala:487
 msgid "Compiling Options"
 msgstr "Opciones de compilación"
 
-#: src/Widgets/Preferences.vala:351
+#: src/Widgets/Preferences.vala:488
 msgid "Adjust how Markdown files are compiled together."
 msgstr "Ajusta cómo se compilan juntos los archivos de Markdown."
 
-#: src/Widgets/Preferences.vala:359
+#: src/Widgets/Preferences.vala:496
 msgid "First Markdown File includes Author Metadata"
 msgstr "El primer archivo de Markdown incluye metadatos del autor"
 
-#: src/Widgets/Preferences.vala:361
+#: src/Widgets/Preferences.vala:498
 msgid ""
 "First Markdown file includes <a href='https://pandoc.org/MANUAL.html#epub-"
 "metadata'>Author metadata</a>"
@@ -934,171 +951,171 @@ msgstr ""
 "El primer archivo de Markdown incluye <a href='https://pandoc.org/MANUAL."
 "html#epub-metadata'> metadatos del autor </a>"
 
-#: src/Widgets/Preferences.vala:377
+#: src/Widgets/Preferences.vala:514
 msgid "Resolve full paths to resources"
 msgstr "Resolver caminos completos hacia los recursos"
 
-#: src/Widgets/Preferences.vala:379
+#: src/Widgets/Preferences.vala:516
 msgid "Resolve full paths to resources on export"
 msgstr "Resuelva rutas completas a los recursos en la exportación"
 
-#: src/Widgets/Preferences.vala:394
+#: src/Widgets/Preferences.vala:531
 msgid "Include YAML title as Heading"
 msgstr "Incluir título YAML como título"
 
-#: src/Widgets/Preferences.vala:396
+#: src/Widgets/Preferences.vala:533
 msgid "Include YAML title as H1 Heading"
 msgstr "Incluya el título YAML como título H1"
 
-#: src/Widgets/Preferences.vala:406
+#: src/Widgets/Preferences.vala:543
 msgid "Page Setup"
 msgstr "Configuración de página"
 
-#: src/Widgets/Preferences.vala:407
+#: src/Widgets/Preferences.vala:544
 msgid "Configure PDF export options."
 msgstr "Configure las opciones de exportación de PDF."
 
-#: src/Widgets/Preferences.vala:415
+#: src/Widgets/Preferences.vala:552
 msgid "Page Break between Folders"
 msgstr "Salto de página entre carpetas"
 
-#: src/Widgets/Preferences.vala:417
+#: src/Widgets/Preferences.vala:554
 msgid "Insert a Page Break after each folder"
 msgstr "Insertar un salto de página después de cada carpeta"
 
-#: src/Widgets/Preferences.vala:432
+#: src/Widgets/Preferences.vala:569
 msgid "Page Break between Sheets"
 msgstr "Salto de página entre hojas"
 
-#: src/Widgets/Preferences.vala:434
+#: src/Widgets/Preferences.vala:571
 msgid "Insert a Page Break after each sheet"
 msgstr "Insertar un salto de página después de cada hoja"
 
-#: src/Widgets/Preferences.vala:474
+#: src/Widgets/Preferences.vala:611
 msgid "Side margins in PDF in inches"
 msgstr "Márgenes laterales en PDF en pulgadas"
 
-#: src/Widgets/Preferences.vala:494
+#: src/Widgets/Preferences.vala:631
 msgid "Top & Bottom margins in PDF in inches"
 msgstr "Márgenes superior e inferior en PDF en pulgadas"
 
-#: src/Widgets/Preferences.vala:504
+#: src/Widgets/Preferences.vala:641
 msgid "PDF CSS"
 msgstr "PDF CSS"
 
-#: src/Widgets/Preferences.vala:505
+#: src/Widgets/Preferences.vala:642
 msgid "Choose CSS Style for PDF Export."
 msgstr "Elija Estilo CSS para exportar PDF."
 
-#: src/Widgets/Preferences.vala:513
+#: src/Widgets/Preferences.vala:650
 msgid "ePub & HTML CSS"
 msgstr "ePub y HTML CSS"
 
-#: src/Widgets/Preferences.vala:514
+#: src/Widgets/Preferences.vala:651
 msgid "Choose CSS Style to use for ePub and HTML Export."
 msgstr "Elija Estilo CSS para usar para ePub y HTML Export."
 
-#: src/Widgets/Preferences.vala:520
+#: src/Widgets/Preferences.vala:657
 msgid "Add Export Style"
 msgstr "Agregar estilo de exportación"
 
-#: src/Widgets/Preferences.vala:543
+#: src/Widgets/Preferences.vala:680
 msgid "Editor"
 msgstr "Editor"
 
-#: src/Widgets/Preferences.vala:547
+#: src/Widgets/Preferences.vala:684
 msgid "Editor Settings"
 msgstr "Configuración del editor"
 
-#: src/Widgets/Preferences.vala:548
+#: src/Widgets/Preferences.vala:685
 msgid "Modify the ThiefMD environment."
 msgstr "Modifique el entorno de ThiefMD."
 
-#: src/Widgets/Preferences.vala:556
+#: src/Widgets/Preferences.vala:693
 msgid "Enable spellcheck"
 msgstr "Habilitar el corrector ortográfico"
 
-#: src/Widgets/Preferences.vala:558
+#: src/Widgets/Preferences.vala:695
 msgid "Check document spelling"
 msgstr "Revisar la ortografía del documento"
 
-#: src/Widgets/Preferences.vala:572
+#: src/Widgets/Preferences.vala:709
 msgid "Enable Write-Good"
 msgstr "Habilitar escritura buena"
 
-#: src/Widgets/Preferences.vala:576
+#: src/Widgets/Preferences.vala:713
 msgid "Enable Write-Good: recommendations for sentence structure"
 msgstr "Habilitar Write-Good: recomendaciones para la estructura de la oración"
 
-#: src/Widgets/Preferences.vala:591
+#: src/Widgets/Preferences.vala:728
 msgid "Toggle typewriter scrolling"
 msgstr "Alternar el desplazamiento de la máquina de escribir"
 
-#: src/Widgets/Preferences.vala:592
+#: src/Widgets/Preferences.vala:729
 msgid "Enable typewriter focus mode"
 msgstr "Habilitar el modo de enfoque de máquina de escribir"
 
-#: src/Widgets/Preferences.vala:612
+#: src/Widgets/Preferences.vala:749
 msgid "Toggle writing statistics"
 msgstr "Alternar escritura de estadísticas"
 
-#: src/Widgets/Preferences.vala:613
+#: src/Widgets/Preferences.vala:750
 msgid "Show writing statistics"
 msgstr "Mostrar estadísticas de escritura"
 
-#: src/Widgets/Preferences.vala:628
+#: src/Widgets/Preferences.vala:765
 msgid "Disable application tips"
 msgstr "Desactivar los consejos de la aplicación"
 
-#: src/Widgets/Preferences.vala:629
+#: src/Widgets/Preferences.vala:766
 msgid "Start with new empty sheet on launch"
 msgstr "Comience con una nueva hoja vacía al inicio"
 
-#: src/Widgets/Preferences.vala:642
+#: src/Widgets/Preferences.vala:779
 msgid "ThiefMD Settings"
 msgstr "Configuración de ThiefMD"
 
-#: src/Widgets/Preferences.vala:643
+#: src/Widgets/Preferences.vala:780
 msgid "Modify the ThiefMD appearance."
 msgstr "Modifica la apariencia de ThiefMD."
 
-#: src/Widgets/Preferences.vala:653
+#: src/Widgets/Preferences.vala:790
 msgid "Toggle interface theming"
 msgstr "Alternar el tema de la interfaz"
 
-#: src/Widgets/Preferences.vala:654
+#: src/Widgets/Preferences.vala:791
 msgid "Apply theme to interface"
 msgstr "Aplicar tema a la interfaz"
 
-#: src/Widgets/Preferences.vala:673
+#: src/Widgets/Preferences.vala:810
 msgid "Toggle auto-hide headerbar"
 msgstr "Alternar ocultar automáticamente la barra de encabezado"
 
-#: src/Widgets/Preferences.vala:675
+#: src/Widgets/Preferences.vala:812
 msgid "Automatically hide headerbar"
 msgstr "Ocultar automáticamente la barra de encabezado"
 
-#: src/Widgets/Preferences.vala:689
+#: src/Widgets/Preferences.vala:826
 msgid "Hide title"
 msgstr "Ocultar título"
 
-#: src/Widgets/Preferences.vala:691
+#: src/Widgets/Preferences.vala:828
 msgid "Remove ThiefMD branding"
 msgstr "Eliminar la marca ThiefMD"
 
-#: src/Widgets/Preferences.vala:705
+#: src/Widgets/Preferences.vala:842
 msgid "Toggle library order"
 msgstr "Alternar orden de biblioteca"
 
-#: src/Widgets/Preferences.vala:707
+#: src/Widgets/Preferences.vala:844
 msgid "Keep library order"
 msgstr "Mantener el orden de la biblioteca"
 
-#: src/Widgets/Preferences.vala:721
+#: src/Widgets/Preferences.vala:858
 msgid "Toggle experimental features"
 msgstr "Alternar funciones experimentales"
 
-#: src/Widgets/Preferences.vala:723
+#: src/Widgets/Preferences.vala:860
 msgid "Enable experimental features"
 msgstr "Habilitar funciones experimentales"
 
