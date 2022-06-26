@@ -72,7 +72,7 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="0.2.6" date="2022-06-25" urgency="low">
+    <release version="0.2.6" date="2022-06-26" urgency="low">
       <description>
         <p>Publish to Hashnode, Medium, or Forem! Share your story in more places faster than ever.</p>
         <ul>
@@ -82,6 +82,7 @@
           <li>Consume latest weasyprint</li>
           <li>Consume latest link-grammar</li>
           <li>Updated other dependencies</li>
+          <li>German and Finnish Translations</li>
           <li>Bug fixes</li>
         </ul>
       </description>
