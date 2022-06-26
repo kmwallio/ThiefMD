@@ -101,8 +101,7 @@ msgstr "Original Code"
 
 #: src/Constants/ThiefProperties.vala:93
 msgid "Based on <a href='https://github.com/lainsce/quilter'>Quilter</a>"
-msgstr ""
-"Basierend auf <a href='https://github.com/lainsce/quilter'>Quilter</a>\n"
+msgstr "Basierend auf <a href='https://github.com/lainsce/quilter'>Quilter</a>"
 
 #: src/Constants/ThiefProperties.vala:93 src/Constants/ThiefProperties.vala:94
 #: src/Constants/ThiefProperties.vala:95 src/Constants/ThiefProperties.vala:96
