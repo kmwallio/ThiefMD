@@ -25,11 +25,14 @@ namespace ThiefMD.Widgets {
     public class PreviewWindow : Hdy.Window {
         private Hdy.HeaderBar toolbar;
         private static PreviewWindow? instance = null;
+        private Preview html_view;
 
         public PreviewWindow () {
+            var settings = AppSettings.get_default ();
             instance = this;
             new KeyBindings (this, false);
             build_ui ();
+            settings.changed.connect (update);
         }
 
         public static void update_preview_title ()
@@ -47,11 +50,20 @@ namespace ThiefMD.Widgets {
             }
         }
 
+        public static bool has_instance () {
+            return instance != null;
+        }
+
         public static PreviewWindow get_instance () {
             if (instance == null) {
                 instance = new PreviewWindow ();
             }
             return instance;
+        }
+
+        public void update () {
+            var settings = AppSettings.get_default ();
+            html_view.update_html_view (true, SheetManager.get_markdown (), is_fountain (settings.last_file));
         }
 
         protected void build_ui () {
@@ -71,7 +83,8 @@ namespace ThiefMD.Widgets {
 
             toolbar.set_show_close_button (true);
             vbox.add (toolbar);
-            vbox.add (Preview.get_instance ());
+            html_view = new Preview();
+            vbox.add (html_view);
             vbox.show_all ();
             add (vbox);
 
@@ -82,11 +95,15 @@ namespace ThiefMD.Widgets {
             ThiefApp.get_instance ().get_size (out w, out h);
             set_default_size(w, h);
             show_all ();
+            update ();
         }
 
         public bool on_delete_event () {
-            remove (Preview.get_instance ());
+            var settings = AppSettings.get_default ();
+            settings.changed.disconnect (update);
+            remove (html_view);
             instance = null;
+            html_view = null;
             return false;
         }
     }

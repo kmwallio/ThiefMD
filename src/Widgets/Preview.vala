@@ -42,20 +42,7 @@ namespace ThiefMD.Widgets {
             settingsweb.enable_page_cache = false;
             settingsweb.enable_developer_extras = false;
             settingsweb.javascript_can_open_windows_automatically = false;
-
-            var settings = AppSettings.get_default ();
-            settings.changed.connect (() => {
-                if (this == instance) {
-                    update_html_view (true, SheetManager.get_markdown (), is_fountain (settings.last_file));
-                }
-            });
             connect_signals ();
-        }
-
-        public static void update_view () {
-            var settings = AppSettings.get_default ();
-            PreviewWindow.update_preview_title ();
-            get_instance ().update_html_view (true, SheetManager.get_markdown (), is_fountain (settings.last_file));
         }
 
         public static Preview get_instance () {

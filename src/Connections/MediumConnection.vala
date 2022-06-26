@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 kmwallio
+ * Copyright (C) 2022 kmwallio
  * 
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -27,30 +27,22 @@ using ThiefMD.Controllers;
 using ThiefMD.Exporters;
 
 namespace ThiefMD.Connections {
-    public class WriteFreelyConnection : ConnectionBase {
-        public const string CONNECTION_TYPE = "writefreely";
+    public class MediumConnection : ConnectionBase {
+        public const string CONNECTION_TYPE = "medium";
         public override string export_name { get; protected set; }
         public override ExportBase exporter { get; protected  set; }
-        public Writeas.Client connection;
+        public Medium.Client connection;
         private string access_token;
         private string alias;
         public string conf_endpoint;
         public string conf_alias;
 
-        public WriteFreelyConnection (string username, string password, string endpoint = "https://write.as/") {
+        public MediumConnection (string username, string password, string endpoint = "https://api.medium.com/v1/") {
             conf_alias = username;
             conf_endpoint = endpoint;
             string api_endpoint = conf_endpoint;
 
-            if (!(api_endpoint.has_suffix ("api") || api_endpoint.has_suffix ("api/"))) {
-                if (api_endpoint.has_suffix ("/")) {
-                    api_endpoint += "api/";
-                } else {
-                    api_endpoint += "/api/";
-                }
-            }
-
-            connection = new Writeas.Client (api_endpoint);
+            connection = new Medium.Client ();
             alias = "";
 
             try {
@@ -58,21 +50,8 @@ namespace ThiefMD.Connections {
                 string temp;
                 if (connection.get_authenticated_user (out temp)) {
                     alias = temp;
-                    string label = endpoint.down ();
-                    if (label.has_prefix ("https://")) {
-                        label = endpoint.substring (8);
-                    } else if (endpoint.has_prefix ("http://")) {
-                        label = endpoint.substring (7);
-                    }
-                    if (label.has_suffix ("api/") || label.has_suffix ("api")) {
-                        label = label.substring (0, label.last_index_of ("api"));
-                    }
-                    label = label.substring (0, 1).up () + label.substring (1).down ();
-                    if (!label.has_suffix ("/")) {
-                        label = label + "/";
-                    }
-                    export_name = label + username;
-                    exporter = new WriteFreelyExporter (connection);
+                    export_name = "https://medium.com/" + alias;
+                    exporter = new MediumExporter (connection);
                 }
             } catch (Error e) {
                 warning ("Could not establish connection: %s", e.message);
@@ -88,7 +67,6 @@ namespace ThiefMD.Connections {
         }
 
         public override void connection_close () {
-            connection.logout ();
         }
 
         public static ConnectionData? create_connection (Gtk.Window? parent) {
@@ -104,27 +82,21 @@ namespace ThiefMD.Connections {
             username_label.xalign = 0;
             Gtk.Entry username_entry = new Gtk.Entry ();
 
-            Gtk.Label password_label = new Gtk.Label (_("Password"));
+            Gtk.Label password_label = new Gtk.Label ("<a href='https://medium.com/me/settings'>" + _("Integration Token") + "</a>");
+            password_label.use_markup = true;
             password_label.xalign = 0;
             Gtk.Entry password_entry = new Gtk.Entry ();
             password_entry.set_visibility (false);
-
-            Gtk.Label endpoint_label = new Gtk.Label (_("Endpoint"));
-            endpoint_label.xalign = 0;
-            Gtk.Entry endpoint_entry = new Gtk.Entry ();
-            endpoint_entry.placeholder_text = "https://write.as/";
 
             grid.attach (username_label, 1, 1, 1, 1);
             grid.attach (username_entry, 2, 1, 2, 1);
             grid.attach (password_label, 1, 2, 1, 1);
             grid.attach (password_entry, 2, 2, 2, 1);
-            grid.attach (endpoint_label, 1, 3, 1, 1);
-            grid.attach (endpoint_entry, 2, 3, 2, 1);
 
             grid.show_all ();
 
             var dialog = new Gtk.Dialog.with_buttons (
-                            _("New WriteFreely Connection"),
+                            _("New Medium Connection"),
                             (parent != null) ? parent : ThiefApp.get_instance (),
                             Gtk.DialogFlags.MODAL,
                             _("_Add Account"),
@@ -144,7 +116,7 @@ namespace ThiefMD.Connections {
                     data.connection_type = CONNECTION_TYPE;
                     data.user = username_entry.text;
                     data.auth = password_entry.text;
-                    data.endpoint = endpoint_entry.text;
+                    data.endpoint = "https://api.medium.com/v1/";
                 }
                 dialog.destroy ();
             });
@@ -154,25 +126,30 @@ namespace ThiefMD.Connections {
                 data.connection_type = CONNECTION_TYPE;
                 data.user = username_entry.text;
                 data.auth = password_entry.text;
-                data.endpoint = endpoint_entry.text;
+                data.endpoint = "https://api.medium.com/v1/";
             }
 
             return data;
         }
     }
 
-    private class WriteFreelyExporter : ExportBase {
+    private class MediumExporter : ExportBase {
         public override string export_name { get; protected set; }
         public override string export_css { get; protected set; }
         private PublisherPreviewWindow publisher_instance;
-        public Writeas.Client connection;
-        private GLib.List<Writeas.Collection> collections;
-        private Gtk.ComboBoxText collection_selector;
+        public Medium.Client connection;
+        private Gtk.ComboBoxText publish_state;
 
-        public WriteFreelyExporter (Writeas.Client connected) {
-            export_name = "writefreely";
+        public MediumExporter (Medium.Client connected) {
+            export_name = "medium";
             export_css = "preview";
             connection = connected;
+
+            publish_state = new Gtk.ComboBoxText ();
+            publish_state.append_text ("draft");
+            publish_state.append_text ("public");
+            publish_state.append_text ("unlisted");
+            publish_state.set_active (0);
         }
 
         public override string update_markdown (string markdown) {
@@ -181,29 +158,12 @@ namespace ThiefMD.Connections {
 
         public override void attach (PublisherPreviewWindow ppw) {
             publisher_instance = ppw;
-            collections = new GLib.List<Writeas.Collection> ();
-            if (connection.get_user_collections (ref collections)) {
-                if (collections.length () > 0) {
-                    collection_selector = new Gtk.ComboBoxText ();
-                    collection_selector.hexpand = true;
-
-                    foreach (var c in collections) {
-                        collection_selector.append_text (c.alias);
-                    }
-
-                    collection_selector.set_active (0);
-                    publisher_instance.headerbar.pack_end (collection_selector);
-                }
-            }
+            publisher_instance.headerbar.pack_end (publish_state);
             return;
         }
 
         public override void detach () {
-            if (collections.length () > 0) {
-                collection_selector.set_active (0);
-                publisher_instance.headerbar.remove (collection_selector);
-                collection_selector = null;
-            }
+            publisher_instance.headerbar.remove (publish_state);
             publisher_instance = null;
             return;
         }
@@ -214,27 +174,35 @@ namespace ThiefMD.Connections {
             string temp;
             string title;
             string date;
-            string token = "";
+            string url = "";
             string id = "";
-            Writeas.Collection publish_collection = null;
+            Gee.Map<string, string> metadata = FileManager.get_yaml_kvp (publisher_instance.get_export_markdown ());
             string body = FileManager.get_yamlless_markdown (
-                    publisher_instance.get_export_markdown (),
-                    0,
-                    out title,
-                    out date,
-                    true,
-                    false, // Override as theme will probably display?
-                    false);
+                publisher_instance.get_export_markdown (),
+                0,
+                out title,
+                out date,
+                true,
+                false, // Override as theme will probably display?
+                false);
+
+            if (metadata.has_key ("bibliography")) {
+                body = publisher_instance.get_export_markdown ();
+            }
+
+            if (metadata.has_key ("title")) {
+                title = metadata.get ("title");
+            }
 
             Gee.Map<string, string> images_to_upload = Pandoc.file_image_map (publisher_instance.get_export_markdown ());
             Gee.HashMap<string, string> replacements = new Gee.HashMap<string, string> ();
 
-            Gee.List<string> writefreelySayings = new Gee.LinkedList<string> ();
-            writefreelySayings.add(_("Taking your words, and letting them go... to the internet!"));
-            writefreelySayings.add(_("Mhm... I see and I ship."));
-            writefreelySayings.add(_("Is this a selfie, and you're happy to see me?"));
+            Gee.List<string> mediumSaying = new Gee.LinkedList<string> ();
+            mediumSaying.add(_("You're writing is kind of... medium..."));
+            mediumSaying.add(_("So hip, so cool, so medium"));
+            mediumSaying.add(_("Taking your writing to the mainstream"));
 
-            if (images_to_upload.keys.size > 0 && connection.endpoint.has_prefix ("https://write.as/")) {
+            if (images_to_upload.keys.size > 0) {
                 Thinking worker = new Thinking (_("Uploading images"), () => {
                     foreach (var images in images_to_upload) {
                         File img_file = File.new_for_path (images.value);
@@ -251,7 +219,7 @@ namespace ThiefMD.Connections {
                         }
                     }
                 },
-                writefreelySayings,
+                mediumSaying,
                 publisher_instance);
                 worker.run ();
             }
@@ -263,53 +231,32 @@ namespace ThiefMD.Connections {
                 warning ("Replaced %s with %s", replacement.key, replacement.value);
             }
 
-            // Authenticated post
-            if (collections.length () > 0 && connection.get_authenticated_user (out temp)) {
-                int option = collection_selector.get_active ();
-                if (option >= 0 && option < collections.length ()) {
-                    publish_collection = collections.nth_data (option);
-                    if (connection.publish_collection_post (
-                        out token,
-                        out id,
-                        publish_collection.alias,
-                        body,
-                        title))
-                    {
-                        non_collected_post = false;
-                        published = true;
-                    }
-                }
+            string published_state = publish_state.get_active_text ();
+
+            if (metadata.has_key ("bibliography")) {
+                string html = "";
+                generate_html (body, out html);
+                body = html;
             }
 
-            if (non_collected_post)
+            // Unauthenticated post
+            if (connection.publish_post (
+                out url,
+                out id,
+                body,
+                title,
+                published_state,
+                metadata.has_key ("bibliography") ? "html" : "markdown"))
             {
-                // Unauthenticated post
-                if (connection.publish_post (
-                    out token,
-                    out id,
-                    body,
-                    title))
-                {
-                    published = true;
-                }
+                published = true;
             }
 
             if (published) {
                 Gtk.Label label = new Gtk.Label (
-                    "<b>Post URL:</b> <a href='%s'>%s</a>\nID: %s\nToken: %s\n".printf (
-                        (non_collected_post) ? ("https://write.as/" + id) : (publish_collection.url + id),
-                        (non_collected_post) ? ("https://write.as/" + id) : (publish_collection.url + id),
-                        id,
-                        token));
-
-                Writeas.Post published_data;
-                if (connection.get_post (out published_data, id) && published_data.slug != null && published_data.slug != "") {
-                    label.set_text ("<b>Post URL:</b> <a href='%s'>%s</a>\nID: %s\nToken: %s\n".printf (
-                        (non_collected_post) ? ("https://write.as/" + id) : (publish_collection.url + published_data.slug),
-                        (non_collected_post) ? ("https://write.as/" + id) : (publish_collection.url + published_data.slug),
-                        id,
-                        token));
-                }
+                    "<b>Post URL:</b> <a href='%s'>%s</a>\nID: %s\n".printf (
+                        url,
+                        url,
+                        id));
 
                 label.xalign = 0;
                 label.use_markup = true;

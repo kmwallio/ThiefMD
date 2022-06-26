@@ -109,11 +109,7 @@ namespace ThiefMD.Exporters {
 
             string pagedjs_loc = Environment.find_program_in_path ("pagedjs-cli");
             if ((pagedjs_loc != null && pagedjs_loc != "" && !publisher_instance.preview.html.contains ("<img")) ||
-                weasyprint_loc != null &&
-                weasyprint_loc != "" &&
-                !publisher_instance.render_fountain &&
-                !publisher_instance.preview.html.contains ("<pre class") &&
-                !publisher_instance.get_original_markdown ().contains ("$$"))
+                (weasyprint_loc != null && weasyprint_loc != "" && !publisher_instance.render_fountain))
             {
                 // string resolved_mkd = Pandoc.resolve_paths (publisher_instance.get_export_markdown ());
                 // string temp_file = FileManager.save_temp_file (resolved_mkd);
@@ -135,8 +131,6 @@ namespace ThiefMD.Exporters {
                             {
                                 command = {
                                     weasyprint_loc,
-                                    "-f",
-                                    "pdf",
                                     temp_html_file,
                                     new_novel.get_path ()
                                 };

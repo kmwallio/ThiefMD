@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.kmwallio.thiefmd', ['vala', 'c'],
-    version: '0.2.5'
+    version: '0.2.6'
 )
 
 # Application ID
@@ -91,6 +91,9 @@ executable(
     'src/Connections/WriteFreelyConnection.vala',
     'src/Connections/GhostConnection.vala',
     'src/Connections/WordpressConnection.vala',
+    'src/Connections/MediumConnection.vala',
+    'src/Connections/ForemConnection.vala',
+    'src/Connections/HashnodeConnection.vala',
     'src/Exporters/ExportBase.vala',
     'src/Exporters/ExportDocx.vala',
     'src/Exporters/ExportEpub.vala',
@@ -136,6 +139,9 @@ executable(
     'src/writeas/src/Writeas.vala',
     'src/ghost/src/Ghost.vala',
     'src/wordpress/src/Wordpress.vala',
+    'src/medium/src/Medium.vala',
+    'src/forem/src/Forem.vala',
+    'src/hashnode/src/Hashnode.vala',
     'src/bibtex/src/BibTex.vala',
     asresources,
     c_args: c_args,
@@ -145,7 +151,6 @@ executable(
         dependency('gtk+-3.0'),
         dependency('gtkspell3-3.0'),
         dependency('webkit2gtk-4.0'),
-        dependency('clutter-1.0'),
         dependency('json-glib-1.0'),
         dependency('gee-0.8'),
         dependency('libarchive'),

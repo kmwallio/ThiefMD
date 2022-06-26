@@ -1,5 +1,5 @@
 Name: com.github.kmwallio.thiefmd
-Version: 0.2.5
+Version: 0.3.0
 Release: 1%{?dist}
 Summary: The markdown editor worth stealing.
 License: GPL-3.0+
@@ -20,7 +20,6 @@ BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(gobject-2.0)
 BuildRequires: pkgconfig(libarchive)
 BuildRequires: pkgconfig(libsecret-1)
-BuildRequires: pkgconfig(clutter-1.0)
 BuildRequires: pkgconfig(gtksourceview-3.0)
 BuildRequires: pkgconfig(gtk+-3.0)
 BuildRequires: pkgconfig(gtkspell3-3.0)

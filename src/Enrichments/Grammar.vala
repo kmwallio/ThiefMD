@@ -72,7 +72,7 @@ namespace ThiefMD.Enrichments {
             checking = Mutex ();
 
             // Default to allow scanning every 2 seconds
-            limit_updates = new TimedMutex (2000);
+            limit_updates = new TimedMutex (500);
             grammar_line = null;
             grammar_word = null;
             last_cursor = -1;

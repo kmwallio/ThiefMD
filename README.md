@@ -52,6 +52,8 @@ yay -S thiefmd
  * Slovak Translation by [Marek L'ach](https://github.com/marek-lach)
  * Swedish Translation by [Åke Engelbrektson](https://github.com/eson57)
  * Czech Translation by [Vojtěch Perník](https://github.com/pervoj)
+ * Finnish Translation by Jiri Grönroos
+ * German Translation by Fish and Helix
 
 ## Planning
 
@@ -113,7 +115,6 @@ libgtkspell3-3-dev
 libwebkit2gtk-4.0-dev
 libmarkdown2-dev
 libxml2-dev
-libclutter-1.0-dev
 libarchive-dev
 libgtk-3-dev
 libgee-0.8-dev
@@ -131,7 +132,6 @@ meson
 ninja-build
 cmake
 libmarkdown-devel
-clutter-gtk-devel
 webkit2gtk3-devel
 gtk3-devel
 gtksourceview4-devel

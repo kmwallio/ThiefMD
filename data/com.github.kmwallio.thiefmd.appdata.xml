@@ -40,6 +40,10 @@
     <keyword>screenplay</keyword>
     <keyword>screenwriting</keyword>
     <keyword>bibtex</keyword>
+    <keyword>devto</keyword>
+    <keyword>hashnode</keyword>
+    <keyword>medium</keyword>
+    <keyword>forem</keyword>
   </keywords>
   <screenshots>
     <screenshot type="default">
@@ -68,6 +72,22 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.6" date="2022-06-26" urgency="low">
+      <description>
+        <p>Publish to Hashnode, Medium, or Forem! Share your story in more places faster than ever.</p>
+        <ul>
+          <li>New Connections to Export to</li>
+          <li>Faster startup time</li>
+          <li>Fixed logic issue in Write-Freely exporter</li>
+          <li>Consume latest weasyprint</li>
+          <li>Consume latest link-grammar</li>
+          <li>Updated other dependencies</li>
+          <li>German and Finnish Translations</li>
+          <li>Bug fixes</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.6</url>
+    </release>
     <release version="0.2.5" date="2022-03-29" urgency="low">
       <description>
         <p>Need some stability?</p>
