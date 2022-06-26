@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-26 10:56-0700\n"
+"POT-Creation-Date: 2022-06-26 11:26-0700\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -188,9 +188,8 @@ msgid "GNU General Public License v2.0"
 msgstr ""
 
 #: src/Constants/ThiefProperties.vala:104
-#, fuzzy
 msgid "PDF Export"
-msgstr "Exportovat"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:104
 msgid "Simon Sapin and contributors"
@@ -287,9 +286,8 @@ msgid ""
 msgstr ""
 
 #: src/Controllers/FileManager.vala:39
-#, fuzzy
 msgid "Stealing file contents..."
-msgstr "<b>Krademe obsahu souboru...</b>"
+msgstr ""
 
 #: src/Controllers/FileManager.vala:40
 msgid "This isn't plagiarism, it's a remix!"
@@ -558,12 +556,12 @@ msgstr "Zajišťování, aby vaše tvrdá práce vypadala perfektně..."
 #: src/Widgets/About.vala:44 src/Widgets/QuickPreferences.vala:132
 #: src/Widgets/QuickPreferences.vala:216 src/Widgets/QuickPreferences.vala:295
 msgid "About ThiefMD"
-msgstr "O ThiefMD"
+msgstr "O aplikaci ThiefMD"
 
 #: src/Widgets/About.vala:44 src/Widgets/QuickPreferences.vala:130
 #: src/Widgets/QuickPreferences.vala:214 src/Widgets/QuickPreferences.vala:293
 msgid "About"
-msgstr "O"
+msgstr "O aplikaci"
 
 #: src/Widgets/About.vala:45
 msgid "Credits"
@@ -572,18 +570,20 @@ msgstr "Zásluhy"
 #. website = ThiefProperties.URL;
 #: src/Widgets/About.vala:94
 msgid "Feedback"
-msgstr ""
+msgstr "Zpětná vazba"
 
 #. license_type = ThiefProperties.LICENSE_TYPE;
 #: src/Widgets/About.vala:99
 msgid "This program comes with absolutely no warranty."
-msgstr ""
+msgstr "Tento program je poskytován bez jakékoli záruky."
 
 #: src/Widgets/About.vala:100
 msgid ""
 "See the <a href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU General "
 "Public License, version 3 or later</a> for details."
 msgstr ""
+"Pro podrobnosti se podívejte na <a href='https://www.gnu.org/licenses/"
+"gpl-3.0.html'>GNU General Public License, verze 3 nebo novější</a>."
 
 #: src/Widgets/HeaderBar.vala:86
 msgid "New Sheet"
@@ -836,9 +836,8 @@ msgstr ""
 #: src/Widgets/Preferences.vala:83 src/Widgets/Preferences.vala:117
 #: src/Widgets/Preferences.vala:151 src/Widgets/Preferences.vala:185
 #: src/Widgets/Preferences.vala:219 src/Widgets/Preferences.vala:264
-#, fuzzy
 msgid "Connection Error"
-msgstr "Přidat připojení"
+msgstr ""
 
 #: src/Widgets/Preferences.vala:91
 msgid "  ghost"

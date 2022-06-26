@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-26 10:56-0700\n"
+"POT-Creation-Date: 2022-06-26 11:26-0700\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -103,9 +103,8 @@ msgstr ""
 #: src/Constants/ThiefProperties.vala:104
 #: src/Constants/ThiefProperties.vala:105
 #: src/Constants/ThiefProperties.vala:106
-#, fuzzy
 msgid "Copyright"
-msgstr "Copy"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:91
 msgid "GNU General Public License v3.0"
@@ -132,9 +131,8 @@ msgid "Font"
 msgstr "Font"
 
 #: src/Constants/ThiefProperties.vala:97
-#, fuzzy
 msgid "Preview CSS"
-msgstr "Preview"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:97
 msgid "Mash up of Splendor and Modest"
@@ -149,9 +147,8 @@ msgid "Fountain Preview and Export"
 msgstr ""
 
 #: src/Constants/ThiefProperties.vala:99
-#, fuzzy
 msgid "Markdown Parsing"
-msgstr "Markdown files"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:99
 msgid "BSD-style License"
@@ -179,9 +176,8 @@ msgid "XML Parsing"
 msgstr ""
 
 #: src/Constants/ThiefProperties.vala:103
-#, fuzzy
 msgid "Pandoc Export"
-msgstr "Export"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:103
 msgid "John MacFarlane and others"
@@ -192,9 +188,8 @@ msgid "GNU General Public License v2.0"
 msgstr ""
 
 #: src/Constants/ThiefProperties.vala:104
-#, fuzzy
 msgid "PDF Export"
-msgstr "Export"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:104
 msgid "Simon Sapin and contributors"
@@ -291,9 +286,8 @@ msgid ""
 msgstr ""
 
 #: src/Controllers/FileManager.vala:39
-#, fuzzy
 msgid "Stealing file contents..."
-msgstr "<b>Stealing file contents...</b>"
+msgstr ""
 
 #: src/Controllers/FileManager.vala:40
 msgid "This isn't plagiarism, it's a remix!"
@@ -420,9 +414,8 @@ msgid "Endpoint"
 msgstr "Endpoint"
 
 #: src/Connections/WriteFreelyConnection.vala:127
-#, fuzzy
 msgid "New WriteFreely Connection"
-msgstr "Current Conenctions"
+msgstr ""
 
 #: src/Connections/WriteFreelyConnection.vala:130
 #: src/Connections/GhostConnection.vala:109
@@ -465,9 +458,8 @@ msgid "E-mail"
 msgstr "E-mail"
 
 #: src/Connections/GhostConnection.vala:106
-#, fuzzy
 msgid "New ghost Connection"
-msgstr "Current Conenctions"
+msgstr ""
 
 #: src/Connections/GhostConnection.vala:192
 msgid "Your words are like Casper... Friendly!"
@@ -482,9 +474,8 @@ msgid "Booooooooooo! (That's Ghost speak for Great Work!)"
 msgstr ""
 
 #: src/Connections/WordpressConnection.vala:109
-#, fuzzy
 msgid "New Wordpress Connection"
-msgstr "Current Conenctions"
+msgstr ""
 
 #: src/Connections/WordpressConnection.vala:191
 msgid "Taking it to the internet!"
@@ -503,9 +494,8 @@ msgid "Characters"
 msgstr ""
 
 #: src/Enrichments/Markdown.vala:30
-#, fuzzy
 msgid "Citations"
-msgstr "Insert Datetime"
+msgstr ""
 
 #: src/Exporters/ExportDocx.vala:60
 msgid "Export DocX"
@@ -532,9 +522,8 @@ msgid "Fountain files"
 msgstr ""
 
 #: src/Exporters/ExportFountain.vala:63
-#, fuzzy
 msgid "Export Fountain"
-msgstr "Export PDF"
+msgstr ""
 
 #: src/Exporters/ExportMhtml.vala:62
 msgid "Export MHTML"
@@ -686,9 +675,8 @@ msgid "Insert YAML Frontmatter"
 msgstr "Insert YAML Frontmatter"
 
 #: src/Widgets/Editor.vala:1379
-#, fuzzy
 msgid "Insert Citation"
-msgstr "Insert Datetime"
+msgstr ""
 
 #. insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
 #: src/Widgets/Library.vala:73
@@ -732,9 +720,8 @@ msgid "None"
 msgstr "None"
 
 #: src/Widgets/Library.vala:644
-#, fuzzy
 msgid "Folder"
-msgstr "Folder Name"
+msgstr ""
 
 #: src/Widgets/Library.vala:647
 msgid "Reader"
@@ -777,19 +764,16 @@ msgid "Monkey"
 msgstr ""
 
 #: src/Widgets/Library.vala:677
-#, fuzzy
 msgid "WordPress"
-msgstr "Word"
+msgstr ""
 
 #: src/Widgets/Library.vala:680
-#, fuzzy
 msgid "Ghost"
-msgstr "Ghost"
+msgstr ""
 
 #: src/Widgets/Library.vala:683
-#, fuzzy
 msgid "Write Freely"
-msgstr "WriteFreely"
+msgstr ""
 
 #: src/Widgets/Library.vala:686
 msgid "Trash"
@@ -850,9 +834,8 @@ msgstr "WriteFreely"
 #: src/Widgets/Preferences.vala:83 src/Widgets/Preferences.vala:117
 #: src/Widgets/Preferences.vala:151 src/Widgets/Preferences.vala:185
 #: src/Widgets/Preferences.vala:219 src/Widgets/Preferences.vala:264
-#, fuzzy
 msgid "Connection Error"
-msgstr "Add Connection"
+msgstr ""
 
 #: src/Widgets/Preferences.vala:91
 msgid "  ghost"
@@ -875,14 +858,12 @@ msgid "  Hashnode"
 msgstr ""
 
 #: src/Widgets/Preferences.vala:279
-#, fuzzy
 msgid "Connections"
-msgstr "Add Connection"
+msgstr ""
 
 #: src/Widgets/Preferences.vala:340
-#, fuzzy
 msgid "Remove "
-msgstr "Remove"
+msgstr ""
 
 #: src/Widgets/Preferences.vala:343
 msgid "_Remove"
@@ -1021,9 +1002,8 @@ msgid "Editor"
 msgstr ""
 
 #: src/Widgets/Preferences.vala:684
-#, fuzzy
 msgid "Editor Settings"
-msgstr "Settings"
+msgstr ""
 
 #: src/Widgets/Preferences.vala:685
 msgid "Modify the ThiefMD environment."
@@ -1070,9 +1050,8 @@ msgid "Start with new empty sheet on launch"
 msgstr ""
 
 #: src/Widgets/Preferences.vala:779
-#, fuzzy
 msgid "ThiefMD Settings"
-msgstr "Settings"
+msgstr ""
 
 #: src/Widgets/Preferences.vala:780
 msgid "Modify the ThiefMD appearance."
@@ -1207,9 +1186,8 @@ msgid "Check Grammar"
 msgstr ""
 
 #: src/Widgets/QuickPreferences.vala:74
-#, fuzzy
 msgid "Toggle Grammar Checking"
-msgstr "Toggle interface theming"
+msgstr ""
 
 #: src/Widgets/QuickPreferences.vala:87
 msgid "Grammar check is not available for your language"
@@ -1305,9 +1283,8 @@ msgid "Library Search"
 msgstr "Library Search"
 
 #: src/Widgets/SearchWindow.vala:421
-#, fuzzy
 msgid "Search"
-msgstr "Search"
+msgstr ""
 
 #: src/Widgets/SearchWindow.vala:445
 msgid "Monitor for Library changes"
@@ -1324,12 +1301,12 @@ msgstr "Heading"
 #~ msgid "Print to File"
 #~ msgstr "Print to File"
 
-#~ msgid " Search"
-#~ msgstr " Search"
-
 #~ msgid ""
 #~ "Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
 #~ "<small>Stored in <a href='file://"
 #~ msgstr ""
 #~ "Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
 #~ "<small>Stored in <a href='file://"
+
+#~ msgid " Search"
+#~ msgstr " Search"

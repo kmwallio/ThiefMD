@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-26 10:56-0700\n"
+"POT-Creation-Date: 2022-06-26 11:26-0700\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,7 +35,7 @@ msgstr "DocX"
 
 #: src/ThiefApp.vala:250
 msgid "Fountain"
-msgstr ""
+msgstr "Fountain"
 
 #. Visual Settings
 #. Arbitrary strings
@@ -69,9 +69,8 @@ msgid "Contributors who help make ThiefMD awesome"
 msgstr "Bidragsgivare som hjälpt till att göra ThiefMD fantastisk"
 
 #: src/Constants/ThiefProperties.vala:87
-#, fuzzy
 msgid "Czech Translation Contributors"
-msgstr "Fransk översättning"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:88
 msgid "French Translation Contributors"
@@ -113,7 +112,7 @@ msgstr "GNU General Public License v3.0"
 
 #: src/Constants/ThiefProperties.vala:92
 msgid "Stolen Victory Font"
-msgstr ""
+msgstr "Stolen Victory Font"
 
 #: src/Constants/ThiefProperties.vala:92 src/Constants/ThiefProperties.vala:94
 #: src/Constants/ThiefProperties.vala:95 src/Constants/ThiefProperties.vala:96
@@ -145,7 +144,7 @@ msgstr "MIT Licens (MIT)"
 
 #: src/Constants/ThiefProperties.vala:98
 msgid "Fountain Preview and Export"
-msgstr ""
+msgstr "Fountain förhandsgranskning och export"
 
 #: src/Constants/ThiefProperties.vala:99
 msgid "Markdown Parsing"
@@ -189,26 +188,24 @@ msgid "GNU General Public License v2.0"
 msgstr "GNU General Public Licens v2.0"
 
 #: src/Constants/ThiefProperties.vala:104
-#, fuzzy
 msgid "PDF Export"
-msgstr "Exportera"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:104
-#, fuzzy
 msgid "Simon Sapin and contributors"
-msgstr "Slovakisk översättning"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:105
 msgid "Grammar Check"
-msgstr ""
+msgstr "Gramatikkontroll"
 
 #: src/Constants/ThiefProperties.vala:105
 msgid "the AbiSource Community"
-msgstr ""
+msgstr "AbiSource-gemenskapen"
 
 #: src/Constants/ThiefProperties.vala:105
 msgid "GNU Lesser General Public License v2.1"
-msgstr ""
+msgstr "GNU Lesser General Public License v2.1"
 
 #: src/Constants/ThiefProperties.vala:106
 msgid "libwritegood-vala based on"
@@ -299,9 +296,8 @@ msgstr ""
 "markdown mer läsbar \"Ctrl+Shift+M\""
 
 #: src/Controllers/FileManager.vala:39
-#, fuzzy
 msgid "Stealing file contents..."
-msgstr "<b>Stjäl filinnehåll...</b>"
+msgstr ""
 
 #: src/Controllers/FileManager.vala:40
 msgid "This isn't plagiarism, it's a remix!"
@@ -505,11 +501,11 @@ msgstr ""
 
 #: src/Enrichments/Fountain.vala:32
 msgid "Characters"
-msgstr ""
+msgstr "Tecken"
 
 #: src/Enrichments/Markdown.vala:30
 msgid "Citations"
-msgstr ""
+msgstr "Citat"
 
 #: src/Exporters/ExportDocx.vala:60
 msgid "Export DocX"
@@ -533,11 +529,11 @@ msgstr "Exportera Markdown"
 
 #: src/Exporters/ExportFountain.vala:57
 msgid "Fountain files"
-msgstr ""
+msgstr "Fountain-filer"
 
 #: src/Exporters/ExportFountain.vala:63
 msgid "Export Fountain"
-msgstr ""
+msgstr "Exportera Fountain"
 
 #: src/Exporters/ExportMhtml.vala:62
 msgid "Export MHTML"
@@ -617,7 +613,7 @@ msgstr "Inställningar"
 
 #: src/Widgets/HeaderBar.vala:144
 msgid "Show Notes"
-msgstr ""
+msgstr "Visa anteckningar"
 
 #: src/Widgets/Sheet.vala:215
 msgid "Sort by"
@@ -660,7 +656,7 @@ msgstr "Exportera"
 
 #: src/Widgets/Sheet.vala:277
 msgid "Copy File Path"
-msgstr ""
+msgstr "Kopiera filsökväg"
 
 #. Gtk.MenuItem menu_rename = new Gtk.MenuItem.with_label (_("Rename File"));
 #. menu_rename.activate.connect (() => {
@@ -692,7 +688,7 @@ msgstr "Infoga YAML Frontmatter"
 
 #: src/Widgets/Editor.vala:1379
 msgid "Insert Citation"
-msgstr ""
+msgstr "Infoga citat"
 
 #. insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
 #: src/Widgets/Library.vala:73
@@ -729,7 +725,7 @@ msgstr "Visa dolda objekt"
 
 #: src/Widgets/Library.vala:638
 msgid "Set Project Icon"
-msgstr ""
+msgstr "Ange projektikon"
 
 #: src/Widgets/Library.vala:641 src/Widgets/Preferences.vala:389
 msgid "None"
@@ -737,63 +733,63 @@ msgstr "Inget"
 
 #: src/Widgets/Library.vala:644
 msgid "Folder"
-msgstr ""
+msgstr "Mapp"
 
 #: src/Widgets/Library.vala:647
 msgid "Reader"
-msgstr ""
+msgstr "Läsare"
 
 #: src/Widgets/Library.vala:650
 msgid "Love"
-msgstr ""
+msgstr "Kärlek"
 
 #: src/Widgets/Library.vala:653
 msgid "Game"
-msgstr ""
+msgstr "Spel"
 
 #: src/Widgets/Library.vala:656
 msgid "Art"
-msgstr ""
+msgstr "Konst"
 
 #: src/Widgets/Library.vala:659
 msgid "Nature"
-msgstr ""
+msgstr "Natur"
 
 #: src/Widgets/Library.vala:662
 msgid "Food"
-msgstr ""
+msgstr "Mat"
 
 #: src/Widgets/Library.vala:665
 msgid "Help"
-msgstr ""
+msgstr "Hjälp"
 
 #: src/Widgets/Library.vala:668
 msgid "Cool"
-msgstr ""
+msgstr "Cool"
 
 #: src/Widgets/Library.vala:671
 msgid "Angel"
-msgstr ""
+msgstr "Ängel"
 
 #: src/Widgets/Library.vala:674
 msgid "Monkey"
-msgstr ""
+msgstr "Apa"
 
 #: src/Widgets/Library.vala:677
 msgid "WordPress"
-msgstr ""
+msgstr "WordPress"
 
 #: src/Widgets/Library.vala:680
 msgid "Ghost"
-msgstr ""
+msgstr "Gast"
 
 #: src/Widgets/Library.vala:683
 msgid "Write Freely"
-msgstr ""
+msgstr "Skriv fritt"
 
 #: src/Widgets/Library.vala:686
 msgid "Trash"
-msgstr ""
+msgstr "Skräp"
 
 #: src/Widgets/Library.vala:696
 msgid "Remove from Library"
@@ -850,9 +846,8 @@ msgstr "  WriteFreely"
 #: src/Widgets/Preferences.vala:83 src/Widgets/Preferences.vala:117
 #: src/Widgets/Preferences.vala:151 src/Widgets/Preferences.vala:185
 #: src/Widgets/Preferences.vala:219 src/Widgets/Preferences.vala:264
-#, fuzzy
 msgid "Connection Error"
-msgstr "Anslutningar"
+msgstr ""
 
 #: src/Widgets/Preferences.vala:91
 msgid "  ghost"
@@ -920,7 +915,7 @@ msgstr "Ord"
 
 #: src/Widgets/Preferences.vala:431
 msgid "Number of Lines to Preview in Sheets View"
-msgstr ""
+msgstr "Antal rader att förhandsvisa i bladvy"
 
 #: src/Widgets/Preferences.vala:440
 msgid "Add New Theme"
@@ -1060,11 +1055,11 @@ msgstr "Visa textstatistik"
 
 #: src/Widgets/Preferences.vala:765
 msgid "Disable application tips"
-msgstr ""
+msgstr "Avaktivera programtips"
 
 #: src/Widgets/Preferences.vala:766
 msgid "Start with new empty sheet on launch"
-msgstr ""
+msgstr "Starta med nytt tomt blad vid uppstart"
 
 #: src/Widgets/Preferences.vala:779
 msgid "ThiefMD Settings"
@@ -1200,15 +1195,15 @@ msgstr "Skriv-bra på/av"
 
 #: src/Widgets/QuickPreferences.vala:71
 msgid "Check Grammar"
-msgstr ""
+msgstr "Kontrollera grammatik "
 
 #: src/Widgets/QuickPreferences.vala:74
 msgid "Toggle Grammar Checking"
-msgstr ""
+msgstr "Grammatikkontroll av/på"
 
 #: src/Widgets/QuickPreferences.vala:87
 msgid "Grammar check is not available for your language"
-msgstr ""
+msgstr "Grammatikkontroll finns inte tillgängligt för ditt språk"
 
 #: src/Widgets/QuickPreferences.vala:97 src/Widgets/QuickPreferences.vala:181
 #: src/Widgets/QuickPreferences.vala:260

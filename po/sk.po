@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-26 10:56-0700\n"
+"POT-Creation-Date: 2022-06-26 11:26-0700\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -82,7 +82,7 @@ msgstr ""
 
 #: src/Constants/ThiefProperties.vala:91
 msgid "Based on <a href='https://github.com/lainsce/quilter'>Quilter</a>"
-msgstr ""
+msgstr "Postavené na <a href='https://github.com/lainsce/quilter'>Quilter</a>"
 
 #: src/Constants/ThiefProperties.vala:91 src/Constants/ThiefProperties.vala:92
 #: src/Constants/ThiefProperties.vala:93 src/Constants/ThiefProperties.vala:94
@@ -180,9 +180,8 @@ msgid "GNU General Public License v2.0"
 msgstr ""
 
 #: src/Constants/ThiefProperties.vala:104
-#, fuzzy
 msgid "PDF Export"
-msgstr "Exportovať PDF"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:104
 msgid "Simon Sapin and contributors"
@@ -190,7 +189,7 @@ msgstr ""
 
 #: src/Constants/ThiefProperties.vala:105
 msgid "Grammar Check"
-msgstr ""
+msgstr "Kontrola gramatiky"
 
 #: src/Constants/ThiefProperties.vala:105
 msgid "the AbiSource Community"
@@ -239,7 +238,7 @@ msgstr ""
 
 #: src/Constants/ThiefProperties.vala:119
 msgid "Don't like what you see? Hit `Ctrl+,` to access the preferences."
-msgstr ""
+msgstr "Nepáči sa vám, čo vidíte? Stlačte `Ctrl+,` pre prístup ku voľbám"
 
 #: src/Constants/ThiefProperties.vala:120
 msgid ""
@@ -292,7 +291,7 @@ msgstr ""
 
 #: src/Controllers/FileManager.vala:43
 msgid "Importing File"
-msgstr ""
+msgstr "Importovanie súboru"
 
 #: src/Controllers/Dialogs.vala:26 src/Controllers/Dialogs.vala:59
 msgid "_Save"
@@ -319,11 +318,11 @@ msgstr "Súbor PDF"
 
 #: src/Controllers/Dialogs.vala:76 src/Exporters/ExportEpub.vala:55
 msgid "ePUB file"
-msgstr "Súbor ePUB"
+msgstr "ePUB súbor"
 
 #: src/Controllers/Dialogs.vala:82 src/Exporters/ExportDocx.vala:55
 msgid "docx file"
-msgstr "Súbor docx"
+msgstr "docx súbor"
 
 #: src/Controllers/Dialogs.vala:88 src/Controllers/Dialogs.vala:153
 #: src/Exporters/ExportMarkdown.vala:55
@@ -344,12 +343,12 @@ msgstr "Súbor LaTeX"
 
 #: src/Controllers/Dialogs.vala:161
 msgid "Supported files"
-msgstr ""
+msgstr "Podporované súbory"
 
 #: src/Controllers/Dialogs.vala:170
 #, c-format
 msgid "%s files"
-msgstr ""
+msgstr "%s súbor/y/ov"
 
 #: src/Controllers/Dialogs.vala:177
 msgid "All files"
@@ -408,7 +407,7 @@ msgstr ""
 
 #: src/Connections/WriteFreelyConnection.vala:127
 msgid "New WriteFreely Connection"
-msgstr ""
+msgstr "Nové prepojenie ku WriteFreely"
 
 #: src/Connections/WriteFreelyConnection.vala:130
 #: src/Connections/GhostConnection.vala:109
@@ -452,7 +451,7 @@ msgstr ""
 
 #: src/Connections/GhostConnection.vala:106
 msgid "New ghost Connection"
-msgstr ""
+msgstr "Nové prepojenie pre Ghost"
 
 #: src/Connections/GhostConnection.vala:192
 msgid "Your words are like Casper... Friendly!"
@@ -468,7 +467,7 @@ msgstr ""
 
 #: src/Connections/WordpressConnection.vala:109
 msgid "New Wordpress Connection"
-msgstr ""
+msgstr "Nové prepojenie pre WordPress"
 
 #: src/Connections/WordpressConnection.vala:191
 msgid "Taking it to the internet!"
@@ -484,11 +483,11 @@ msgstr ""
 
 #: src/Enrichments/Fountain.vala:32
 msgid "Characters"
-msgstr ""
+msgstr "Znaky"
 
 #: src/Enrichments/Markdown.vala:30
 msgid "Citations"
-msgstr ""
+msgstr "Citácie"
 
 #: src/Exporters/ExportDocx.vala:60
 msgid "Export DocX"
@@ -563,7 +562,7 @@ msgstr "Autori"
 #. website = ThiefProperties.URL;
 #: src/Widgets/About.vala:94
 msgid "Feedback"
-msgstr ""
+msgstr "Odozva"
 
 #. license_type = ThiefProperties.LICENSE_TYPE;
 #: src/Widgets/About.vala:99
@@ -594,7 +593,7 @@ msgstr "Nastavenia"
 
 #: src/Widgets/HeaderBar.vala:144
 msgid "Show Notes"
-msgstr ""
+msgstr "Ukázať poznámky"
 
 #: src/Widgets/Sheet.vala:215
 msgid "Sort by"
@@ -606,23 +605,23 @@ msgstr "Zoradiť vzostupne podľa názvu súboru"
 
 #: src/Widgets/Sheet.vala:224
 msgid "Sort by Filename Descending"
-msgstr ""
+msgstr "Zoradiť zostupne podľa názvu súboru"
 
 #: src/Widgets/Sheet.vala:231
 msgid "Sort by Title Ascending"
-msgstr "Zoradiť vzostupne podľa nadpisu"
+msgstr "Zoradiť vzostupne nadpisom"
 
 #: src/Widgets/Sheet.vala:237
 msgid "Sort by Title Descending"
-msgstr ""
+msgstr "Zoradiť zostupne nadpisom"
 
 #: src/Widgets/Sheet.vala:244
 msgid "Sort by Date Ascending"
-msgstr "Zoradiť vzostupne podľa dátumu"
+msgstr "Zoradiť vzostupne dátumom"
 
 #: src/Widgets/Sheet.vala:250
 msgid "Sort by Date Descending"
-msgstr ""
+msgstr "Zoradiť zostupne dátumom"
 
 #: src/Widgets/Sheet.vala:261 src/Widgets/QuickPreferences.vala:95
 #: src/Widgets/QuickPreferences.vala:179 src/Widgets/QuickPreferences.vala:258
@@ -633,7 +632,7 @@ msgstr "Náhľad"
 #: src/Widgets/PublisherPreviewWindow.vala:155
 #: src/Widgets/ProjectStatistics.vala:64
 msgid "Export"
-msgstr ""
+msgstr "Exportovať"
 
 #: src/Widgets/Sheet.vala:277
 msgid "Copy File Path"
@@ -645,7 +644,7 @@ msgstr ""
 #. menu.add (menu_rename);
 #: src/Widgets/Sheet.vala:293
 msgid "Danger Zone"
-msgstr ""
+msgstr "Nebezpečná oblasť"
 
 #: src/Widgets/Sheet.vala:299
 msgid "Move to Trash"
@@ -657,11 +656,11 @@ msgstr "_Načítať z disku"
 
 #: src/Widgets/Editor.vala:238
 msgid "_Keep what's in editor"
-msgstr ""
+msgstr "_Ponechať, čo je v editore"
 
 #: src/Widgets/Editor.vala:1263
 msgid "Insert Datetime"
-msgstr ""
+msgstr "Vložiť dátum a čas"
 
 #: src/Widgets/Editor.vala:1281
 msgid "Insert YAML Frontmatter"
@@ -669,7 +668,7 @@ msgstr ""
 
 #: src/Widgets/Editor.vala:1379
 msgid "Insert Citation"
-msgstr ""
+msgstr "Vložiť citáciu"
 
 #. insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
 #: src/Widgets/Library.vala:73
@@ -678,11 +677,11 @@ msgstr "Knižnica"
 
 #: src/Widgets/Library.vala:538
 msgid "Export Preview"
-msgstr ""
+msgstr "Náhľad exportu"
 
 #: src/Widgets/Library.vala:548
 msgid "Writing Statistics"
-msgstr ""
+msgstr "Štatistiky písania"
 
 #: src/Widgets/Library.vala:561
 msgid "Search "
@@ -690,7 +689,7 @@ msgstr "Hľadať "
 
 #: src/Widgets/Library.vala:573
 msgid "Open in File Manager"
-msgstr ""
+msgstr "Otvoriť v správcovi súborov"
 
 #: src/Widgets/Library.vala:585
 msgid "Create Sub-Folder"
@@ -714,7 +713,7 @@ msgstr "Žiaden"
 
 #: src/Widgets/Library.vala:644
 msgid "Folder"
-msgstr ""
+msgstr "Zložka"
 
 #: src/Widgets/Library.vala:647
 msgid "Reader"
@@ -770,7 +769,7 @@ msgstr ""
 
 #: src/Widgets/Library.vala:686
 msgid "Trash"
-msgstr ""
+msgstr "Kôš"
 
 #: src/Widgets/Library.vala:696
 msgid "Remove from Library"
@@ -802,23 +801,23 @@ msgstr "Vytvoriť"
 
 #: src/Widgets/NewSheet.vala:41
 msgid "Import"
-msgstr ""
+msgstr "Importovať"
 
 #: src/Widgets/Preferences.vala:50
 msgid "Current Connections"
-msgstr ""
+msgstr "Súčasné prepojenia"
 
 #: src/Widgets/Preferences.vala:51
 msgid "Click on a connection to remove."
-msgstr ""
+msgstr "Kliknite na spojenie k jeho odstráneniu"
 
 #: src/Widgets/Preferences.vala:54
 msgid "Add Connection"
-msgstr ""
+msgstr "Pridať prepojenie"
 
 #: src/Widgets/Preferences.vala:55
 msgid "Choose your blogging software."
-msgstr ""
+msgstr "Vyberte si svoj blogovací softvér"
 
 #: src/Widgets/Preferences.vala:57
 msgid "  WriteFreely"
@@ -852,11 +851,11 @@ msgstr ""
 
 #: src/Widgets/Preferences.vala:279
 msgid "Connections"
-msgstr ""
+msgstr "Prepojenia"
 
 #: src/Widgets/Preferences.vala:340
 msgid "Remove "
-msgstr ""
+msgstr "Odstrániť "
 
 #: src/Widgets/Preferences.vala:343
 msgid "_Remove"
@@ -868,15 +867,15 @@ msgstr "_Ponechať"
 
 #: src/Widgets/Preferences.vala:373
 msgid "Display"
-msgstr ""
+msgstr "Zobrazenie"
 
 #: src/Widgets/Preferences.vala:377
 msgid "Display Options"
-msgstr ""
+msgstr "Možnosti zobrazenia"
 
 #: src/Widgets/Preferences.vala:378
 msgid "Make ThiefMD feel like home."
-msgstr ""
+msgstr "Cíťte sa v ThiefMD ako doma."
 
 #: src/Widgets/Preferences.vala:384
 msgid "Focus"
@@ -896,7 +895,7 @@ msgstr "Slovo"
 
 #: src/Widgets/Preferences.vala:431
 msgid "Number of Lines to Preview in Sheets View"
-msgstr ""
+msgstr "Počet riadkov v náhľade, pri listovom zobrazení"
 
 #: src/Widgets/Preferences.vala:440
 msgid "Add New Theme"
@@ -904,11 +903,11 @@ msgstr "Pridať novú tému"
 
 #: src/Widgets/Preferences.vala:487
 msgid "Compiling Options"
-msgstr ""
+msgstr "Možnosti kompilácie"
 
 #: src/Widgets/Preferences.vala:488
 msgid "Adjust how Markdown files are compiled together."
-msgstr ""
+msgstr "Upraviť ako sú Markdown súbory kompilované dokopy"
 
 #: src/Widgets/Preferences.vala:496
 msgid "First Markdown File includes Author Metadata"
@@ -938,7 +937,7 @@ msgstr ""
 
 #: src/Widgets/Preferences.vala:543
 msgid "Page Setup"
-msgstr ""
+msgstr "Nastavenie strany"
 
 #: src/Widgets/Preferences.vala:544
 msgid "Configure PDF export options."
@@ -994,11 +993,11 @@ msgstr ""
 
 #: src/Widgets/Preferences.vala:684
 msgid "Editor Settings"
-msgstr ""
+msgstr "Nastavenia editora"
 
 #: src/Widgets/Preferences.vala:685
 msgid "Modify the ThiefMD environment."
-msgstr ""
+msgstr "Upraviť prostredie ThiefMD."
 
 #: src/Widgets/Preferences.vala:693
 msgid "Enable spellcheck"
@@ -1010,11 +1009,11 @@ msgstr "Kontrolovať pravopis dokumentu"
 
 #: src/Widgets/Preferences.vala:709
 msgid "Enable Write-Good"
-msgstr ""
+msgstr "Zapnúť Write-Good (lepšie písanie)"
 
 #: src/Widgets/Preferences.vala:713
 msgid "Enable Write-Good: recommendations for sentence structure"
-msgstr ""
+msgstr "Zapnúť Write-Good: odporúčania pre lepšiu vetovú štruktúru"
 
 #: src/Widgets/Preferences.vala:728
 msgid "Toggle typewriter scrolling"
@@ -1022,11 +1021,11 @@ msgstr ""
 
 #: src/Widgets/Preferences.vala:729
 msgid "Enable typewriter focus mode"
-msgstr ""
+msgstr "Zapnúť režim písaceho stroja"
 
 #: src/Widgets/Preferences.vala:749
 msgid "Toggle writing statistics"
-msgstr ""
+msgstr "Zapnúť štatistiky písania"
 
 #: src/Widgets/Preferences.vala:750
 msgid "Show writing statistics"
@@ -1034,23 +1033,23 @@ msgstr "Ukázať štatistiky písania"
 
 #: src/Widgets/Preferences.vala:765
 msgid "Disable application tips"
-msgstr ""
+msgstr "Vypnúť softvérovu nápovedu"
 
 #: src/Widgets/Preferences.vala:766
 msgid "Start with new empty sheet on launch"
-msgstr ""
+msgstr "Pri spustení začínať s novým, prázdnym listom"
 
 #: src/Widgets/Preferences.vala:779
 msgid "ThiefMD Settings"
-msgstr ""
+msgstr "Nastavenia ThiefMD"
 
 #: src/Widgets/Preferences.vala:780
 msgid "Modify the ThiefMD appearance."
-msgstr ""
+msgstr "Upraviť vzhľad ThiefMD."
 
 #: src/Widgets/Preferences.vala:790
 msgid "Toggle interface theming"
-msgstr ""
+msgstr "Zapnúť témovanie prostredia"
 
 #: src/Widgets/Preferences.vala:791
 msgid "Apply theme to interface"
@@ -1058,11 +1057,11 @@ msgstr "Použiť tému pre prostredie"
 
 #: src/Widgets/Preferences.vala:810
 msgid "Toggle auto-hide headerbar"
-msgstr ""
+msgstr "Zapnúť automatické skrývanie záhlavia"
 
 #: src/Widgets/Preferences.vala:812
 msgid "Automatically hide headerbar"
-msgstr ""
+msgstr "Automaticky skryť záhlavie"
 
 #: src/Widgets/Preferences.vala:826
 msgid "Hide title"
@@ -1070,11 +1069,11 @@ msgstr "Skryť názov"
 
 #: src/Widgets/Preferences.vala:828
 msgid "Remove ThiefMD branding"
-msgstr ""
+msgstr "Odstrániť značku ThiefMD"
 
 #: src/Widgets/Preferences.vala:842
 msgid "Toggle library order"
-msgstr ""
+msgstr "Zapnúť zoraďovanie knižnice"
 
 #: src/Widgets/Preferences.vala:844
 msgid "Keep library order"
@@ -1162,23 +1161,23 @@ msgstr "Zapnúť kontrolu pravopisu"
 
 #: src/Widgets/QuickPreferences.vala:61
 msgid "Write Good"
-msgstr ""
+msgstr "Write Good (lepšie písanie)"
 
 #: src/Widgets/QuickPreferences.vala:64
 msgid "Toggle Write Good"
-msgstr ""
+msgstr "Zapnúť Write Good (lepšie písanie)"
 
 #: src/Widgets/QuickPreferences.vala:71
 msgid "Check Grammar"
-msgstr ""
+msgstr "Kontrolovať gramatiku"
 
 #: src/Widgets/QuickPreferences.vala:74
 msgid "Toggle Grammar Checking"
-msgstr ""
+msgstr "Zapnúť kontrolu gramatiky"
 
 #: src/Widgets/QuickPreferences.vala:87
 msgid "Grammar check is not available for your language"
-msgstr ""
+msgstr "Kontrola gramatiky pre váš jazyk nieje dostupná"
 
 #: src/Widgets/QuickPreferences.vala:97 src/Widgets/QuickPreferences.vala:181
 #: src/Widgets/QuickPreferences.vala:260
@@ -1220,20 +1219,20 @@ msgstr "Výber písma"
 
 #: src/Widgets/ThemeSelector.vala:326
 msgid "Download"
-msgstr ""
+msgstr "Stiahnúť"
 
 #: src/Widgets/ThemeSelector.vala:326
 msgid "more themes"
-msgstr ""
+msgstr "viac vzhľadov"
 
 #: src/Widgets/ThemeSelector.vala:326
 msgid "Stored in"
-msgstr ""
+msgstr "Uložené v"
 
 #: src/Widgets/SearchBar.vala:110
 #, c-format
 msgid "(%d occurences)"
-msgstr ""
+msgstr "(%d nálezov)"
 
 #: src/Widgets/StatisticsBar.vala:100
 #, c-format

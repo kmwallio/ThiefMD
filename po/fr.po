@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-26 10:56-0700\n"
+"POT-Creation-Date: 2022-06-26 11:26-0700\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -188,9 +188,8 @@ msgid "GNU General Public License v2.0"
 msgstr ""
 
 #: src/Constants/ThiefProperties.vala:104
-#, fuzzy
 msgid "PDF Export"
-msgstr "Exporter"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:104
 msgid "Simon Sapin and contributors"
@@ -287,9 +286,8 @@ msgid ""
 msgstr ""
 
 #: src/Controllers/FileManager.vala:39
-#, fuzzy
 msgid "Stealing file contents..."
-msgstr "<b>Dérobe le contenu du fichier...</b>"
+msgstr ""
 
 #: src/Controllers/FileManager.vala:40
 msgid "This isn't plagiarism, it's a remix!"
@@ -839,9 +837,8 @@ msgstr "  Mode sans distraction"
 #: src/Widgets/Preferences.vala:83 src/Widgets/Preferences.vala:117
 #: src/Widgets/Preferences.vala:151 src/Widgets/Preferences.vala:185
 #: src/Widgets/Preferences.vala:219 src/Widgets/Preferences.vala:264
-#, fuzzy
 msgid "Connection Error"
-msgstr "Ajouter une connexion"
+msgstr ""
 
 #: src/Widgets/Preferences.vala:91
 msgid "  ghost"

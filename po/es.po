@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-26 10:56-0700\n"
+"POT-Creation-Date: 2022-06-26 11:26-0700\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -69,9 +69,8 @@ msgid "Contributors who help make ThiefMD awesome"
 msgstr "Colaboradores que ayudan a que ThiefMD sea increíble"
 
 #: src/Constants/ThiefProperties.vala:87
-#, fuzzy
 msgid "Czech Translation Contributors"
-msgstr "Colaboradores de traducción al francés"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:88
 msgid "French Translation Contributors"
@@ -189,14 +188,12 @@ msgid "GNU General Public License v2.0"
 msgstr "Licencia pública general GNU v2.0"
 
 #: src/Constants/ThiefProperties.vala:104
-#, fuzzy
 msgid "PDF Export"
-msgstr "Exportar"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:104
-#, fuzzy
 msgid "Simon Sapin and contributors"
-msgstr "Colaboradores de traducción al eslovaco"
+msgstr ""
 
 #: src/Constants/ThiefProperties.vala:105
 msgid "Grammar Check"
@@ -304,9 +301,8 @@ msgstr ""
 "sea más legible `Ctrl + Shift + M`."
 
 #: src/Controllers/FileManager.vala:39
-#, fuzzy
 msgid "Stealing file contents..."
-msgstr "<b> Robando el contenido del archivo ... </b>"
+msgstr ""
 
 #: src/Controllers/FileManager.vala:40
 msgid "This isn't plagiarism, it's a remix!"
@@ -855,9 +851,8 @@ msgstr "  Escribe libremente"
 #: src/Widgets/Preferences.vala:83 src/Widgets/Preferences.vala:117
 #: src/Widgets/Preferences.vala:151 src/Widgets/Preferences.vala:185
 #: src/Widgets/Preferences.vala:219 src/Widgets/Preferences.vala:264
-#, fuzzy
 msgid "Connection Error"
-msgstr "Conexiones"
+msgstr ""
 
 #: src/Widgets/Preferences.vala:91
 msgid "  ghost"
