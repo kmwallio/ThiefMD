@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ThiefMD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-26 11:26-0700\n"
+"POT-Creation-Date: 2022-06-26 11:34-0700\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -85,14 +85,21 @@ msgid "Swedish Translation Contributors"
 msgstr ""
 
 #: src/Constants/ThiefProperties.vala:91
+msgid "German Translation Contributors"
+msgstr ""
+
+#: src/Constants/ThiefProperties.vala:92
+msgid "Finnish Translation Contributors"
+msgstr ""
+
+#: src/Constants/ThiefProperties.vala:93
 msgid "Original Code"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:91
+#: src/Constants/ThiefProperties.vala:93
 msgid "Based on <a href='https://github.com/lainsce/quilter'>Quilter</a>"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:91 src/Constants/ThiefProperties.vala:92
 #: src/Constants/ThiefProperties.vala:93 src/Constants/ThiefProperties.vala:94
 #: src/Constants/ThiefProperties.vala:95 src/Constants/ThiefProperties.vala:96
 #: src/Constants/ThiefProperties.vala:97 src/Constants/ThiefProperties.vala:98
@@ -103,183 +110,185 @@ msgstr ""
 #: src/Constants/ThiefProperties.vala:104
 #: src/Constants/ThiefProperties.vala:105
 #: src/Constants/ThiefProperties.vala:106
+#: src/Constants/ThiefProperties.vala:107
+#: src/Constants/ThiefProperties.vala:108
 msgid "Copyright"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:91
+#: src/Constants/ThiefProperties.vala:93
 msgid "GNU General Public License v3.0"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:92
+#: src/Constants/ThiefProperties.vala:94
 msgid "Stolen Victory Font"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:92 src/Constants/ThiefProperties.vala:94
-#: src/Constants/ThiefProperties.vala:95 src/Constants/ThiefProperties.vala:96
+#: src/Constants/ThiefProperties.vala:94 src/Constants/ThiefProperties.vala:96
+#: src/Constants/ThiefProperties.vala:97 src/Constants/ThiefProperties.vala:98
 msgid "SIL OPEN FONT LICENSE Version 1.1"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:93 src/Constants/ThiefProperties.vala:98
-#: src/Constants/ThiefProperties.vala:101
-#: src/Constants/ThiefProperties.vala:102
+#: src/Constants/ThiefProperties.vala:95 src/Constants/ThiefProperties.vala:100
+#: src/Constants/ThiefProperties.vala:103
+#: src/Constants/ThiefProperties.vala:104
 msgid "MIT License"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:95 src/Constants/ThiefProperties.vala:96
+#: src/Constants/ThiefProperties.vala:97 src/Constants/ThiefProperties.vala:98
 #: src/Widgets/ThemeSelector.vala:50
 msgid "Font"
 msgstr "Font"
 
-#: src/Constants/ThiefProperties.vala:97
+#: src/Constants/ThiefProperties.vala:99
 msgid "Preview CSS"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:97
+#: src/Constants/ThiefProperties.vala:99
 msgid "Mash up of Splendor and Modest"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:97 src/Constants/ThiefProperties.vala:106
+#: src/Constants/ThiefProperties.vala:99 src/Constants/ThiefProperties.vala:108
 msgid "The MIT License (MIT)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:98
+#: src/Constants/ThiefProperties.vala:100
 msgid "Fountain Preview and Export"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:99
+#: src/Constants/ThiefProperties.vala:101
 msgid "Markdown Parsing"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:99
+#: src/Constants/ThiefProperties.vala:101
 msgid "BSD-style License"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:100
+#: src/Constants/ThiefProperties.vala:102
 msgid "Syntax Highlighting"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:100
-#: src/Constants/ThiefProperties.vala:104
+#: src/Constants/ThiefProperties.vala:102
+#: src/Constants/ThiefProperties.vala:106
 msgid "BSD-3-Clause License"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:101
+#: src/Constants/ThiefProperties.vala:103
 msgid "Math Rendering"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:101
+#: src/Constants/ThiefProperties.vala:103
 msgid "Khan Academy and other contributors."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:102
+#: src/Constants/ThiefProperties.vala:104
 msgid "XML Parsing"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:103
+#: src/Constants/ThiefProperties.vala:105
 msgid "Pandoc Export"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:103
+#: src/Constants/ThiefProperties.vala:105
 msgid "John MacFarlane and others"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:103
+#: src/Constants/ThiefProperties.vala:105
 msgid "GNU General Public License v2.0"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:104
+#: src/Constants/ThiefProperties.vala:106
 msgid "PDF Export"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:104
+#: src/Constants/ThiefProperties.vala:106
 msgid "Simon Sapin and contributors"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:105
+#: src/Constants/ThiefProperties.vala:107
 msgid "Grammar Check"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:105
+#: src/Constants/ThiefProperties.vala:107
 msgid "the AbiSource Community"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:105
+#: src/Constants/ThiefProperties.vala:107
 msgid "GNU Lesser General Public License v2.1"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:106
+#: src/Constants/ThiefProperties.vala:108
 msgid "libwritegood-vala based on"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:106
+#: src/Constants/ThiefProperties.vala:108
 msgid "write-good: Naive linter for English prose"
 msgstr ""
 
 #. Needs to be kept in sync with PAPER_SIZES_GTK_NAME
-#: src/Constants/ThiefProperties.vala:110
+#: src/Constants/ThiefProperties.vala:112
 msgid "A3 (11.7 x 16.5 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:111
+#: src/Constants/ThiefProperties.vala:113
 msgid "A4 (8 x 11 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:112
+#: src/Constants/ThiefProperties.vala:114
 msgid "A5 (5.8 x 8.3 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:113
+#: src/Constants/ThiefProperties.vala:115
 msgid "B5 (6.93 x 9.84 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:114
+#: src/Constants/ThiefProperties.vala:116
 msgid "Executive (7 x 10 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:115
+#: src/Constants/ThiefProperties.vala:117
 msgid "Legal (8.5 x 14 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:116
+#: src/Constants/ThiefProperties.vala:118
 msgid "Letter (8.5 x 11 inches)"
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:119
+#: src/Constants/ThiefProperties.vala:121
 msgid "Don't like what you see? Hit `Ctrl+,` to access the preferences."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:120
+#: src/Constants/ThiefProperties.vala:122
 msgid ""
 "No built in dark mode? Dark themes are available at https://themes.thiefmd."
 "com. Add more in the Preferences (`Ctrl+,`)."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:121
+#: src/Constants/ThiefProperties.vala:123
 msgid ""
 "Don't like how the preview looks? Hit `Ctrl+,` to access the preferences and "
 "click Export."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:122
+#: src/Constants/ThiefProperties.vala:124
 msgid ""
 "Want to import a ePub, HTML, or DocX? Click Import from the New Sheet prompt."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:123
+#: src/Constants/ThiefProperties.vala:125
 msgid ""
 "Ready to publish your great work? Right-click on the folder and choose "
 "\"Export Preview\""
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:124
+#: src/Constants/ThiefProperties.vala:126
 msgid "Want to block out distractions? Full-screen is just an `F11` away."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:125
+#: src/Constants/ThiefProperties.vala:127
 msgid "Quickly switch view modes with `Ctrl+1`, `Ctrl+2`, and `Ctrl+3`."
 msgstr ""
 
-#: src/Constants/ThiefProperties.vala:126
+#: src/Constants/ThiefProperties.vala:128
 msgid ""
 "Working with a lot of links? Turn on Experimental Mode to make your markdown "
 "more readable `Ctrl+Shift+M`."
