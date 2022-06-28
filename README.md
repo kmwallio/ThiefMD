@@ -52,6 +52,8 @@ yay -S thiefmd
  * Slovak Translation by [Marek L'ach](https://github.com/marek-lach)
  * Swedish Translation by [Åke Engelbrektson](https://github.com/eson57)
  * Czech Translation by [Vojtěch Perník](https://github.com/pervoj)
+ * Finnish Translation by Jiri Grönroos
+ * German Translation by Fish and Helix
 
 ## Planning
 
