@@ -415,16 +415,17 @@ namespace ThiefMD.Controllers.FileManager {
 
         Regex headers = null;
         try {
-            headers = new Regex ("^\\s*(.+?)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            headers = new Regex ("^\\s*(.+?)\\s*[=:]\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
         } catch (Error e) {
             warning ("Could not compile regex: %s", e.message);
         }
-
-        if (buffer.has_prefix ("---" + ThiefProperties.THIEF_MARK_CONST)) {
+        
+        if (buffer.has_prefix ("---" + ThiefProperties.THIEF_MARK_CONST) || buffer.has_prefix ("+++" + ThiefProperties.THIEF_MARK_CONST)) {
             buffer = buffer.replace (ThiefProperties.THIEF_MARK_CONST, "");
         }
 
-        if (buffer.length > 4 && buffer[0:4] == "---\n") {
+        string buffer_prefix = (buffer.length > 4) ? buffer[0:4] : "";
+        if (buffer.length > 4 && (buffer_prefix == "---\n" || buffer_prefix == "+++\n")) {
             int i = 0;
             int last_newline = 3;
             int next_newline;
@@ -433,7 +434,7 @@ namespace ThiefMD.Controllers.FileManager {
 
             while (valid_frontmatter) {
                 next_newline = buffer.index_of_char('\n', last_newline + 1);
-                if (next_newline == -1 && !((buffer.length > last_newline + 1) && buffer.substring (last_newline + 1).has_prefix("---"))) {
+                if (next_newline == -1 && !((buffer.length > last_newline + 1) && (buffer.substring (last_newline + 1).has_prefix("---") || buffer.substring (last_newline + 1).has_prefix("+++")))) {
                     valid_frontmatter = false;
                     break;
                 }
@@ -446,7 +447,7 @@ namespace ThiefMD.Controllers.FileManager {
                 line = line.replace (ThiefProperties.THIEF_MARK_CONST, "");
                 last_newline = next_newline;
 
-                if (line == "---") {
+                if (line == "---" || line == "+++") {
                     break;
                 }
 
@@ -476,11 +477,11 @@ namespace ThiefMD.Controllers.FileManager {
                     }
                 } else {
                     string quick_parse = line.chomp ();
-                    int split = quick_parse.index_of (":");
+                    int split = quick_parse.index_of (":") != -1 ? quick_parse.index_of (":") : quick_parse.index_of ("=");
                     if (split != -1) {
                         string match = quick_parse.substring (0, split);
                         string key = quick_parse.substring (0, split).chug ().chomp ();
-                        string value = quick_parse.substring (quick_parse.index_of (":") + 1);
+                        string value = quick_parse.substring (split + 1).chug ().chomp ();
                         if (value.has_prefix ("\"") && value.has_suffix ("\"")) {
                             value = value.substring (1, value.length - 2);
                         }
@@ -517,7 +518,7 @@ namespace ThiefMD.Controllers.FileManager {
         string buffer = markdown;
         Regex headers = null;
         try {
-            headers = new Regex ("^\\s*(.+?)\\s*:\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            headers = new Regex ("^\\s*(.+?)\\s*[=:]\\s+(.*)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
         } catch (Error e) {
             warning ("Could not compile regex: %s", e.message);
         }
@@ -529,11 +530,12 @@ namespace ThiefMD.Controllers.FileManager {
         var markout = new StringBuilder ();
         int mklines = 0;
 
-        if (buffer.has_prefix ("---" + ThiefProperties.THIEF_MARK_CONST)) {
+        if (buffer.has_prefix ("---" + ThiefProperties.THIEF_MARK_CONST) || buffer.has_prefix ("+++" + ThiefProperties.THIEF_MARK_CONST)) {
             buffer = buffer.replace (ThiefProperties.THIEF_MARK_CONST, "");
         }
 
-        if (buffer.length > 4 && buffer[0:4] == "---\n") {
+        string buffer_prefix = (buffer.length > 4) ? buffer[0:4] : "";
+        if (buffer.length > 4 && ((buffer_prefix == "---\n") || (buffer_prefix == "+++\n"))) {
             int i = 0;
             int last_newline = 3;
             int next_newline;
@@ -555,7 +557,7 @@ namespace ThiefMD.Controllers.FileManager {
                 line = line.replace (ThiefProperties.THIEF_MARK_CONST, "");
                 last_newline = next_newline;
 
-                if (line == "---") {
+                if (line == "---" || line == "+++") {
                     break;
                 }
 
@@ -638,7 +640,7 @@ namespace ThiefMD.Controllers.FileManager {
 
         try {
             var file = File.new_for_path (file_path);
-            Regex headers = new Regex ("^\\s*(.+?)\\s*:\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex headers = new Regex ("^\\s*(.+?)\\s*[=:]\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             MatchInfo matches;
 
             if (file.query_exists ()) {
@@ -652,7 +654,7 @@ namespace ThiefMD.Controllers.FileManager {
 
                 while (((line = input.read_line (null)) != null) && (lines_read < lines || lines <= 0)) {
                     if ((!non_empty_lines_only) || (line.chomp() != "")) {
-                        if (line == "---") {
+                        if (line == "---" || line == "+++") {
                             if (in_yaml) {
                                 in_yaml = false;
                                 continue;
