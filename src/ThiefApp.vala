@@ -22,12 +22,12 @@ using ThiefMD.Widgets;
 using ThiefMD.Controllers;
 
 namespace ThiefMD {
-    public class ThiefApp : Hdy.ApplicationWindow {
+    public class ThiefApp : Adw.ApplicationWindow {
         private static ThiefApp _instance;
         public Headerbar toolbar;
         public Library library;
-        public Hdy.Leaflet main_content;
-        public Hdy.Leaflet library_pane;
+        public Adw.Leaflet main_content;
+        public Adw.Leaflet library_pane;
         public Gtk.ScrolledWindow library_view;
         public SearchBar search_bar;
         public StatisticsBar stats_bar;
@@ -134,8 +134,8 @@ namespace ThiefMD {
             var notes_context = notes_widget.get_style_context ();
             notes_context.add_class ("thief-notes");
 
-            library_pane = new Hdy.Leaflet ();
-            library_pane.transition_type = Hdy.LeafletTransitionType.SLIDE;
+            library_pane = new Adw.Leaflet ();
+            library_pane.transition_type = Adw.LeafletTransitionType.SLIDE;
             library_pane.set_homogeneous (true, Gtk.Orientation.HORIZONTAL, false);
             library_pane.set_orientation (Gtk.Orientation.HORIZONTAL);
             library_view = new Gtk.ScrolledWindow (null, null);
@@ -144,8 +144,8 @@ namespace ThiefMD {
             notes = new Gtk.Revealer ();
             notes.set_transition_type (Gtk.RevealerTransitionType.SLIDE_LEFT);
             notes.set_reveal_child (false);
-            main_content = new Hdy.Leaflet ();
-            main_content.transition_type = Hdy.LeafletTransitionType.SLIDE;
+            main_content = new Adw.Leaflet ();
+            main_content.transition_type = Adw.LeafletTransitionType.SLIDE;
             main_content.set_homogeneous (true, Gtk.Orientation.HORIZONTAL, false);
             main_content.set_orientation (Gtk.Orientation.HORIZONTAL);
 

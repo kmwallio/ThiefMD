@@ -21,64 +21,110 @@ using ThiefMD;
 using ThiefMD.Widgets;
 
 namespace ThiefMD.Enrichments {
-    public class FountainCharacterSuggestor : Gtk.SourceCompletionProvider, Object {
+    public class FountainCharacterSuggestion : GtkSource.CompletionCell, GtkSource.CompletionProposal {
+        public FountainCharacterSuggestion (string character) {
+            text = character;
+            markup = character;
+            widget = new Gtk.Label(character);
+        }
+    }
+
+    public class FountainCharacterSuggestor : GtkSource.CompletionProvider, Object {
         public Gee.HashSet<string> characters;
 
         public FountainCharacterSuggestor () {
             characters = new Gee.HashSet<string> ();
         }
 
-        public override string get_name () {
+        public string? get_title () {
             return _("Characters");
         }
 
-        public override bool match (Gtk.SourceCompletionContext context) {
-            Gtk.TextIter? start = null, iter = null;
-            if (context.get_iter (out iter)) {
-                if (iter.ends_line () && context.get_iter (out start)) {
-                    start.backward_word_start ();
-                    if ((iter.get_offset () - start.get_offset ()) >= 2) {
-                        string check = start.get_text (iter);
-                        return check == check.up ();
-                    }
-                }
+        public void activate (GtkSource.CompletionContext context, GtkSource.CompletionProposal proposal) {
+            Gtk.TextIter? start = null, end = null;
+            if (context.get_bounds (out start, out end)) {
+                string character = ((FountainCharacterSuggestion) proposal).text;
+                string character_prefix = start.get_text (end);
+                var buffer = context.get_buffer ();
+                buffer.insert (ref end, character.substring (character_prefix.length), -1);
             }
-
-            return false;
         }
 
-        public override void populate (Gtk.SourceCompletionContext context) {
-            List<Gtk.SourceCompletionItem> completions = new List<Gtk.SourceCompletionItem> ();
-            Gtk.TextIter? start = null, iter = null;
-            if (context.get_iter (out iter)) {
-                if (iter.ends_line () && context.get_iter (out start)) {
-                    start.backward_word_start ();
-                    if ((iter.get_offset () - start.get_offset ()) >= 2) {
-                        string check = start.get_text (iter);
+        public void display (GtkSource.CompletionContext context, GtkSource.CompletionProposal proposal, GtkSource.CompletionCell cell) {
+            string character = ((FountainCharacterSuggestion) proposal).text;
+            cell.text = character;
+        }
+
+        public bool is_trigger (Gtk.TextIter iter, unichar ch) {
+            if (iter.ends_word ()) {
+                var end = iter.copy ();
+                if (iter.backward_line ()) {
+                    string text = iter.get_text (end);
+                    if (text == text.up () && text.length >= 2) {
                         foreach (var character in characters) {
-                            if (character.has_prefix (check) && character != check) {
-                                var com_item = new Gtk.SourceCompletionItem ();
-                                com_item.text = character;
-                                com_item.label = character;
-                                com_item.markup = character;
-                                completions.append (com_item);
+                            if (character.has_prefix (text)) {
+                                return true;
                             }
                         }
                     }
                 }
             }
-            context.add_proposals (this, completions, true);
+
+            return false;
         }
 
-        public override bool activate_proposal (Gtk.SourceCompletionProposal proposal, Gtk.TextIter iter) {
-            return false;
+        public GLib.GenericArray<GtkSource.CompletionProposal>? list_alternates (GtkSource.CompletionContext context, GtkSource.CompletionProposal proposal) {
+            return null;
+        }
+
+        public void refilter (GtkSource.CompletionContext context, GLib.ListModel model) {
+            Gtk.TextIter? start = null, end = null;
+            if (context.get_bounds (out start, out end) && (end.get_offset () - start.get_offset () >= 2)) {
+                var completions = ((ListStore) model);
+                completions.remove_all ();
+                string check = start.get_text (end);
+                foreach (var character in characters) {
+                    if (character.has_prefix (check) && character != check) {
+                        var com_item = new FountainCharacterSuggestion (character);
+                        completions.append (com_item);
+                    }
+                }
+            }
+        }
+
+        public bool key_activates (GtkSource.CompletionContext context, GtkSource.CompletionProposal proposal, uint keyval, Gdk.ModifierType state) {
+            return (keyval == Gdk.Key.Return) || (keyval == Gdk.Key.Tab) || (keyval == Gdk.Key.KP_Enter);
+        }
+
+        public int get_priority (GtkSource.CompletionContext context) {
+            var language = context.get_language ();
+            if (language != null && language.name.down ().contains ("fountain")) {
+                return 0;
+            } else {
+                return 10;
+            }
+        }
+
+        public async GLib.ListModel populate_async (GtkSource.CompletionContext context, GLib.Cancellable? cancellable) {
+            ListStore completions = new ListStore (typeof (GtkSource.CompletionProposal));
+            Gtk.TextIter? start = null, end = null;
+            if (context.get_bounds (out start, out end) && (end.get_offset () - start.get_offset () >= 2)) {
+                string check = start.get_text (end);
+                foreach (var character in characters) {
+                    if (character.has_prefix (check) && character != check) {
+                        var com_item = new FountainCharacterSuggestion (character);
+                        completions.append (com_item);
+                    }
+                }
+            }
+            return completions;
         }
     }
 
     public class FountainEnrichment : Object {
         private FountainCharacterSuggestor character_suggester;
-        private Gtk.SourceCompletionWords source_completion;
-        private Gtk.SourceView view;
+        private GtkSource.CompletionWords source_completion;
+        private GtkSource.View view;
         private Gtk.TextBuffer buffer;
         private Mutex checking;
 
@@ -301,7 +347,7 @@ namespace ThiefMD.Enrichments {
             } while (match_info.next ());
         }
 
-        public bool attach (Gtk.SourceView textview) {
+        public bool attach (GtkSource.View textview) {
             if (textview == null) {
                 return false;
             }
@@ -349,7 +395,7 @@ namespace ThiefMD.Enrichments {
                 try {
                     var completion = view.get_completion ();
                     completion.add_provider (character_suggester);
-                    source_completion = new Gtk.SourceCompletionWords ("Character Suggestor", null);
+                    source_completion = new GtkSource.CompletionWords ("Character Suggestor");
                     source_completion.register (buffer);
                 } catch (Error e) {
                     warning ("Cannot add autocompletion: %s", e.message);

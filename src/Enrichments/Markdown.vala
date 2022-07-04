@@ -22,104 +22,177 @@ using ThiefMD.Widgets;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Enrichments {
-    public class BibTexCompletionProvider : Gtk.SourceCompletionProvider, Object {
+    public class BibTexSuggestion : GtkSource.CompletionCell, GtkSource.CompletionProposal {
+        public BibTexSuggestion (string label, string citation) {
+            text = citation;
+            markup = label;
+            widget = new Gtk.Label(label);
+        }
+    }
+
+    public class BibTexCompletionProvider : GtkSource.CompletionProvider, Object {
         public BibTexCompletionProvider () {
         }
 
-        public override string get_name () {
+        public string? get_title () {
             return _("Citations");
         }
 
-        public override bool match (Gtk.SourceCompletionContext context) {
-            Gtk.TextIter? start = null, sanity = null;
-            if (context.get_iter (out start) && context.get_iter (out sanity)) {
-                if (start.backward_char ()) {
-                    if (start.get_char () == '@') {
-                        if (!start.backward_char ()) {
-                            return true;
-                        }
-                        return start.get_char ().isspace () || !start.get_char ().isalnum ();
-                    }
-                    unichar check = start.get_char ();
-                    for (int i = 0; i < 10; i++) {
-                        if (check == ' ' || check == '@' || check == '\n' || check == '\t') {
-                            break;
-                        }
-                        if (!start.backward_char ()) {
-                            break;
-                        }
-                        check = start.get_char ();
-                    }
-
-                    if (start.get_char () == '@') {
-                        if (!start.backward_char ()) {
-                            return true;
-                        }
-                        return start.get_char ().isspace () || !start.get_char ().isalnum ();
-                    }
+        public int get_priority (GtkSource.CompletionContext context) {
+            var settings = AppSettings.get_default ();
+            string bib_file = find_bibtex_for_sheet (settings.last_file);
+            if (bib_file != "") {
+                BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
+                bib_parser.parse_file ();
+                var cite_labels = bib_parser.get_labels ();
+                if (!cite_labels.is_empty) {
+                    return 0;
                 }
             }
+            return 10;
+        }
 
+        public void display (GtkSource.CompletionContext context, GtkSource.CompletionProposal proposal, GtkSource.CompletionCell cell) {
+            string biblabel = ((BibTexSuggestion) proposal).markup;
+            cell.text = biblabel;
+        }
+
+        public bool key_activates (GtkSource.CompletionContext context, GtkSource.CompletionProposal proposal, uint keyval, Gdk.ModifierType state) {
+            return (keyval == Gdk.Key.Return) || (keyval == Gdk.Key.Tab) || (keyval == Gdk.Key.KP_Enter);
+        }
+
+        public GLib.GenericArray<GtkSource.CompletionProposal>? list_alternates (GtkSource.CompletionContext context, GtkSource.CompletionProposal proposal) {
+            return null;
+        }
+
+        public void activate (GtkSource.CompletionContext context, GtkSource.CompletionProposal proposal) {
+            Gtk.TextIter? start = null, end = null;
+            if (context.get_bounds (out start, out end)) {
+                string bibent = ((BibTexSuggestion) proposal).text;
+                string bib_prefix = start.get_text (end);
+                var buffer = context.get_buffer ();
+                buffer.insert (ref end, bibent.substring (bib_prefix.length), -1);
+            }
+        }
+
+        public bool is_trigger (Gtk.TextIter iter, unichar ch) {
+            var end = iter.copy ();
+            var start = iter.copy ();
+            if (start.backward_char ()) {
+                if (start.get_char () == '@') {
+                    if (!start.backward_char ()) {
+                        return true;
+                    }
+                    return start.get_char ().isspace () || !start.get_char ().isalnum ();
+                }
+                unichar check = start.get_char ();
+                for (int i = 0; i < 10; i++) {
+                    if (check == ' ' || check == '@' || check == '\n' || check == '\t') {
+                        break;
+                    }
+                    if (!start.backward_char ()) {
+                        break;
+                    }
+                }
+
+                if (start.get_char () == '@') {
+                    if (!start.backward_char ()) {
+                        return true;
+                    }
+                    return start.get_char ().isspace () || !start.get_char ().isalnum ();
+                }
+            }
             return false;
         }
 
-        public override void populate (Gtk.SourceCompletionContext context) {
-            List<Gtk.SourceCompletionItem> completions = new List<Gtk.SourceCompletionItem> ();
+        public void refilter (GtkSource.CompletionContext context, GLib.ListModel model) {
             Gtk.TextIter? start = null, end = null;
-            if (context.get_iter (out start) && context.get_iter (out end)) {
-                string prefix = "";
+            if (context.get_bounds (out start, out end) && (end.get_offset () - start.get_offset () >= 2)) {
                 for (int i = 0; i < 10 && start.backward_char (); i++) {
                     unichar check = start.get_char ();
                     if (check == ' ' || check == '@' || check == '\n' || check == '\t') {
                         break;
                     }
                 }
-                start.forward_char ();
-                if (start.get_offset () < end.get_offset ()) {
-                    prefix = start.get_text (end);
-                }
+                if (start.get_char () == '@' && start.get_offset () < end.get_offset ()) {
+                    start.forward_char ();
+                    string prefix = start.get_text (end);
 
-                var settings = AppSettings.get_default ();
-                string bib_file = find_bibtex_for_sheet (settings.last_file);
-                if (bib_file != "") {
-                    BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
-                    bib_parser.parse_file ();
-                    var cite_labels = bib_parser.get_labels ();
-                    if (!cite_labels.is_empty) {
-                        foreach (var citation in cite_labels) {
-                            if (citation.down ().has_prefix (prefix.down ()) && citation.down () != prefix.down ()) {
-                                var com_item = new Gtk.SourceCompletionItem ();
-                                string title = bib_parser.get_title (citation);
-                                if (title.length > Constants.CITATION_TITLE_MAX_LEN) {
-                                    title = title.substring (0, Constants.CITATION_TITLE_MAX_LEN - 3) + "...";
+                    var settings = AppSettings.get_default ();
+                    string bib_file = find_bibtex_for_sheet (settings.last_file);
+                    if (bib_file != "") {
+                        BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
+                        bib_parser.parse_file ();
+                        var cite_labels = bib_parser.get_labels ();
+                        if (!cite_labels.is_empty) {
+                            var completions = ((ListStore) model);
+                            completions.remove_all ();
+                            foreach (var citation in cite_labels) {
+                                if (citation.down ().has_prefix (prefix.down ()) && citation.down () != prefix.down ()) {
+                                    string title = bib_parser.get_title (citation);
+                                    if (title.length > Constants.CITATION_TITLE_MAX_LEN) {
+                                        title = title.substring (0, Constants.CITATION_TITLE_MAX_LEN - 3) + "...";
+                                    }
+                                    var com_item = new BibTexSuggestion (title, citation);
+                                    completions.append (com_item);
                                 }
-                                com_item.text = citation;
-                                com_item.label = citation + ": " + title;
-                                com_item.info = bib_parser.get_title (citation);
-                                com_item.markup = "<b>" + citation + "</b>: <i>" + title + "</i>";
-                                completions.append (com_item);
                             }
                         }
                     }
                 }
             }
-            context.add_proposals (this, completions, true);
         }
 
-        public override bool activate_proposal (Gtk.SourceCompletionProposal proposal, Gtk.TextIter iter) {
-            return false;
+        public async GLib.ListModel populate_async (GtkSource.CompletionContext context, GLib.Cancellable? cancellable) {
+            ListStore completions = new ListStore (typeof (GtkSource.CompletionProposal));
+            Gtk.TextIter? start = null, end = null;
+            if (context.get_bounds (out start, out end))
+            {
+                for (int i = 0; i < 10 && start.backward_char (); i++) {
+                    unichar check = start.get_char ();
+                    if (check == ' ' || check == '@' || check == '\n' || check == '\t') {
+                        break;
+                    }
+                }
+                if (start.get_char () == '@' && start.get_offset () < end.get_offset ()) {
+                    start.forward_char ();
+                    string prefix = start.get_text (end);
+
+                    var settings = AppSettings.get_default ();
+                    string bib_file = find_bibtex_for_sheet (settings.last_file);
+                    if (bib_file != "") {
+                        BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
+                        bib_parser.parse_file ();
+                        var cite_labels = bib_parser.get_labels ();
+                        if (!cite_labels.is_empty) {
+                            foreach (var citation in cite_labels) {
+                                if (citation.down ().has_prefix (prefix.down ()) && citation.down () != prefix.down ()) {
+                                    string title = bib_parser.get_title (citation);
+                                    if (title.length > Constants.CITATION_TITLE_MAX_LEN) {
+                                        title = title.substring (0, Constants.CITATION_TITLE_MAX_LEN - 3) + "...";
+                                    }
+                                    var com_item = new BibTexSuggestion (title, citation);
+                                    completions.append (com_item);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return completions;
         }
     }
 
     public class MarkdownEnrichment : Object {
         private BibTexCompletionProvider citation_suggester = null;
-        private Gtk.SourceCompletionWords source_completion;
-        private unowned Gtk.SourceView view;
+        private GtkSource.CompletionWords source_completion;
+        private unowned GtkSource.View view;
         private unowned Gtk.TextBuffer buffer;
         private Mutex checking;
         private bool markup_inserted_around_selection;
         private bool cursor_at_interesting_location = false;
         public bool active_selection = false;
+        private Gtk.EventControllerKey key_handler = null;
 
         private Gtk.TextTag[] heading_text;
         public Gtk.TextTag code_block;
@@ -623,8 +696,7 @@ namespace ThiefMD.Enrichments {
             checking.unlock ();
         }
 
-        private bool on_keypress (Gdk.EventKey key) {
-            uint keycode = key.hardware_keycode;
+        private bool on_keypress (uint keyval, uint keycode, Gdk.ModifierType key) {
             bool skip_request = false;
 
             if (is_list == null || is_partial_list == null || numerical_list == null) {
@@ -849,7 +921,7 @@ namespace ThiefMD.Enrichments {
             }
         }
 
-        public bool attach (Gtk.SourceView textview) {
+        public bool attach (GtkSource.View textview) {
             if (textview == null) {
                 return false;
             }
@@ -863,9 +935,11 @@ namespace ThiefMD.Enrichments {
             }
 
             var settings = AppSettings.get_default ();
+            key_handler = new Gtk.EventControllerKey ();
 
             view.destroy.connect (detach);
-            view.key_press_event.connect (on_keypress);
+            view.add_controller (key_handler);
+            key_handler.key_pressed.connect (this.on_keypress);
 
             heading_text = new Gtk.TextTag[6];
             for (int h = 0; h < 6; h++) {
@@ -923,7 +997,7 @@ namespace ThiefMD.Enrichments {
                     citation_suggester = new BibTexCompletionProvider ();
                     var completion = view.get_completion ();
                     completion.add_provider (citation_suggester);
-                    source_completion = new Gtk.SourceCompletionWords ("Citation Suggestor", null);
+                    source_completion = new GtkSource.CompletionWords ("Citation Suggestor");
                     source_completion.register (buffer);
                 } catch (Error e) {
                     warning ("Could not add suggestions: %s", e.message);
@@ -1060,7 +1134,9 @@ namespace ThiefMD.Enrichments {
                 citation_suggester = null;
             }
 
-            view.key_press_event.disconnect (on_keypress);
+
+            view.remove_controller (key_handler);
+            key_handler.key_pressed.disconnect (this.on_keypress);
             settings.changed.disconnect (settings_updated);
             buffer.notify["cursor-position"].disconnect (cursor_update_heading_margins);
             view = null;

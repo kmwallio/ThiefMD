@@ -85,7 +85,7 @@ namespace ThiefMD.Controllers.UI {
     //
     // Themeing and Styling of the App
     //
-    private Gtk.SourceStyleSchemeManager thief_schemes;
+    private GtkSource.StyleSchemeManager thief_schemes;
     public List<Ultheme.Parser> user_themes;
     private Thread<bool> theme_worker_thread;
 
@@ -323,9 +323,9 @@ namespace ThiefMD.Controllers.UI {
         }
     }
 
-    public Gtk.SourceStyleSchemeManager UserSchemes () {
+    public GtkSource.StyleSchemeManager UserSchemes () {
         if (thief_schemes == null) {
-            thief_schemes = new Gtk.SourceStyleSchemeManager ();
+            thief_schemes = new GtkSource.StyleSchemeManager ();
         }
 
         return thief_schemes;
@@ -461,11 +461,11 @@ namespace ThiefMD.Controllers.UI {
     //
     // ThiefMD Custom GtkSourceView Languages
     //
-    private Gtk.SourceLanguageManager thief_languages;
+    private GtkSource.LanguageManager thief_languages;
 
-    public Gtk.SourceLanguageManager get_language_manager () {
+    public GtkSource.LanguageManager get_language_manager () {
         if (thief_languages == null) {
-            thief_languages = new Gtk.SourceLanguageManager ();
+            thief_languages = new GtkSource.LanguageManager ();
             string custom_languages = Path.build_path (
                 Path.DIR_SEPARATOR_S,
                 Build.PKGDATADIR,
@@ -479,16 +479,16 @@ namespace ThiefMD.Controllers.UI {
             var markdown = thief_languages.get_language ("markdown");
             if (markdown == null) {
                 warning ("Could not load custom languages");
-                thief_languages = Gtk.SourceLanguageManager.get_default ();
+                thief_languages = GtkSource.LanguageManager.get_default ();
             }
         }
 
         return thief_languages;
     }
 
-    public Gtk.SourceLanguage get_source_language (string filename = "something.md") {
+    public GtkSource.Language get_source_language (string filename = "something.md") {
         var languages = get_language_manager ();
-        Gtk.SourceLanguage? language = null;
+        GtkSource.Language? language = null;
         string file_name = filename.down ();
 
         if (file_name.has_suffix (".bib") || file_name.has_suffix (".bibtex")) {

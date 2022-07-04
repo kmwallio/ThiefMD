@@ -22,14 +22,14 @@ using Gdk;
 using ThiefMD.Enrichments;
 
 namespace ThiefMD.Widgets {
-    public class Editor : Gtk.SourceView {
+    public class Editor : GtkSource.View {
 
         //
         // Things related to the file of this instance
         //
 
         private File file;
-        public new Gtk.SourceBuffer buffer;
+        public new GtkSource.Buffer buffer;
         private string opened_filename;
         public string preview_markdown = "";
         private bool active = true;
@@ -113,7 +113,7 @@ namespace ThiefMD.Widgets {
         construct {
             var settings = AppSettings.get_default ();
 
-            buffer = new Gtk.SourceBuffer.with_language (UI.get_source_language ());
+            buffer = new GtkSource.Buffer.with_language (UI.get_source_language ());
             buffer.highlight_syntax = true;
             buffer.set_max_undo_levels (Constants.MAX_UNDO_LEVELS);
 
@@ -1134,7 +1134,7 @@ namespace ThiefMD.Widgets {
         public void set_scheme (string id) {
             if (id == "thiefmd") {
                 // Reset application CSS to coded
-                var style_manager = Gtk.SourceStyleSchemeManager.get_default ();
+                var style_manager = GtkSource.StyleSchemeManager.get_default ();
                 var style = style_manager.get_scheme (id);
                 buffer.set_style_scheme (style);
             } else {

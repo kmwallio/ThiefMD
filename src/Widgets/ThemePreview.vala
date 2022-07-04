@@ -78,8 +78,8 @@ namespace ThiefMD.Widgets {
 
     public class ThemePreview : Gtk.ToggleButton {
         private Ultheme.Parser theme;
-        private Gtk.SourceView view;
-        private Gtk.SourceBuffer buffer;
+        private GtkSource.View view;
+        private GtkSource.Buffer buffer;
         private bool am_dark;
         private Ultheme.HexColorPalette palette;
 
@@ -89,9 +89,9 @@ namespace ThiefMD.Widgets {
             am_dark = is_dark;
 
             margin = 0;
-            view = new Gtk.SourceView ();
+            view = new GtkSource.View ();
             view.margin = 0;
-            buffer = new Gtk.SourceBuffer.with_language (UI.get_source_language ());
+            buffer = new GtkSource.Buffer.with_language (UI.get_source_language ());
             buffer.highlight_syntax = true;
             view.editable = false;
             view.set_buffer (buffer);

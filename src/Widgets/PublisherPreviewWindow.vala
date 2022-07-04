@@ -23,8 +23,8 @@ using ThiefMD.Controllers;
 using ThiefMD.Exporters;
 
 namespace ThiefMD.Widgets {
-    public class PublisherPreviewWindow : Hdy.Window {
-        public Hdy.HeaderBar headerbar;
+    public class PublisherPreviewWindow : Adw.Window {
+        public Adw.HeaderBar headerbar;
         public Preview preview;
         private Gtk.Box advanced_options;
         public Gtk.Paned options_pane;
@@ -63,7 +63,7 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             int w, h;
 
-            headerbar = new Hdy.HeaderBar ();
+            headerbar = new Adw.HeaderBar ();
             headerbar.set_title (_("Publishing Preview"));
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);

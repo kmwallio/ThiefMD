@@ -32,8 +32,8 @@ namespace ThiefMD.Controllers.SheetManager {
     private Widgets.Editor _welcome_screen;
     private bool show_welcome = false;
     private SheetPair _search_sheet = null;
-    private Gtk.SourceSearchContext _search_context;
-    private Gtk.SourceSearchSettings _search_settings;
+    private GtkSource.SearchContext _search_context;
+    private GtkSource.SearchSettings _search_settings;
     private Gtk.TextIter? _last_search;
     private bool _search_buffer_changed;
 
@@ -100,7 +100,7 @@ namespace ThiefMD.Controllers.SheetManager {
         }
 
         if (_search_settings == null) {
-            _search_settings = new Gtk.SourceSearchSettings ();
+            _search_settings = new GtkSource.SearchSettings ();
             _search_settings.case_sensitive = false;
             _search_settings.wrap_around = true;
         }
@@ -109,7 +109,7 @@ namespace ThiefMD.Controllers.SheetManager {
         _search_settings.search_text = text;
 
         _search_sheet = _currentSheet;
-        _search_context = new Gtk.SourceSearchContext (_search_sheet.editor.buffer, _search_settings);
+        _search_context = new GtkSource.SearchContext (_search_sheet.editor.buffer, _search_settings);
         _search_context.set_highlight (true);
 
         ThiefApp.get_instance ().search_bar.set_match_count (_search_sheet.editor.get_buffer_text ().down ().split (text.down ()).length - 1);

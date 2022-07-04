@@ -24,7 +24,7 @@ using Gdk;
 using ThiefMD.Connections;
 
 namespace ThiefMD.Widgets {
-    public class Preferences : Hdy.PreferencesWindow {
+    public class Preferences : Adw.PreferencesWindow {
         public Preferences () {
             build_ui ();
         }
@@ -39,18 +39,18 @@ namespace ThiefMD.Widgets {
             show_all ();
         }
 
-        private Hdy.PreferencesPage connection_grid () {
-            var page = new Hdy.PreferencesPage ();
+        private Adw.PreferencesPage connection_grid () {
+            var page = new Adw.PreferencesPage ();
             var connection_scroller = new ScrolledWindow (null, null);
             connection_scroller.hexpand = true;
             connection_scroller.vexpand = true;
             connection_scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
 
-            Hdy.PreferencesGroup display_options = new Hdy.PreferencesGroup ();
+            Adw.PreferencesGroup display_options = new Adw.PreferencesGroup ();
             display_options.title = _("Current Connections");
             display_options.description = _("Click on a connection to remove.");
 
-            Hdy.PreferencesGroup connection_options = new Hdy.PreferencesGroup ();
+            Adw.PreferencesGroup connection_options = new Adw.PreferencesGroup ();
             connection_options.title = _("Add Connection");
             connection_options.description = _("Choose your blogging software.");
 
@@ -280,7 +280,7 @@ namespace ThiefMD.Widgets {
             return page;
         }
 
-        private Gtk.Button connection_button (ConnectionBase connection, Hdy.PreferencesGroup grid) {
+        private Gtk.Button connection_button (ConnectionBase connection, Adw.PreferencesGroup grid) {
             Gtk.Button button = new Gtk.Button.with_label ("  " + connection.export_name);
             string type = "";
             string alias = "";
@@ -367,13 +367,13 @@ namespace ThiefMD.Widgets {
             return button;
         }
 
-        private Hdy.PreferencesPage display_grid () {
+        private Adw.PreferencesPage display_grid () {
             var settings = AppSettings.get_default ();
-            Hdy.PreferencesPage page = new Hdy.PreferencesPage ();
+            Adw.PreferencesPage page = new Adw.PreferencesPage ();
             page.set_title (_("Display"));
             page.set_icon_name ("preferences-desktop-display-symbolic");
 
-            Hdy.PreferencesGroup display_options = new Hdy.PreferencesGroup ();
+            Adw.PreferencesGroup display_options = new Adw.PreferencesGroup ();
             display_options.title = _("Display Options");
             display_options.description = _("Make ThiefMD feel like home.");
 
@@ -477,13 +477,13 @@ namespace ThiefMD.Widgets {
             return page;
         }
 
-        private Hdy.PreferencesPage export_grid () {
-            Hdy.PreferencesPage page = new Hdy.PreferencesPage ();
+        private Adw.PreferencesPage export_grid () {
+            Adw.PreferencesPage page = new Adw.PreferencesPage ();
             page.set_title (_("Export"));
             page.set_icon_name ("preferences-system-devices-symbolic");
             var settings = AppSettings.get_default ();
 
-            Hdy.PreferencesGroup editor_options = new Hdy.PreferencesGroup ();
+            Adw.PreferencesGroup editor_options = new Adw.PreferencesGroup ();
             editor_options.title = _("Compiling Options");
             editor_options.description = _("Adjust how Markdown files are compiled together.");
 
@@ -539,7 +539,7 @@ namespace ThiefMD.Widgets {
             export_include_yaml.add (export_include_yaml_title_label);
             editor_options.add (export_include_yaml);
 
-            Hdy.PreferencesGroup page_setup = new Hdy.PreferencesGroup ();
+            Adw.PreferencesGroup page_setup = new Adw.PreferencesGroup ();
             page_setup.title = _("Page Setup");
             page_setup.description = _("Configure PDF export options.");
 
@@ -637,7 +637,7 @@ namespace ThiefMD.Widgets {
             top_bottom_margin.add (top_bottom_margin_label);
             page_setup.add (top_bottom_margin);
 
-            Hdy.PreferencesGroup pdf_options = new Hdy.PreferencesGroup ();
+            Adw.PreferencesGroup pdf_options = new Adw.PreferencesGroup ();
             pdf_options.title = _("PDF CSS");
             pdf_options.description = _("Choose CSS Style for PDF Export.");
             int cur_w = this.get_allocated_width ();
@@ -646,7 +646,7 @@ namespace ThiefMD.Widgets {
             print_css_selector.set_size_request (cur_w, (int)(1.2 * Constants.CSS_PREVIEW_HEIGHT + 5));
             pdf_options.add (print_css_selector);
 
-            Hdy.PreferencesGroup epub_setup = new Hdy.PreferencesGroup ();
+            Adw.PreferencesGroup epub_setup = new Adw.PreferencesGroup ();
             epub_setup.title = _("ePub & HTML CSS");
             epub_setup.description = _("Choose CSS Style to use for ePub and HTML Export.");
 
@@ -674,13 +674,13 @@ namespace ThiefMD.Widgets {
             return page;
         }
 
-        private Hdy.PreferencesPage editor_grid () {
+        private Adw.PreferencesPage editor_grid () {
             var settings = AppSettings.get_default ();
-            Hdy.PreferencesPage page = new Hdy.PreferencesPage ();
+            Adw.PreferencesPage page = new Adw.PreferencesPage ();
             page.set_title (_("Editor"));
             page.set_icon_name ("thiefmd-symbolic");
 
-            Hdy.PreferencesGroup editor_options = new Hdy.PreferencesGroup ();
+            Adw.PreferencesGroup editor_options = new Adw.PreferencesGroup ();
             editor_options.title = _("Editor Settings");
             editor_options.description = _("Modify the ThiefMD environment.");
 
@@ -775,7 +775,7 @@ namespace ThiefMD.Widgets {
             // More UI-ish options
             //
 
-            Hdy.PreferencesGroup thiefmd_options = new Hdy.PreferencesGroup ();
+            Adw.PreferencesGroup thiefmd_options = new Adw.PreferencesGroup ();
             thiefmd_options.title = _("ThiefMD Settings");
             thiefmd_options.description = _("Modify the ThiefMD appearance.");
 

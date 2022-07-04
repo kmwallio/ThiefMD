@@ -22,7 +22,7 @@ using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
     public class Headerbar : Gtk.Revealer {
-        private Hdy.HeaderBar the_bar;
+        private Adw.HeaderBar the_bar;
         private ThiefApp _instance;
         private Gtk.Button change_view_button;
         private Gtk.Button add_library_button;
@@ -33,7 +33,7 @@ namespace ThiefMD.Widgets {
         private Gtk.Label spacer;
 
         public Headerbar (ThiefApp instance) {
-            the_bar = new Hdy.HeaderBar ();
+            the_bar = new Adw.HeaderBar ();
             _instance = instance;
             var header_context = the_bar.get_style_context ();
             header_context.add_class ("thief-toolbar");

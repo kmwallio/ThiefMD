@@ -506,7 +506,7 @@ namespace ThiefMD.Enrichments {
             last_cursor = -1; // reset to scan whole document on attach
 
             GLib.Idle.add (update_buffer);
-            Hdy.ApplicationWindow? instance = (Hdy.ApplicationWindow?)ThiefApp.get_instance ();
+            Adw.ApplicationWindow? instance = (Adw.ApplicationWindow?)ThiefApp.get_instance ();
             instance.destroy.connect (detach);
 
             return true;
@@ -534,7 +534,7 @@ namespace ThiefMD.Enrichments {
                 processor_running = false;
             }
 
-            Hdy.ApplicationWindow? instance = (Hdy.ApplicationWindow?)ThiefApp.get_instance ();
+            Adw.ApplicationWindow? instance = (Adw.ApplicationWindow?)ThiefApp.get_instance ();
             if (instance != null) {
                 instance.destroy.connect (detach);
             }

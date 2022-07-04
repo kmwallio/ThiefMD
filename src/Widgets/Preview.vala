@@ -20,12 +20,17 @@
 *
 */
 
+#if HAVE_WEBKIT
 using WebKit;
+#endif
 using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class Preview : WebKit.WebView {
+#if HAVE_WEBKIT
+#else
+    public class Preview : Gtk.Widget {
+#endif
         private static Preview? instance = null;
         public string html;
         public bool exporting = false;
@@ -33,16 +38,20 @@ namespace ThiefMD.Widgets {
         public string? override_css = null;
 
         public Preview () {
+#if HAVE_WEBKIT
             Object(user_content_manager: new UserContentManager());
+#endif
             visible = true;
             vexpand = true;
             hexpand = true;
+#if HAVE_WEBKIT
             var settingsweb = get_settings();
             settingsweb.enable_plugins = false;
             settingsweb.enable_page_cache = false;
             settingsweb.enable_developer_extras = false;
             settingsweb.javascript_can_open_windows_automatically = false;
             connect_signals ();
+#endif
         }
 
         public static Preview get_instance () {
@@ -54,6 +63,7 @@ namespace ThiefMD.Widgets {
             return instance;
         }
 
+#if HAVE_WEBKIT
         protected override bool context_menu (
             ContextMenu context_menu,
             Gdk.Event event,
@@ -61,6 +71,7 @@ namespace ThiefMD.Widgets {
         ) {
             return true;
         }
+#endif
 
         private string set_stylesheet (bool render_fountain = false) {
             var settings = AppSettings.get_default ();
@@ -194,6 +205,7 @@ namespace ThiefMD.Widgets {
             return style;
         }
 
+#if HAVE_WEBKIT
         private void connect_signals () {
             create.connect ((navigation_action) => {
                 launch_browser (navigation_action.get_request().get_uri ());
@@ -288,6 +300,7 @@ namespace ThiefMD.Widgets {
                 stop_loading ();
             }
         }
+#endif
 
         private bool get_preview_markdown (string raw_mk, out string processed_mk) {
             var settings = AppSettings.get_default ();
@@ -468,7 +481,9 @@ namespace ThiefMD.Widgets {
                 </html>""".printf(stylesheet, headerscript, markdown_res.replace ("`", "\\`"), script);
             }
             adjust_thief_mark (use_thief_mark);
+#if HAVE_WEBKIT
             this.load_html (html, "file:///");
+#endif
         }
 
         private void adjust_thief_mark (bool use_thief_mark) {

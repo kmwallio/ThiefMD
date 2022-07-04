@@ -4,6 +4,7 @@
 [submodule "src/writegood"]
 	path = src/writegood
 	url = https://github.com/ThiefMD/libwritegood-vala
+	branch = gtk4
 [submodule "src/ultheme"]
 	path = src/ultheme
 	url = https://github.com/TwiRp/ultheme-vala

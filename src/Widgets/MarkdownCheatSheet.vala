@@ -21,8 +21,8 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class MarkdownCheatSheet : Hdy.Window {
-        Hdy.HeaderBar headerbar;
+    public class MarkdownCheatSheet : Adw.Window {
+        Adw.HeaderBar headerbar;
 
         public MarkdownCheatSheet () {
             build_ui ();
@@ -30,7 +30,7 @@ namespace ThiefMD.Widgets {
 
         private void build_ui () {
             Gtk.Box vbox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            headerbar = new Hdy.HeaderBar ();
+            headerbar = new Adw.HeaderBar ();
             headerbar.set_title ("Cheat Sheet");
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);

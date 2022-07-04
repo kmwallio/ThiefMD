@@ -370,7 +370,7 @@ namespace ThiefMD.Widgets {
     }
 
     public class SearchWidget : Gtk.Box {
-        Hdy.SearchBar headerbar;
+        Gtk.SearchBar headerbar;
         public SearchBase searcher;
         string scoped_folder;
 
@@ -382,7 +382,7 @@ namespace ThiefMD.Widgets {
         }
 
         private void build_ui () {
-            headerbar = new Hdy.SearchBar ();
+            headerbar = new Gtk.SearchBar ();
             headerbar.connect_entry (searcher.search);
             headerbar.set_show_close_button (false);
             headerbar.search_mode_enabled = true;
@@ -401,8 +401,8 @@ namespace ThiefMD.Widgets {
         }
     }
 
-    public class SearchWindow : Hdy.Window {
-        Hdy.HeaderBar headerbar;
+    public class SearchWindow : Adw.Window {
+        Adw.HeaderBar headerbar;
         SearchBase searcher;
         string scoped_folder;
 
@@ -414,7 +414,7 @@ namespace ThiefMD.Widgets {
 
         private void build_ui () {
             var settings = AppSettings.get_default ();
-            headerbar = new Hdy.HeaderBar ();
+            headerbar = new Adw.HeaderBar ();
             if (scoped_folder == null || scoped_folder.chomp ().chug () == "") {
                 headerbar.set_title (_("Library Search"));
             } else {

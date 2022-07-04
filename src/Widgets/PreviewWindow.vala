@@ -17,15 +17,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using WebKit;
 using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class PreviewWindow : Hdy.Window {
-        private Hdy.HeaderBar toolbar;
+    public class PreviewWindow : Adw.Window {
+        private Adw.HeaderBar toolbar;
         private static PreviewWindow? instance = null;
         private Preview html_view;
+        private Gtk.Box vbox;
 
         public PreviewWindow () {
             var settings = AppSettings.get_default ();
@@ -46,7 +46,7 @@ namespace ThiefMD.Widgets {
                 } else {
                     instance.title = "Preview";
                 }
-                instance.toolbar.title = instance.title;
+                instance.toolbar.set_title_widget (new Gtk.Label (instance.title));
             }
         }
 
@@ -69,7 +69,7 @@ namespace ThiefMD.Widgets {
         protected void build_ui () {
             var settings = AppSettings.get_default ();
             int w, h;
-            toolbar = new Hdy.HeaderBar ();
+            toolbar = new Adw.HeaderBar ();
 
             if (settings.show_filename && settings.last_file != "") {
                 string file_name = settings.last_file.substring(settings.last_file.last_index_of (Path.DIR_SEPARATOR_S) + 1);
@@ -77,31 +77,30 @@ namespace ThiefMD.Widgets {
             } else {
                 title = "Preview";
             }
-            toolbar.title = title;
+            toolbar.set_title_widget (new Gtk.Label(title));
 
-            Gtk.Box vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
-            toolbar.set_show_close_button (true);
-            vbox.add (toolbar);
+            vbox.append (toolbar);
             html_view = new Preview();
-            vbox.add (html_view);
-            vbox.show_all ();
-            add (vbox);
+            vbox.append (html_view);
+            vbox.show ();
+            set_content (vbox);
 
-            delete_event.connect (this.hide_on_delete);
             settings.changed.connect (update_preview_title);
 
             UI.update_preview ();
-            ThiefApp.get_instance ().get_size (out w, out h);
-            set_default_size(w, h);
-            show_all ();
+            w = ThiefApp.get_instance ().get_size (Gtk.Orientation.HORIZONTAL);
+            h = ThiefApp.get_instance ().get_size (Gtk.Orientation.VERTICAL);
+            set_size_request (w, h);
+            show ();
             update ();
         }
 
         public bool on_delete_event () {
             var settings = AppSettings.get_default ();
             settings.changed.disconnect (update);
-            remove (html_view);
+            vbox.remove (html_view);
             instance = null;
             html_view = null;
             return false;
