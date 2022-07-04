@@ -70,10 +70,9 @@ namespace ThiefMD.Widgets {
             _label.use_markup = true;
             _label.set_ellipsize (Pango.EllipsizeMode.END);
             _label.xalign = 0;
-            add (_label);
+            set_child (_label);
 
             var header_context = this.get_style_context ();
-            header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-list-sheet");
 
             clicked.connect (() => {
@@ -110,7 +109,7 @@ namespace ThiefMD.Widgets {
 
             // Load minimark if file has content
             redraw ();
-            show_all ();
+            show ();
 
             // Load file ordering information
             metadata = null;
@@ -205,114 +204,109 @@ namespace ThiefMD.Widgets {
         // Click Menu Options
         //
 
-        public override bool button_press_event(Gdk.EventButton event) {
-            base.button_press_event (event);
+        public void button_press_event(int n_press, double x, double y) {
+            GLib.Menu menu = new GLib.Menu ();
 
-            if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3) {
-                Gtk.Menu menu = new Gtk.Menu ();
-                menu.attach_to_widget (this, null);
-
-                Gtk.MenuItem sort_sheets = new Gtk.MenuItem.with_label (_("Sort by"));
-                Gtk.Menu sort_menu = new Gtk.Menu ();
-                {
-                    Gtk.MenuItem sort_sheets_by_name = new Gtk.MenuItem.with_label (_("Sort by Filename Ascending"));
-                    sort_menu.add (sort_sheets_by_name);
-                    sort_sheets_by_name.activate.connect (() => {
-                        _parent.sort_sheets_by_name ();
-                    });
-
-                    Gtk.MenuItem sort_sheets_by_name_desc = new Gtk.MenuItem.with_label (_("Sort by Filename Descending"));
-                    sort_menu.add (sort_sheets_by_name_desc);
-                    sort_sheets_by_name_desc.activate.connect (() => {
-                        _parent.sort_sheets_by_name (false);
-                    });
-
-                    sort_menu.add (new Gtk.SeparatorMenuItem ());
-                    Gtk.MenuItem sort_sheets_by_title = new Gtk.MenuItem.with_label (_("Sort by Title Ascending"));
-                    sort_menu.add (sort_sheets_by_title);
-                    sort_sheets_by_title.activate.connect (() => {
-                        _parent.sort_sheets_by_title ();
-                    });
-
-                    Gtk.MenuItem sort_sheets_by_title_desc = new Gtk.MenuItem.with_label (_("Sort by Title Descending"));
-                    sort_menu.add (sort_sheets_by_title_desc);
-                    sort_sheets_by_title_desc.activate.connect (() => {
-                        _parent.sort_sheets_by_title (false);
-                    });
-
-                    sort_menu.add (new Gtk.SeparatorMenuItem ());
-                    Gtk.MenuItem sort_sheets_by_date = new Gtk.MenuItem.with_label (_("Sort by Date Ascending"));
-                    sort_menu.add (sort_sheets_by_date);
-                    sort_sheets_by_date.activate.connect (() => {
-                        _parent.sort_sheets_by_date ();
-                    });
-
-                    Gtk.MenuItem sort_sheets_by_date_desc = new Gtk.MenuItem.with_label (_("Sort by Date Descending"));
-                    sort_menu.add (sort_sheets_by_date_desc);
-                    sort_sheets_by_date_desc.activate.connect (() => {
-                        _parent.sort_sheets_by_date (false);
-                    });
-                }
-                sort_sheets.submenu = sort_menu;
-                menu.add (sort_sheets);
-
-                menu.add (new Gtk.SeparatorMenuItem ());
-
-                Gtk.MenuItem menu_preview_sheet = new Gtk.MenuItem.with_label (_("Preview"));
-                menu.add (menu_preview_sheet);
-                menu_preview_sheet.activate.connect (() => {
-                    this.clicked ();
-                    PreviewWindow pvw = PreviewWindow.get_instance ();
-                    pvw.show_all ();
+            GLib.Menu sort_menu = new GLib.Menu ();
+            {
+                
+                GLib.MenuItem sort_sheets_by_name = new GLib.MenuItem (_("Sort by Filename Ascending"));
+                sort_menu.add (sort_sheets_by_name);
+                sort_sheets_by_name.activate.connect (() => {
+                    _parent.sort_sheets_by_name ();
                 });
 
-                Gtk.MenuItem menu_export_sheet = new Gtk.MenuItem.with_label (_("Export"));
-                menu.add (menu_export_sheet);
-                menu_export_sheet.activate.connect (() => {
-                    string preview_markdown = FileManager.get_file_contents (_sheet_path);
-                    PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown, is_fountain (_sheet_path));
-                    ppw.show ();
+                GLib.MenuItem sort_sheets_by_name_desc = new GLib.MenuItem.with_label (_("Sort by Filename Descending"));
+                sort_menu.add (sort_sheets_by_name_desc);
+                sort_sheets_by_name_desc.activate.connect (() => {
+                    _parent.sort_sheets_by_name (false);
                 });
 
-                Gtk.MenuItem copy_file_path = new Gtk.MenuItem.with_label (_("Copy File Path"));
-                menu.add (copy_file_path);
-                copy_file_path.activate.connect (() => {
-                    string file_path = _sheet_path;
-                    var copy = Gtk.Clipboard.get_default (Gdk.Display.get_default ());
-                    copy.set_text (file_path, file_path.length);
+                sort_menu.add (new Gtk.SeparatorMenuItem ());
+                GLib.MenuItem sort_sheets_by_title = new GLib.MenuItem.with_label (_("Sort by Title Ascending"));
+                sort_menu.add (sort_sheets_by_title);
+                sort_sheets_by_title.activate.connect (() => {
+                    _parent.sort_sheets_by_title ();
                 });
 
-                menu.add (new Gtk.SeparatorMenuItem ());
-
-                //  Gtk.MenuItem menu_rename = new Gtk.MenuItem.with_label (_("Rename File"));
-                //  menu_rename.activate.connect (() => {
-
-                //  });
-                //  menu.add (menu_rename);
-
-                Gtk.MenuItem menu_danger_zone = new Gtk.MenuItem.with_label (_("Danger Zone"));
-                menu_danger_zone.set_sensitive (false);
-                menu.add (menu_danger_zone);
-
-                menu.add (new Gtk.SeparatorMenuItem ());
-
-                Gtk.MenuItem menu_delete_sheet = new Gtk.MenuItem.with_label (_("Move to Trash"));
-                menu_delete_sheet.activate.connect (() => {
-                    debug ("Got remove for sheet %s", _sheet_path);
-                    _parent.remove_sheet (this);
-                    SheetManager.close_active_file (_sheet_path);
-                    FileManager.move_to_trash (_sheet_path);
-                    File metadata_file = File.new_for_path (_notes_path);
-                    if (metadata_file.query_exists ()) {
-                        FileManager.move_to_trash (_notes_path);
-                    }
+                GLib.MenuItem sort_sheets_by_title_desc = new GLib.MenuItem.with_label (_("Sort by Title Descending"));
+                sort_menu.add (sort_sheets_by_title_desc);
+                sort_sheets_by_title_desc.activate.connect (() => {
+                    _parent.sort_sheets_by_title (false);
                 });
-                menu.add (menu_delete_sheet);
-                menu.show_all ();
-                menu.popup_at_pointer (event);
+
+                sort_menu.add (new Gtk.SeparatorMenuItem ());
+                GLib.MenuItem sort_sheets_by_date = new GLib.MenuItem.with_label (_("Sort by Date Ascending"));
+                sort_menu.add (sort_sheets_by_date);
+                sort_sheets_by_date.activate.connect (() => {
+                    _parent.sort_sheets_by_date ();
+                });
+
+                GLib.MenuItem sort_sheets_by_date_desc = new GLib.MenuItem.with_label (_("Sort by Date Descending"));
+                sort_menu.add (sort_sheets_by_date_desc);
+                sort_sheets_by_date_desc.activate.connect (() => {
+                    _parent.sort_sheets_by_date (false);
+                });
             }
+            GLib.MenuItem sort_sheets = new GLib.MenuItem.submenu (_("Sort by"), sort_menu);
 
-            return true;
+            sort_sheets.submenu = sort_menu;
+            menu.add (sort_sheets);
+
+            menu.add (new Gtk.SeparatorMenuItem ());
+
+            GLib.MenuItem menu_preview_sheet = new GLib.MenuItem.with_label (_("Preview"));
+            menu.add (menu_preview_sheet);
+            menu_preview_sheet.activate.connect (() => {
+                this.clicked ();
+                PreviewWindow pvw = PreviewWindow.get_instance ();
+                pvw.show_all ();
+            });
+
+            GLib.MenuItem menu_export_sheet = new GLib.MenuItem.with_label (_("Export"));
+            menu.add (menu_export_sheet);
+            menu_export_sheet.activate.connect (() => {
+                string preview_markdown = FileManager.get_file_contents (_sheet_path);
+                PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown, is_fountain (_sheet_path));
+                ppw.show ();
+            });
+
+            GLib.MenuItem copy_file_path = new GLib.MenuItem.with_label (_("Copy File Path"));
+            menu.add (copy_file_path);
+            copy_file_path.activate.connect (() => {
+                string file_path = _sheet_path;
+                var copy = Gtk.Clipboard.get_default (Gdk.Display.get_default ());
+                copy.set_text (file_path, file_path.length);
+            });
+
+            menu.add (new Gtk.SeparatorMenuItem ());
+
+            //  GLib.MenuItem menu_rename = new GLib.MenuItem.with_label (_("Rename File"));
+            //  menu_rename.activate.connect (() => {
+
+            //  });
+            //  menu.add (menu_rename);
+
+            GLib.MenuItem menu_danger_zone = new GLib.MenuItem.with_label (_("Danger Zone"));
+            menu_danger_zone.set_sensitive (false);
+            menu.add (menu_danger_zone);
+
+            menu.add (new Gtk.SeparatorMenuItem ());
+
+            GLib.MenuItem menu_delete_sheet = new GLib.MenuItem.with_label (_("Move to Trash"));
+            menu_delete_sheet.activate.connect (() => {
+                debug ("Got remove for sheet %s", _sheet_path);
+                _parent.remove_sheet (this);
+                SheetManager.close_active_file (_sheet_path);
+                FileManager.move_to_trash (_sheet_path);
+                File metadata_file = File.new_for_path (_notes_path);
+                if (metadata_file.query_exists ()) {
+                    FileManager.move_to_trash (_notes_path);
+                }
+            });
+            menu.add (menu_delete_sheet);
+            menu.show_all ();
+            menu.popup_at_pointer (event);
         }
 
         //
