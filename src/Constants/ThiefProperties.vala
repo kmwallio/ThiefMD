@@ -273,6 +273,10 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         .thief-search-results *:hover:active {
             background: lighter(@colorPrimary);
             color: @textColorPrimary;
+            border-bottom: 0px solid @textColorPrimary;
+            border-top: 0px solid @textColorPrimary;
+            border-left: 5px solid @textColorPrimary;
+            border-right: 0px;
         }
 
         .thief-search-input:focus {
