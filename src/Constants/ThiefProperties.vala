@@ -203,6 +203,7 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             border-bottom-color: transparent;
             border-bottom-width: 1px;
             background: @colorPrimary;
+            background-image: linear-gradient(lighter(@colorPrimary), @colorPrimary 3%%);
             color: @textColorGlobal;
             box-shadow: 0 1px transparent inset;
         }
@@ -229,6 +230,11 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         .thief-search-matches {
           background: @colorPrimary;
           color: @textColorGlobal;
+        }
+
+        .thiefmd-toolbar:backdrop, .thief-toolbar:backdrop, .thiefmd-toolbar:backdrop button {
+          background-image: linear-gradient(lighter(@colorPrimary), @colorPrimary 50%%);
+          color: mix(@textColorGlobal, @colorPrimary, 0.5);
         }
 
         .thiefmd-toolbar button:active,
