@@ -62,7 +62,6 @@ namespace ThiefMD {
             populate_header ();
 
             preview_display = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-            preview_display.add2 (preview);
             scroller.vexpand = true;
             scroller.hexpand = true;
             editor.vexpand = true;

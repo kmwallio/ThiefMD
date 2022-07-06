@@ -33,3 +33,7 @@ Packages will be in parent directory.
 ## Push Tag
 
 `git push origin v0.0.0-label`
+
+## Running Under Debugger
+
+`G_DEBUG=fatal-criticals gdb --args ./com.github.kmwallio.thiefmd`
