@@ -256,6 +256,18 @@ namespace ThiefMD.Widgets {
                 sort_sheets.submenu = sort_menu;
                 menu.add (sort_sheets);
 
+                /*
+                menu.add (new Gtk.SeparatorMenuItem ());
+
+                Gtk.MenuItem menu_new_window = new Gtk.MenuItem.with_label (_("Open in Separate Window"));
+                menu.add (menu_new_window);
+                menu_new_window.activate.connect (() => {
+                    File target = File.new_for_path (_sheet_path);
+                    ThiefApplication.open_file (target);
+                });
+                menu.add (menu_new_window);
+                */
+
                 menu.add (new Gtk.SeparatorMenuItem ());
 
                 Gtk.MenuItem menu_preview_sheet = new Gtk.MenuItem.with_label (_("Preview"));

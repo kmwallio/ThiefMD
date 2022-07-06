@@ -24,6 +24,7 @@ using ThiefMD.Controllers;
 namespace ThiefMD {
     public class ThiefApp : Hdy.ApplicationWindow {
         private static ThiefApp _instance;
+        private static bool am_hidden = false;
         public Headerbar toolbar;
         public Library library;
         public Hdy.Leaflet main_content;
@@ -56,6 +57,29 @@ namespace ThiefMD {
 
         public static ThiefApp get_instance () {
             return _instance;
+        }
+
+        public static void hide_main_instance () {
+            if (_instance != null) {
+                am_hidden = true;
+                _instance.hide ();
+            }
+        }
+
+        public static void show_main_instance () {
+            if (_instance != null) {
+                am_hidden = false;
+                _instance.show ();
+                _instance.present ();
+            }
+        }
+
+        public static bool main_instance_hidden () {
+            if (_instance != null) {
+                return am_hidden;
+            }
+
+            return false;
         }
 
         public int pane_position {
@@ -335,6 +359,18 @@ namespace ThiefMD {
                     UI.shrink_sheets ();
                     settings.changed ();
                 }
+            });
+
+            delete_event.connect (() => {
+                bool can_close = ThiefApplication.close_window (this);
+                debug ("Can close (%u): %s", ThiefApplication.active_window_count (), can_close ? "Yes" : "No");
+                if (!can_close) {
+                    am_hidden = true;
+                    debug ("Hiding instead of closing");
+                    return hide_on_delete ();
+                }
+                ThiefApplication.exit ();
+                return false;
             });
 
             destroy.connect (() => {

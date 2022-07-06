@@ -30,11 +30,11 @@ namespace ThiefMD.Widgets {
         public Gtk.ToggleButton _writegood_button;
         public Gtk.ToggleButton _grammar_button;
         public Gtk.ToggleButton _typewriter_button;
-        private ThiefApp _instance;
+        private Gtk.Window _instance;
         private bool am_mobile = false;
         private Gtk.Grid menu_grid;
 
-        public QuickPreferences (ThiefApp instance) {
+        public QuickPreferences (Gtk.Window instance) {
             _instance = instance;
             var settings = AppSettings.get_default ();
 
@@ -96,8 +96,13 @@ namespace ThiefMD.Widgets {
             preview_button.has_tooltip = true;
             preview_button.tooltip_text = _("Launch Preview");
             preview_button.clicked.connect (() => {
-                PreviewWindow pvw = PreviewWindow.get_instance ();
-                pvw.show ();
+                if (_instance is ThiefApp) {
+                    PreviewWindow pvw = PreviewWindow.get_instance ();
+                    pvw.show ();
+                } else {
+                    var editor = (SoloEditor)_instance;
+                    editor.toggle_preview ();
+                }
             });
 
             var export_button = new Gtk.ModelButton ();
@@ -105,8 +110,13 @@ namespace ThiefMD.Widgets {
             export_button.has_tooltip = true;
             export_button.tooltip_text = _("Open Export Window");
             export_button.clicked.connect (() => {
-                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
-                ppw.show ();
+                if (_instance is ThiefApp) {
+                    PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
+                    ppw.show ();
+                } else if (_instance is SoloEditor) {
+                    var editor = (SoloEditor)_instance;
+                    editor.export ();
+                }
             });
 
             var search_button = new Gtk.ModelButton ();
@@ -114,7 +124,11 @@ namespace ThiefMD.Widgets {
             search_button.has_tooltip = true;
             search_button.tooltip_text = _("Open Search Window");
             search_button.clicked.connect (() => {
-                UI.show_search ();
+                if (_instance is ThiefApp) {
+                    UI.show_search ();
+                } else if (_instance is SoloEditor) {
+
+                }
             });
 
             var preferences_button = new Gtk.ModelButton ();
@@ -149,10 +163,12 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
-            if (_instance.show_touch_friendly) {
+            if (_instance is ThiefApp && ((ThiefApp)_instance).show_touch_friendly) {
                 menu_grid.add (export_button);
                 menu_grid.add (search_button);
                 am_mobile = true;
+            } else if (_instance is SoloEditor) {
+                menu_grid.add (export_button);
             }
             menu_grid.add (preferences_button);
             menu_grid.add (about_button);
@@ -189,8 +205,13 @@ namespace ThiefMD.Widgets {
             export_button.has_tooltip = true;
             export_button.tooltip_text = _("Open Export Window");
             export_button.clicked.connect (() => {
-                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
-                ppw.show ();
+                if (_instance is ThiefApp) {
+                    PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
+                    ppw.show ();
+                } else if (_instance is SoloEditor) {
+                    var editor = (SoloEditor)_instance;
+                    editor.export ();
+                }
             });
 
             var search_button = new Gtk.ModelButton ();
@@ -259,8 +280,13 @@ namespace ThiefMD.Widgets {
             preview_button.has_tooltip = true;
             preview_button.tooltip_text = _("Launch Preview");
             preview_button.clicked.connect (() => {
-                PreviewWindow pvw = PreviewWindow.get_instance ();
-                pvw.show_all ();
+                if (_instance is ThiefApp) {
+                    PreviewWindow pvw = PreviewWindow.get_instance ();
+                    pvw.show_all ();
+                } else if (_instance is SoloEditor) {
+                    var editor = (SoloEditor)_instance;
+                    editor.toggle_preview ();
+                }
             });
 
             var export_button = new Gtk.ModelButton ();
@@ -268,8 +294,13 @@ namespace ThiefMD.Widgets {
             export_button.has_tooltip = true;
             export_button.tooltip_text = _("Open Export Window");
             export_button.clicked.connect (() => {
-                PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
-                ppw.show ();
+                if (_instance is ThiefApp) {
+                    PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
+                    ppw.show ();
+                } else if (_instance is SoloEditor) {
+                    var editor = (SoloEditor)_instance;
+                    editor.export ();
+                }
             });
 
             var search_button = new Gtk.ModelButton ();
@@ -312,6 +343,9 @@ namespace ThiefMD.Widgets {
             menu_grid.add (_writegood_button);
             menu_grid.add (separator2);
             menu_grid.add (preview_button);
+            if (_instance is SoloEditor) {
+                menu_grid.add (export_button);
+            }
             menu_grid.add (preferences_button);
             menu_grid.add (about_button);
             menu_grid.show_all ();
@@ -326,9 +360,9 @@ namespace ThiefMD.Widgets {
             _grammar_button.set_active (settings.grammar);
             _writegood_button.set_active (settings.writegood);
 
-            if (_instance.show_touch_friendly && !am_mobile) {
+            if (_instance is ThiefApp && ((ThiefApp)_instance).show_touch_friendly && !am_mobile) {
                 build_mobilemenu ();
-            } else if (!_instance.show_touch_friendly && am_mobile) {
+            } else if (_instance is ThiefApp && !((ThiefApp)_instance).show_touch_friendly && am_mobile) {
                 build_desktopmenu ();
             }
         }
