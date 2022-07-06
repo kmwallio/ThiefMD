@@ -581,7 +581,7 @@ namespace ThiefMD.Controllers.UI {
                     toggle_view ();
                 }
             } else {
-                instance.main_content.set_visible_child (SheetManager.get_view ());
+                instance.main_content.set_visible_child (instance.editor_widgets);
             }
         } else {
             settings.view_state = (settings.view_state + 1) % 3;
@@ -632,7 +632,7 @@ namespace ThiefMD.Controllers.UI {
             instance.library_pane.set_visible_child (current);
             instance.library_box.hide ();
             instance.library_pane.width_request = settings.view_sheets_width;
-            instance.main_content.set_visible_child (SheetManager.get_view ());
+            instance.main_content.set_visible_child (instance.editor_widgets);
             instance.library_pane.show ();
         }
         
@@ -653,7 +653,7 @@ namespace ThiefMD.Controllers.UI {
             instance.library_pane.show_all ();
             instance.library_pane.width_request = settings.view_sheets_width + settings.view_library_width;
         }
-        instance.main_content.set_visible_child (SheetManager.get_view ());
+        instance.main_content.set_visible_child (instance.editor_widgets);
     }
 
     // Show just the Editor
