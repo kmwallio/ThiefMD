@@ -21,7 +21,7 @@ namespace ThiefMD {
     public class ThiefProperties : Object {
         public const string NAME = "ThiefMD";
         public const string URL = "https://thiefmd.com";
-        public const string COPYRIGHT = "Copyright © 2020 kmwallio";
+        public const string COPYRIGHT = "Copyright © 2020-2022 kmwallio";
         public const string TAGLINE = _("The Markdown editor worth stealing");
         public const string THIEF_MARK_CONST = "THIEFMDa63471e6ec1b4f35b7ca635f3ca39a85";
         public const string THIEF_MARK = "<span id='thiefmark'></span>";
