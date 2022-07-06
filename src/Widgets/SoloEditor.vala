@@ -23,7 +23,7 @@ using ThiefMD.Controllers;
 
 namespace ThiefMD {
     public class SoloEditor : Hdy.Window {
-        private Editor editor;
+        public Editor editor;
         private Gtk.Box vbox;
         private Preview preview;
         private Gtk.ScrolledWindow scroller;
@@ -77,6 +77,9 @@ namespace ThiefMD {
             editor.buffer.changed.connect (update_preview);
 
             delete_event.connect (this.on_delete_event);
+            size_allocate.connect (() => {
+                editor.dynamic_margins ();
+            });
         }
 
         private void populate_header () {
@@ -127,6 +130,13 @@ namespace ThiefMD {
                 preview = null;
                 vbox.add (scroller);
                 vbox.show_all ();
+            }
+        }
+
+        public void get_editor_size (out int w, out int h) {
+            get_size (out w, out h);
+            if (preview_display.get_child1 () != null) {
+                w = preview_display.get_position ();
             }
         }
 

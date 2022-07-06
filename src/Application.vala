@@ -56,6 +56,19 @@ namespace ThiefMD {
             solo_win.present ();
         }
 
+        public static SoloEditor? get_solo (File file) {
+            foreach (var win in important_windows) {
+                if (win is SoloEditor) {
+                    var w = (SoloEditor)win;
+                    if (w.already_opened (file)) {
+                        return w;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public override void open (File[] files, string hint) {
             // Start library hidden
             if (main_window == null) {
