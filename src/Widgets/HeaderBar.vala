@@ -195,14 +195,16 @@ namespace ThiefMD.Widgets {
                 the_bar.set_subtitle ("");
             }
 
-            if (ThiefApp.get_instance ().main_content.folded) {
-                spacer.hide ();
-            } else {
-                spacer.show ();
-            }
+            if (ThiefApp.get_instance ().ready) {
+                if (ThiefApp.get_instance ().main_content.folded) {
+                    spacer.hide ();
+                } else {
+                    spacer.show ();
+                }
 
-            if (!settings.hide_toolbar) {
-                show_headerbar ();
+                if (!settings.hide_toolbar) {
+                    show_headerbar ();
+                }
             }
         }
     }

@@ -544,7 +544,7 @@ namespace ThiefMD.Controllers.FileManager {
 
             while (valid_frontmatter) {
                 next_newline = buffer.index_of_char('\n', last_newline + 1);
-                if (next_newline == -1 && !((buffer.length > last_newline + 1) && buffer.substring (last_newline + 1).has_prefix("---"))) {
+                if (next_newline == -1 && !((buffer.length > last_newline + 1) && (buffer.substring (last_newline + 1).has_prefix("---") || buffer.substring (last_newline + 1).has_prefix("+++")))) {
                     valid_frontmatter = false;
                     break;
                 }

@@ -131,6 +131,8 @@ executable(
     'src/Widgets/ThemePreview.vala',
     'src/Widgets/Thinking.vala',
     'src/Widgets/MarkdownCheatSheet.vala',
+    'src/Widgets/SoloEditor.vala',
+    'src/Widgets/Welcome.vala',
     'src/ultheme/src/HexColors.vala',
     'src/ultheme/src/Ultheme.vala',
     'src/writegood/src/language.vala',
