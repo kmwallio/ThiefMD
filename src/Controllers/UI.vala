@@ -570,7 +570,7 @@ namespace ThiefMD.Controllers.UI {
             if (settings.view_state == 0) {
                 show_sheets_and_library ();
                 instance.main_content.set_visible_child (instance.library_pane);
-                instance.library_pane.set_visible_child (instance.library_view);
+                instance.library_pane.set_visible_child (instance.library_box);
             } else if (settings.view_state == 1) {
                 show_sheets_and_library ();
                 instance.main_content.set_visible_child (instance.library_pane);
@@ -630,7 +630,7 @@ namespace ThiefMD.Controllers.UI {
             current.show ();
             current.width_request = settings.view_sheets_width;
             instance.library_pane.set_visible_child (current);
-            instance.library_view.hide ();
+            instance.library_box.hide ();
             instance.library_pane.width_request = settings.view_sheets_width;
             instance.main_content.set_visible_child (SheetManager.get_view ());
             instance.library_pane.show ();
@@ -648,8 +648,8 @@ namespace ThiefMD.Controllers.UI {
         if (current != null) {
             current.show ();
             current.width_request = settings.view_sheets_width;
-            instance.library_view.show ();
-            instance.library_view.width_request = settings.view_library_width;
+            instance.library_box.show ();
+            instance.library_box.width_request = settings.view_library_width;
             instance.library_pane.show_all ();
             instance.library_pane.width_request = settings.view_sheets_width + settings.view_library_width;
         }

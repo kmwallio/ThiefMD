@@ -39,6 +39,7 @@ namespace ThiefMD {
         public Gtk.Box main_window_horizon_box;
         public Gtk.Box editor_widgets;
         public Gtk.Box editor_notes_widget;
+        public Gtk.Box library_box;
         public Notes notes_widget;
         public bool show_touch_friendly = true;
         public SearchWidget search_widget;
@@ -175,7 +176,7 @@ namespace ThiefMD {
             main_content.set_homogeneous (true, Gtk.Orientation.HORIZONTAL, false);
             main_content.set_orientation (Gtk.Orientation.HORIZONTAL);
 
-            var library_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            library_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             var library_header = new Hdy.HeaderBar ();
             library_header.set_title ("");
             library_header.pack_start (new Gtk.Label (_("Library")));
@@ -211,6 +212,7 @@ namespace ThiefMD {
             editor_notes_widget = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 
             library_view.add (library);
+            library_box.width_request = settings.view_library_width;
             library_view.width_request = settings.view_library_width;
             stats_bar = new StatisticsBar ();
             start_sheet = library.get_sheets (start_dir);
