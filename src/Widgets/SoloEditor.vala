@@ -53,6 +53,9 @@ namespace ThiefMD {
             }
             title += file.get_basename ();
             headerbar.set_title (title);
+            if (settings.show_filename) {
+                headerbar.set_subtitle (file.get_parent ().get_path ());
+            }
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-toolbar");
