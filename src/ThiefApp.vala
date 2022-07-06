@@ -36,7 +36,9 @@ namespace ThiefMD {
         public Gee.ConcurrentList<Connections.ConnectionBase> connections;
         public bool ready = false;
         public Gtk.Revealer notes;
-        public Gtk.Box editor_notes_pane;
+        public Gtk.Box main_window_horizon_box;
+        public Gtk.Box editor_widgets;
+        public Gtk.Box editor_notes_widget;
         public Notes notes_widget;
         public bool show_touch_friendly = true;
         public SearchWidget search_widget;
@@ -164,7 +166,7 @@ namespace ThiefMD {
             library_pane.set_orientation (Gtk.Orientation.HORIZONTAL);
             library_view = new Gtk.ScrolledWindow (null, null);
             library_view.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
-            editor_notes_pane = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            main_window_horizon_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             notes = new Gtk.Revealer ();
             notes.set_transition_type (Gtk.RevealerTransitionType.SLIDE_LEFT);
             notes.set_reveal_child (false);
@@ -201,15 +203,18 @@ namespace ThiefMD {
             library_header_context.add_class ("thief-library-header");
 
             library_box.add (library_header);
-            library_box.add (library);
+            library_box.add (library_view);
             library.vexpand = true;
             library.hexpand = true;
 
-            library_view.add (library_box);
+            editor_widgets = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            editor_notes_widget = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+
+            library_view.add (library);
             library_view.width_request = settings.view_library_width;
             stats_bar = new StatisticsBar ();
             start_sheet = library.get_sheets (start_dir);
-            library_pane.add (library_view);
+            library_pane.add (library_box);
             library_view.show_all ();
             start_sheet.width_request = settings.view_sheets_width;
             library_pane.add (start_sheet);
@@ -224,14 +229,17 @@ namespace ThiefMD {
 
             main_content.add (library_pane);
             library_pane.width_request = settings.view_library_width + settings.view_sheets_width;
-            main_content.add (SheetManager.get_view ());
-            editor_notes_pane.add (main_content);
-            editor_notes_pane.add (notes);
+            editor_widgets.add (toolbar);
+            editor_notes_widget.add (SheetManager.get_view ());
+            editor_notes_widget.add (notes);
+            editor_widgets.add (editor_notes_widget);
+            main_content.add (editor_widgets);
+            main_window_horizon_box.add (main_content);
             notes.add (notes_widget);
             notes.set_reveal_child (false);
 
             desktop_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            desktop_box.add (editor_notes_pane);
+            desktop_box.add (main_window_horizon_box);
             desktop_box.add (stats_bar);
 
             hide_titlebar_when_maximized = true;

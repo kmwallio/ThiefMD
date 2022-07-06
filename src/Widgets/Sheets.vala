@@ -110,6 +110,20 @@ namespace ThiefMD.Widgets {
         }
     }
 
+    private int get_string_px_width (Gtk.Label lbl, string str) {
+        int f_w = 14;
+        var font_context = lbl.get_pango_context ();
+        var font_desc = font_context.get_font_description ();
+        var font_layout = new Pango.Layout (font_context);
+        font_layout.set_font_description (font_desc);
+        font_layout.set_text (str, str.length);
+        Pango.Rectangle ink, logical;
+        font_layout.get_pixel_extents (out ink, out logical);
+        font_layout.dispose ();
+        warning ("# Ink: %d, Logical: %d", ink.width, logical.width);
+        return int.max (ink.width, logical.width);
+    }
+
     /**
      * Sheets View
      * 
@@ -150,13 +164,19 @@ namespace ThiefMD.Widgets {
             bar.set_title ("");
             var bar_label = new Gtk.Label ("<b>" + title + "</b>");
             bar_label.use_markup = true;
-            bar_label.wrap_mode = Pango.WrapMode.WORD_CHAR;
+            while (title.length > 12 && get_string_px_width(bar_label, title + "...") > 180) {
+                title = title.substring (0, title.length - 2);
+                warning (title);
+                bar_label.set_markup ("<b>" + title + "...</b>");
+            }
             bar_label.xalign = 0;
             bar_label.set_ellipsize (Pango.EllipsizeMode.END);
+            int w1, w2;
+            bar_label.get_layout_offsets (out w1, out w2);
+            warning ("Label width: %d, %d", w1, w2);
             bar.pack_start (bar_label);
             bar.set_show_close_button (false);
             bar.width_request = settings.view_sheets_width;
-            bar_label.width_request = settings.view_sheets_width;
 
             new_sheet = new Gtk.MenuButton ();
             new_sheet_widget = new NewSheet ();
@@ -172,6 +192,8 @@ namespace ThiefMD.Widgets {
             });
 
             bar.pack_end (new_sheet);
+
+            bar_label.width_request = settings.view_sheets_width - 20;
 
             var header_context = bar.get_style_context ();
             header_context.add_class ("thiefmd-toolbar");
