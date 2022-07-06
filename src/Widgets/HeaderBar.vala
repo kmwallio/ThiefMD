@@ -76,7 +76,7 @@ namespace ThiefMD.Widgets {
             change_view_button = new Gtk.Button ();
             change_view_button.has_tooltip = true;
             change_view_button.tooltip_text = (_("Change View"));
-            change_view_button.set_image (new Gtk.Image.from_icon_name("document-page-setup-symbolic", Gtk.IconSize.BUTTON));
+            change_view_button.set_image (new Gtk.Image.from_icon_name("sidebar-show-symbolic", Gtk.IconSize.BUTTON));
             change_view_button.clicked.connect (() => {
                 UI.toggle_view();
             });
