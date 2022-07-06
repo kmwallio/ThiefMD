@@ -120,7 +120,6 @@ namespace ThiefMD.Widgets {
         Pango.Rectangle ink, logical;
         font_layout.get_pixel_extents (out ink, out logical);
         font_layout.dispose ();
-        warning ("# Ink: %d, Logical: %d", ink.width, logical.width);
         return int.max (ink.width, logical.width);
     }
 
@@ -166,14 +165,10 @@ namespace ThiefMD.Widgets {
             bar_label.use_markup = true;
             while (title.length > 12 && get_string_px_width(bar_label, title + "...") > 180) {
                 title = title.substring (0, title.length - 2);
-                warning (title);
                 bar_label.set_markup ("<b>" + title + "...</b>");
             }
             bar_label.xalign = 0;
             bar_label.set_ellipsize (Pango.EllipsizeMode.END);
-            int w1, w2;
-            bar_label.get_layout_offsets (out w1, out w2);
-            warning ("Label width: %d, %d", w1, w2);
             bar.pack_start (bar_label);
             bar.set_show_close_button (false);
             bar.width_request = settings.view_sheets_width;

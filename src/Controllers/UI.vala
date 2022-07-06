@@ -526,7 +526,7 @@ namespace ThiefMD.Controllers.UI {
         var settings = AppSettings.get_default ();
         ThiefApp instance = ThiefApp.get_instance ();
         if (instance.main_content != null) {
-            instance.main_content.set_visible_child (SheetManager.get_view ());
+            instance.main_content.set_visible_child (instance.editor_widgets);
             if (instance.main_content.folded) {
                 settings.view_state = 2;
             }
@@ -597,6 +597,9 @@ namespace ThiefMD.Controllers.UI {
             _show_filename = settings.show_filename;
         }
 
+        if (!ThiefApp.get_instance ().ready) {
+            return;
+        }
         ThiefApp.get_instance ().hide_search ();
         if (settings.view_state == 0) {
             show_sheets_and_library ();
