@@ -13,5 +13,6 @@
         <file alias="medium.png" compressed="false" preprocess="">icons/connections/medium.png</file>
         <file alias="forem.png" compressed="false" preprocess="">icons/connections/forem.png</file>
         <file alias="hashnode.png" compressed="false" preprocess="">icons/connections/hashnode.png</file>
+        <file alias="library.png" compressed="false" preprocess="">icons/other/library.png</file>
     </gresource>
 </gresources>

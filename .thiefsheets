@@ -16,12 +16,14 @@
     "src",
     "meson",
     "po",
-    "tests"
+    "tests",
+    "builddir"
   ],
   "folder-order" : [
     "docs",
     "po",
-    "tests"
+    "tests",
+    "builddir"
   ],
   "notes" : "",
   "icon" : ""

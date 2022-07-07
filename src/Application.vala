@@ -33,11 +33,23 @@ namespace ThiefMD {
         }
 
         protected override void activate () {
+            var settings = AppSettings.get_default ();
+            settings.validate_library ();
+            var projects = settings.library ();
+
             if (main_window == null) {
                 main_window = this.active_window;
                 main_window = new ThiefApp (this);
             }
-            ThiefApp.show_main_instance ();
+
+            if (projects.length > 0) {
+                ThiefApp.show_main_instance ();
+            } else {
+                ThiefApp.hide_main_instance ();
+                var welcome_win = new WelcomeWindow ();
+                important_windows.append (welcome_win);
+                welcome_win.present ();
+            }
         }
 
         public static void open_file (File file) {
