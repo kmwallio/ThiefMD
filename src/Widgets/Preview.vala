@@ -31,6 +31,7 @@ namespace ThiefMD.Widgets {
         public bool exporting = false;
         public bool print_only = false;
         public string? override_css = null;
+        public string base_path = "";
 
         public Preview () {
             Object(user_content_manager: new UserContentManager());
@@ -294,7 +295,7 @@ namespace ThiefMD.Widgets {
 
             // Resolve paths to images or local files if needed
             if (!exporting || settings.export_resolve_paths) {
-                string file_path = settings.last_file.substring(0, settings.last_file.last_index_of(Path.DIR_SEPARATOR_S));
+                string file_path = (base_path == "") ? settings.last_file.substring(0, settings.last_file.last_index_of(Path.DIR_SEPARATOR_S)) : base_path;
                 processed_mk = Pandoc.resolve_paths (raw_mk, file_path);
             } else {
                 processed_mk = raw_mk;

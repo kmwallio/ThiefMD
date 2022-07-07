@@ -115,6 +115,7 @@ namespace ThiefMD {
                 // Populate the preview display
                 preview_display.add1 (scroller);
                 preview = new Preview ();
+                preview.base_path = file.get_parent ().get_path ();
                 preview_mutex = new TimedMutex ();
                 preview.update_html_view (true, editor.get_buffer_text (), has_fountain ());
                 preview_display.add2 (preview);
