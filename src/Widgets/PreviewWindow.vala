@@ -42,9 +42,9 @@ namespace ThiefMD.Widgets {
             {
                 if (settings.show_filename && settings.last_file != "") {
                     string file_name = settings.last_file.substring(settings.last_file.last_index_of(Path.DIR_SEPARATOR_S) + 1);
-                    instance.title = "Preview: " + file_name;
+                    instance.title = _("Preview: ") + file_name;
                 } else {
-                    instance.title = "Preview";
+                    instance.title = _("Preview");
                 }
                 instance.toolbar.title = instance.title;
             }
@@ -73,9 +73,9 @@ namespace ThiefMD.Widgets {
 
             if (settings.show_filename && settings.last_file != "") {
                 string file_name = settings.last_file.substring(settings.last_file.last_index_of (Path.DIR_SEPARATOR_S) + 1);
-                title = "Preview: " + file_name;
+                instance.title = _("Preview: ") + file_name;
             } else {
-                title = "Preview";
+                instance.title = _("Preview");
             }
             toolbar.title = title;
 
