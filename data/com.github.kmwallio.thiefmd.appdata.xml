@@ -72,12 +72,15 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="0.2.7" date="2022-07-16" urgency="low">
+    <release version="0.2.7" date="2023-06-03" urgency="low">
       <description>
         <p>Like your files to fly solo? Open files from your file manager. Even abandon our library concept if you want to.</p>
+        <p>We also have a new out of box experience and some <i>hopefully</i> UI improvements.</p>
+        <p><b>Breaking Change</b> We've updated the Wordpress API. You now have to use Application Passwords.</p>
         <ul>
           <li>Add support for single file opening</li>
           <li>Fix some null references</li>
+          <li>New UI</li>
         </ul>
       </description>
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.7</url>
