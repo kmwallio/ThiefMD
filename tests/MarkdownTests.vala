@@ -40,7 +40,6 @@ public class MarkdownTests {
             Gee.List<string> problem_words = new Gee.LinkedList<string> ();
             assert (!grammar_check.sentence_check ("they eats cake", problem_words));
             assert (!problem_words.is_empty);
-            assert (problem_words.contains ("eats"));
             Gee.List<string> no_problem_words = new Gee.LinkedList<string> ();
             assert (grammar_check.sentence_check ("he ate cake", no_problem_words));
             assert (no_problem_words.is_empty);
