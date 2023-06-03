@@ -278,7 +278,7 @@ namespace ThiefMD.Widgets {
         }
 
         private void show_empty () {
-            _empty = new Gtk.Label("Select an item from the Library to open or create a new Sheet.");
+            _empty = new Gtk.Label(_("Select an item from the Library to open or create a new Sheet."));
             _empty.set_ellipsize (Pango.EllipsizeMode.END);
             _empty.lines = 30;
             _view.add(_empty);
