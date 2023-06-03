@@ -23,19 +23,110 @@ using ThiefMD.Controllers;
 
 namespace ThiefMD {
     public class ThiefApplication : Gtk.Application {
+        private static Gtk.Window main_window = null;
+        private static List<Gtk.Window> important_windows = new List<Gtk.Window> ();
         public ThiefApplication () {
             Object (
                 application_id: "com.github.kmwallio.thiefmd",
-                flags: ApplicationFlags.FLAGS_NONE
+                flags: ApplicationFlags.HANDLES_OPEN
             );
         }
 
         protected override void activate () {
-            var window = this.active_window;
-            if (window == null) {
-                window = new ThiefApp (this);
+            var settings = AppSettings.get_default ();
+            settings.validate_library ();
+            var projects = settings.library ();
+
+            if (main_window == null) {
+                main_window = this.active_window;
+                main_window = new ThiefApp (this);
             }
-            window.present ();
+
+            if (projects.length > 0) {
+                ThiefApp.show_main_instance ();
+            } else {
+                ThiefApp.hide_main_instance ();
+                var welcome_win = new WelcomeWindow ();
+                important_windows.append (welcome_win);
+                welcome_win.present ();
+            }
+        }
+
+        public static void open_file (File file) {
+            foreach (var win in important_windows) {
+                if (win is SoloEditor) {
+                    var w = (SoloEditor)win;
+                    if (w.already_opened (file)) {
+                        w.present ();
+                        warning ("Already opened");
+                        return;
+                    }
+                }
+            }
+            var solo_win = new SoloEditor (file);
+            important_windows.append (solo_win);
+            solo_win.present ();
+        }
+
+        public static SoloEditor? get_solo (File file) {
+            foreach (var win in important_windows) {
+                if (win is SoloEditor) {
+                    var w = (SoloEditor)win;
+                    if (w.already_opened (file)) {
+                        return w;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public override void open (File[] files, string hint) {
+            // Start library hidden
+            if (main_window == null) {
+                main_window = new ThiefApp (this);
+                ThiefApp.hide_main_instance ();
+            }
+
+            foreach (var file in files) {
+                if (file.query_exists ()) {
+                    open_file (file);
+                }
+            }
+        }
+
+        public static bool close_window (Gtk.Window win) {
+            debug ("Open Files: %u", important_windows.length ());
+            if (win is ThiefApp && important_windows.length () > 0) {
+                ThiefApp.hide_main_instance ();
+                debug ("Hide main window");
+                return false;
+            } else if (win is ThiefApp && important_windows.length () == 0) {
+                debug ("Close main window");
+                return true;
+            }
+
+            important_windows.remove (win);
+            debug ("Closing solo window");
+            if (important_windows.length () == 0 && ThiefApp.get_instance () != null && ThiefApp.main_instance_hidden ()) {
+                ThiefApp.get_instance ().close ();
+            }
+            return true;
+        }
+
+        public static uint active_window_count () {
+            return important_windows.length ();
+        }
+
+        public static void exit () {
+            debug ("Calling exit");
+            foreach (var win in important_windows) {
+                win.close ();
+            }
+
+            if (main_window != null) {
+                main_window.close ();
+            }
         }
 
         public static int main (string[] args) {

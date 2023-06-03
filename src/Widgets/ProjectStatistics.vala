@@ -40,7 +40,7 @@ namespace ThiefMD.Widgets {
             headerbar.set_title (get_base_library_path (monitor_path).replace (Path.DIR_SEPARATOR_S, " " + Path.DIR_SEPARATOR_S + " "));
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
-            header_context.add_class ("thief-toolbar");
+            header_context.add_class ("thiefmd-toolbar");
 
             word_label = new Gtk.Label ("");
             word_label.xalign = 0;

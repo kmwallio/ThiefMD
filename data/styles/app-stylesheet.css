@@ -40,6 +40,11 @@ menu {
     color: @textColorPrimary;
 }
 
+.thiefmd-toolbar:backdrop, .thief-toolbar:backdrop, .thiefmd-toolbar:backdrop button {
+    background-image: linear-gradient(lighter(@colorPrimary), @colorPrimary 50%);
+    color: mix(@textColorPrimary, @colorPrimary, 0.5);
+}
+
 actionbar,
 .action-bar {
     border-top-color: transparent;
@@ -80,6 +85,10 @@ actionbar,
 .thief-search-results *:hover:active {
     background: @colorPrimaryActive;
     color: @textColorActive;
+    border-bottom: 0px solid @textColorPrimary;
+    border-top: 0px solid @textColorPrimary;
+    border-left: 5px solid @selectionColor;
+    border-right: 0px;
 }
 
 filechooser actionbar, filechooser, filechooser stack, placessidebar, window {
@@ -87,12 +96,20 @@ filechooser actionbar, filechooser, filechooser stack, placessidebar, window {
     color: @colorPrimary;
 }
 
-placessidebar, treeview {
+placessidebar, treeview, .thief-library-header {
     background: lighter(@windowColor);
     color: @colorPrimary;
+    border: 0;
 }
 
-treeview.view header button {
+.thief-library-header button:active,
+.thief-library-header button:hover,
+.thief-library-header button:hover:active {
+    background: lighter(@windowColor);
+    color: @textColorGlobal;
+}
+
+treeview.view header button, .thief-library-header button {
     background: lighter(@windowColor);
     color: @colorPrimary;
 }

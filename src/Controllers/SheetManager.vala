@@ -63,7 +63,6 @@ namespace ThiefMD.Controllers.SheetManager {
 
         if (_box_view == null) {
             _box_view = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-
             _box_view.add (ThiefApp.get_instance ().search_bar);
             _bar = new Gtk.InfoBar ();
             _bar.revealed = false;

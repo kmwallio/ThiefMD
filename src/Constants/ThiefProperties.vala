@@ -21,11 +21,12 @@ namespace ThiefMD {
     public class ThiefProperties : Object {
         public const string NAME = "ThiefMD";
         public const string URL = "https://thiefmd.com";
-        public const string COPYRIGHT = "Copyright © 2020 kmwallio";
+        public const string COPYRIGHT = "Copyright © 2020-2022 kmwallio";
         public const string TAGLINE = _("The Markdown editor worth stealing");
         public const string THIEF_MARK_CONST = "THIEFMDa63471e6ec1b4f35b7ca635f3ca39a85";
         public const string THIEF_MARK = "<span id='thiefmark'></span>";
         public const string SUPPORTED_IMPORT_FILES = "*.docx;*.odt;*.html;*.tex;*.epub;*.textile;*.html;*.fb2;*.dbk;*.xml;*.opml;*.rst;*.md;*.markdown;*.fountain;*.fou;*.spmd";
+        public const string SUPPORTED_OPEN_FILES = "*.md;*.markdown;*.fountain;*.fou;*.spmd";
         public const string VERSION = Build.VERSION;
         public const Gtk.License LICENSE_TYPE = Gtk.License.GPL_3_0;
 
@@ -90,6 +91,8 @@ namespace ThiefMD {
             giants.add (_("Swedish Translation Contributors") + ":\n<a href='https://github.com/eson57'>Åke Engelbrektson</a>\n");
             giants.add (_("German Translation Contributors") + ":\nHelix and Fish\n");
             giants.add (_("Finnish Translation Contributors") + ":\nJiri Grönroos\n");
+            giants.add (_("Polish Translation Contributors") + ":\nŁukasz Horodecki\n");
+            giants.add (_("Turkish Translation Contributors") + ":\nSabri Ünal\n");
             giants.add (_("Original Code") + ":\n" + _("Based on <a href='https://github.com/lainsce/quilter'>Quilter</a>") + "\n" + _("Copyright") + " © 2017 Lains.\n<a href='https://github.com/lainsce/quilter/blob/master/LICENSE'>" + _("GNU General Public License v3.0") + "</a>" + "\n");
             giants.add (_("Stolen Victory Font") + ":\nModified <a href='https://github.com/iaolo/iA-Fonts'>iA Writer Duospace</a>\n" + _("Copyright") + " © 2018 Information Architects Inc.\nwith Reserved Font Name \"iA Writer\"\n<a href='https://github.com/iaolo/iA-Fonts/blob/master/iA%20Writer%20Duospace/LICENSE.md'>" + _("SIL OPEN FONT LICENSE Version 1.1") + "</a>");
             giants.add ("Modified <a href='https://rubjo.github.io/victor-mono/'>Victor Mono</a>\n" + _("Copyright") + " © 2019 Rune Bjørnerås\n<a href='https://github.com/rubjo/victor-mono/blob/master/LICENSE'>" + _("MIT License") + "</a>");
@@ -203,6 +206,7 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             border-bottom-color: transparent;
             border-bottom-width: 1px;
             background: @colorPrimary;
+            background-image: linear-gradient(lighter(@colorPrimary), @colorPrimary 3%%);
             color: @textColorGlobal;
             box-shadow: 0 1px transparent inset;
         }
@@ -229,6 +233,11 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         .thief-search-matches {
           background: @colorPrimary;
           color: @textColorGlobal;
+        }
+
+        .thiefmd-toolbar:backdrop, .thief-toolbar:backdrop, .thiefmd-toolbar:backdrop button {
+          background-image: linear-gradient(lighter(@colorPrimary), @colorPrimary 50%%);
+          color: mix(@textColorGlobal, @colorPrimary, 0.5);
         }
 
         .thiefmd-toolbar button:active,
@@ -273,6 +282,10 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
         .thief-search-results *:hover:active {
             background: lighter(@colorPrimary);
             color: @textColorPrimary;
+            border-bottom: 0px solid @textColorPrimary;
+            border-top: 0px solid @textColorPrimary;
+            border-left: 5px solid @textColorPrimary;
+            border-right: 0px;
         }
 
         .thief-search-input:focus {
@@ -289,17 +302,24 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
             background: darker(@colorPrimary);
             color: @textColorPrimary;
         }
-        
-        placessidebar, treeview {
+
+        placessidebar, treeview, .thief-library-header {
             background: lighter(@colorPrimaryActive);
             color: @textColorGlobal;
         }
-        
-        treeview.view header button {
-            background: @colorPrimary;
+
+        .thief-library-header button:active,
+        .thief-library-header button:hover,
+        .thief-library-header button:hover:active {
+          background: lighter(lighter(@colorPrimaryActive));
+          color: @textColorGlobal;
+        }
+
+        treeview.view header button, .thief-library-header button {
+            background: lighter(@colorPrimaryActive);
             color: @textColorGlobal;
         }
-        
+
         placessidebar *:selected, treeview.view:selected {
             background: lighter(@colorPrimary);
             color: @textColorGlobal;

@@ -1,7 +1,7 @@
 {
     "app-id": "com.github.kmwallio.thiefmd",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "41",
+    "runtime-version": "44",
     "sdk": "org.gnome.Sdk",
     "command": "com.github.kmwallio.thiefmd",
     "finish-args": [
@@ -40,6 +40,7 @@
                 "sha256": "c30019506320ca2474d834cced1e2217ea533e00eb2a3f4eb7879007940ec682"
             }]
         },
+        "shared-modules/intltool/intltool-0.51.json",
         {
             "name": "gtkspell",
             "cleanup": [
@@ -49,20 +50,7 @@
                 "type": "archive",
                 "url": "https://sourceforge.net/projects/gtkspell/files/3.0.10/gtkspell3-3.0.10.tar.xz",
                 "sha256": "b040f63836b347eb344f5542443dc254621805072f7141d49c067ecb5a375732"
-            }],
-            "modules": [{
-                    "name": "enchant",
-                    "cleanup": [
-                        "*.a"
-                    ],
-                    "sources": [{
-                        "type": "archive",
-                        "url": "https://github.com/AbiWord/enchant/releases/download/v2.2.11/enchant-2.2.11.tar.gz",
-                        "sha256": "a29c5777c4e45fcac2595c15c49d6d2aa434fa5e7c993dff3f9f367b65fe472a"
-                    }]
-                },
-                "shared-modules/intltool/intltool-0.51.json"
-            ]
+            }]
         },
         {
             "name": "discount",

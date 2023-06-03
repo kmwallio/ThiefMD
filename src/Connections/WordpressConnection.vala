@@ -86,7 +86,7 @@ namespace ThiefMD.Connections {
             username_label.xalign = 0;
             Gtk.Entry username_entry = new Gtk.Entry ();
 
-            Gtk.Label password_label = new Gtk.Label (_("Password"));
+            Gtk.Label password_label = new Gtk.Label (_("Application Password"));
             password_label.xalign = 0;
             Gtk.Entry password_entry = new Gtk.Entry ();
             password_entry.set_visibility (false);
@@ -184,6 +184,7 @@ namespace ThiefMD.Connections {
             string id = "";
             string html = "";
             string featured_image = "";
+            int featured_image_id = -1;
 
             debug ("Exporting");
 
@@ -194,17 +195,43 @@ namespace ThiefMD.Connections {
 
             Gee.Map<string, string> images_to_upload = Pandoc.file_image_map (publisher_instance.get_export_markdown ());
             Gee.HashMap<string, string> replacements = new Gee.HashMap<string, string> ();
+            Gee.Map<string, string> metadata = FileManager.get_yaml_kvp (publisher_instance.get_export_markdown ());
+
+            if (metadata.has_key ("cover-image")) { // Consistency for ePub cover-image
+                featured_image = metadata.get ("cover-image");
+            } else if (metadata.has_key ("feature_image")) { // What ghost API documents
+                featured_image = metadata.get ("feature_image");
+            } else if (metadata.has_key ("coverimage")) { // Misc. things I'll try and wonder why they didn't work
+                featured_image = metadata.get ("coverimage");
+            } else if (metadata.has_key ("featureimage")) {
+                featured_image = metadata.get ("featureimage");
+            } else if (metadata.has_key ("featuredimage")) {
+                featured_image = metadata.get ("featureimage");
+            } else if (metadata.has_key ("featured-image")) {
+                featured_image = metadata.get ("featureimage");
+            } else if (metadata.has_key ("cover_image")) { // What ghost API documents
+                featured_image = metadata.get ("cover_image");
+            }
+
             if (images_to_upload.keys.size > 0) {
                 Thinking worker = new Thinking (_("Uploading images"), () => {
                     foreach (var images in images_to_upload) {
                         File img_file = File.new_for_path (images.value);
                         if (img_file.query_exists () && !FileUtils.test (images.value, FileTest.IS_DIR)) {
                             string upload_url;
-                            if (connection.upload_image_simple (
+                            int upload_id;
+                            if (connection.upload_image (
                                 out upload_url,
+                                out upload_id,
                                 img_file.get_path ()))
                             {
                                 replacements.set (images.key, upload_url);
+                                if (featured_image != null && 
+                                    featured_image.ascii_up ().chomp ().chug ().contains (images.value.ascii_up ().chomp ().chug ()) &&
+                                    images.value.chomp ().chug ().length == featured_image.chomp ().chug ().length) {
+                                    warning ("Set featured image");
+                                    featured_image_id = upload_id;
+                                }
                             } else {
                                 warning ("Could not upload image %s", img_file.get_basename ());
                             }
@@ -213,8 +240,6 @@ namespace ThiefMD.Connections {
                 }, wordpressSayings, publisher_instance);
                 worker.run ();
             }
-
-            Gee.Map<string, string> metadata = FileManager.get_yaml_kvp (publisher_instance.get_export_markdown ());
 
             string body = FileManager.get_yamlless_markdown (
                     publisher_instance.get_export_markdown (),
@@ -231,22 +256,6 @@ namespace ThiefMD.Connections {
 
             if (metadata.has_key ("title")) {
                 title = metadata.get ("title");
-            }
-
-            if (metadata.has_key ("cover-image")) { // Consistency for ePub cover-image
-                featured_image = metadata.get ("cover-image");
-            } else if (metadata.has_key ("feature_image")) { // What ghost API documents
-                featured_image = metadata.get ("feature_image");
-            } else if (metadata.has_key ("coverimage")) { // Misc. things I'll try and wonder why they didn't work
-                featured_image = metadata.get ("coverimage");
-            } else if (metadata.has_key ("featureimage")) {
-                featured_image = metadata.get ("featureimage");
-            } else if (metadata.has_key ("featuredimage")) {
-                featured_image = metadata.get ("featureimage");
-            } else if (metadata.has_key ("featured-image")) {
-                featured_image = metadata.get ("featureimage");
-            } else if (metadata.has_key ("cover_image")) { // What ghost API documents
-                featured_image = metadata.get ("cover_image");
             }
 
             debug ("Read title: %s", title);
@@ -272,14 +281,14 @@ namespace ThiefMD.Connections {
                     title,
                     html,
                     immediately_publish,
-                    featured_image.has_prefix ("http") ? featured_image : ""))
+                    featured_image_id))
                 {
                     published = true;
                     debug ("Posted");
                     Gtk.Label label = new Gtk.Label (
                         "<b>Post URL:</b> <a href='%s'>%s</a>".printf (
-                            connection.endpoint.substring (0, connection.endpoint.last_index_of_char  ('/')) + "/?p=" + id,
-                            connection.endpoint.substring (0, connection.endpoint.last_index_of_char  ('/')) + "/?p=" + id));
+                            connection.blog_url + "/?p=" + id,
+                            connection.blog_url + "/?p=" + id));
 
                     label.xalign = 0;
                     label.use_markup = true;

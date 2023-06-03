@@ -54,6 +54,7 @@ yay -S thiefmd
  * Czech Translation by [Vojtěch Perník](https://github.com/pervoj)
  * Finnish Translation by Jiri Grönroos
  * German Translation by Fish and Helix
+ * Polish Translation by Łukasz Horodecki
 
 ## Planning
 
@@ -157,6 +158,17 @@ $ sudo ninja install
 ```
 
 [Prebuilt packages](https://github.com/kmwallio/ThiefMD/releases) are available.
+
+### Building and Running the Tests
+
+By default the code is built without tests. To compile the test suite the project has to be told to do so by setting the meson variable `build_tests`.
+
+After that they can be built and run by `ninja`:
+
+```bash
+$ meson configure -Dbuild_tests=true build
+$ cd build && ninja && ninja tests
+```
 
 ## Acknowledgments
 

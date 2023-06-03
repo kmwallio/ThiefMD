@@ -915,17 +915,27 @@ namespace ThiefMD.Widgets {
             }
 
             int w, h;
-            ThiefApp.get_instance ().get_size (out w, out h);
+            SoloEditor se = ThiefApplication.get_solo (file);
+            if (se == null) {
+                ThiefApp.get_instance ().get_size (out w, out h);
 
-            int note_w = 0;
-            if (ThiefApp.get_instance ().notes != null) {
-                note_w = (ThiefApp.get_instance ().notes.child_revealed) ? Notes.get_notes_width () : 0;
-            }
-            w = w - ThiefApp.get_instance ().pane_position - note_w;
-            last_height = h;
+                int note_w = 0;
+                if (ThiefApp.get_instance ().notes != null) {
+                    note_w = (ThiefApp.get_instance ().notes.child_revealed) ? Notes.get_notes_width () : 0;
+                }
+                w = w - ThiefApp.get_instance ().pane_position - note_w;
+                last_height = h;
 
-            if (w == last_width) {
-                return;
+                if (w == last_width) {
+                    return;
+                }
+            } else {
+                se.get_editor_size (out w, out h);
+                last_height = h;
+
+                if (w == last_width) {
+                    return;
+                }
             }
 
             move_margins ();
@@ -940,13 +950,18 @@ namespace ThiefMD.Widgets {
             }
 
             int w, h, m, p;
-            ThiefApp.get_instance ().get_size (out w, out h);
+            SoloEditor se = ThiefApplication.get_solo (file);
+            if (se == null) {
+                ThiefApp.get_instance ().get_size (out w, out h);
 
-            int note_w = 0;
-            if (ThiefApp.get_instance ().notes != null) {
-                note_w = (ThiefApp.get_instance ().notes.child_revealed) ? Notes.get_notes_width () : 0;
+                int note_w = 0;
+                if (ThiefApp.get_instance ().notes != null) {
+                    note_w = (ThiefApp.get_instance ().notes.child_revealed) ? Notes.get_notes_width () : 0;
+                }
+                w = w - ThiefApp.get_instance ().pane_position - note_w;
+            } else {
+                se.get_editor_size (out w, out h);
             }
-            w = w - ThiefApp.get_instance ().pane_position - note_w;
             last_height = h;
             last_width = w;
 

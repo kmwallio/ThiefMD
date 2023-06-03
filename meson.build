@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.kmwallio.thiefmd', ['vala', 'c'],
-    version: '0.2.6'
+    version: '0.2.7'
 )
 
 # Application ID
@@ -131,17 +131,19 @@ executable(
     'src/Widgets/ThemePreview.vala',
     'src/Widgets/Thinking.vala',
     'src/Widgets/MarkdownCheatSheet.vala',
+    'src/Widgets/SoloEditor.vala',
+    'src/Widgets/Welcome.vala',
     'src/ultheme/src/HexColors.vala',
     'src/ultheme/src/Ultheme.vala',
     'src/writegood/src/language.vala',
     'src/writegood/src/writegood.vala',
     'src/writegood/src/en_us.vala',
-    'src/writeas/src/Writeas.vala',
-    'src/ghost/src/Ghost.vala',
-    'src/wordpress/src/Wordpress.vala',
-    'src/medium/src/Medium.vala',
-    'src/forem/src/Forem.vala',
-    'src/hashnode/src/Hashnode.vala',
+    'src/writeas/src/Writeas3.vala',
+    'src/ghost/src/Ghost3.vala',
+    'src/wordpress/src/Wordpress3.vala',
+    'src/medium/src/Medium3.vala',
+    'src/forem/src/Forem3.vala',
+    'src/hashnode/src/Hashnode3.vala',
     'src/bibtex/src/BibTex.vala',
     asresources,
     c_args: c_args,
@@ -150,7 +152,7 @@ executable(
         dependency('gtksourceview-4'),
         dependency('gtk+-3.0'),
         dependency('gtkspell3-3.0'),
-        dependency('webkit2gtk-4.0'),
+        dependency('webkit2gtk-4.1'),
         dependency('json-glib-1.0'),
         dependency('gee-0.8'),
         dependency('libarchive'),

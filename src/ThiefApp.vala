@@ -24,6 +24,7 @@ using ThiefMD.Controllers;
 namespace ThiefMD {
     public class ThiefApp : Hdy.ApplicationWindow {
         private static ThiefApp _instance;
+        private static bool am_hidden = false;
         public Headerbar toolbar;
         public Library library;
         public Hdy.Leaflet main_content;
@@ -35,7 +36,10 @@ namespace ThiefMD {
         public Gee.ConcurrentList<Connections.ConnectionBase> connections;
         public bool ready = false;
         public Gtk.Revealer notes;
-        public Gtk.Box editor_notes_pane;
+        public Gtk.Box main_window_horizon_box;
+        public Gtk.Box editor_widgets;
+        public Gtk.Box editor_notes_widget;
+        public Gtk.Box library_box;
         public Notes notes_widget;
         public bool show_touch_friendly = true;
         public SearchWidget search_widget;
@@ -56,6 +60,29 @@ namespace ThiefMD {
 
         public static ThiefApp get_instance () {
             return _instance;
+        }
+
+        public static void hide_main_instance () {
+            if (_instance != null) {
+                am_hidden = true;
+                _instance.hide ();
+            }
+        }
+
+        public static void show_main_instance () {
+            if (_instance != null) {
+                am_hidden = false;
+                _instance.show ();
+                _instance.present ();
+            }
+        }
+
+        public static bool main_instance_hidden () {
+            if (_instance != null) {
+                return am_hidden;
+            }
+
+            return false;
         }
 
         public int pane_position {
@@ -140,7 +167,7 @@ namespace ThiefMD {
             library_pane.set_orientation (Gtk.Orientation.HORIZONTAL);
             library_view = new Gtk.ScrolledWindow (null, null);
             library_view.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
-            editor_notes_pane = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            main_window_horizon_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             notes = new Gtk.Revealer ();
             notes.set_transition_type (Gtk.RevealerTransitionType.SLIDE_LEFT);
             notes.set_reveal_child (false);
@@ -149,11 +176,47 @@ namespace ThiefMD {
             main_content.set_homogeneous (true, Gtk.Orientation.HORIZONTAL, false);
             main_content.set_orientation (Gtk.Orientation.HORIZONTAL);
 
+            library_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            var library_header = new Hdy.HeaderBar ();
+            library_header.set_title ("");
+            library_header.pack_start (new Gtk.Label (_("Library")));
+
+            var add_library_button = new Gtk.Button ();
+            add_library_button.has_tooltip = true;
+            add_library_button.tooltip_text = (_("Add Folder to Library"));
+            add_library_button.set_image (new Gtk.Image.from_icon_name ("folder-new-symbolic", Gtk.IconSize.BUTTON));
+            add_library_button.clicked.connect (() => {
+                settings.menu_active = true;
+                string new_lib = Dialogs.select_folder_dialog ();
+                if (FileUtils.test(new_lib, FileTest.IS_DIR)) {
+                    if (settings.add_to_library (new_lib)) {
+                        // Refresh
+                        ThiefApp instance = ThiefApp.get_instance ();
+                        instance.refresh_library ();
+                    }
+                }
+                settings.menu_active = false;
+            });
+
+            library_header.pack_end (add_library_button);
+
+            var library_header_context = library_header.get_style_context ();
+            library_header_context.add_class ("thief-library-header");
+
+            library_box.add (library_header);
+            library_box.add (library_view);
+            library.vexpand = true;
+            library.hexpand = true;
+
+            editor_widgets = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            editor_notes_widget = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+
             library_view.add (library);
+            library_box.width_request = settings.view_library_width;
             library_view.width_request = settings.view_library_width;
             stats_bar = new StatisticsBar ();
             start_sheet = library.get_sheets (start_dir);
-            library_pane.add (library_view);
+            library_pane.add (library_box);
             library_view.show_all ();
             start_sheet.width_request = settings.view_sheets_width;
             library_pane.add (start_sheet);
@@ -168,15 +231,17 @@ namespace ThiefMD {
 
             main_content.add (library_pane);
             library_pane.width_request = settings.view_library_width + settings.view_sheets_width;
-            main_content.add (SheetManager.get_view ());
-            editor_notes_pane.add (main_content);
-            editor_notes_pane.add (notes);
+            editor_widgets.add (toolbar);
+            editor_notes_widget.add (SheetManager.get_view ());
+            editor_notes_widget.add (notes);
+            editor_widgets.add (editor_notes_widget);
+            main_content.add (editor_widgets);
+            main_window_horizon_box.add (main_content);
             notes.add (notes_widget);
             notes.set_reveal_child (false);
 
             desktop_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            desktop_box.add (toolbar);
-            desktop_box.add (editor_notes_pane);
+            desktop_box.add (main_window_horizon_box);
             desktop_box.add (stats_bar);
 
             hide_titlebar_when_maximized = true;
@@ -304,6 +369,18 @@ namespace ThiefMD {
                     UI.shrink_sheets ();
                     settings.changed ();
                 }
+            });
+
+            delete_event.connect (() => {
+                bool can_close = ThiefApplication.close_window (this);
+                debug ("Can close (%u): %s", ThiefApplication.active_window_count (), can_close ? "Yes" : "No");
+                if (!can_close) {
+                    am_hidden = true;
+                    debug ("Hiding instead of closing");
+                    return hide_on_delete ();
+                }
+                ThiefApplication.exit ();
+                return false;
             });
 
             destroy.connect (() => {

@@ -25,11 +25,8 @@ namespace ThiefMD.Widgets {
         private Hdy.HeaderBar the_bar;
         private ThiefApp _instance;
         private Gtk.Button change_view_button;
-        private Gtk.Button add_library_button;
-        private Gtk.MenuButton new_sheet;
         private Gtk.MenuButton menu_button;
         private Gtk.Button sidebar_button;
-        private NewSheet new_sheet_widget;
         private Gtk.Label spacer;
 
         public Headerbar (ThiefApp instance) {
@@ -48,10 +45,6 @@ namespace ThiefMD.Widgets {
             get {
                 return !child_revealed;
             }
-        }
-
-        public void make_new_sheet () {
-            new_sheet_widget.popup ();
         }
 
         public void toggle_headerbar () {
@@ -80,42 +73,12 @@ namespace ThiefMD.Widgets {
 
         private void build_ui () {
             var settings = AppSettings.get_default ();
-            new_sheet = new Gtk.MenuButton ();
-            new_sheet_widget = new NewSheet ();
-            new_sheet.has_tooltip = true;
-            new_sheet.tooltip_text = (_("New Sheet"));
-            new_sheet.set_image (new Gtk.Image.from_icon_name ("document-new-symbolic", Gtk.IconSize.BUTTON));
-            new_sheet.popover = new_sheet_widget;
-            new_sheet.clicked.connect(() => {
-                settings.menu_active = true;
-                new_sheet.popover.hide.connect (() => {
-                    settings.menu_active = false;
-                });
-            });
-
             change_view_button = new Gtk.Button ();
             change_view_button.has_tooltip = true;
             change_view_button.tooltip_text = (_("Change View"));
-            change_view_button.set_image (new Gtk.Image.from_icon_name("document-page-setup-symbolic", Gtk.IconSize.BUTTON));
+            change_view_button.set_image (new Gtk.Image.from_icon_name("sidebar-show-symbolic", Gtk.IconSize.BUTTON));
             change_view_button.clicked.connect (() => {
                 UI.toggle_view();
-            });
-
-            add_library_button = new Gtk.Button ();
-            add_library_button.has_tooltip = true;
-            add_library_button.tooltip_text = (_("Add Folder to Library"));
-            add_library_button.set_image (new Gtk.Image.from_icon_name ("folder-new-symbolic", Gtk.IconSize.BUTTON));
-            add_library_button.clicked.connect (() => {
-                settings.menu_active = true;
-                string new_lib = Dialogs.select_folder_dialog ();
-                if (FileUtils.test(new_lib, FileTest.IS_DIR)) {
-                    if (settings.add_to_library (new_lib)) {
-                        // Refresh
-                        ThiefApp instance = ThiefApp.get_instance ();
-                        instance.refresh_library ();
-                    }
-                }
-                settings.menu_active = false;
             });
 
 
@@ -153,13 +116,8 @@ namespace ThiefMD.Widgets {
                     return false;
                 });
             });
-            spacer = new Gtk.Label("                          ");
 
             the_bar.pack_start (change_view_button);
-            the_bar.pack_start (add_library_button);
-            // @TODO: Need to find a better way to do this
-            // the_bar.pack_start (spacer);
-            the_bar.pack_start (new_sheet);
 
             the_bar.pack_end (sidebar_button);
             the_bar.pack_end (menu_button);
@@ -195,14 +153,10 @@ namespace ThiefMD.Widgets {
                 the_bar.set_subtitle ("");
             }
 
-            if (ThiefApp.get_instance ().main_content.folded) {
-                spacer.hide ();
-            } else {
-                spacer.show ();
-            }
-
-            if (!settings.hide_toolbar) {
-                show_headerbar ();
+            if (ThiefApp.get_instance ().ready) {
+                if (!settings.hide_toolbar) {
+                    show_headerbar ();
+                }
             }
         }
     }

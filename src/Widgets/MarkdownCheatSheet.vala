@@ -34,7 +34,7 @@ namespace ThiefMD.Widgets {
             headerbar.set_title ("Cheat Sheet");
             var header_context = headerbar.get_style_context ();
             header_context.add_class (Gtk.STYLE_CLASS_FLAT);
-            header_context.add_class ("thief-toolbar");
+            header_context.add_class ("thiefmd-toolbar");
 
             var grid = new Gtk.Grid ();
             grid.orientation = Gtk.Orientation.VERTICAL;
