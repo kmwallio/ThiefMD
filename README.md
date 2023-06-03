@@ -54,6 +54,7 @@ yay -S thiefmd
  * Czech Translation by [Vojtěch Perník](https://github.com/pervoj)
  * Finnish Translation by Jiri Grönroos
  * German Translation by Fish and Helix
+ * Polish Translation by Łukasz Horodecki
 
 ## Planning
 

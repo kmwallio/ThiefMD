@@ -57,7 +57,9 @@ src/ultheme/src/Ultheme.vala
 src/writegood/src/language.vala
 src/writegood/src/writegood.vala
 src/writegood/src/en_us.vala
-src/writeas/src/Writeas.vala
-src/ghost/src/Ghost.vala
-src/wordpress/src/Wordpress.vala
+src/writeas/src/Writeas3.vala
+src/ghost/src/Ghost3.vala
+src/wordpress/src/Wordpress3.vala
+src/hashnode/src/Hashnode3.vala
+src/forem/src/Forem3.vala
 src/bibtex/src/BibTex.vala

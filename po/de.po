@@ -1,327 +1,37 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: ThiefMD\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-26 11:34-0700\n"
-"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: POEditor.com\n"
+"Project-Id-Version: ThiefMD\n"
+"Language: de\n"
 
-#: src/ThiefApp.vala:244
+#: src/ThiefApp.vala:309
 msgid "HTML"
 msgstr "HTML"
 
-#: src/ThiefApp.vala:245
+#: src/ThiefApp.vala:310
 msgid "PDF"
 msgstr "PDF"
 
-#: src/ThiefApp.vala:246
+#: src/ThiefApp.vala:311
 msgid "MHTML"
 msgstr "MHTML"
 
-#: src/ThiefApp.vala:247
+#: src/ThiefApp.vala:312
 msgid "Markdown"
 msgstr "Markdown"
 
-#: src/ThiefApp.vala:248
+#: src/ThiefApp.vala:313
 msgid "LaTeX"
 msgstr "LaTeX"
 
-#: src/ThiefApp.vala:249
+#: src/ThiefApp.vala:314
 msgid "DocX"
 msgstr "DocX"
 
-#: src/ThiefApp.vala:250
-#, fuzzy
-msgid "Fountain"
-msgstr "Fountain"
-
-#. Visual Settings
-#. Arbitrary strings
-#: src/Constants/AppSettings.vala:104
-#, c-format
-msgid ""
-"# Click on a sheet to get started\n"
-"\n"
-"First time here?  Drag a folder into the library, or click on the Folder "
-"icon to select a folder to add.\n"
-"\n"
-"## Thief Tip:\n"
-"\n"
-"%s"
-msgstr ""
-"# Wähle eine Seite um loszulegen\n"
-"\n"
-"Das erste mal hier?  Schiebe einen Ordner in die Bibliothek auf der linken "
-"Seite oder öffne einen über das Ordnersymbol.\n"
-"\n"
-"## Kleiner Tipp:\n"
-"\n"
-"%s"
-
-#: src/Constants/ThiefProperties.vala:25
-msgid "The Markdown editor worth stealing"
-msgstr "Der Markdown-Editor zum Stehlen"
-
-#: src/Constants/ThiefProperties.vala:86
-msgid "Contributors who help make ThiefMD awesome"
-msgstr "Mitwirkende, welche ThiefMD großartig machen"
-
-#: src/Constants/ThiefProperties.vala:87
-msgid "Czech Translation Contributors"
-msgstr ""
-
-#: src/Constants/ThiefProperties.vala:88
-msgid "French Translation Contributors"
-msgstr "Französische Übersetzung"
-
-#: src/Constants/ThiefProperties.vala:89
-msgid "Slovak Translation Contributors"
-msgstr "Slovakische Übersetzung"
-
-#: src/Constants/ThiefProperties.vala:90
-msgid "Swedish Translation Contributors"
-msgstr "Schwedische Übersetzung"
-
-#: src/Constants/ThiefProperties.vala:91
-#, fuzzy
-msgid "German Translation Contributors"
-msgstr "Französische Übersetzung"
-
-#: src/Constants/ThiefProperties.vala:92
-#, fuzzy
-msgid "Finnish Translation Contributors"
-msgstr "Französische Übersetzung"
-
-#: src/Constants/ThiefProperties.vala:93
-msgid "Original Code"
-msgstr "Original Code"
-
-#: src/Constants/ThiefProperties.vala:93
-msgid "Based on <a href='https://github.com/lainsce/quilter'>Quilter</a>"
-msgstr "Basierend auf <a href='https://github.com/lainsce/quilter'>Quilter</a>"
-
-#: src/Constants/ThiefProperties.vala:93 src/Constants/ThiefProperties.vala:94
-#: src/Constants/ThiefProperties.vala:95 src/Constants/ThiefProperties.vala:96
-#: src/Constants/ThiefProperties.vala:97 src/Constants/ThiefProperties.vala:98
-#: src/Constants/ThiefProperties.vala:99 src/Constants/ThiefProperties.vala:100
-#: src/Constants/ThiefProperties.vala:101
-#: src/Constants/ThiefProperties.vala:102
-#: src/Constants/ThiefProperties.vala:103
-#: src/Constants/ThiefProperties.vala:104
-#: src/Constants/ThiefProperties.vala:105
-#: src/Constants/ThiefProperties.vala:106
-#: src/Constants/ThiefProperties.vala:107
-#: src/Constants/ThiefProperties.vala:108
-msgid "Copyright"
-msgstr "Urheberrecht"
-
-#: src/Constants/ThiefProperties.vala:93
-msgid "GNU General Public License v3.0"
-msgstr "GNU General Public License v3.0"
-
-#: src/Constants/ThiefProperties.vala:94
-msgid "Stolen Victory Font"
-msgstr "Stolen Victory Schriftart"
-
-#: src/Constants/ThiefProperties.vala:94 src/Constants/ThiefProperties.vala:96
-#: src/Constants/ThiefProperties.vala:97 src/Constants/ThiefProperties.vala:98
-msgid "SIL OPEN FONT LICENSE Version 1.1"
-msgstr "SIL OPEN FONT LICENSE Version 1.1"
-
-#: src/Constants/ThiefProperties.vala:95 src/Constants/ThiefProperties.vala:100
-#: src/Constants/ThiefProperties.vala:103
-#: src/Constants/ThiefProperties.vala:104
-msgid "MIT License"
-msgstr "MIT-Lizenz"
-
-#: src/Constants/ThiefProperties.vala:97 src/Constants/ThiefProperties.vala:98
-#: src/Widgets/ThemeSelector.vala:50
-msgid "Font"
-msgstr "Schriftart"
-
-#: src/Constants/ThiefProperties.vala:99
-msgid "Preview CSS"
-msgstr "CSS Vorschau"
-
-#: src/Constants/ThiefProperties.vala:99
-msgid "Mash up of Splendor and Modest"
-msgstr "Eine Mischung aus Splendor und Modest"
-
-#: src/Constants/ThiefProperties.vala:99 src/Constants/ThiefProperties.vala:108
-msgid "The MIT License (MIT)"
-msgstr "Die MIT Lizenz (MIT)"
-
-#: src/Constants/ThiefProperties.vala:100
-#, fuzzy
-msgid "Fountain Preview and Export"
-msgstr "Fountain Vorschau und Export"
-
-#: src/Constants/ThiefProperties.vala:101
-msgid "Markdown Parsing"
-msgstr "Markdown-Parsing"
-
-#: src/Constants/ThiefProperties.vala:101
-msgid "BSD-style License"
-msgstr "BSD-ähnliche Lizenz"
-
-#: src/Constants/ThiefProperties.vala:102
-msgid "Syntax Highlighting"
-msgstr "Syntax Highlighting"
-
-#: src/Constants/ThiefProperties.vala:102
-#: src/Constants/ThiefProperties.vala:106
-msgid "BSD-3-Clause License"
-msgstr "BSD-3-Clause License"
-
-#: src/Constants/ThiefProperties.vala:103
-msgid "Math Rendering"
-msgstr "Mathematik-Rendering"
-
-#: src/Constants/ThiefProperties.vala:103
-msgid "Khan Academy and other contributors."
-msgstr "Khan Academy und andere Mitwirkende."
-
-#: src/Constants/ThiefProperties.vala:104
-msgid "XML Parsing"
-msgstr "XML-Parsing"
-
-#: src/Constants/ThiefProperties.vala:105
-msgid "Pandoc Export"
-msgstr "Pandoc Export"
-
-#: src/Constants/ThiefProperties.vala:105
-msgid "John MacFarlane and others"
-msgstr "John MacFarlane und andere"
-
-#: src/Constants/ThiefProperties.vala:105
-msgid "GNU General Public License v2.0"
-msgstr "GNU General Public License v2.0"
-
-#: src/Constants/ThiefProperties.vala:106
-msgid "PDF Export"
-msgstr ""
-
-#: src/Constants/ThiefProperties.vala:106
-msgid "Simon Sapin and contributors"
-msgstr ""
-
-#: src/Constants/ThiefProperties.vala:107
-msgid "Grammar Check"
-msgstr "Gramatikprüfung"
-
-#: src/Constants/ThiefProperties.vala:107
-msgid "the AbiSource Community"
-msgstr "die AbiSource Gemeinschaft"
-
-#: src/Constants/ThiefProperties.vala:107
-msgid "GNU Lesser General Public License v2.1"
-msgstr "GNU Lesser General Public License v2.1"
-
-#: src/Constants/ThiefProperties.vala:108
-msgid "libwritegood-vala based on"
-msgstr "ibwritegood-vala basiert auf"
-
-#: src/Constants/ThiefProperties.vala:108
-#, fuzzy
-msgid "write-good: Naive linter for English prose"
-msgstr "write-good: Hilfe bei englischer Prosa"
-
-#. Needs to be kept in sync with PAPER_SIZES_GTK_NAME
-#: src/Constants/ThiefProperties.vala:112
-msgid "A3 (11.7 x 16.5 inches)"
-msgstr "A3 (29,7 x 42 cm)"
-
-#: src/Constants/ThiefProperties.vala:113
-msgid "A4 (8 x 11 inches)"
-msgstr "A4 (21 x 29,7 cm)"
-
-#: src/Constants/ThiefProperties.vala:114
-msgid "A5 (5.8 x 8.3 inches)"
-msgstr "A5 (14,8 x 21 cm)"
-
-#: src/Constants/ThiefProperties.vala:115
-msgid "B5 (6.93 x 9.84 inches)"
-msgstr "B5 (17,6 x 25 cm)"
-
-#: src/Constants/ThiefProperties.vala:116
-msgid "Executive (7 x 10 inches)"
-msgstr "Executive (18,4 x 26,7 cm)"
-
-#: src/Constants/ThiefProperties.vala:117
-msgid "Legal (8.5 x 14 inches)"
-msgstr "Legal (21,6 x 35,5 cm)"
-
-#: src/Constants/ThiefProperties.vala:118
-msgid "Letter (8.5 x 11 inches)"
-msgstr "Brief (21,6 x 27,9 cm)"
-
-#: src/Constants/ThiefProperties.vala:121
-msgid "Don't like what you see? Hit `Ctrl+,` to access the preferences."
-msgstr ""
-"Dir gefällt nicht, was du siehst? Drücke `STRG+C` für die Einstellungen"
-
-#: src/Constants/ThiefProperties.vala:122
-msgid ""
-"No built in dark mode? Dark themes are available at https://themes.thiefmd."
-"com. Add more in the Preferences (`Ctrl+,`)."
-msgstr ""
-"Kein Dunkler Modus? Themen sind erhältlich unter https://themes.thiefmd.com "
-"und in den Einstellungen (`STRG+C`)."
-
-#: src/Constants/ThiefProperties.vala:123
-msgid ""
-"Don't like how the preview looks? Hit `Ctrl+,` to access the preferences and "
-"click Export."
-msgstr ""
-"Du magst die Vorschau nicht? Drücke `STRG+C` für die Einstellungen und "
-"klicke Exportieren."
-
-#: src/Constants/ThiefProperties.vala:124
-msgid ""
-"Want to import a ePub, HTML, or DocX? Click Import from the New Sheet prompt."
-msgstr ""
-"Du willst ein ePUB, HTML oder DocX Dokument öffnen? Importiere es über das "
-"Menü zum Seite erstellen."
-
-#: src/Constants/ThiefProperties.vala:125
-msgid ""
-"Ready to publish your great work? Right-click on the folder and choose "
-"\"Export Preview\""
-msgstr ""
-"Bereit deine Arbeit zu veröffentlichen? Rechtsklick den Ordner und wähle "
-"\"Vorschau exportieren\""
-
-#: src/Constants/ThiefProperties.vala:126
-msgid "Want to block out distractions? Full-screen is just an `F11` away."
-msgstr "Keine Ablenkung? Dann `F11`."
-
-#: src/Constants/ThiefProperties.vala:127
-msgid "Quickly switch view modes with `Ctrl+1`, `Ctrl+2`, and `Ctrl+3`."
-msgstr "Mit `Ctrl+1`, `Ctrl+2`, und `Ctrl+3` schnell die Ansicht wechseln."
-
-#: src/Constants/ThiefProperties.vala:128
-msgid ""
-"Working with a lot of links? Turn on Experimental Mode to make your markdown "
-"more readable `Ctrl+Shift+M`."
-msgstr ""
-"Arbeitest du viel mit Links? Probiere den Experimentellen Modus "
-"`STRG+Umschalt+M`."
-
-#: src/Controllers/FileManager.vala:39
-msgid "Stealing file contents..."
-msgstr ""
-
-#: src/Controllers/FileManager.vala:40
-msgid "This isn't plagiarism, it's a remix!"
-msgstr ""
-
-#: src/Controllers/FileManager.vala:41
-msgid "NYT Best Seller, here we come!"
-msgstr ""
-
+#. Supported import file extensions
 #: src/Controllers/FileManager.vala:43
 msgid "Importing File"
 msgstr "Datei importieren"
@@ -374,15 +84,6 @@ msgstr "MHTML Dateien"
 msgid "LaTeX file"
 msgstr "LaTeX Dateien"
 
-#: src/Controllers/Dialogs.vala:161
-msgid "Supported files"
-msgstr "Unterstützte Formate"
-
-#: src/Controllers/Dialogs.vala:170
-#, c-format
-msgid "%s files"
-msgstr "%s Dateien"
-
 #: src/Controllers/Dialogs.vala:177
 msgid "All files"
 msgstr "Alle Datein"
@@ -401,9 +102,7 @@ msgstr "Datei speichern"
 
 #: src/Controllers/Dialogs.vala:222
 msgid "There are unsaved changes to the file. Do you want to save?"
-msgstr ""
-"Es befinden sich ungespeicherte Änderungen im aktuellen Dokument. Möchtest "
-"du diese speichern?"
+msgstr "Es befinden sich ungespeicherte Änderungen im aktuellen Dokument. Möchtest du diese speichern?"
 
 #: src/Controllers/Dialogs.vala:223
 msgid "If you don't save, changes will be lost forever."
@@ -413,15 +112,9 @@ msgstr "Wenn du nicht speicherst sind alle Änderungen verloren."
 msgid "Close without saving"
 msgstr "Schließen ohne zu speichern"
 
-#: src/Controllers/SheetManager.vala:157 src/Widgets/StatisticsBar.vala:93
+#: src/Controllers/SheetManager.vala:156 src/Widgets/StatisticsBar.vala:93
 msgid "No file opened"
 msgstr "Keine Datei geöffnet"
-
-#: src/Connections/ConnectionBase.vala:85 src/Widgets/About.vala:59
-#: src/Widgets/PublisherPreviewWindow.vala:295
-#: src/Widgets/ProjectStatistics.vala:71
-msgid "Close"
-msgstr "Schließen"
 
 #: src/Connections/WriteFreelyConnection.vala:103
 #: src/Connections/WordpressConnection.vala:85
@@ -430,7 +123,6 @@ msgstr "Nutzername"
 
 #: src/Connections/WriteFreelyConnection.vala:107
 #: src/Connections/GhostConnection.vala:86
-#: src/Connections/WordpressConnection.vala:89
 msgid "Password"
 msgstr "Passwort"
 
@@ -440,43 +132,21 @@ msgstr "Passwort"
 msgid "Endpoint"
 msgstr "Endpunkt"
 
-#: src/Connections/WriteFreelyConnection.vala:127
-msgid "New WriteFreely Connection"
-msgstr "Neue WriteFreely Verbindung"
-
 #: src/Connections/WriteFreelyConnection.vala:130
 #: src/Connections/GhostConnection.vala:109
 #: src/Connections/WordpressConnection.vala:112
 msgid "_Add Account"
 msgstr "_Account hinzufügen"
 
-#: src/Connections/WriteFreelyConnection.vala:233
-msgid "Taking your words, and letting them go... to the internet!"
-msgstr ""
-
-#: src/Connections/WriteFreelyConnection.vala:234
-msgid "Mhm... I see and I ship."
-msgstr ""
-
-#: src/Connections/WriteFreelyConnection.vala:235
-msgid "Is this a selfie, and you're happy to see me?"
-msgstr ""
-
-#: src/Connections/WriteFreelyConnection.vala:238
-#: src/Connections/GhostConnection.vala:197
-#: src/Connections/WordpressConnection.vala:198
-msgid "Uploading images"
-msgstr "Bilder werden hochgeladen"
-
 #: src/Connections/WriteFreelyConnection.vala:318
 #: src/Connections/GhostConnection.vala:288
-#: src/Connections/WordpressConnection.vala:288
+#: src/Connections/WordpressConnection.vala:297
 msgid " Published"
 msgstr " Veröffentlicht"
 
 #: src/Connections/WriteFreelyConnection.vala:318
 #: src/Connections/GhostConnection.vala:288
-#: src/Connections/WordpressConnection.vala:288
+#: src/Connections/WordpressConnection.vala:297
 msgid "Post Published"
 msgstr "Beitrag veröffentlicht"
 
@@ -484,45 +154,11 @@ msgstr "Beitrag veröffentlicht"
 msgid "E-mail"
 msgstr "E-mail"
 
-#: src/Connections/GhostConnection.vala:106
-msgid "New ghost Connection"
-msgstr "Neue gohst Verbindung"
-
-#: src/Connections/GhostConnection.vala:192
-msgid "Your words are like Casper... Friendly!"
-msgstr ""
-
-#: src/Connections/GhostConnection.vala:193
-msgid "I see your words, and I'm taking them to the internet!"
-msgstr ""
-
-#: src/Connections/GhostConnection.vala:194
-msgid "Booooooooooo! (That's Ghost speak for Great Work!)"
-msgstr ""
-
-#: src/Connections/WordpressConnection.vala:109
-msgid "New Wordpress Connection"
-msgstr "Neue Wordpress Verbindung"
-
-#: src/Connections/WordpressConnection.vala:191
-msgid "Taking it to the internet!"
-msgstr ""
-
-#: src/Connections/WordpressConnection.vala:192
-msgid "Don't forget to share on reddit."
-msgstr ""
-
-#: src/Connections/WordpressConnection.vala:193
-msgid "Pressing words together..."
-msgstr ""
-
-#: src/Enrichments/Fountain.vala:32
-msgid "Characters"
-msgstr "Zeichen"
-
-#: src/Enrichments/Markdown.vala:30
-msgid "Citations"
-msgstr "Zitate"
+#: src/Connections/WriteFreelyConnection.vala:238
+#: src/Connections/GhostConnection.vala:197
+#: src/Connections/WordpressConnection.vala:217
+msgid "Uploading images"
+msgstr "Bilder werden hochgeladen"
 
 #: src/Exporters/ExportDocx.vala:60
 msgid "Export DocX"
@@ -544,16 +180,6 @@ msgstr "Als LaTeX exportieren"
 msgid "Export Markdown"
 msgstr "Als Markdown exportieren"
 
-#: src/Exporters/ExportFountain.vala:57
-#, fuzzy
-msgid "Fountain files"
-msgstr "Fountain Dateien"
-
-#: src/Exporters/ExportFountain.vala:63
-#, fuzzy
-msgid "Export Fountain"
-msgstr "Als Fountain exportieren"
-
 #: src/Exporters/ExportMhtml.vala:62
 msgid "Export MHTML"
 msgstr "Als MHTML exporieren"
@@ -561,18 +187,6 @@ msgstr "Als MHTML exporieren"
 #: src/Exporters/ExportPdf.vala:93
 msgid "Export PDF"
 msgstr "Als PDF exportieren"
-
-#: src/Exporters/ExportPdf.vala:149
-msgid "Simply Shakespearean."
-msgstr ""
-
-#: src/Exporters/ExportPdf.vala:150
-msgid "Hmm... that's interesting..."
-msgstr ""
-
-#: src/Exporters/ExportPdf.vala:151
-msgid "Your writing is insightful."
-msgstr ""
 
 #: src/Exporters/ExportPdf.vala:153 src/Exporters/ExportPdf.vala:183
 msgid "Working PDF Magic"
@@ -582,13 +196,17 @@ msgstr "PDF-Magie wird ausgeführt"
 msgid "Making sure your hard work looks purrfect..."
 msgstr "Sicherstellen, dass deine harte Arbeit perfekt aussieht..."
 
-#: src/Widgets/About.vala:44 src/Widgets/QuickPreferences.vala:132
-#: src/Widgets/QuickPreferences.vala:216 src/Widgets/QuickPreferences.vala:295
+#: src/Exporters/ExportPdf.vala:107
+msgid "Print to File"
+msgstr "Als PDF drucken"
+
+#: src/Widgets/About.vala:44 src/Widgets/QuickPreferences.vala:146
+#: src/Widgets/QuickPreferences.vala:237 src/Widgets/QuickPreferences.vala:326
 msgid "About ThiefMD"
 msgstr "Über ThiefMD"
 
-#: src/Widgets/About.vala:44 src/Widgets/QuickPreferences.vala:130
-#: src/Widgets/QuickPreferences.vala:214 src/Widgets/QuickPreferences.vala:293
+#: src/Widgets/About.vala:44 src/Widgets/QuickPreferences.vala:144
+#: src/Widgets/QuickPreferences.vala:235 src/Widgets/QuickPreferences.vala:324
 msgid "About"
 msgstr "Über"
 
@@ -596,43 +214,27 @@ msgstr "Über"
 msgid "Credits"
 msgstr "Impressum"
 
-#. website = ThiefProperties.URL;
-#: src/Widgets/About.vala:94
-msgid "Feedback"
-msgstr "Feedback"
+#: src/Connections/ConnectionBase.vala:85 src/Widgets/About.vala:59
+#: src/Widgets/PublisherPreviewWindow.vala:295
+#: src/Widgets/ProjectStatistics.vala:71
+msgid "Close"
+msgstr "Schließen"
 
-#. license_type = ThiefProperties.LICENSE_TYPE;
-#: src/Widgets/About.vala:99
-msgid "This program comes with absolutely no warranty."
-msgstr "Dieses Programm wird ohne Garantie geliefert"
-
-#: src/Widgets/About.vala:100
-msgid ""
-"See the <a href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU General "
-"Public License, version 3 or later</a> for details."
-msgstr ""
-"Für Details lies bitte die <a href='https://www.gnu.org/licenses/gpl-3.0."
-"html'>GNU General Public License, version 3 oder neuer</a>."
-
-#: src/Widgets/HeaderBar.vala:86
+#: src/Widgets/Sheets.vala:179
 msgid "New Sheet"
 msgstr "Neue Seite"
 
-#: src/Widgets/HeaderBar.vala:98
+#: src/Widgets/HeaderBar.vala:78
 msgid "Change View"
 msgstr "Ansicht anpassen"
 
-#: src/Widgets/HeaderBar.vala:106
+#: src/ThiefApp.vala:186
 msgid "Add Folder to Library"
 msgstr "Ordner zur Bibliothek hinzufügen"
 
-#: src/Widgets/HeaderBar.vala:129
+#: src/Widgets/HeaderBar.vala:92
 msgid "Settings"
 msgstr "Einstellungen"
-
-#: src/Widgets/HeaderBar.vala:144
-msgid "Show Notes"
-msgstr "Notizen anzeigen"
 
 #: src/Widgets/Sheet.vala:215
 msgid "Sort by"
@@ -662,30 +264,26 @@ msgstr "Sortieren nach aufsteigendem Datum"
 msgid "Sort by Date Descending"
 msgstr "Sortieren nach absteigendem Datum"
 
-#: src/Widgets/Sheet.vala:261 src/Widgets/QuickPreferences.vala:95
-#: src/Widgets/QuickPreferences.vala:179 src/Widgets/QuickPreferences.vala:258
+#: src/Widgets/Sheet.vala:273 src/Widgets/QuickPreferences.vala:95
+#: src/Widgets/QuickPreferences.vala:195 src/Widgets/QuickPreferences.vala:279
 msgid "Preview"
 msgstr "Vorschau"
 
-#: src/Widgets/Sheet.vala:269 src/Widgets/Preferences.vala:482
+#: src/Widgets/Sheet.vala:281 src/Widgets/Preferences.vala:482
 #: src/Widgets/PublisherPreviewWindow.vala:155
 #: src/Widgets/ProjectStatistics.vala:64
 msgid "Export"
 msgstr "Exportieren"
 
-#: src/Widgets/Sheet.vala:277
-msgid "Copy File Path"
-msgstr "Dateipfad kopieren"
-
 #. Gtk.MenuItem menu_rename = new Gtk.MenuItem.with_label (_("Rename File"));
 #. menu_rename.activate.connect (() => {
 #. });
 #. menu.add (menu_rename);
-#: src/Widgets/Sheet.vala:293
+#: src/Widgets/Sheet.vala:305
 msgid "Danger Zone"
 msgstr "Gefahrenzone"
 
-#: src/Widgets/Sheet.vala:299
+#: src/Widgets/Sheet.vala:311
 msgid "Move to Trash"
 msgstr "Löschen"
 
@@ -697,128 +295,47 @@ msgstr "_Von Festplatte laden"
 msgid "_Keep what's in editor"
 msgstr "_Im Editor behalten"
 
-#: src/Widgets/Editor.vala:1263
+#: src/Widgets/Editor.vala:1278
 msgid "Insert Datetime"
 msgstr "Datum einfügen"
 
-#: src/Widgets/Editor.vala:1281
+#: src/Widgets/Editor.vala:1296
 msgid "Insert YAML Frontmatter"
 msgstr "YAML-Formatierung einfügen"
 
-#: src/Widgets/Editor.vala:1379
-msgid "Insert Citation"
-msgstr "Zitat einfügen"
-
-#. insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
-#: src/Widgets/Library.vala:73
-msgid "Library"
-msgstr "Bibliothek"
-
-#: src/Widgets/Library.vala:538
+#: src/Widgets/Library.vala:539
 msgid "Export Preview"
 msgstr "Vorschau exportieren"
 
-#: src/Widgets/Library.vala:548
+#: src/Widgets/Library.vala:549
 msgid "Writing Statistics"
 msgstr "Schreibstatistik"
 
-#: src/Widgets/Library.vala:561
+#: src/Widgets/Library.vala:562
 msgid "Search "
 msgstr "Suche "
 
-#: src/Widgets/Library.vala:573
-msgid "Open in File Manager"
-msgstr "Im Dateiverwaltung öffnen"
-
-#: src/Widgets/Library.vala:585
+#: src/Widgets/Library.vala:586
 msgid "Create Sub-Folder"
 msgstr "Unterordner erstellen"
 
-#: src/Widgets/Library.vala:602
+#: src/Widgets/Library.vala:603
 msgid "Hide from Library"
 msgstr "Verbergen"
 
-#: src/Widgets/Library.vala:626
+#: src/Widgets/Library.vala:627
 msgid "Show Hidden Items"
 msgstr "Verborgene Einträge anzeigen"
 
-#: src/Widgets/Library.vala:638
-msgid "Set Project Icon"
-msgstr "Projekt-Icon wählen"
-
-#: src/Widgets/Library.vala:641 src/Widgets/Preferences.vala:389
-msgid "None"
-msgstr "Keine"
-
-#: src/Widgets/Library.vala:644
-msgid "Folder"
-msgstr "Ordner"
-
-#: src/Widgets/Library.vala:647
-msgid "Reader"
-msgstr "Leser"
-
-#: src/Widgets/Library.vala:650
-msgid "Love"
-msgstr "Liebe"
-
-#: src/Widgets/Library.vala:653
-msgid "Game"
-msgstr "Spiel"
-
-#: src/Widgets/Library.vala:656
-msgid "Art"
-msgstr "Kunst"
-
-#: src/Widgets/Library.vala:659
-msgid "Nature"
-msgstr "Natur"
-
-#: src/Widgets/Library.vala:662
-msgid "Food"
-msgstr "Essen"
-
-#: src/Widgets/Library.vala:665
-msgid "Help"
-msgstr "Hilfe"
-
-#: src/Widgets/Library.vala:668
-msgid "Cool"
-msgstr "Kalt"
-
-#: src/Widgets/Library.vala:671
-msgid "Angel"
-msgstr "Engel"
-
-#: src/Widgets/Library.vala:674
-msgid "Monkey"
-msgstr "Affe"
-
-#: src/Widgets/Library.vala:677
-msgid "WordPress"
-msgstr "WordPress"
-
-#: src/Widgets/Library.vala:680
-msgid "Ghost"
-msgstr "Ghost"
-
-#: src/Widgets/Library.vala:683
-msgid "Write Freely"
-msgstr "Write Freely"
-
-#: src/Widgets/Library.vala:686
-msgid "Trash"
-msgstr "Müll"
-
-#: src/Widgets/Library.vala:696
+#: src/Widgets/Library.vala:697
 msgid "Remove from Library"
 msgstr "Aus Bibliothek entfernen"
 
-#: src/Widgets/Library.vala:933
+#: src/Widgets/Library.vala:934
 msgid "Copy"
 msgstr "Kopieren"
 
-#: src/Widgets/Library.vala:935
+#: src/Widgets/Library.vala:936
 msgid "Move"
 msgstr "Verschieben"
 
@@ -837,10 +354,6 @@ msgstr "Seitenname"
 #: src/Widgets/NewSheet.vala:40
 msgid "Create"
 msgstr "Erstellen"
-
-#: src/Widgets/NewSheet.vala:41
-msgid "Import"
-msgstr "Importieren"
 
 #: src/Widgets/Preferences.vala:50
 msgid "Current Connections"
@@ -862,39 +375,9 @@ msgstr "Wähle dein blogger Programm."
 msgid "  WriteFreely"
 msgstr "  WriteFreely"
 
-#: src/Widgets/Preferences.vala:83 src/Widgets/Preferences.vala:117
-#: src/Widgets/Preferences.vala:151 src/Widgets/Preferences.vala:185
-#: src/Widgets/Preferences.vala:219 src/Widgets/Preferences.vala:264
-msgid "Connection Error"
-msgstr ""
-
 #: src/Widgets/Preferences.vala:91
 msgid "  ghost"
 msgstr "  ghost"
-
-#: src/Widgets/Preferences.vala:125
-msgid "  WordPress"
-msgstr "  WordPress"
-
-#: src/Widgets/Preferences.vala:159
-msgid "  Medium"
-msgstr ""
-
-#: src/Widgets/Preferences.vala:193
-msgid "  Forem"
-msgstr ""
-
-#: src/Widgets/Preferences.vala:227
-msgid "  Hashnode"
-msgstr ""
-
-#: src/Widgets/Preferences.vala:279
-msgid "Connections"
-msgstr "Verbindungen"
-
-#: src/Widgets/Preferences.vala:340
-msgid "Remove "
-msgstr "Entfernen "
 
 #: src/Widgets/Preferences.vala:343
 msgid "_Remove"
@@ -904,21 +387,13 @@ msgstr "_Entfernen"
 msgid "_Keep"
 msgstr "_Behalten"
 
-#: src/Widgets/Preferences.vala:373
-msgid "Display"
-msgstr "Anzeigen"
-
-#: src/Widgets/Preferences.vala:377
-msgid "Display Options"
-msgstr "Anzeigeoptionen"
-
-#: src/Widgets/Preferences.vala:378
-msgid "Make ThiefMD feel like home."
-msgstr "Fühle dich wie Zuhause in ThiefMD"
-
 #: src/Widgets/Preferences.vala:384
 msgid "Focus"
 msgstr "Fokusieren"
+
+#: src/Widgets/Library.vala:642 src/Widgets/Preferences.vala:389
+msgid "None"
+msgstr "Keine"
 
 #: src/Widgets/Preferences.vala:390
 msgid "Paragraph"
@@ -932,33 +407,17 @@ msgstr "Satz"
 msgid "Word"
 msgstr "Wort"
 
-#: src/Widgets/Preferences.vala:431
-msgid "Number of Lines to Preview in Sheets View"
-msgstr "Anzahl der Zeilen in der Seitenvorschau"
-
 #: src/Widgets/Preferences.vala:440
 msgid "Add New Theme"
 msgstr "Neues Theme einfügen"
-
-#: src/Widgets/Preferences.vala:487
-msgid "Compiling Options"
-msgstr "Zusammensetzungsoptionen"
-
-#: src/Widgets/Preferences.vala:488
-msgid "Adjust how Markdown files are compiled together."
-msgstr "Passen Sie an, wie Markdown-Dateien zusammengesetzt werden."
 
 #: src/Widgets/Preferences.vala:496
 msgid "First Markdown File includes Author Metadata"
 msgstr "Die erste Markdowndatei enthält Metadaten zum Autor"
 
 #: src/Widgets/Preferences.vala:498
-msgid ""
-"First Markdown file includes <a href='https://pandoc.org/MANUAL.html#epub-"
-"metadata'>Author metadata</a>"
-msgstr ""
-"Die erste Markdowndatei enthält <a href='https://pandoc.org/MANUAL.html#epub-"
-"metadata'>Metadaten zum Autor</a>"
+msgid "First Markdown file includes <a href='https://pandoc.org/MANUAL.html#epub-metadata'>Author metadata</a>"
+msgstr "Die erste Markdowndatei enthält <a href='https://pandoc.org/MANUAL.html#epub-metadata'>Metadaten zum Autor</a>"
 
 #: src/Widgets/Preferences.vala:514
 msgid "Resolve full paths to resources"
@@ -975,14 +434,6 @@ msgstr "YAML-Titel als Überschrift einbinden"
 #: src/Widgets/Preferences.vala:533
 msgid "Include YAML title as H1 Heading"
 msgstr "YAML-Titel als H1 Überschrift einbinden"
-
-#: src/Widgets/Preferences.vala:543
-msgid "Page Setup"
-msgstr "Seite einrichten"
-
-#: src/Widgets/Preferences.vala:544
-msgid "Configure PDF export options."
-msgstr "Passe die Einstellungen für den PDF-Export an."
 
 #: src/Widgets/Preferences.vala:552
 msgid "Page Break between Folders"
@@ -1008,37 +459,9 @@ msgstr "Seitenabstand der PDF in Zoll"
 msgid "Top & Bottom margins in PDF in inches"
 msgstr "Oberer & Unterer Abstand der PDF in Zoll"
 
-#: src/Widgets/Preferences.vala:641
-msgid "PDF CSS"
-msgstr "PDF CSS"
-
-#: src/Widgets/Preferences.vala:642
-msgid "Choose CSS Style for PDF Export."
-msgstr "Wähle den CSS-Stil für den PDF-Export."
-
-#: src/Widgets/Preferences.vala:650
-msgid "ePub & HTML CSS"
-msgstr "ePUB & HTLM CSS"
-
-#: src/Widgets/Preferences.vala:651
-msgid "Choose CSS Style to use for ePub and HTML Export."
-msgstr "Wähle den CSS-Stil für den ePUB und HTML-Export."
-
 #: src/Widgets/Preferences.vala:657
 msgid "Add Export Style"
 msgstr "Export Stil hinzufügen"
-
-#: src/Widgets/Preferences.vala:680
-msgid "Editor"
-msgstr "Editor"
-
-#: src/Widgets/Preferences.vala:684
-msgid "Editor Settings"
-msgstr "Editoreinstellungen"
-
-#: src/Widgets/Preferences.vala:685
-msgid "Modify the ThiefMD environment."
-msgstr "Ändere die ThiefMD-Umgebung."
 
 #: src/Widgets/Preferences.vala:693
 msgid "Enable spellcheck"
@@ -1072,22 +495,6 @@ msgstr "Schreibstatistik umschalten"
 msgid "Show writing statistics"
 msgstr "Schreibstatistik anzeigen"
 
-#: src/Widgets/Preferences.vala:765
-msgid "Disable application tips"
-msgstr "Anwendungstipps deaktivieren"
-
-#: src/Widgets/Preferences.vala:766
-msgid "Start with new empty sheet on launch"
-msgstr "Mit neuer leerer Seite beginnen"
-
-#: src/Widgets/Preferences.vala:779
-msgid "ThiefMD Settings"
-msgstr "ThiefMD-Einstellungen"
-
-#: src/Widgets/Preferences.vala:780
-msgid "Modify the ThiefMD appearance."
-msgstr "Ändere das ThiefMD-Erscheinungsbild."
-
 #: src/Widgets/Preferences.vala:790
 msgid "Toggle interface theming"
 msgstr "Darstellungsthema umschalten"
@@ -1120,18 +527,10 @@ msgstr "Reihenfolge der Bibliothek umschalten"
 msgid "Keep library order"
 msgstr "Reihenfolge der Bibliothek beibehalten"
 
-#: src/Widgets/Preferences.vala:858
-msgid "Toggle experimental features"
-msgstr "Experimentelle Funktionen"
-
-#: src/Widgets/Preferences.vala:860
-msgid "Enable experimental features"
-msgstr "Experimentelle Funktionen aktivieren"
-
 #: src/Widgets/PublisherPreviewWindow.vala:67
 #: src/Widgets/PublisherPreviewWindow.vala:209
-#: src/Widgets/QuickPreferences.vala:104 src/Widgets/QuickPreferences.vala:188
-#: src/Widgets/QuickPreferences.vala:267
+#: src/Widgets/QuickPreferences.vala:109 src/Widgets/QuickPreferences.vala:204
+#: src/Widgets/QuickPreferences.vala:293
 msgid "Publishing Preview"
 msgstr "Vorschau der Veröffentlichung"
 
@@ -1156,14 +555,11 @@ msgid "words"
 msgstr "Wörter"
 
 #: src/Widgets/ProjectStatistics.vala:126
-#, c-format
-msgid ""
-"<b>Reading Time:</b>\n"
+msgid "<b>Reading Time:</b>\n"
 "%d %s\n"
 "%d %s\n"
 "%d %s"
-msgstr ""
-"<b>Lesezeit:</b>\n"
+msgstr "<b>Lesezeit:</b>\n"
 "%d %s\n"
 "%d %s\n"
 "%d %s"
@@ -1212,75 +608,41 @@ msgstr ""
 msgid "Toggle Write Good"
 msgstr "Write Good umschalten"
 
-#: src/Widgets/QuickPreferences.vala:71
-msgid "Check Grammar"
-msgstr "Grammatik überprüfen"
-
-#: src/Widgets/QuickPreferences.vala:74
-msgid "Toggle Grammar Checking"
-msgstr "Grammatiküberprüfung einschalten"
-
-#: src/Widgets/QuickPreferences.vala:87
-msgid "Grammar check is not available for your language"
-msgstr "Die Grammatiküberprüfung ist in dieser Sprache nicht verfügbar."
-
-#: src/Widgets/QuickPreferences.vala:97 src/Widgets/QuickPreferences.vala:181
-#: src/Widgets/QuickPreferences.vala:260
+#: src/Widgets/QuickPreferences.vala:97 src/Widgets/QuickPreferences.vala:197
+#: src/Widgets/QuickPreferences.vala:281
 msgid "Launch Preview"
 msgstr "Vorschau anzeigen"
 
-#: src/Widgets/QuickPreferences.vala:106 src/Widgets/QuickPreferences.vala:190
-#: src/Widgets/QuickPreferences.vala:269
-msgid "Open Export Window"
-msgstr "Exportfenster öffnen"
-
-#: src/Widgets/QuickPreferences.vala:113 src/Widgets/QuickPreferences.vala:197
-#: src/Widgets/QuickPreferences.vala:276
-msgid "Search Library"
-msgstr "Bibliothek durchsuchen"
-
-#: src/Widgets/QuickPreferences.vala:115 src/Widgets/QuickPreferences.vala:199
-#: src/Widgets/QuickPreferences.vala:278
-msgid "Open Search Window"
-msgstr "Suchfenster öffnen"
-
-#: src/Widgets/QuickPreferences.vala:121 src/Widgets/QuickPreferences.vala:205
-#: src/Widgets/QuickPreferences.vala:284
+#: src/Widgets/QuickPreferences.vala:135 src/Widgets/QuickPreferences.vala:226
+#: src/Widgets/QuickPreferences.vala:315
 msgid "Preferences"
 msgstr "Einstellungen"
 
-#: src/Widgets/QuickPreferences.vala:123 src/Widgets/QuickPreferences.vala:207
-#: src/Widgets/QuickPreferences.vala:286
+#: src/Widgets/QuickPreferences.vala:137 src/Widgets/QuickPreferences.vala:228
+#: src/Widgets/QuickPreferences.vala:317
 msgid "Edit Preferences"
 msgstr "Einstellungen bearbeiten"
 
-#: src/Widgets/ThemeSelector.vala:55
-msgid "Spacing"
-msgstr "Abstand"
+#: src/Constants/ThiefProperties.vala:98 src/Constants/ThiefProperties.vala:99
+#: src/Widgets/ThemeSelector.vala:50
+msgid "Font"
+msgstr "Schriftart"
 
 #: src/Widgets/ThemeSelector.vala:142
 msgid "Font Selector"
 msgstr "Schriftartauswahl"
 
-#: src/Widgets/ThemeSelector.vala:326
-msgid "Download"
-msgstr "Herunterladen"
-
-#: src/Widgets/ThemeSelector.vala:326
-msgid "more themes"
-msgstr "mehr Themes"
-
-#: src/Widgets/ThemeSelector.vala:326
-msgid "Stored in"
-msgstr "Gespeichert in"
+#: src/Widgets/ThemeSelector.vala:320
+msgid "Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
+"<small>Stored in <a href='file://"
+msgstr "<a href='https://themes.thiefmd.com/themes/'>Mehr Themen </a> herunterladen.\n"
+"<small>Speicherort: <a href='file://"
 
 #: src/Widgets/SearchBar.vala:110
-#, c-format
 msgid "(%d occurences)"
 msgstr "(%d Vorkommen)"
 
 #: src/Widgets/StatisticsBar.vala:100
-#, c-format
 msgid "%d %s %d %s and %d %s reading time."
 msgstr "%d %s %d %s und %d %s Lesezeit."
 
@@ -1305,7 +667,6 @@ msgid "seconds"
 msgstr "Sekunden"
 
 #: src/Widgets/StatisticsBar.vala:106
-#, c-format
 msgid "%s : %d words."
 msgstr "%s : %d Wörter."
 
@@ -1313,9 +674,9 @@ msgstr "%s : %d Wörter."
 msgid "Library Search"
 msgstr "Bibliothek durchsuchen"
 
-#: src/Widgets/SearchWindow.vala:421
-msgid "Search"
-msgstr "Suche"
+#: src/Widgets/SearchWindow.vala:422
+msgid " Search"
+msgstr " Suche"
 
 #: src/Widgets/SearchWindow.vala:445
 msgid "Monitor for Library changes"
@@ -1329,16 +690,617 @@ msgstr "<b>Dateiinhalt stehlen...</b>"
 msgid "Heading"
 msgstr "Überschrift"
 
-#~ msgid "Print to File"
-#~ msgstr "Als PDF drucken"
+#. Font settings
+#. Arbitrary strings
+#: src/Constants/AppSettings.vala:104
+msgid "# Click on a sheet to get started\n"
+"\n"
+"First time here?  Drag a folder into the library, or click on the Folder icon to select a folder to add.\n"
+"\n"
+"## Thief Tip:\n"
+"\n"
+"%s"
+msgstr "# Wähle eine Seite um loszulegen\n"
+"\n"
+"Das erste mal hier?  Schiebe einen Ordner in die Bibliothek auf der linken Seite oder öffne einen über das Ordnersymbol.\n"
+"\n"
+"## Kleiner Tipp:\n"
+"\n"
+"%s"
 
-#~ msgid ""
-#~ "Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
-#~ "<small>Stored in <a href='file://"
-#~ msgstr ""
-#~ "<a href='https://themes.thiefmd.com/themes/'>Mehr Themen </a> "
-#~ "herunterladen.\n"
-#~ "<small>Speicherort: <a href='file://"
+#. insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
+#: src/ThiefApp.vala:182
+msgid "Library"
+msgstr "Bibliothek"
 
-#~ msgid " Search"
-#~ msgstr " Suche"
+#: src/Widgets/Preferences.vala:680
+msgid "Editor"
+msgstr "Editor"
+
+#: src/Widgets/SearchWindow.vala:421
+msgid "Search"
+msgstr "Suche"
+
+#: src/Widgets/QuickPreferences.vala:111 src/Widgets/QuickPreferences.vala:206
+#: src/Widgets/QuickPreferences.vala:295
+msgid "Open Export Window"
+msgstr "Exportfenster öffnen"
+
+#: src/Widgets/QuickPreferences.vala:123 src/Widgets/QuickPreferences.vala:218
+#: src/Widgets/QuickPreferences.vala:307
+msgid "Search Library"
+msgstr "Bibliothek durchsuchen"
+
+#: src/Widgets/QuickPreferences.vala:125 src/Widgets/QuickPreferences.vala:220
+#: src/Widgets/QuickPreferences.vala:309
+msgid "Open Search Window"
+msgstr "Suchfenster öffnen"
+
+#: src/Widgets/ThemeSelector.vala:55
+msgid "Spacing"
+msgstr "Abstand"
+
+#: src/Widgets/Preferences.vala:858
+msgid "Toggle experimental features"
+msgstr "Experimentelle Funktionen"
+
+#: src/Widgets/Preferences.vala:860
+msgid "Enable experimental features"
+msgstr "Experimentelle Funktionen aktivieren"
+
+#: src/Controllers/Dialogs.vala:161
+msgid "Supported files"
+msgstr "Unterstützte Formate"
+
+#: src/Controllers/Dialogs.vala:170
+msgid "%s files"
+msgstr "%s Dateien"
+
+#: src/Widgets/Library.vala:574
+msgid "Open in File Manager"
+msgstr "Im Dateiverwaltung öffnen"
+
+#: src/Widgets/NewSheet.vala:41
+msgid "Import"
+msgstr "Importieren"
+
+#: src/Widgets/Preferences.vala:125
+msgid "  WordPress"
+msgstr "  WordPress"
+
+#: src/Constants/ThiefProperties.vala:25
+msgid "The Markdown editor worth stealing"
+msgstr "Der Markdown-Editor zum Stehlen"
+
+#: src/Constants/ThiefProperties.vala:87
+msgid "Contributors who help make ThiefMD awesome"
+msgstr "Mitwirkende, welche ThiefMD großartig machen"
+
+#: src/Constants/ThiefProperties.vala:89
+msgid "French Translation Contributors"
+msgstr "Französische Übersetzung"
+
+#: src/Constants/ThiefProperties.vala:90
+msgid "Slovak Translation Contributors"
+msgstr "Slovakische Übersetzung"
+
+#: src/Constants/ThiefProperties.vala:91
+msgid "Swedish Translation Contributors"
+msgstr "Schwedische Übersetzung"
+
+#: src/Constants/ThiefProperties.vala:94
+msgid "Original Code"
+msgstr "Original Code"
+
+#: src/Constants/ThiefProperties.vala:94
+msgid "Based on <a href='https://github.com/lainsce/quilter'>Quilter</a>"
+msgstr "Basierend auf <a href='https://github.com/lainsce/quilter'>Quilter</a>"
+""
+
+#: src/Constants/ThiefProperties.vala:94 src/Constants/ThiefProperties.vala:95
+#: src/Constants/ThiefProperties.vala:96 src/Constants/ThiefProperties.vala:97
+#: src/Constants/ThiefProperties.vala:98 src/Constants/ThiefProperties.vala:99
+#: src/Constants/ThiefProperties.vala:100
+#: src/Constants/ThiefProperties.vala:101
+#: src/Constants/ThiefProperties.vala:102
+#: src/Constants/ThiefProperties.vala:103
+#: src/Constants/ThiefProperties.vala:104
+#: src/Constants/ThiefProperties.vala:105
+#: src/Constants/ThiefProperties.vala:106
+#: src/Constants/ThiefProperties.vala:107
+#: src/Constants/ThiefProperties.vala:108
+#: src/Constants/ThiefProperties.vala:109
+msgid "Copyright"
+msgstr "Urheberrecht"
+
+#: src/Constants/ThiefProperties.vala:94
+msgid "GNU General Public License v3.0"
+msgstr "GNU General Public License v3.0"
+
+#: src/Constants/ThiefProperties.vala:95 src/Constants/ThiefProperties.vala:97
+#: src/Constants/ThiefProperties.vala:98 src/Constants/ThiefProperties.vala:99
+msgid "SIL OPEN FONT LICENSE Version 1.1"
+msgstr "SIL OPEN FONT LICENSE Version 1.1"
+
+#: src/Constants/ThiefProperties.vala:100
+msgid "Preview CSS"
+msgstr "CSS Vorschau"
+
+#: src/Constants/ThiefProperties.vala:100
+msgid "Mash up of Splendor and Modest"
+msgstr "Eine Mischung aus Splendor und Modest"
+
+#: src/Constants/ThiefProperties.vala:100
+#: src/Constants/ThiefProperties.vala:109
+msgid "The MIT License (MIT)"
+msgstr "Die MIT Lizenz (MIT)"
+
+#: src/Constants/ThiefProperties.vala:102
+msgid "Markdown Parsing"
+msgstr "Markdown-Parsing"
+
+#: src/Constants/ThiefProperties.vala:102
+msgid "BSD-style License"
+msgstr "BSD-ähnliche Lizenz"
+
+#: src/Constants/ThiefProperties.vala:103
+msgid "Syntax Highlighting"
+msgstr "Syntax Highlighting"
+
+#: src/Constants/ThiefProperties.vala:103
+#: src/Constants/ThiefProperties.vala:107
+msgid "BSD-3-Clause License"
+msgstr "BSD-3-Clause License"
+
+#: src/Constants/ThiefProperties.vala:104
+msgid "Math Rendering"
+msgstr "Mathematik-Rendering"
+
+#: src/Constants/ThiefProperties.vala:104
+msgid "Khan Academy and other contributors."
+msgstr "Khan Academy und andere Mitwirkende."
+
+#: src/Constants/ThiefProperties.vala:96 src/Constants/ThiefProperties.vala:101
+#: src/Constants/ThiefProperties.vala:104
+#: src/Constants/ThiefProperties.vala:105
+msgid "MIT License"
+msgstr "MIT-Lizenz"
+
+#: src/Constants/ThiefProperties.vala:105
+msgid "XML Parsing"
+msgstr "XML-Parsing"
+
+#: src/Constants/ThiefProperties.vala:106
+msgid "Pandoc Export"
+msgstr "Pandoc Export"
+
+#: src/Constants/ThiefProperties.vala:106
+msgid "John MacFarlane and others"
+msgstr "John MacFarlane und andere"
+
+#: src/Constants/ThiefProperties.vala:106
+msgid "GNU General Public License v2.0"
+msgstr "GNU General Public License v2.0"
+
+#: src/Constants/ThiefProperties.vala:109
+msgid "libwritegood-vala based on"
+msgstr "ibwritegood-vala basiert auf"
+
+#: src/Constants/ThiefProperties.vala:109
+#, fuzzy
+msgid "write-good: Naive linter for English prose"
+msgstr "write-good: Hilfe bei englischer Prosa"
+
+#. Needs to be kept in sync with PAPER_SIZES_GTK_NAME
+#: src/Constants/ThiefProperties.vala:113
+msgid "A3 (11.7 x 16.5 inches)"
+msgstr "A3 (29,7 x 42 cm)"
+
+#: src/Constants/ThiefProperties.vala:114
+msgid "A4 (8 x 11 inches)"
+msgstr "A4 (21 x 29,7 cm)"
+
+#: src/Constants/ThiefProperties.vala:115
+msgid "A5 (5.8 x 8.3 inches)"
+msgstr "A5 (14,8 x 21 cm)"
+
+#: src/Constants/ThiefProperties.vala:116
+msgid "B5 (6.93 x 9.84 inches)"
+msgstr "B5 (17,6 x 25 cm)"
+
+#: src/Constants/ThiefProperties.vala:117
+msgid "Executive (7 x 10 inches)"
+msgstr "Executive (18,4 x 26,7 cm)"
+
+#: src/Constants/ThiefProperties.vala:118
+msgid "Legal (8.5 x 14 inches)"
+msgstr "Legal (21,6 x 35,5 cm)"
+
+#: src/Constants/ThiefProperties.vala:119
+msgid "Letter (8.5 x 11 inches)"
+msgstr "Brief (21,6 x 27,9 cm)"
+
+#: src/Constants/ThiefProperties.vala:122
+msgid "Don't like what you see? Hit `Ctrl+,` to access the preferences."
+msgstr "Dir gefällt nicht, was du siehst? Drücke `STRG+C` für die Einstellungen"
+
+#: src/Constants/ThiefProperties.vala:123
+msgid "No built in dark mode? Dark themes are available at https://themes.thiefmd.com. Add more in the Preferences (`Ctrl+,`)."
+msgstr "Kein Dunkler Modus? Themen sind erhältlich unter https://themes.thiefmd.com und in den Einstellungen (`STRG+C`)."
+
+#: src/Constants/ThiefProperties.vala:124
+msgid "Don't like how the preview looks? Hit `Ctrl+,` to access the preferences and click Export."
+msgstr "Du magst die Vorschau nicht? Drücke `STRG+C` für die Einstellungen und klicke Exportieren."
+
+#: src/Constants/ThiefProperties.vala:125
+msgid "Want to import a ePub, HTML, or DocX? Click Import from the New Sheet prompt."
+msgstr "Du willst ein ePUB, HTML oder DocX Dokument öffnen? Importiere es über das Menü zum Seite erstellen."
+
+#: src/Constants/ThiefProperties.vala:126
+msgid "Ready to publish your great work? Right-click on the folder and choose \"Export Preview\""
+msgstr "Bereit deine Arbeit zu veröffentlichen? Rechtsklick den Ordner und wähle \"Vorschau exportieren\""
+
+#: src/Constants/ThiefProperties.vala:127
+msgid "Want to block out distractions? Full-screen is just an `F11` away."
+msgstr "Keine Ablenkung? Dann `F11`."
+
+#: src/Constants/ThiefProperties.vala:128
+msgid "Quickly switch view modes with `Ctrl+1`, `Ctrl+2`, and `Ctrl+3`."
+msgstr "Mit `Ctrl+1`, `Ctrl+2`, und `Ctrl+3` schnell die Ansicht wechseln."
+
+#: src/Constants/ThiefProperties.vala:129
+msgid "Working with a lot of links? Turn on Experimental Mode to make your markdown more readable `Ctrl+Shift+M`."
+msgstr "Arbeitest du viel mit Links? Probiere den Experimentellen Modus `STRG+Umschalt+M`."
+
+#: src/Connections/WriteFreelyConnection.vala:127
+msgid "New WriteFreely Connection"
+msgstr "Neue WriteFreely Verbindung"
+
+#: src/Connections/GhostConnection.vala:106
+msgid "New ghost Connection"
+msgstr "Neue gohst Verbindung"
+
+#: src/Connections/WordpressConnection.vala:109
+msgid "New Wordpress Connection"
+msgstr "Neue Wordpress Verbindung"
+
+#. website = ThiefProperties.URL;
+#: src/Widgets/About.vala:94
+msgid "Feedback"
+msgstr "Feedback"
+
+#. license_type = ThiefProperties.LICENSE_TYPE;
+#: src/Widgets/About.vala:99
+msgid "This program comes with absolutely no warranty."
+msgstr "Dieses Programm wird ohne Garantie geliefert"
+
+#: src/Widgets/About.vala:100
+msgid "See the <a href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU General Public License, version 3 or later</a> for details."
+msgstr "Für Details lies bitte die <a href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU General Public License, version 3 oder neuer</a>."
+
+#: src/Widgets/Preferences.vala:279
+msgid "Connections"
+msgstr "Verbindungen"
+
+#: src/Widgets/Preferences.vala:340
+msgid "Remove "
+msgstr "Entfernen "
+
+#: src/Widgets/Preferences.vala:373
+msgid "Display"
+msgstr "Anzeigen"
+
+#: src/Widgets/Preferences.vala:377
+msgid "Display Options"
+msgstr "Anzeigeoptionen"
+
+#: src/Widgets/Preferences.vala:378
+msgid "Make ThiefMD feel like home."
+msgstr "Fühle dich wie Zuhause in ThiefMD"
+
+#: src/Widgets/Preferences.vala:487
+msgid "Compiling Options"
+msgstr "Zusammensetzungsoptionen"
+
+#: src/Widgets/Preferences.vala:488
+msgid "Adjust how Markdown files are compiled together."
+msgstr "Passen Sie an, wie Markdown-Dateien zusammengesetzt werden."
+
+#: src/Widgets/Preferences.vala:543
+msgid "Page Setup"
+msgstr "Seite einrichten"
+
+#: src/Widgets/Preferences.vala:544
+msgid "Configure PDF export options."
+msgstr "Passe die Einstellungen für den PDF-Export an."
+
+#: src/Widgets/Preferences.vala:641
+msgid "PDF CSS"
+msgstr "PDF CSS"
+
+#: src/Widgets/Preferences.vala:642
+msgid "Choose CSS Style for PDF Export."
+msgstr "Wähle den CSS-Stil für den PDF-Export."
+
+#: src/Widgets/Preferences.vala:650
+msgid "ePub & HTML CSS"
+msgstr "ePUB & HTLM CSS"
+
+#: src/Widgets/Preferences.vala:651
+msgid "Choose CSS Style to use for ePub and HTML Export."
+msgstr "Wähle den CSS-Stil für den ePUB und HTML-Export."
+
+#: src/Widgets/Preferences.vala:684
+msgid "Editor Settings"
+msgstr "Editoreinstellungen"
+
+#: src/Widgets/Preferences.vala:685
+msgid "Modify the ThiefMD environment."
+msgstr "Ändere die ThiefMD-Umgebung."
+
+#: src/Widgets/Preferences.vala:779
+msgid "ThiefMD Settings"
+msgstr "ThiefMD-Einstellungen"
+
+#: src/Widgets/Preferences.vala:780
+msgid "Modify the ThiefMD appearance."
+msgstr "Ändere das ThiefMD-Erscheinungsbild."
+
+#: src/Widgets/ThemeSelector.vala:326
+msgid "Download"
+msgstr "Herunterladen"
+
+#: src/Widgets/ThemeSelector.vala:326
+msgid "more themes"
+msgstr "mehr Themes"
+
+#: src/Widgets/ThemeSelector.vala:326
+msgid "Stored in"
+msgstr "Gespeichert in"
+
+#: src/ThiefApp.vala:315
+#, fuzzy
+msgid "Fountain"
+msgstr "Fountain"
+
+#: src/Constants/ThiefProperties.vala:101
+#, fuzzy
+msgid "Fountain Preview and Export"
+msgstr "Fountain Vorschau und Export"
+
+#: src/Exporters/ExportFountain.vala:57
+#, fuzzy
+msgid "Fountain files"
+msgstr "Fountain Dateien"
+
+#: src/Exporters/ExportFountain.vala:63
+#, fuzzy
+msgid "Export Fountain"
+msgstr "Als Fountain exportieren"
+
+#: src/Widgets/HeaderBar.vala:107
+msgid "Show Notes"
+msgstr "Notizen anzeigen"
+
+#: src/Widgets/Sheet.vala:289
+msgid "Copy File Path"
+msgstr "Dateipfad kopieren"
+
+#: src/Widgets/Editor.vala:1394
+msgid "Insert Citation"
+msgstr "Zitat einfügen"
+
+#: src/Widgets/Library.vala:639
+msgid "Set Project Icon"
+msgstr "Projekt-Icon wählen"
+
+#: src/Widgets/Library.vala:645
+msgid "Folder"
+msgstr "Ordner"
+
+#: src/Widgets/Library.vala:648
+msgid "Reader"
+msgstr "Leser"
+
+#: src/Widgets/Library.vala:651
+msgid "Love"
+msgstr "Liebe"
+
+#: src/Widgets/Library.vala:654
+msgid "Game"
+msgstr "Spiel"
+
+#: src/Widgets/Library.vala:657
+msgid "Art"
+msgstr "Kunst"
+
+#: src/Widgets/Library.vala:660
+msgid "Nature"
+msgstr "Natur"
+
+#: src/Widgets/Library.vala:663
+msgid "Food"
+msgstr "Essen"
+
+#: src/Widgets/Library.vala:666
+msgid "Help"
+msgstr "Hilfe"
+
+#: src/Widgets/Library.vala:669
+msgid "Cool"
+msgstr "Kalt"
+
+#: src/Widgets/Library.vala:672
+msgid "Angel"
+msgstr "Engel"
+
+#: src/Widgets/Library.vala:675
+msgid "Monkey"
+msgstr "Affe"
+
+#: src/Widgets/Library.vala:678
+msgid "WordPress"
+msgstr "WordPress"
+
+#: src/Widgets/Library.vala:681
+msgid "Ghost"
+msgstr "Ghost"
+
+#: src/Widgets/Library.vala:684
+msgid "Write Freely"
+msgstr "Write Freely"
+
+#: src/Widgets/Library.vala:687
+msgid "Trash"
+msgstr "Müll"
+
+#: src/Widgets/Preferences.vala:431
+msgid "Number of Lines to Preview in Sheets View"
+msgstr "Anzahl der Zeilen in der Seitenvorschau"
+
+#: src/Widgets/Preferences.vala:765
+msgid "Disable application tips"
+msgstr "Anwendungstipps deaktivieren"
+
+#: src/Widgets/Preferences.vala:766
+msgid "Start with new empty sheet on launch"
+msgstr "Mit neuer leerer Seite beginnen"
+
+#: src/Enrichments/Fountain.vala:32
+msgid "Characters"
+msgstr "Zeichen"
+
+#: src/Enrichments/Markdown.vala:30
+msgid "Citations"
+msgstr "Zitate"
+
+#: src/Constants/ThiefProperties.vala:95
+msgid "Stolen Victory Font"
+msgstr "Stolen Victory Schriftart"
+
+#: src/Constants/ThiefProperties.vala:108
+msgid "Grammar Check"
+msgstr "Gramatikprüfung"
+
+#: src/Constants/ThiefProperties.vala:108
+msgid "the AbiSource Community"
+msgstr "die AbiSource Gemeinschaft"
+
+#: src/Constants/ThiefProperties.vala:108
+msgid "GNU Lesser General Public License v2.1"
+msgstr "GNU Lesser General Public License v2.1"
+
+#: src/Widgets/QuickPreferences.vala:71
+msgid "Check Grammar"
+msgstr "Grammatik überprüfen"
+
+#: src/Widgets/QuickPreferences.vala:74
+msgid "Toggle Grammar Checking"
+msgstr "Grammatiküberprüfung einschalten"
+
+#: src/Widgets/QuickPreferences.vala:87
+msgid "Grammar check is not available for your language"
+msgstr "Die Grammatiküberprüfung ist in dieser Sprache nicht verfügbar."
+
+#: src/Constants/ThiefProperties.vala:88
+msgid "Czech Translation Contributors"
+msgstr ""
+
+#: src/Constants/ThiefProperties.vala:107
+msgid "PDF Export"
+msgstr ""
+
+#: src/Constants/ThiefProperties.vala:107
+msgid "Simon Sapin and contributors"
+msgstr ""
+
+#: src/Controllers/FileManager.vala:39
+msgid "Stealing file contents..."
+msgstr ""
+
+#: src/Controllers/FileManager.vala:40
+msgid "This isn't plagiarism, it's a remix!"
+msgstr ""
+
+#: src/Controllers/FileManager.vala:41
+msgid "NYT Best Seller, here we come!"
+msgstr ""
+
+#: src/Connections/WriteFreelyConnection.vala:233
+msgid "Taking your words, and letting them go... to the internet!"
+msgstr ""
+
+#: src/Connections/WriteFreelyConnection.vala:234
+msgid "Mhm... I see and I ship."
+msgstr ""
+
+#: src/Connections/WriteFreelyConnection.vala:235
+msgid "Is this a selfie, and you're happy to see me?"
+msgstr ""
+
+#: src/Connections/GhostConnection.vala:192
+msgid "Your words are like Casper... Friendly!"
+msgstr ""
+
+#: src/Connections/GhostConnection.vala:193
+msgid "I see your words, and I'm taking them to the internet!"
+msgstr ""
+
+#: src/Connections/GhostConnection.vala:194
+msgid "Booooooooooo! (That's Ghost speak for Great Work!)"
+msgstr ""
+
+#: src/Connections/WordpressConnection.vala:192
+msgid "Taking it to the internet!"
+msgstr ""
+
+#: src/Connections/WordpressConnection.vala:193
+msgid "Don't forget to share on reddit."
+msgstr ""
+
+#: src/Connections/WordpressConnection.vala:194
+msgid "Pressing words together..."
+msgstr ""
+
+#: src/Exporters/ExportPdf.vala:149
+msgid "Simply Shakespearean."
+msgstr ""
+
+#: src/Exporters/ExportPdf.vala:150
+msgid "Hmm... that's interesting..."
+msgstr ""
+
+#: src/Exporters/ExportPdf.vala:151
+msgid "Your writing is insightful."
+msgstr ""
+
+#: src/Widgets/Preferences.vala:83 src/Widgets/Preferences.vala:117
+#: src/Widgets/Preferences.vala:151 src/Widgets/Preferences.vala:185
+#: src/Widgets/Preferences.vala:219 src/Widgets/Preferences.vala:264
+msgid "Connection Error"
+msgstr ""
+
+#: src/Widgets/Preferences.vala:159
+msgid "  Medium"
+msgstr ""
+
+#: src/Widgets/Preferences.vala:193
+msgid "  Forem"
+msgstr ""
+
+#: src/Widgets/Preferences.vala:227
+msgid "  Hashnode"
+msgstr ""
+
+#: src/Constants/ThiefProperties.vala:92
+msgid "German Translation Contributors"
+msgstr ""
+
+#: src/Constants/ThiefProperties.vala:93
+msgid "Finnish Translation Contributors"
+msgstr ""
+
+#: src/Connections/WordpressConnection.vala:89
+msgid "Application Password"
+msgstr ""
+
