@@ -13,9 +13,6 @@ jobs:
       - name: Add vala next
         run: sudo add-apt-repository ppa:vala-team/daily
 
-      - name: Add libhandy-1 for focal
-        run: sudo add-apt-repository ppa:apandada1/libhandy-1
-
       - name: Update Ubuntu
         run: sudo apt-get update
 
