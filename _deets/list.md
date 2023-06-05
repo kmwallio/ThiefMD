@@ -42,6 +42,9 @@ title: Details
   * [WriteFreely](https://writefreely.org)
   * [Ghost](https://ghost.org)
   * [WordPress](https://wordpress.org)
+  * [Medium](https://medium.com)
+  * [Hashnode](https://hashnode.com)
+  * [Forem](https://www.forem.com)
 * Import (Drag File onto Folder in Library)
   * [Office Open XML](https://en.wikipedia.org/wiki/Office_Open_XML) - file.docx
   * [OpenDocument](https://en.wikipedia.org/wiki/OpenDocument) - file.odt

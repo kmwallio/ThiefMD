@@ -81,6 +81,10 @@ buffer.paste_done.connect ((clipboard) => {
 
 [Forem-vala](https://github.com/ThiefMD/forem-vala) is a simple library for publishing posts to [Forem](https://www.forem.com) communities (like [dev.to](https://dev.to)).
 
+## Hashnode-vala
+
+[Hashnode-vala](https://github.com/TwiRp/hashnode-vala) is a simple library for publishing posts to [Hashnode](https://hashnode.com).
+
 ## BibTeX-vala
 
 [BibTeX-vala](https://github.com/ThiefMD/BiBtex-vala) is a quick processor for [BibTeX](http://www.bibtex.org) files. It generates a HashMap of items in the BibTeX file and allows for querying a list of the labels and getting a title for the label.
