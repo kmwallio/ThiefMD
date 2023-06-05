@@ -13,6 +13,7 @@ We're making ThiefMD components reusable. You can find the components in at [Git
 - [wordpress-vala](#wordpress-vala)
 - [medium-vala](#medium-vala)
 - [forem-vala](#forem-vala)
+- [hashnode-vala](#hashnode-vala)
 - [BibTeX-vala](#BibTeX-vala)
 - [Theme Generator](#theme-generator)
 - [ultheme-vala](#ultheme-vala)
