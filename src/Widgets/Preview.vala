@@ -303,7 +303,9 @@ namespace ThiefMD.Widgets {
 
             // Use fast preview if no special cases are needed
             string bib_file = (!exporting) ? find_bibtex_for_sheet (settings.last_file) : "";
-            bool need_pandoc = Pandoc.needs_bibtex (raw_mk);
+            bool need_pandoc = Pandoc.needs_bibtex (raw_mk) || Pandoc.has_discount_issue (processed_mk);
+
+            warning ("NEED PANDOC: %s", need_pandoc? "yes":"no");
 
             // BibTeX File
             if (!exporting && (settings.last_file.has_suffix ("bib") || settings.last_file.has_suffix ("bibtex"))) {
@@ -325,7 +327,7 @@ namespace ThiefMD.Widgets {
                 }
             }
 
-            if (need_pandoc || render_citations) {
+            if (render_citations) {
                 return Pandoc.make_preview (out processed_mk, raw_mk, bib_file, exporting);
             } else {
                 string title, date;
@@ -337,8 +339,8 @@ namespace ThiefMD.Widgets {
                     true,   // Include empty lines
                     settings.export_include_yaml_title, // H1 title:
                     false); // Include date
-                    
-                if (exporting) {
+
+                if (exporting || need_pandoc) {
                     return Pandoc.make_preview (out processed_mk, processed_mk, "", exporting);
                 } else {
                     Pandoc.generate_discount_html (processed_mk, out processed_mk);

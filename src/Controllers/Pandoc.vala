@@ -323,7 +323,7 @@ namespace ThiefMD.Controllers.Pandoc {
             add_upload_paths,
             add_upload_paths);
 
-            return sub_files;
+        return sub_files;
     }
 
     public Gee.LinkedList<string> file_import_paths (string markdown) {
@@ -367,6 +367,7 @@ namespace ThiefMD.Controllers.Pandoc {
             Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex css_url_search = new Regex ("url\\(['\"]?(.+?)['\"]?\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex cover_image_search = new Regex ("(cover-image|coverimage|feature_image|featureimage|featured_image|csl|featuredimage|bibliography):\\s*['\"]?(.+?)['\"]?\\s*$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex reference_image_search = new Regex("(\\[[^\\]]+\\]):\\s+(.*?)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
 
             processed_mk = url_search.replace_eval (
                 processed_mk,
@@ -390,6 +391,13 @@ namespace ThiefMD.Controllers.Pandoc {
                 src_callback);
 
             processed_mk = cover_image_search.replace_eval (
+                processed_mk,
+                (ssize_t) processed_mk.length,
+                0,
+                RegexMatchFlags.NOTEMPTY,
+                cover_callback);
+
+            processed_mk = reference_image_search.replace_eval (
                 processed_mk,
                 (ssize_t) processed_mk.length,
                 0,
@@ -507,6 +515,45 @@ namespace ThiefMD.Controllers.Pandoc {
         } else {
             return url;
         }
+    }
+
+    public bool has_discount_issue (string markdown, string path = "") {
+        bool issue_present = false;
+
+        RegexEvalCallback no_op = (match_info, result) =>
+        {
+            return false;
+        };
+
+        RegexEvalCallback problem_child = (match_info, result) =>
+        {
+            if (match_info.get_match_count () > 2) {
+                var url = match_info.fetch (2);
+                string abs_path = "";
+                if (!url.contains (":") && find_file_to_upload (url, path, out abs_path) && abs_path != "") {
+                    if (abs_path.contains (" ")) {
+                        issue_present = true;
+                    }
+                }
+            } else {
+                var url = match_info.fetch (1);
+                string abs_path = "";
+                if (!url.contains (":") && find_file_to_upload (url, path, out abs_path) && abs_path != "") {
+                    if (abs_path.contains (" ")) {
+                        issue_present = true;
+                    }
+                }
+            }
+            return false;
+        };
+
+        manipulate_markdown_local_paths (markdown, path,
+            no_op,
+            no_op,
+            no_op,
+            problem_child);
+
+        return issue_present;
     }
 
     public bool needs_bibtex (string markdown) {
