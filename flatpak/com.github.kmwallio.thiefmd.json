@@ -1,7 +1,7 @@
 {
     "app-id": "com.github.kmwallio.thiefmd",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "44",
+    "runtime-version": "45",
     "sdk": "org.gnome.Sdk",
     "command": "com.github.kmwallio.thiefmd",
     "finish-args": [
@@ -172,6 +172,7 @@
                 "*.a"
             ],
             "buildsystem": "meson",
+            "run-tests": true,
             "sources": [{
                 "type": "dir",
                 "path": ".."
