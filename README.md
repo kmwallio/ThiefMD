@@ -55,6 +55,7 @@ yay -S thiefmd
  * Finnish Translation by Jiri Grönroos
  * German Translation by Fish and Helix
  * Polish Translation by Łukasz Horodecki
+ * Turkish Translation by [Sabri Ünal](https://github.com/sabriunal)
 
 ## Planning
 
