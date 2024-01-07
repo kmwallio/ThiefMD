@@ -2,10 +2,10 @@
 Name=ThiefMD
 GenericName=Thief Markdown Editor
 Comment=The Markdown Editor worth Stealing
-Categories=Office
+Categories=Office;Utility;
 Exec=com.github.kmwallio.thiefmd %U
 Icon=com.github.kmwallio.thiefmd
 Terminal=false
 Type=Application
-Keywords=markdown;text;editor;
+Keywords=markdown;text;editor;writing;novel;book;blog;ghost;wordpress;write;fountain;screenplay;screenwriting;bibtex;devto;hashnode;medium;forem;
 MimeType=text/x-markdown;text/markdown;text/fountain;text/spmd;

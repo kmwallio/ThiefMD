@@ -1,50 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2018 Miles Wallio <mwallio@gmail.com> -->
 <component type="desktop">
-  <id>com.github.kmwallio.thiefmd.desktop</id>
+  <id>com.github.kmwallio.thiefmd</id>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>ThiefMD</name>
   <launchable type="desktop-id">com.github.kmwallio.thiefmd.desktop</launchable>
-  <summary>The markdown editor worth stealing.</summary>
+  <translation type="gettext">com.github.kmwallio.thiefmd</translation>
+  <summary>The markdown editor worth stealing</summary>
   <description>
     <p>Keep your Markdown managed. Write epic tales, a novel, that screen play, keep a journal, or finally write that book report.</p>
     <p>ThiefMD is a Markdown Editor providing an easy way to organize, format, and compile your markdown documents. When you're ready to Publish, go to ePub, PDF, Office, Ghost, WordPress, Write-Freely, or more.</p>
     <p>Import from and Export to Office, ePUB, HTML, and more. ThiefMD is your one stop shop for making and managing markdown mischief.</p>
     <p>Working on a screenplay? ThiefMD can handle and combine Fountain files as well. Write your novel and prepare for that movie deal all from the same app.</p>
   </description>
-  <developer_name>kmwallio</developer_name>
+  <developer_name translatable="no">kmwallio</developer_name>
   <url type="homepage">https://thiefmd.com</url>
   <url type="bugtracker">https://github.com/kmwallio/thiefmd/issues</url>
   <url type="help">https://thiefmd.com/deets</url>
   <url type="donation">https://github.com/sponsors/kmwallio</url>
   <url type="translate">https://poeditor.com/join/project?hash=iQkE5oTIOV</url>
+  <url type="vcs-browser">https://github.com/kmwallio/thiefmd</url>
   <content_rating type="oars-1.1">
     <content_attribute id="language-humor">mild</content_attribute>
   </content_rating>
-  <categories>
-    <category>Office</category>
-    <category>Utility</category>
-  </categories>
-  <keywords>
-    <keyword>markdown</keyword>
-    <keyword>editor</keyword>
-    <keyword>writing</keyword>
-    <keyword>novel</keyword>
-    <keyword>book</keyword>
-    <keyword>blog</keyword>
-    <keyword>ghost</keyword>
-    <keyword>wordpress</keyword>
-    <keyword>write</keyword>
-    <keyword>fountain</keyword>
-    <keyword>screenplay</keyword>
-    <keyword>screenwriting</keyword>
-    <keyword>bibtex</keyword>
-    <keyword>devto</keyword>
-    <keyword>hashnode</keyword>
-    <keyword>medium</keyword>
-    <keyword>forem</keyword>
-  </keywords>
+  <provides>
+    <id>com.github.kmwallio.thiefmd.desktop</id>
+  </provides>
   <screenshots>
     <screenshot type="default">
       <caption>ThiefMD, a Markdown Editor, showing a Library view with an open file</caption>
@@ -73,10 +55,10 @@
   </screenshots>
   <releases>
     <release version="0.2.7" date="2023-06-03" urgency="low">
-      <description>
+      <description translatable="no">
         <p>Like your files to fly solo? Open files from your file manager. Even abandon our library concept if you want to.</p>
-        <p>We also have a new out of box experience and some <i>hopefully</i> UI improvements.</p>
-        <p><b>Breaking Change</b> We've updated the Wordpress API. You now have to use Application Passwords.</p>
+        <p>We also have a new out of box experience and some hopefully UI improvements.</p>
+        <p>Breaking Change: We've updated the Wordpress API. You now have to use Application Passwords.</p>
         <ul>
           <li>Add support for single file opening</li>
           <li>Fix some null references</li>
