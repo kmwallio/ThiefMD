@@ -23,14 +23,24 @@ foreach f : fonts
     endforeach
 endforeach
 
-install_data(
-    meson.project_name() + '.desktop',
-    install_dir: join_paths(get_option('datadir'), 'applications')
+desktop_file = i18n.merge_file(
+  input: 'com.github.kmwallio.thiefmd.desktop.in',
+  output: 'com.github.kmwallio.thiefmd.desktop',
+  type: 'desktop',
+  po_dir: '../po',
+  install: true,
+  install_dir: join_paths(get_option('datadir'), 'applications')
 )
 
 install_data(
     meson.project_name() + '.appdata.xml',
     install_dir: join_paths(get_option('datadir'), 'metainfo')
+desktop_utils = find_program('desktop-file-validate', required: false)
+if desktop_utils.found()
+  test('Validate desktop file', desktop_utils,
+    args: [desktop_file]
+  )
+endif
 )
 
 install_data(
