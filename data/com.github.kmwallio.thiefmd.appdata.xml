@@ -7,6 +7,7 @@
   <name>ThiefMD</name>
   <launchable type="desktop-id">com.github.kmwallio.thiefmd.desktop</launchable>
   <summary>The markdown editor worth stealing.</summary>
+  <translation type="gettext">com.github.kmwallio.thiefmd</translation>
   <description>
     <p>Keep your Markdown managed. Write epic tales, a novel, that screen play, keep a journal, or finally write that book report.</p>
     <p>ThiefMD is a Markdown Editor providing an easy way to organize, format, and compile your markdown documents. When you're ready to Publish, go to ePub, PDF, Office, Ghost, WordPress, Write-Freely, or more.</p>
