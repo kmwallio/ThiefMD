@@ -19,6 +19,7 @@
   <url type="help">https://thiefmd.com/deets</url>
   <url type="donation">https://github.com/sponsors/kmwallio</url>
   <url type="translate">https://poeditor.com/join/project?hash=iQkE5oTIOV</url>
+  <url type="vcs-browser">https://github.com/kmwallio/thiefmd</url>
   <content_rating type="oars-1.1">
     <content_attribute id="language-humor">mild</content_attribute>
   </content_rating>
