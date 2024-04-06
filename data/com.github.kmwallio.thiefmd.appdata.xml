@@ -73,7 +73,7 @@
   </screenshots>
   <releases>
     <release version="0.2.7" date="2023-06-03" urgency="low">
-      <description>
+      <description translate="no">
         <p>Like your files to fly solo? Open files from your file manager. Even abandon our library concept if you want to.</p>
         <p>We also have a new out of box experience and some <i>hopefully</i> UI improvements.</p>
         <p><b>Breaking Change</b> We've updated the Wordpress API. You now have to use Application Passwords.</p>
@@ -86,7 +86,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.7</url>
     </release>
     <release version="0.2.6" date="2022-06-26" urgency="low">
-      <description>
+      <description translate="no">
         <p>Publish to Hashnode, Medium, or Forem! Share your story in more places faster than ever.</p>
         <ul>
           <li>New Connections to Export to</li>
@@ -102,7 +102,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.6</url>
     </release>
     <release version="0.2.5" date="2022-03-29" urgency="low">
-      <description>
+      <description translate="no">
         <p>Need some stability?</p>
         <ul>
           <li>Fixed racecondition in Thinking Widget</li>
@@ -113,7 +113,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.5-stability</url>
     </release>
     <release version="0.2.4" date="2021-09-04" urgency="low">
-      <description>
+      <description translate="no">
         <p>You made this PDF using Markdown? And it was easy? Like WeasyPrint?</p>
         <ul>
           <li>WeasyPrint for PDF Export</li>
@@ -124,7 +124,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.4-easypdf</url>
     </release>
     <release version="0.2.3" date="2021-04-10" urgency="low">
-      <description>
+      <description translate="no">
         <p>Check, 1, 2. Check 1, 2. Does this look right to you?</p>
         <p>Spell-Check, Check. Write-Good Check, Check. Grammar Check... Check! ThiefMD offers Spell Check, Write-Good Style Check, and now Grammar Check!</p>
         <ul>
@@ -136,7 +136,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.3-draftcheck</url>
     </release>
     <release version="0.2.2" date="2021-03-27" urgency="low">
-      <description>
+      <description translate="no">
         <p>This one's for the creators, the note takers, and the plain-text savers. Notes support, screen play support, citation insertion, and more.</p>
         <ul>
           <li>This is a bug fix release of the last release...</li>
@@ -150,7 +150,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.2-fiximgup</url>
     </release>
     <release version="0.2.0" date="2021-03-26" urgency="low">
-      <description>
+      <description translate="no">
         <p>This one's for the creators, the note takers, and the plain-text savers. Notes support, screen play support, citation insertion, and more.</p>
         <ul>
           <li>Open Bibtex files and Right-Click Insert Citation in Markdown</li>
@@ -163,7 +163,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.2.0-creators-edition</url>
     </release>
     <release version="0.1.8" date="2021-03-20" urgency="low">
-      <description>
+      <description translate="no">
         <p>Translation loading fixes</p>
         <ul>
           <li>New Translations available, hopefully for real this time: French, Slovak, and Swedish</li>
@@ -172,7 +172,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.8-languages</url>
     </release>
     <release version="0.1.7" date="2021-03-13" urgency="low">
-      <description>
+      <description translate="no">
         <p>The subtle update.</p>
         <ul>
           <li>New Translations available: French, Slovak, and Swedish</li>
@@ -185,7 +185,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.7-subtle</url>
     </release>
     <release version="0.1.6" date="2021-03-05" urgency="low">
-      <description>
+      <description translate="no">
         <p>Finess and WordPress</p>
         <ul>
           <li>WordPress Export is now available, just add a Connection</li>
@@ -197,7 +197,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.6-finess</url>
     </release>
     <release version="0.1.5" date="2021-02-28" urgency="low">
-      <description>
+      <description translate="no">
         <p>Editor Enhancements</p>
         <ul>
           <li>Added a shortcut for inserting in a link</li>
@@ -208,7 +208,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.5-listmayhem</url>
     </release>
     <release version="0.1.4" date="2021-02-07" urgency="low">
-      <description>
+      <description translate="no">
         <p>New Languages and Line Spacing.</p>
         <ul>
           <li>Added French Translation from David Bosman</li>
@@ -220,7 +220,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.4-welcome2021</url>
     </release>
     <release version="0.1.3" date="2020-12-06" urgency="low">
-      <description>
+      <description translate="no">
         <p>Oh Hdy, Hdy, Hdy, Hdy, Hdy, Hdy, Ho... ThiefMD migrates to libhandy and adds better small display support.</p>
         <ul>
           <li>Initial steps towards supporting mobile</li>
@@ -232,7 +232,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.3-ohsohandy</url>
     </release>
     <release version="0.1.2" date="2020-10-23" urgency="low">
-      <description>
+      <description translate="no">
         <p>Blog publishing support? Interface improvements? We're working on making ThiefMD more approachable and easier to use.</p>
         <ul>
           <li>Export to a WriteFreely instance</li>
@@ -245,7 +245,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.2-sophistication</url>
     </release>
     <release version="0.1.1" date="2020-10-16" urgency="low">
-      <description>
+      <description translate="no">
         <p>Custom Font? Drag and Drop Editor Support for CSV's and more? Export individual sheets? Search select parts of the library? We're hoping this helps you get things done and then some.</p>
         <ul>
           <li>Custom Font for Editor</li>
@@ -259,7 +259,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.1-notnanoprep</url>
     </release>
     <release version="0.1.0" date="2020-10-10" urgency="low">
-      <description>
+      <description translate="no">
         <p>Get things in out and done with ThiefMD.</p>
         <ul>
           <li>New File Search `Ctrl+F` and Library Search `Ctrl+Shift+F`</li>
@@ -271,7 +271,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.1.0-inandout</url>
     </release>
     <release version="0.0.12" date="2020-10-05" urgency="low">
-      <description>
+      <description translate="no">
         <p>Can ThiefMD help you write better?</p>
         <ul>
           <li>Write-Good Support, highlight potential writing issues like long sentences, passive voice, repeat words, and more</li>
@@ -283,7 +283,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.12-luminance</url>
     </release>
     <release version="0.0.11" date="2020-10-01" urgency="low">
-      <description>
+      <description translate="no">
         <p>Can ThiefMD help you write better?</p>
         <ul>
           <li>Write-Good Support, highlight potential writing issues like long sentences, passive voice, repeat words, and more</li>
@@ -292,7 +292,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.11-writegood</url>
     </release>
     <release version="0.0.10" date="2020-09-30" urgency="low">
-      <description>
+      <description translate="no">
         <p>Share your writing, maybe publish that novel?</p>
         <ul>
           <li>Match User's Gtk Theme</li>
@@ -303,7 +303,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.10-lookingood</url>
     </release>
     <release version="0.0.9" date="2020-09-18" urgency="low">
-      <description>
+      <description translate="no">
         <p>Share your writing, maybe publish that novel?</p>
         <ul>
           <li>This release fixes some bugs introduced in 0.0.8</li>
@@ -317,7 +317,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.9-oops</url>
     </release>
     <release version="0.0.8" date="2020-09-17" urgency="low">
-      <description>
+      <description translate="no">
         <p>Share your writing, maybe publish that novel?</p>
         <ul>
           <li>Pandoc powered export. ePub, docx, pdf, it's now available</li>
@@ -330,7 +330,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.8-shareandcare</url>
     </release>
     <release version="0.0.7" date="2020-09-13" urgency="low">
-      <description>
+      <description translate="no">
         <p>Organize your writing and maybe share that great novel you've been working on.</p>
         <ul>
           <li>Files can now be reordered.</li>
@@ -341,7 +341,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.7-orderlyfashion</url>
     </release>
     <release version="0.0.6" date="2020-09-08" urgency="low">
-      <description>
+      <description translate="no">
         <p>Dark Mode, Light Mode, and anywhere in between. ThiefMD can now import your favorite themes.</p>
         <ul>
           <li>Ulysses Theme support.</li>
@@ -355,7 +355,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.6-ohsopretty</url>
     </release>
     <release version="0.0.5" date="2020-09-03" urgency="low">
-      <description>
+      <description translate="no">
         <p>Last release broke some preview items.</p>
         <ul>
           <li>Fix bug in removing characters between parentheses.</li>
@@ -366,7 +366,7 @@
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.5-previewfixes</url>
     </release>
     <release version="0.0.4" date="2020-09-02" urgency="low">
-      <description>
+      <description translate="no">
         <p>This release focuses on blogging. We added some new UI features and better Library management tools.</p>
       </description>
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.0.4-blogatog</url>
