@@ -65,7 +65,7 @@
             ],
             "sources": [{
                 "type": "archive",
-                "url": "http://www.pell.portland.or.us/~orc/Code/discount/discount-2.2.7b.tar.bz2",
+                "url": "https://www.pell.portland.or.us/~orc/Code/discount/discount-2.2.7b.tar.bz2",
                 "sha256": "b9368cc2063831635f9e790d0c4c338c2b4b72658cdc244323241bfcddf6ffd5"
             }]
         },
