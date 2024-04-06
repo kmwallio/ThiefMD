@@ -24,29 +24,6 @@
   <content_rating type="oars-1.1">
     <content_attribute id="language-humor">mild</content_attribute>
   </content_rating>
-  <categories>
-    <category>Office</category>
-    <category>Utility</category>
-  </categories>
-  <keywords>
-    <keyword>markdown</keyword>
-    <keyword>editor</keyword>
-    <keyword>writing</keyword>
-    <keyword>novel</keyword>
-    <keyword>book</keyword>
-    <keyword>blog</keyword>
-    <keyword>ghost</keyword>
-    <keyword>wordpress</keyword>
-    <keyword>write</keyword>
-    <keyword>fountain</keyword>
-    <keyword>screenplay</keyword>
-    <keyword>screenwriting</keyword>
-    <keyword>bibtex</keyword>
-    <keyword>devto</keyword>
-    <keyword>hashnode</keyword>
-    <keyword>medium</keyword>
-    <keyword>forem</keyword>
-  </keywords>
   <screenshots>
     <screenshot type="default">
       <caption>ThiefMD, a Markdown Editor, showing a Library view with an open file</caption>
