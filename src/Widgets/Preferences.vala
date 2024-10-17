@@ -849,6 +849,22 @@ namespace ThiefMD.Widgets {
             preserve_library.add (perserve_library_label);
             thiefmd_options.add (preserve_library);
 
+            var sheet_filename = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+            var sheet_filename_switch = new Switch ();
+            sheet_filename_switch.set_active (settings.show_sheet_filenames);
+            sheet_filename_switch.notify["active"].connect (() => {
+                settings.show_sheet_filenames = sheet_filename_switch.get_active ();
+            });
+            sheet_filename_switch.tooltip_text = _("Toggle always show sheet filenames");
+            sheet_filename_switch.margin = 12;
+            var sheet_filename_label = new Label(_("Always show sheet filenames"));
+            sheet_filename_label.xalign = 0;
+            sheet_filename_label.margin = 12;
+            sheet_filename_label.set_line_wrap (true);
+            sheet_filename.add (sheet_filename_switch);
+            sheet_filename.add (sheet_filename_label);
+            thiefmd_options.add (sheet_filename);
+
             var experimental_mode = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var experimental_mode_switch = new Switch ();
             experimental_mode_switch.set_active (settings.experimental);
