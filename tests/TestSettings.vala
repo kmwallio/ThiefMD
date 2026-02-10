@@ -289,6 +289,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public bool dark_mode { get; set; default = false; }
         public bool ui_editor_theme { get; set; default = false; }
         public bool save_library_order { get; set; default = true; }
+        public bool show_sheet_filenames { get; set; default = true; }
         public bool export_break_folders { get; set; default = false; }
         public bool export_break_sheets { get; set; default = false; }
         public bool export_resolve_paths { get; set; default = false; }
