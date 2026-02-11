@@ -236,14 +236,14 @@ namespace ThiefMD {
             notes.set_reveal_child (false);
 
             desktop_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            desktop_box.append (toolbar);
             desktop_box.append (main_window_horizon_box);
             desktop_box.append (stats_bar);
 
             is_fullscreen = settings.fullscreen;
 
             set_default_size (settings.window_width, settings.window_height);
-            set_titlebar (toolbar);
-            set_child (desktop_box);
+            set_content (desktop_box);
             show ();
         }
 
