@@ -62,6 +62,10 @@ namespace ThiefMD.Controllers.SheetManager {
             _view = new Gtk.ScrolledWindow ();
             _view.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
             _view_container = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            _view.hexpand = true;
+            _view.vexpand = true;
+            _view_container.hexpand = true;
+            _view_container.vexpand = true;
             _view.set_child (_view_container);
         }
 

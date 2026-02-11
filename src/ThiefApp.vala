@@ -207,7 +207,11 @@ namespace ThiefMD {
             library.hexpand = true;
 
             editor_widgets = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            editor_widgets.hexpand = true;
+            editor_widgets.vexpand = true;
             editor_notes_widget = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            editor_notes_widget.hexpand = true;
+            editor_notes_widget.vexpand = true;
 
             library_view.set_child (library);
             library_box.width_request = settings.view_library_width;

@@ -1038,6 +1038,8 @@ namespace ThiefMD.Widgets {
 
         private void update_settings () {
             var settings = AppSettings.get_default ();
+            // Wrap long lines at word boundaries so the full file stays visible without horizontal scrolling
+            this.set_wrap_mode (Gtk.WrapMode.WORD_CHAR);
             this.set_pixels_above_lines ((int)(settings.spacing + (settings.line_spacing - 1.0) * settings.font_size));
             this.set_pixels_inside_wrap ((int)(settings.spacing + (settings.line_spacing - 1.0) * settings.font_size));
             this.set_show_line_numbers (settings.show_num_lines);
