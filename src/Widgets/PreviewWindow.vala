@@ -81,14 +81,11 @@ namespace ThiefMD.Widgets {
             title_widget.set_title (title);
             toolbar.set_title_widget (title_widget);
 
-            Gtk.Box vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-
             toolbar.set_show_start_title_buttons (true);
             toolbar.set_show_end_title_buttons (true);
-            vbox.append (toolbar);
             html_view = new Preview();
-            vbox.append (html_view);
-            set_child (vbox);
+            set_titlebar (toolbar);
+            set_child (html_view);
 
             close_request.connect (( ) => {
                 hide ();
