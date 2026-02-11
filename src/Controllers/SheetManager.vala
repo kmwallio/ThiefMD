@@ -19,6 +19,7 @@
 
 using ThiefMD;
 using ThiefMD.Widgets;
+using Gspell;
 
 namespace ThiefMD.Controllers.SheetManager {
     private SheetPair? _currentSheet;
@@ -28,12 +29,13 @@ namespace ThiefMD.Controllers.SheetManager {
     private Gee.LinkedList<SheetPair> _active_editors;
     private Gtk.Box _box_view;
     private Gtk.ScrolledWindow _view;
-    private Gtk.InfoBar _bar;
+    private Gtk.Box _view_container;
+    private Gtk.Box _bar;
     private Widgets.Editor _welcome_screen;
     private bool show_welcome = false;
     private SheetPair _search_sheet = null;
-    private Gtk.SourceSearchContext _search_context;
-    private Gtk.SourceSearchSettings _search_settings;
+    private GtkSource.SearchContext _search_context;
+    private GtkSource.SearchSettings _search_settings;
     private Gtk.TextIter? _last_search;
     private bool _search_buffer_changed;
 
@@ -57,19 +59,19 @@ namespace ThiefMD.Controllers.SheetManager {
 
         if (_view == null) {
             _welcome_screen = new Widgets.Editor ("");
-            _view = new Gtk.ScrolledWindow (null, null);
+            _view = new Gtk.ScrolledWindow ();
             _view.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+            _view_container = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            _view.set_child (_view_container);
         }
 
         if (_box_view == null) {
             _box_view = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            _box_view.add (ThiefApp.get_instance ().search_bar);
-            _bar = new Gtk.InfoBar ();
-            _bar.revealed = false;
-            _bar.show_close_button = true;
-            _box_view.add (_bar);
-            _box_view.add (_view);
-            _box_view.show_all ();
+            _box_view.append (ThiefApp.get_instance ().search_bar);
+            _bar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+            _bar.set_visible (false);
+            _box_view.append (_bar);
+            _box_view.append (_view);
             _search_buffer_changed = true;
         }
     }
@@ -99,7 +101,7 @@ namespace ThiefMD.Controllers.SheetManager {
         }
 
         if (_search_settings == null) {
-            _search_settings = new Gtk.SourceSearchSettings ();
+            _search_settings = new GtkSource.SearchSettings ();
             _search_settings.case_sensitive = false;
             _search_settings.wrap_around = true;
         }
@@ -108,7 +110,7 @@ namespace ThiefMD.Controllers.SheetManager {
         _search_settings.search_text = text;
 
         _search_sheet = _currentSheet;
-        _search_context = new Gtk.SourceSearchContext (_search_sheet.editor.buffer, _search_settings);
+        _search_context = new GtkSource.SearchContext (_search_sheet.editor.buffer, _search_settings);
         _search_context.set_highlight (true);
 
         ThiefApp.get_instance ().search_bar.set_match_count (_search_sheet.editor.get_buffer_text ().down ().split (text.down ()).length - 1);
@@ -210,26 +212,23 @@ namespace ThiefMD.Controllers.SheetManager {
     }
 
     public void show_error (string error_message) {
-        _bar.set_message_type (Gtk.MessageType.ERROR);
-        var content = _bar.get_content_area ();
+        while (_bar.get_first_child () != null) {
+            _bar.remove (_bar.get_first_child ());
+        }
         var error_label = new Gtk.Label ("<b>" + error_message + "</b>");
         error_label.use_markup = true;
-        content.add (error_label);
-        _bar.show ();
-
-        _bar.close.connect (() => {
-            content.remove (error_label);
-        });
-
-        _box_view.show_all ();
+        _bar.append (error_label);
+        _bar.set_visible (true);
     }
 
     private void update_view () {
         // Clear the view
-        _view.hide ();
+        while (_view_container.get_first_child () != null) {
+            _view_container.remove (_view_container.get_first_child ());
+        }
         if (show_welcome && _welcome_screen != null) {
             _welcome_screen.am_active = false;
-            _view.remove (_welcome_screen);
+            _view_container.remove (_welcome_screen);
             _welcome_screen.clean ();
             _welcome_screen = null;
         }
@@ -239,14 +238,12 @@ namespace ThiefMD.Controllers.SheetManager {
             show_welcome = true;
             _welcome_screen = new Widgets.Editor ("");
             _welcome_screen.am_active = true;
-            _view.add (_welcome_screen);
+            _view_container.append (_welcome_screen);
         } else {
             foreach (var editor in _active_editors) {
-                _view.add (editor.editor);
+                _view_container.append (editor.editor);
             }
         }
-        _view.show_all ();
-
         _view.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.ALWAYS);
         _view.queue_draw ();
         _view.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
@@ -442,7 +439,7 @@ namespace ThiefMD.Controllers.SheetManager {
         if (parent_dir != "" && sheet != null && sheet.get_sheets_path () != "") {
             if (FileManager.create_sheet(sheet.get_sheets_path (), file_name)) {
                 sheet.refresh ();
-                sheet.show_all ();
+                sheet.set_visible (true);
             }
         } else {
             warning ("Could not create file, no current sheet");
@@ -473,7 +470,7 @@ namespace ThiefMD.Controllers.SheetManager {
             editor.sheet.redraw ();
             editor.sheet.active_sheet = false;
             editor.editor.am_active = false;
-            _view.remove (editor.editor);
+            _view_container.remove (editor.editor);
         }
 
         _active_editors.drain (_editors);
@@ -533,7 +530,7 @@ namespace ThiefMD.Controllers.SheetManager {
 
         if (_welcome_screen != null && _welcome_screen.file_path == file_path) {
             settings.sheet_changed (); // Save notes
-            _view.remove (_welcome_screen);
+            _view_container.remove (_welcome_screen);
             _welcome_screen.clean ();
             _welcome_screen = null;
             _welcome_screen = new Widgets.Editor ("");
@@ -546,7 +543,7 @@ namespace ThiefMD.Controllers.SheetManager {
             remove_this.sheet.active_sheet = false;
             _active_editors.remove (remove_this);
             _editors.remove (remove_this);
-            _view.remove (remove_this.editor);
+            _view_container.remove (remove_this.editor);
             remove_this.editor.clean ();
             remove_this.editor = null;
             remove_this.sheet = null;
@@ -579,7 +576,7 @@ namespace ThiefMD.Controllers.SheetManager {
 
     private void clear_view () {
         foreach (var editor in _active_editors) {
-            _view.remove (editor.editor);
+            _view_container.remove (editor.editor);
         }
         update_view ();
     }

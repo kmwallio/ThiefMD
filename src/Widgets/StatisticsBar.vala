@@ -21,13 +21,16 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class StatisticsBar : Gtk.Revealer {
+    public class StatisticsBar : Gtk.Box {
+        private Gtk.Revealer revealer;
         Gtk.Box statsbar;
         private Gtk.Label reading_time;
         private Gtk.Label active_file;
         string last_file;
 
         public StatisticsBar () {
+            Object (orientation: Gtk.Orientation.VERTICAL, spacing: 0);
+            revealer = new Gtk.Revealer ();
             build_ui ();
         }
 
@@ -39,20 +42,22 @@ namespace ThiefMD.Widgets {
 
             reading_time = new Gtk.Label ("Statistics");
             reading_time.use_markup = true;
-            reading_time.xalign = 1;
-            statsbar.pack_end (reading_time);
+            reading_time.halign = Gtk.Align.END;
 
             active_file = new Gtk.Label ("File");
             active_file.use_markup = true;
-            active_file.xalign = 0;
-            statsbar.pack_end (active_file);
+            active_file.hexpand = true;
+            active_file.halign = Gtk.Align.START;
 
-            statsbar.show_all ();
-            add (statsbar);
+            statsbar.append (active_file);
+            statsbar.append (reading_time);
+
+            revealer.set_child (statsbar);
+            append (revealer);
         }
 
         public void show_statistics () {
-            if (child_revealed) {
+            if (revealer.child_revealed) {
                 return;
             }
 
@@ -61,11 +66,11 @@ namespace ThiefMD.Widgets {
             update_wordcount ();
             settings.writing_changed.connect (update_wordcount);
             settings.sheet_changed.connect (update_wordcount);
-            set_reveal_child (true);
+            revealer.set_reveal_child (true);
         }
 
         public void hide_statistics () {
-            if (!child_revealed) {
+            if (!revealer.child_revealed) {
                 return;
             }
 
@@ -73,11 +78,11 @@ namespace ThiefMD.Widgets {
             settings.show_writing_statistics = false;
             settings.writing_changed.disconnect (update_wordcount);
             settings.sheet_changed.disconnect (update_wordcount);
-            set_reveal_child (false);
+            revealer.set_reveal_child (false);
         }
 
         public void toggle_statistics () {
-            if (child_revealed) {
+            if (revealer.child_revealed) {
                 hide_statistics ();
             } else {
                 show_statistics ();

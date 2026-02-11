@@ -18,18 +18,19 @@
  */
 
 using ThiefMD.Controllers;
+using Gspell;
 using Gdk;
 using ThiefMD.Enrichments;
 
 namespace ThiefMD.Widgets {
-    public class Editor : Gtk.SourceView {
+    public class Editor : GtkSource.View {
 
         //
         // Things related to the file of this instance
         //
 
         private File file;
-        public new Gtk.SourceBuffer buffer;
+        public new GtkSource.Buffer buffer;
         private string opened_filename;
         public string preview_markdown = "";
         private bool active = true;
@@ -49,7 +50,7 @@ namespace ThiefMD.Widgets {
         // UI Items
         //
 
-        public GtkSpell.Checker spell = null;
+        private Gspell.Checker? spell = null;
         public WriteGood.Checker writegood = null;
         public GrammarChecker grammar = null;
         private TimedMutex writegood_limit;
@@ -62,6 +63,7 @@ namespace ThiefMD.Widgets {
         private bool writecheck_active;
         private bool typewriter_active;
         private bool grammar_active = false;
+        private bool no_hiding = false;
 
         private Gtk.TextTag focus_text;
         private Gtk.TextTag outoffocus_text;
@@ -85,183 +87,125 @@ namespace ThiefMD.Widgets {
             settings.changed.connect (update_settings);
 
             file_mutex = Mutex ();
-            disk_change_prompted = new TimedMutex (10000);
-            dynamic_margin_update = new TimedMutex (250);
-
-            if (!open_file (file_path)) {
-                settings.validate_library ();
-                string[] library_check = settings.library ();
-                if (!settings.dont_show_tips || library_check.length == 0) {
-                    set_text (Constants.FIRST_USE.printf (ThiefProperties.THIEF_TIPS.get (Random.int_range(0, ThiefProperties.THIEF_TIPS.size))), true);
-                    editable = false;
-                }
-            } else {
-                modified_time = new DateTime.now_utc ();
-            }
-
-            build_menu ();
-            update_settings ();
-            dynamic_margins ();
-        }
-
-        public string get_buffer_text () {
-            Gtk.TextIter start, end;
-            buffer.get_bounds (out start, out end);
-            return buffer.get_text (start, end, true);
-        }
-
-        construct {
+            #if false
+            // GTK4 TODO: rebuild editor context menu with Gtk.PopoverMenu
             var settings = AppSettings.get_default ();
+            this.populate_popup.connect ((source, menu) => {
+                no_change_prompt = true;
+                if (!please_no_spell_prompt) {
+                    please_no_spell_prompt = true;
+                    Timeout.add (10000, () => {
+                        if (no_change_prompt) {
+                            no_change_prompt = false;
+                        }
+                        please_no_spell_prompt = false;
+                        return false;
+                    });
+                }
+                Gtk.SeparatorMenuItem sep = new Gtk.SeparatorMenuItem ();
+                menu.add (sep);
 
-            buffer = new Gtk.SourceBuffer.with_language (UI.get_source_language ());
-            buffer.highlight_syntax = true;
-            buffer.set_max_undo_levels (Constants.MAX_UNDO_LEVELS);
+                Gtk.MenuItem menu_insert_datetime = new Gtk.MenuItem.with_label (_("Insert Datetime"));
+                menu_insert_datetime.activate.connect (() => {
 
-            warning_tag = new Gtk.TextTag ("warning_bg");
-            warning_tag.underline = Pango.Underline.ERROR;
-            warning_tag.underline_rgba = Gdk.RGBA () { red = 0.13, green = 0.55, blue = 0.13, alpha = 1.0 };
+                    string parent_path = file.get_parent ().get_path ().down ();
+                    bool am_iso8601 = parent_path.contains ("content");
 
-            error_tag = new Gtk.TextTag ("error_bg");
-            error_tag.underline = Pango.Underline.ERROR;
+                    DateTime now = new DateTime.now_local ();
+                    string new_text = now.format ("%F %T");
 
-            highlight_tag = new Gtk.TextTag ("search-match");
-            highlight_tag.background_rgba = Gdk.RGBA () { red = 1.0, green = 0.8, blue = 0.13, alpha = 1.0 };
-            highlight_tag.foreground_rgba = Gdk.RGBA () { red = 0.0, green = 0.0, blue = 0.0, alpha = 1.0 };
-            highlight_tag.background_set = true;
-            highlight_tag.foreground_set = true;
-
-
-            buffer.tag_table.add (error_tag);
-            buffer.tag_table.add (warning_tag);
-
-            is_modified = false;
-
-            this.set_buffer (buffer);
-            this.set_wrap_mode (Gtk.WrapMode.WORD_CHAR);
-            this.top_margin = Constants.TOP_MARGIN;
-            this.bottom_margin = Constants.BOTTOM_MARGIN;
-            this.expand = true;
-            this.has_focus = true;
-            this.set_tab_width (4);
-            this.set_insert_spaces_instead_of_tabs (true);
-            this.smart_backspace = true;
-            Timeout.add (250, () => {
-                set_scheme (settings.get_valid_theme_id ());
-                return false;
-            });
-
-            spell = new GtkSpell.Checker ();
-            writegood = new WriteGood.Checker ();
-            writegood.show_tooltip = true;
-            markdown = new MarkdownEnrichment ();
-            markdown.attach (this);
-            grammar = new GrammarChecker ();
-            grammar_active = false;
-
-            focus_text = buffer.create_tag ("focus-text");
-            outoffocus_text = buffer.create_tag ("outoffocus-text");
-
-            double r, g, b;
-            UI.get_focus_color (out r, out g, out b);
-            focus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
-            focus_text.foreground_set = true;
-            UI.get_focus_bg_color (out r, out g, out b);
-            focus_text.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
-            focus_text.background_set = true;
-            // out of focus settings
-            outoffocus_text.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
-            outoffocus_text.background_set = true;
-            UI.get_out_of_focus_color (out r, out g, out b);
-            outoffocus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
-            outoffocus_text.foreground_set = true;
-
-            last_width = settings.window_width;
-            last_height = settings.window_height;
-            preview_mutex = new TimedMutex ();
-            writegood_limit = new TimedMutex (1500);
-            drag_data_received.connect (on_drag_data_received);
-
-            focus_in_event.connect ((in_event) => {
-                prompt_on_disk_modifications ();
-
-                return false;
-            });
-        }
-
-        public bool prompt_on_disk_modifications () {
-            if (!editable) {
-                return false;
-            }
-
-            if (!disk_change_prompted.can_do_action ()) {
-                return false;
-            }
-
-            if (opened_filename == "") {
-                return false;
-            }
-
-            string disk_text;
-            DateTime disk_time;
-            bool have_match = disk_matches_buffer (out disk_text, out disk_time);
-
-            debug ("Mod: %s, LFT: %s, CFT: %s", modified_time.to_string (), file_modified_time.to_string (), disk_time.to_string ());
-
-            // File is different, disable save?
-            if (have_match) {
-                return false;
-            }
-            should_save = false;
-
-            // Load newer contents from disk?
-            if (modified_time.compare (disk_time) < 0) {
-                set_text (disk_text);
-                have_match = true;
-            }
-
-            if (file_modified_time.compare (disk_time) == 0 || modified_time.compare (disk_time) == 0) {
-                have_match = true;
-            }
-
-            // Trying to account for right-click menu changes?
-            if ((modified_time.to_unix () - file_modified_time.to_unix ()).abs () < 10) {
-                return false;
-            }
-
-            if (!have_match && !no_change_prompt) {
-                var dialog = new Gtk.Dialog.with_buttons (
-                    "Contents changed on disk",
-                    ThiefApp.get_instance (),
-                    Gtk.DialogFlags.MODAL,
-                    _("_Load from disk"),
-                    Gtk.ResponseType.ACCEPT,
-                    _("_Keep what's in editor"),
-                    Gtk.ResponseType.REJECT,
-                    null);
-
-                dialog.response.connect ((response_val) => {
-                    if (response_val == Gtk.ResponseType.ACCEPT) {
-                        set_text (disk_text);
-                    } else {
-                        should_save = true;
-                        autosave ();
+                    if (am_iso8601) {
+                        new_text = now.format ("%FT%T%z");
                     }
-                    dialog.destroy ();
+
+                    // Set timer so we don't prompt for file modification?
+                    disk_change_prompted.can_do_action ();
+                    insert_at_cursor (new_text);
                 });
 
-                if (dialog.run () == Gtk.ResponseType.ACCEPT) {
-                    set_text (disk_text);
-                } else {
-                    should_save = true;
-                    autosave ();
-                }
-            } else {
-                no_change_prompt = false;
-            }
+                Gtk.MenuItem menu_insert_frontmatter = new Gtk.MenuItem.with_label (_("Insert YAML Frontmatter"));
+                menu_insert_frontmatter.activate.connect (() => {
+                    if (!get_buffer_text ().has_prefix ("---")) {
+                        int new_cursor_location = 0;
+                        Regex date = null;
+                        try {
+                            date = new Regex ("([0-9]{4}-[0-9]{1,2}-[0-9]{1,2}-?)?(.*?)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+                        } catch (Error e) {
+                            warning ("Could not compile regex: %s", e.message);
+                        }
 
-            return have_match;
+                        DateTime now = new DateTime.now_local ();
+                        string current_time = now.format ("%F %T");
+
+                        string parent_folder = file.get_parent ().get_basename ().down ();
+                        string page_type = (parent_folder.contains ("post") || parent_folder.contains ("draft")) ? "post" : "page";
+                        string current_title = file.get_basename ();
+                        string parent_path = file.get_parent ().get_path ().down ();
+                        string base_url = settings.site_url;
+                        if (parent_path.contains ("content")) {
+                            page_type = parent_path.substring (parent_path.last_index_of ("content") + 8, -1).replace ("/", "").replace ("\\", "");
+                        }
+
+                        if (parent_path.contains ("/posts")) {
+                            base_url = settings.posts_url;
+                        } else if (parent_path.contains ("/pages")) {
+                            base_url = settings.pages_url;
+                        }
+
+                        // Setup defaults based on WordPress and Hugo archetypes
+                        string frontmatter =
+"---\n" +
+"title: \"" + current_title + "\"\n" +
+"date: " + current_time + "\n" +
+"url: \"" + base_url + current_title + "\"\n" +
+"type: \"" + page_type + "\"\n" +
+"draft: true\n" +
+"tags: []\n" +
+"categories: []\n" +
+"summary: \"\"\n" +
+"---\n\n";
+
+                        /*
+                        // Blacklist frontmatter of posts or pages
+                        if (parent_path.contains ("posts") || parent_path.contains ("pages")) {
+                            frontmatter = "---\n";
+                        }
+                        */
+
+                        if (settings.quarter_publishing) {
+                            try {
+                                var match = date.match (parent_path);
+                                if (match != null) {
+                                    if (match.fetch (2) != null) {
+                                        current_title = match.fetch (2).replace ("/", "");
+                                    }
+                                }
+                            } catch (Error e) {
+                                warning ("Could not look for weekly filename title");
+                            }
+                        }
+
+                        var copy = Gtk.Clipboard.get_default (Gdk.Display.get_default ());
+                        copy.set_text (current_title, current_title.length);
+
+                        insert_at_cursor (frontmatter);
+                        TextIter cursor;
+                        buffer.get_start_iter (out cursor);
+                        cursor.forward_lines (9);
+                        buffer.place_cursor (cursor);
+                    }
+                });
+
+                menu.add (menu_insert_datetime);
+                menu.add (menu_insert_frontmatter);
+                menu.show_all ();
+            });
+            #endif
+
+            // GTK4: file loading handled in open_file; constructor no longer performs disk checks.
         }
 
+        /* GTK4 TODO: motion_notify_event replaced by Gtk.EventController
         private bool no_hiding = false;
         public override bool motion_notify_event (EventMotion event ) {
             if (((event.state & Gdk.ModifierType.BUTTON1_MASK) != 0) ||
@@ -291,7 +235,9 @@ namespace ThiefMD.Widgets {
             base.motion_notify_event (event);
             return false;
         }
+        */
 
+        /* GTK4 TODO: Drag-and-drop not yet reimplemented
         private void on_drag_data_received (
             Gtk.Widget widget,
             DragContext context,
@@ -378,6 +324,7 @@ namespace ThiefMD.Widgets {
             }
             return;
         }
+        */
 
         public signal void changed ();
 
@@ -504,15 +451,12 @@ namespace ThiefMD.Widgets {
                     // Register for redrawing of window for handling margins and other
                     // redrawing
                     //
-                    size_allocate.connect (dynamic_margins);
                     left_margin = 0;
                     right_margin = 0;
-                    show_all ();
                     move_margins ();
                     should_scroll = true;
                     update_preview ();
                     spellcheck_enable();
-                    show_all ();
                 } else {
                     if (active != value) {
                         cursor_location = buffer.cursor_position;
@@ -522,7 +466,6 @@ namespace ThiefMD.Widgets {
                         save ();
 
                         buffer.changed.disconnect (on_change_notification);
-                        size_allocate.disconnect (dynamic_margins);
                         settings.changed.disconnect (update_settings);
 
                         if (settings.writegood) {
@@ -554,6 +497,12 @@ namespace ThiefMD.Widgets {
             return preview_markdown;
         }
 
+        public string get_buffer_text () {
+            Gtk.TextIter start, end;
+            buffer.get_bounds (out start, out end);
+            return buffer.get_text (start, end, true);
+        }
+
         public bool spellcheck {
             set {
                 if (value && !spellcheck_active) {
@@ -562,7 +511,7 @@ namespace ThiefMD.Widgets {
                         var settings = AppSettings.get_default ();
                         var last_language = settings.spellcheck_language;
                         bool language_set = false;
-                        var language_list = GtkSpell.Checker.get_language_list ();
+                        var language_list = Gspell.Checker.get_language_list ();
                         foreach (var element in language_list) {
                             if (last_language == element) {
                                 language_set = true;
@@ -574,7 +523,7 @@ namespace ThiefMD.Widgets {
                         if (language_list.length () == 0) {
                             spell.set_language (null);
                         } else if (!language_set) {
-                            last_language = language_list.first ().data;
+                            last_language = language_list.data;
                             spell.set_language (last_language);
                         }
                         spell.attach (this);
@@ -664,7 +613,7 @@ namespace ThiefMD.Widgets {
             // Jamming this here for now to prevent
             // reinit of spellcheck on resize
             int w, h;
-            ThiefApp.get_instance ().get_size (out w, out h);
+            ThiefApp.get_instance ().get_default_size (out w, out h);
             settings.window_width = w;
             settings.window_height = h;
 
@@ -673,6 +622,18 @@ namespace ThiefMD.Widgets {
             }
 
             return settings.autosave;
+        }
+
+        public void undo () {
+            if (buffer != null) {
+                buffer.undo ();
+            }
+        }
+
+        public void redo () {
+            if (buffer != null) {
+                buffer.redo ();
+            }
         }
 
         private bool writecheck_scheduled = false;
@@ -693,6 +654,7 @@ namespace ThiefMD.Widgets {
             }
         }
 
+        /* GTK4 TODO: get_selected used for Gtk.Menu manipulation
         private Gtk.MenuItem? get_selected (Gtk.Menu? menu) {
             if (menu == null) return null;
             var active = menu.get_active () as Gtk.MenuItem;
@@ -705,6 +667,7 @@ namespace ThiefMD.Widgets {
 
             return null;
         }
+        */
 
         public void on_text_modified () {
             SheetManager.last_modified (this);
@@ -885,7 +848,6 @@ namespace ThiefMD.Widgets {
         public void set_text (string text, bool opening = true) {
             if (opening) {
                 buffer.set_max_undo_levels (0);
-                buffer.begin_not_undoable_action ();
                 buffer.changed.disconnect (on_text_modified);
             }
 
@@ -893,7 +855,6 @@ namespace ThiefMD.Widgets {
 
             if (opening) {
                 buffer.set_max_undo_levels (Constants.MAX_UNDO_LEVELS);
-                buffer.end_not_undoable_action ();
                 buffer.changed.connect (on_text_modified);
             }
 
@@ -909,6 +870,11 @@ namespace ThiefMD.Widgets {
             });
         }
 
+        public override void size_allocate (int width, int height, int baseline) {
+            base.size_allocate (width, height, baseline);
+            dynamic_margins ();
+        }
+
         public void dynamic_margins () {
             if (!ThiefApp.get_instance ().ready) {
                 return;
@@ -917,7 +883,7 @@ namespace ThiefMD.Widgets {
             int w, h;
             SoloEditor se = ThiefApplication.get_solo (file);
             if (se == null) {
-                ThiefApp.get_instance ().get_size (out w, out h);
+                ThiefApp.get_instance ().get_default_size (out w, out h);
 
                 int note_w = 0;
                 if (ThiefApp.get_instance ().notes != null) {
@@ -952,7 +918,7 @@ namespace ThiefMD.Widgets {
             int w, h, m, p;
             SoloEditor se = ThiefApplication.get_solo (file);
             if (se == null) {
-                ThiefApp.get_instance ().get_size (out w, out h);
+                ThiefApp.get_instance ().get_default_size (out w, out h);
 
                 int note_w = 0;
                 if (ThiefApp.get_instance ().notes != null) {
@@ -1054,18 +1020,18 @@ namespace ThiefMD.Widgets {
 
             double r, g, b;
             UI.get_focus_color (out r, out g, out b);
-            focus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            focus_text.foreground_rgba = Gdk.RGBA () { red = (float) r, green = (float) g, blue = (float) b, alpha = 1.0f };
             focus_text.foreground_set = true;
             focus_text.underline = Pango.Underline.NONE;
             focus_text.underline_set = true;
             UI.get_focus_bg_color (out r, out g, out b);
-            focus_text.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            focus_text.background_rgba = Gdk.RGBA () { red = (float) r, green = (float) g, blue = (float) b, alpha = 1.0f };
             focus_text.background_set = true;
             // out of focus settings
-            outoffocus_text.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            outoffocus_text.background_rgba = Gdk.RGBA () { red = (float) r, green = (float) g, blue = (float) b, alpha = 1.0f };
             outoffocus_text.background_set = true;
             UI.get_out_of_focus_color (out r, out g, out b);
-            outoffocus_text.foreground_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+            outoffocus_text.foreground_rgba = Gdk.RGBA () { red = (float) r, green = (float) g, blue = (float) b, alpha = 1.0f };
             outoffocus_text.foreground_set = true;
             outoffocus_text.underline = Pango.Underline.NONE;
             outoffocus_text.underline_set = true;
@@ -1149,7 +1115,7 @@ namespace ThiefMD.Widgets {
         public void set_scheme (string id) {
             if (id == "thiefmd") {
                 // Reset application CSS to coded
-                var style_manager = Gtk.SourceStyleSchemeManager.get_default ();
+                var style_manager = GtkSource.StyleSchemeManager.get_default ();
                 var style = style_manager.get_scheme (id);
                 buffer.set_style_scheme (style);
             } else {
@@ -1250,6 +1216,7 @@ namespace ThiefMD.Widgets {
             return settings.typewriter_scrolling;
         }
 
+        /* GTK4 TODO: Context menu needs Gtk4 PopoverMenu/GMenu reimplementation
         private bool please_no_spell_prompt = false;
         private void build_menu () {
             if (file == null) {
@@ -1432,6 +1399,7 @@ namespace ThiefMD.Widgets {
                 });
             });
         }
+        */
 
         public void clean () {
             editable = false;

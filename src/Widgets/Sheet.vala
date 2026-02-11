@@ -70,10 +70,9 @@ namespace ThiefMD.Widgets {
             _label.use_markup = true;
             _label.set_ellipsize (Pango.EllipsizeMode.END);
             _label.xalign = 0;
-            add (_label);
+            set_child (_label);
 
             var header_context = this.get_style_context ();
-            header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-list-sheet");
 
             clicked.connect (() => {
@@ -82,7 +81,8 @@ namespace ThiefMD.Widgets {
                 active = active_sheet;
             });
 
-            // Add ability to be dragged
+            // @TODO: GTK4 Add ability to be dragged
+            /*
             Gtk.drag_source_set (
                 this,                      // widget will be drag-able
                 Gdk.ModifierType.BUTTON1_MASK, // modifier that will start a drag
@@ -107,10 +107,11 @@ namespace ThiefMD.Widgets {
             this.drag_leave.connect(this.on_drag_leave);
             this.drag_drop.connect(this.on_drag_drop);
             this.drag_data_received.connect(this.on_drag_data_received);
+            */
 
             // Load minimark if file has content
             redraw ();
-            show_all ();
+            set_visible (true);
 
             // Load file ordering information
             metadata = null;
@@ -211,6 +212,9 @@ namespace ThiefMD.Widgets {
         // Click Menu Options
         //
 
+        // TODO: GTK4 migration - Replace Gtk.Menu with Gtk.PopoverMenu
+        // This context menu functionality will be re-implemented with GMenu models
+        /*
         public override bool button_press_event(Gdk.EventButton event) {
             base.button_press_event (event);
 
@@ -274,6 +278,8 @@ namespace ThiefMD.Widgets {
                 menu.add (menu_new_window);
                 */
 
+                // TODO: GTK4 - Reimplement menu functionality
+                /*
                 menu.add (new Gtk.SeparatorMenuItem ());
 
                 Gtk.MenuItem menu_preview_sheet = new Gtk.MenuItem.with_label (_("Preview"));
@@ -481,6 +487,7 @@ namespace ThiefMD.Widgets {
             Gtk.drag_finish (context, false, false, time);
             return;
         }
+            */
 
         public static bool areEqual (Sheet a, Sheet b) {
             if ((b == null && a != null) || (a == null && b != null)) {

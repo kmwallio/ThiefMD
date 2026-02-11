@@ -93,7 +93,10 @@ namespace ThiefMD.Connections {
 
         public static ConnectionData? create_connection (Gtk.Window? parent) {
             Gtk.Grid grid = new Gtk.Grid ();
-            grid.margin = 12;
+            grid.margin_top = 12;
+            grid.margin_bottom = 12;
+            grid.margin_start = 12;
+            grid.margin_end = 12;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
             grid.orientation = Gtk.Orientation.VERTICAL;
@@ -121,8 +124,6 @@ namespace ThiefMD.Connections {
             grid.attach (endpoint_label, 1, 3, 1, 1);
             grid.attach (endpoint_entry, 2, 3, 2, 1);
 
-            grid.show_all ();
-
             var dialog = new Gtk.Dialog.with_buttons (
                             _("New WriteFreely Connection"),
                             (parent != null) ? parent : ThiefApp.get_instance (),
@@ -133,10 +134,11 @@ namespace ThiefMD.Connections {
                             Gtk.ResponseType.REJECT,
                             null);
 
-            dialog.get_content_area ().add (grid);
+            dialog.get_content_area ().append (grid);
 
             ConnectionData data = null;
 
+            var loop = new GLib.MainLoop ();
             dialog.response.connect ((response_id) => {
                 if (response_id == Gtk.ResponseType.ACCEPT) {
                     debug ("Data from callback");
@@ -147,15 +149,15 @@ namespace ThiefMD.Connections {
                     data.endpoint = endpoint_entry.text;
                 }
                 dialog.destroy ();
+                loop.quit ();
             });
-            if (dialog.run () == Gtk.ResponseType.ACCEPT) {
-                debug ("Data from block");
-                data = new ConnectionData ();
-                data.connection_type = CONNECTION_TYPE;
-                data.user = username_entry.text;
-                data.auth = password_entry.text;
-                data.endpoint = endpoint_entry.text;
-            }
+            dialog.close_request.connect (() => {
+                loop.quit ();
+                return false;
+            });
+
+            dialog.present ();
+            loop.run ();
 
             return data;
         }

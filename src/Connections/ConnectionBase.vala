@@ -56,34 +56,35 @@ namespace ThiefMD.Connections {
             build_ui ();
         }
 
+        // GTK4 shim for old run() callers
+        public void run () {
+            present ();
+        }
+
         private void build_ui () {
-            window_position = Gtk.WindowPosition.CENTER;
-            this.get_content_area().add (build_message_ui ());
-            show_all ();
+            set_child (build_message_ui ());
         }
 
         private Gtk.Grid build_message_ui () {
             Gtk.Grid grid = new Gtk.Grid ();
-            grid.margin = 12;
+            grid.margin_top = 12;
+            grid.margin_bottom = 12;
+            grid.margin_start = 12;
+            grid.margin_end = 12;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
             grid.orientation = Gtk.Orientation.VERTICAL;
             grid.hexpand = true;
             grid.vexpand = true;
 
-            try {
-                Gtk.IconTheme icon_theme = Gtk.IconTheme.get_default();
-                var thief_icon = icon_theme.load_icon("com.github.kmwallio.thiefmd", 128, Gtk.IconLookupFlags.FORCE_SVG);
-                var icon = new Gtk.Image.from_pixbuf (thief_icon);
-                grid.attach (icon, 1, 1);
-            } catch (Error e) {
-                warning ("Could not load logo: %s", e.message);
-            }
+            var icon = new Gtk.Image.from_icon_name ("com.github.kmwallio.thiefmd");
+            icon.set_pixel_size (96);
+            grid.attach (icon, 1, 1, 1, 1);
 
-            grid.attach (message, 1, 2);
+            grid.attach (message, 1, 2, 1, 1);
 
             Gtk.Button close = new Gtk.Button.with_label (_("Close"));
-            grid.attach (close, 1, 3);
+            grid.attach (close, 1, 3, 1, 1);
 
             close.clicked.connect (() => {
                 this.destroy ();
@@ -93,7 +94,6 @@ namespace ThiefMD.Connections {
                 this.destroy ();
             });
 
-            grid.show_all ();
             return grid;
         }
     }

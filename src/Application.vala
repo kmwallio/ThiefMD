@@ -137,7 +137,7 @@ namespace ThiefMD {
             
             var app = new ThiefApplication ();
             app.startup.connect (() => {
-                Hdy.init ();
+                Adw.init ();
             });
             return app.run (args);
         }

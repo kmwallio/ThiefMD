@@ -112,16 +112,16 @@ meson
 ninja-build
 valac
 cmake
-libgtkspell3-3-dev
-libwebkit2gtk-4.0-dev
+libgspell-1-dev
+libwebkitgtk-6.0-dev
 libmarkdown2-dev
 libxml2-dev
 libarchive-dev
-libgtk-3-dev
+libgtk-4-dev
 libgee-0.8-dev
-libgtksourceview-4-dev
+libgtksourceview-5-dev
 libsecret-1-dev
-libhandy-1-dev
+libadwaita-1-dev
 liblink-grammar-dev
 ```
 
@@ -133,15 +133,15 @@ meson
 ninja-build
 cmake
 libmarkdown-devel
-webkit2gtk3-devel
-gtk3-devel
-gtksourceview4-devel
-gtkspell3-devel
+webkitgtk6.0-devel
+gtk4-devel
+gtksourceview5-devel
+gspell-devel
 libarchive-devel
 libxml2-devel
 libgee-devel
 libsecret-devel
-libhandy1-devel
+libadwaita-devel
 link-grammar-devel
 ```
 

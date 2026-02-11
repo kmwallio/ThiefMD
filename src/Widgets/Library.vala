@@ -59,7 +59,7 @@ namespace ThiefMD.Widgets {
 
         public Library () {
             debug ("Setting up library");
-            _lib_store = new TreeStore (3, typeof (string), typeof (LibPair), typeof (Pixbuf));
+            _lib_store = new TreeStore (3, typeof (string), typeof (LibPair), typeof (GLib.Icon));
             parse_library ();
             set_model (_lib_store);
             var library_item_display = new TreeViewColumn ();
@@ -68,7 +68,7 @@ namespace ThiefMD.Widgets {
             library_item_display.pack_start (library_item_icon, false);
             library_item_display.pack_start (library_item_text, true);
             library_item_display.add_attribute (library_item_text, "text", 0);
-            library_item_display.add_attribute (library_item_icon, "pixbuf", 2);
+            library_item_display.add_attribute (library_item_icon, "gicon", 2);
             // insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
             append_column (library_item_display);
             get_selection ().changed.connect (on_selection);
@@ -76,16 +76,6 @@ namespace ThiefMD.Widgets {
             _droppable = new PreventDelayedDrop ();
 
             headers_visible = false;
-
-            // Drop Support
-            enable_model_drag_dest (target_list, DragAction.MOVE);
-            this.drag_motion.connect(this.on_drag_motion);
-            this.drag_leave.connect(this.on_drag_leave);
-            this.drag_drop.connect(this.on_drag_drop);
-            this.drag_data_received.connect(this.on_drag_data_received);
-            
-            // Drap support
-            enable_model_drag_source (ModifierType.BUTTON1_MASK, target_list, DragAction.MOVE);
         }
 
         public void set_active () {
@@ -227,7 +217,7 @@ namespace ThiefMD.Widgets {
                     _lib_store.append (out root, null);
                     debug (lib);
                     LibPair pair = new LibPair(lib, root);
-                    var icon = get_pixbuf_for_folder (lib);
+                    var icon = get_icon_for_folder (lib);
                     _lib_store.set (root, 0, pair._title, 1, pair, 2, icon, -1);
                     _all_sheets.append (pair);
 
@@ -290,7 +280,7 @@ namespace ThiefMD.Widgets {
                             LibPair pair = new LibPair(path, child);
                             _all_sheets.append (pair);
                             // Append dir to list
-                            var icon = get_pixbuf_for_folder (path);
+                            var icon = get_icon_for_folder (path);
                             _lib_store.set (child, 0, pair._title, 1, pair, 2, icon, -1);
 
                             parse_dir (pair._sheets, path, child);
@@ -317,7 +307,7 @@ namespace ThiefMD.Widgets {
                             LibPair pair = new LibPair(path, child);
                             _all_sheets.append (pair);
                             // Append dir to list
-                            var icon = get_pixbuf_for_folder (path);
+                            var icon = get_icon_for_folder (path);
                             _lib_store.set (child, 0, pair._title, 1, pair, 2, icon, -1);
                             sheet_dir.metadata.add_folder (file_name);
 
@@ -529,7 +519,9 @@ namespace ThiefMD.Widgets {
         // Mouse Click Actions
         //
 
-        public override bool button_press_event(Gdk.EventButton event) {
+        #if false
+        // GTK4 TODO: context menu and drag-and-drop not yet reimplemented
+        public override bool button_press_event (Gdk.EventButton event) {
             base.button_press_event (event);
 
             if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3) {
@@ -722,6 +714,7 @@ namespace ThiefMD.Widgets {
             }
             return true;
         }
+        #endif
 
         private void on_selection (TreeSelection selected) {
             TreeModel model;
@@ -744,9 +737,9 @@ namespace ThiefMD.Widgets {
         }
 
         //
-        // Drag and Drop Support
+        // @TODO: GTK4 Drag and Drop Support
         //
-
+        /*
         // Highlight current tree item sheet is over
         private bool on_drag_motion (
             Widget widget,
@@ -1019,5 +1012,6 @@ namespace ThiefMD.Widgets {
 
             Gtk.drag_finish (context, dnd_success, delete_selection_data, time);
         }
+        */
     }
 }

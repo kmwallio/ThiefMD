@@ -32,7 +32,6 @@ namespace ThiefMD.Widgets {
             instance = thiefapp;
             still_in_motion = new TimedMutex (Constants.MOUSE_IN_MOTION_TIME);
             clear_bar = new TimedMutex (Constants.MOUSE_MOTION_CHECK_TIME);
-            instance.motion_notify_event.connect (mouse_movement);
         }
 
         private TimedMutex still_in_motion;
@@ -41,6 +40,7 @@ namespace ThiefMD.Widgets {
         private double mouse_y = 0;
         private double last_x = 0;
         private double last_y = 0;
+        /* GTK4 TODO: EventMotion replaced by Gtk.EventControllerMotion
         private bool mouse_movement (EventMotion event) {
             var settings = AppSettings.get_default ();
             last_x = event.x_root;
@@ -71,6 +71,7 @@ namespace ThiefMD.Widgets {
 
             return false;
         }
+        */
 
         private bool hide_the_bar () {
             var settings = AppSettings.get_default ();

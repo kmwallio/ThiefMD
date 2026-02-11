@@ -26,33 +26,34 @@ namespace ThiefMD.Widgets {
     public class KeyBindings : Object { 
         private bool is_fullscreen = false;
         public KeyBindings (Gtk.Window window, bool is_main = true) {
-            window.key_press_event.connect ((e) => {
-                uint keycode = e.hardware_keycode;
+            var key_controller = new Gtk.EventControllerKey ();
+            key_controller.key_pressed.connect ((keyval, _keycode, state) => {
+                uint keycode = keyval;
                 var settings = AppSettings.get_default ();
 
                 // Quit
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                     if (match_keycode (Gdk.Key.q, keycode)) {
                         window.destroy ();
                     }
                 }
 
                 // Search
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.f, keycode)) {
                         ThiefApp.get_instance ().search_bar.toggle_search ();
                     }
                 }
 
                 // Experimental Mode
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.m, keycode)) {
                         settings.experimental = !settings.experimental;
                     }
                 }
 
                 // Headerbar
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) != 0 && is_main) {
                     if (match_keycode (Gdk.Key.h, keycode)) {
                         settings.hide_toolbar = !settings.hide_toolbar;
                         if (settings.hide_toolbar) {
@@ -64,33 +65,33 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Global search
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) != 0) {
                     if (match_keycode (Gdk.Key.f, keycode)) {
                         SearchWindow search = new SearchWindow ();
-                        search.show_all ();
+                        search.present ();
                     }
                 }
 
                 // Cheat Sheet
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                     if (match_keycode (Gdk.Key.h, keycode)) {
                         MarkdownCheatSheet cheat_sheet = new MarkdownCheatSheet ();
-                        cheat_sheet.show_all ();
+                        cheat_sheet.present ();
                     }
                 }
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) != 0) {
                     if (match_keycode (Gdk.Key.question, keycode)) {
                         MarkdownCheatSheet cheat_sheet = new MarkdownCheatSheet ();
-                        cheat_sheet.show_all ();
+                        cheat_sheet.present ();
                     }
                 }
 
                 // Preview
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.p, keycode)) {
                         if (window is ThiefApp) {
                             PreviewWindow pvw = PreviewWindow.get_instance ();
-                            pvw.show_all ();
+                            pvw.present ();
                         } else {
                             ((SoloEditor)window).toggle_preview ();
                         }
@@ -98,28 +99,28 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Focus
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.r, keycode)) {
                         settings.focus_mode = !settings.focus_mode;
                     }
                 }
 
                 // Type-writer scrolling
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) != 0) {
                     if (match_keycode (Gdk.Key.t, keycode)) {
                         settings.typewriter_scrolling = !settings.typewriter_scrolling;
                     }
                 }
 
                 // Write-Good Suggestions
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.w, keycode)) {
                         settings.writegood = !settings.writegood;
                     }
                 }
 
                 // New Sheet
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.n, keycode)) {
                         if (window is ThiefApp) {
                             SheetManager.get_sheets ().make_new_sheet ();
@@ -128,7 +129,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Bold
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.b, keycode)) {
                         if (window is ThiefApp) {
                             SheetManager.bold ();
@@ -140,7 +141,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Italic
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.i, keycode)) {
                         if (window is ThiefApp) {
                             SheetManager.italic ();
@@ -152,7 +153,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Strikethrough
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.d, keycode)) {
                         if (window is ThiefApp) {
                             SheetManager.strikethrough ();
@@ -164,7 +165,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Link
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.k, keycode)) {
                         if (window is ThiefApp) {
                             SheetManager.link ();
@@ -176,7 +177,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Shrink font
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.minus, keycode)) {
                         int next_font_size = settings.font_size - 2;
                         if (next_font_size >= 6) {
@@ -187,7 +188,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Enlarge font
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.plus, keycode)) {
                         int next_font_size = settings.font_size + 2;
                         if (next_font_size <= 512) {
@@ -198,7 +199,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Save
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                     if (match_keycode (Gdk.Key.s, keycode)) {
                         SheetManager.save_active ();
                         if (window is SoloEditor) {
@@ -208,7 +209,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Toggle statistics bar
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.s, keycode)) {
                         if (window is ThiefApp) {
                             ((ThiefApp)window).stats_bar.toggle_statistics ();
@@ -217,7 +218,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Toggle Dark/Light theme
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.l, keycode)) {
                         if (settings.theme_id != "thiefmd") {
                             settings.dark_mode = !settings.dark_mode;
@@ -232,15 +233,15 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Preferences
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0) {
                     if (match_keycode (Gdk.Key.comma, keycode)) {
                         Preferences prf = new Preferences();
-                        prf.show_all ();
+                        prf.present ();
                     }
                 }
 
                 // Undo
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.z, keycode)) {
                         if (window is ThiefApp) {
                             SheetManager.undo ();
@@ -252,7 +253,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Redo
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK & Gdk.ModifierType.SHIFT_MASK) != 0 && (window is ThiefApp || window is SoloEditor)) {
                     if (match_keycode (Gdk.Key.z, keycode)) {
                         if (window is ThiefApp) {
                             SheetManager.redo ();
@@ -264,7 +265,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Editor Mode
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.@1, keycode)) {
                         if (window is ThiefApp) {
                             settings.view_state = 2;
@@ -274,7 +275,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Sheets + Editor Mode
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.@2, keycode)) {
                         if (window is ThiefApp) {
                             settings.view_state = 1;
@@ -284,7 +285,7 @@ namespace ThiefMD.Widgets {
                 }
 
                 // Library + Sheets + Editor Mode
-                if ((e.state & Gdk.ModifierType.CONTROL_MASK) != 0 && (e.state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
+                if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && (state & Gdk.ModifierType.SHIFT_MASK) == 0 && is_main) {
                     if (match_keycode (Gdk.Key.@3, keycode)) {
                         if (window is ThiefApp) {
                             settings.view_state = 0;
@@ -328,6 +329,7 @@ namespace ThiefMD.Widgets {
 
                 return false;
             });
+            ((Gtk.Widget) window).add_controller (key_controller);
         }
     }
 }

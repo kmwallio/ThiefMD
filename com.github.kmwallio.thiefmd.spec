@@ -20,11 +20,11 @@ BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(gobject-2.0)
 BuildRequires: pkgconfig(libarchive)
 BuildRequires: pkgconfig(libsecret-1)
-BuildRequires: pkgconfig(gtksourceview-3.0)
-BuildRequires: pkgconfig(gtk+-3.0)
-BuildRequires: pkgconfig(gtkspell3-3.0)
-BuildRequires: pkgconfig(webkit2gtk-4.0)
-BuildRequires: pkgconfig(libhandy-1)
+BuildRequires: pkgconfig(gtksourceview-5)
+BuildRequires: pkgconfig(gtk4)
+BuildRequires: pkgconfig(gspell-1)
+BuildRequires: pkgconfig(webkitgtk-6.0)
+BuildRequires: pkgconfig(libadwaita-1)
 
 %description
 Keep your Markdown managed. Write epic tales, keep a journal, or finally write that book report.

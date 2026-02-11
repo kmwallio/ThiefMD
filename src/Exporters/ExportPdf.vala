@@ -183,7 +183,7 @@ namespace ThiefMD.Exporters {
                     _("Working PDF Magic"),
                     new Gtk.Label (_("Making sure your hard work looks purrfect...")));
 
-                debug ("Using webkit2gtk2pdf");
+                debug ("Using webkitgtk6 for PDF export");
                 var print_operation = new WebKit.PrintOperation (publisher_instance.preview);
                 var print_settings = new Gtk.PrintSettings ();
                 print_settings.set_printer ("Print to File");

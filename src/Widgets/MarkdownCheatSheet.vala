@@ -19,10 +19,12 @@
 
 using ThiefMD;
 using ThiefMD.Controllers;
+using Adw;
 
 namespace ThiefMD.Widgets {
-    public class MarkdownCheatSheet : Hdy.Window {
-        Hdy.HeaderBar headerbar;
+    public class MarkdownCheatSheet : Gtk.ApplicationWindow {
+        Adw.HeaderBar headerbar;
+        Adw.WindowTitle title_widget;
 
         public MarkdownCheatSheet () {
             build_ui ();
@@ -30,19 +32,20 @@ namespace ThiefMD.Widgets {
 
         private void build_ui () {
             Gtk.Box vbox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            headerbar = new Hdy.HeaderBar ();
-            headerbar.set_title ("Cheat Sheet");
+            headerbar = new Adw.HeaderBar ();
+            title_widget = new Adw.WindowTitle ("Cheat Sheet", "");
+            headerbar.set_title_widget (title_widget);
             var header_context = headerbar.get_style_context ();
-            header_context.add_class (Gtk.STYLE_CLASS_FLAT);
+            header_context.add_class ("flat");
             header_context.add_class ("thiefmd-toolbar");
 
-            var grid = new Gtk.Grid ();
-            grid.orientation = Gtk.Orientation.VERTICAL;
-            grid.margin = 12;
-            grid.row_spacing = 12;
-            grid.column_spacing = 12;
-            grid.vexpand = true;
-            grid.hexpand = true;
+            var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
+            box.margin_top = 12;
+            box.margin_bottom = 12;
+            box.margin_start = 12;
+            box.margin_end = 12;
+            box.vexpand = true;
+            box.hexpand = true;
 
             string hashtags = "";
             for (int h = 1; h <= 6; h++) {
@@ -54,7 +57,7 @@ namespace ThiefMD.Widgets {
             var heading = new Gtk.Label ("<b>" + hashtags + "</b>");
             heading.xalign = 0;
             heading.use_markup = true;
-            grid.add (heading);
+            box.append (heading);
 
             //  var sp0 = new Gtk.Label (" ");
             //  grid.add (sp0);
@@ -62,7 +65,7 @@ namespace ThiefMD.Widgets {
             var bold_italic_string = new Gtk.Label ("<b>**Strong**</b>\n<i>*Emphasis*</i>\n~~<s>Deleted</s>~~\n`<tt>Code</tt>`");
             bold_italic_string.use_markup = true;
             bold_italic_string.xalign = 0;
-            grid.add (bold_italic_string);
+            box.append (bold_italic_string);
 
             //  var sp1 = new Gtk.Label (" ");
             //  grid.add (sp1);
@@ -70,7 +73,7 @@ namespace ThiefMD.Widgets {
             var url = new Gtk.Label ("[Link](<u>http://to-site.com</u>)\n<b>!</b>[Image Description](<u>/path/to/image.png</u>)");
             url.use_markup = true;
             url.xalign = 0;
-            grid.add (url);
+            box.append (url);
 
             //  var sp2 = new Gtk.Label (" ");
             //  grid.add (sp2);
@@ -78,12 +81,12 @@ namespace ThiefMD.Widgets {
             var ul = new Gtk.Label ("<b>*</b> List Item 1\n<b>*</b> List Item 2");
             ul.use_markup = true;
             ul.xalign = 0;
-            grid.add (ul);
+            box.append (ul);
 
             var ol = new Gtk.Label ("<b>1.</b> List Item 1\n<b>2.</b> List Item 2");
             ol.use_markup = true;
             ol.xalign = 0;
-            grid.add (ol);
+            box.append (ol);
 
             //  var sp3 = new Gtk.Label (" ");
             //  grid.add (sp3);
@@ -91,7 +94,7 @@ namespace ThiefMD.Widgets {
             var blockquote = new Gtk.Label ("<b>&gt;</b> Blockquote");
             blockquote.use_markup = true;
             blockquote.xalign = 0;
-            grid.add (blockquote);
+            box.append (blockquote);
 
             //  var sp4 = new Gtk.Label (" ");
             //  grid.add (sp4);
@@ -99,7 +102,7 @@ namespace ThiefMD.Widgets {
             var code_block = new Gtk.Label ("```python\n<tt>print (\"Hello World!\")</tt>\n```");
             code_block.use_markup = true;
             code_block.xalign = 0;
-            grid.add (code_block);
+            box.append (code_block);
 
             //  var sp5 = new Gtk.Label (" ");
             //  grid.add (sp5);
@@ -107,24 +110,17 @@ namespace ThiefMD.Widgets {
             var hr = new Gtk.Label ("<b>***</b> (Horizontal Rule)");
             hr.use_markup = true;
             hr.xalign = 0;
-            grid.add (hr);
+            box.append (hr);
 
 
-            headerbar.set_show_close_button (true);
+            headerbar.set_show_start_title_buttons (true);
+            headerbar.set_show_end_title_buttons (true);
             transient_for = ThiefApp.get_instance ();
-            destroy_with_parent = true;
-            vbox.add (headerbar);
-            vbox.add (grid);
-            add (vbox);
+            vbox.append (headerbar);
+            vbox.append (box);
+            set_child (vbox);
 
-            int w, h;
-            ThiefApp.get_instance ().get_size (out w, out h);
-
-            show_all ();
-
-            delete_event.connect (() => {
-                return false;
-            });
+            close_request.connect (() => false);
         }
    }
 }

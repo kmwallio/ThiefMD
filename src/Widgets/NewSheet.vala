@@ -41,7 +41,10 @@ namespace ThiefMD.Widgets {
             _import = new Gtk.Button.with_label (_("Import"));
 
             var menu_grid = new Gtk.Grid ();
-            menu_grid.margin = 6;
+            menu_grid.margin_top = 6;
+            menu_grid.margin_bottom = 6;
+            menu_grid.margin_start = 6;
+            menu_grid.margin_end = 6;
             menu_grid.row_spacing = 6;
             menu_grid.column_spacing = 12;
             menu_grid.orientation = Gtk.Orientation.VERTICAL;
@@ -50,9 +53,7 @@ namespace ThiefMD.Widgets {
             menu_grid.attach (_import, 0, 1, 1, 1);
             menu_grid.attach (_create, 1, 1, 1, 1);
 
-            menu_grid.show_all ();
-
-            add (menu_grid);
+            set_child (menu_grid);
 
             _create.clicked.connect (new_file);
             _import.clicked.connect (() => {

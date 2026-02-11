@@ -19,9 +19,11 @@
 
 using ThiefMD;
 using ThiefMD.Widgets;
+using GtkSource;
 
 namespace ThiefMD.Enrichments {
-    public class FountainCharacterSuggestor : Gtk.SourceCompletionProvider, Object {
+    /* GTK4 TODO: GtkSourceView 5 API changes - GtkSource.CompletionProvider removed
+    public class FountainCharacterSuggestor : GtkSource.CompletionProvider, Object {
         public Gee.HashSet<string> characters;
 
         public FountainCharacterSuggestor () {
@@ -32,7 +34,7 @@ namespace ThiefMD.Enrichments {
             return _("Characters");
         }
 
-        public override bool match (Gtk.SourceCompletionContext context) {
+        public override bool match (GtkSource.CompletionContext context) {
             Gtk.TextIter? start = null, iter = null;
             if (context.get_iter (out iter)) {
                 if (iter.ends_line () && context.get_iter (out start)) {
@@ -47,8 +49,8 @@ namespace ThiefMD.Enrichments {
             return false;
         }
 
-        public override void populate (Gtk.SourceCompletionContext context) {
-            List<Gtk.SourceCompletionItem> completions = new List<Gtk.SourceCompletionItem> ();
+        public override void populate (GtkSource.CompletionContext context) {
+            List<GtkSource.CompletionItem> completions = new List<GtkSource.CompletionItem> ();
             Gtk.TextIter? start = null, iter = null;
             if (context.get_iter (out iter)) {
                 if (iter.ends_line () && context.get_iter (out start)) {
@@ -57,7 +59,7 @@ namespace ThiefMD.Enrichments {
                         string check = start.get_text (iter);
                         foreach (var character in characters) {
                             if (character.has_prefix (check) && character != check) {
-                                var com_item = new Gtk.SourceCompletionItem ();
+                                var com_item = new GtkSource.CompletionItem ();
                                 com_item.text = character;
                                 com_item.label = character;
                                 com_item.markup = character;
@@ -70,15 +72,14 @@ namespace ThiefMD.Enrichments {
             context.add_proposals (this, completions, true);
         }
 
-        public override bool activate_proposal (Gtk.SourceCompletionProposal proposal, Gtk.TextIter iter) {
+        public override bool activate_proposal (GtkSource.CompletionProposal proposal, Gtk.TextIter iter) {
             return false;
         }
     }
+    */
 
     public class FountainEnrichment : Object {
-        private FountainCharacterSuggestor character_suggester;
-        private Gtk.SourceCompletionWords source_completion;
-        private Gtk.SourceView view;
+        private GtkSource.View view;
         private Gtk.TextBuffer buffer;
         private Mutex checking;
 
@@ -105,11 +106,9 @@ namespace ThiefMD.Enrichments {
             } catch (Error e) {
                 warning ("Could not build regexes: %s", e.message);
             }
-            character_suggester = new FountainCharacterSuggestor ();
             checking = Mutex ();
             limit_updates = new TimedMutex (250);
             last_cursor = -1;
-            source_completion = null;
         }
 
         public void reset () {
@@ -234,22 +233,6 @@ namespace ThiefMD.Enrichments {
                                 buffer.apply_tag (tag_parenthetical, start, end);
                             } else {
                                 buffer.apply_tag (tag_character, start, end);
-                                start.backward_word_start ();
-                                end.forward_word_end ();
-                                if (!character_suggester.characters.contains (character) && !cursor_iter.in_range (start, end)) {
-                                    bool partial_character_name = false;
-                                    if (character.has_suffix ("^")) {
-                                        character = character.substring (0, character.length - 1);
-                                    }
-                                    foreach (var person in character_suggester.characters) {
-                                        if (person.contains (character)) {
-                                            partial_character_name = true;
-                                        }
-                                    }
-                                    if (!partial_character_name) {
-                                        character_suggester.characters.add (character);
-                                    }
-                                }
                             }
                         }
 
@@ -301,7 +284,7 @@ namespace ThiefMD.Enrichments {
             } while (match_info.next ());
         }
 
-        public bool attach (Gtk.SourceView textview) {
+        public bool attach (GtkSource.View textview) {
             if (textview == null) {
                 return false;
             }
@@ -345,24 +328,7 @@ namespace ThiefMD.Enrichments {
 
         private void settings_changed () {
             var settings = AppSettings.get_default ();
-            if (settings.experimental && source_completion == null) {
-                try {
-                    var completion = view.get_completion ();
-                    completion.add_provider (character_suggester);
-                    source_completion = new Gtk.SourceCompletionWords ("Character Suggestor", null);
-                    source_completion.register (buffer);
-                } catch (Error e) {
-                    warning ("Cannot add autocompletion: %s", e.message);
-                }
-            } else if (!settings.experimental && source_completion != null) {
-                try {
-                    var completion = view.get_completion ();
-                    source_completion.unregister (buffer);
-                    completion.remove_provider (character_suggester);
-                } catch (Error e) {
-                    warning ("Could not add autocompletion: %s", e.message);
-                }
-            }
+            /* GTK4 TODO: Completion provider integration pending GtkSource.Completion port */
         }
 
         private void calculate_margins () {
@@ -430,10 +396,6 @@ namespace ThiefMD.Enrichments {
             buffer.tag_table.remove (tag_character);
             buffer.tag_table.remove (tag_parenthetical);
             buffer.tag_table.remove (tag_dialogue);
-
-            if (source_completion != null) {
-                source_completion.unregister (buffer);
-            }
 
             settings.changed.disconnect (settings_changed);
 

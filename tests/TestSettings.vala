@@ -153,10 +153,10 @@ namespace ThiefMD {
     }
 
     public class UI {
-        public static Gtk.SourceStyleSchemeManager thief_schemes = null;
-        public static Gtk.SourceStyleSchemeManager UserSchemes () {
+        public static GtkSource.StyleSchemeManager thief_schemes = null;
+        public static GtkSource.StyleSchemeManager UserSchemes () {
             if (thief_schemes == null) {
-                thief_schemes = new Gtk.SourceStyleSchemeManager ();
+                thief_schemes = new GtkSource.StyleSchemeManager ();
             }
     
             return thief_schemes;

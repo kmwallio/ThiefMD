@@ -49,7 +49,10 @@ namespace ThiefMD.Widgets {
 
             var font_label = new Gtk.Label (_("Font"));
             font_label.xalign = 0;
-            font_label.margin = 12;
+            font_label.margin_top = 12;
+            font_label.margin_bottom = 12;
+            font_label.margin_start = 12;
+            font_label.margin_end = 12;
             font_label.use_markup = true;
 
             var line_label = new Gtk.Label (_("Spacing"));
@@ -149,38 +152,41 @@ namespace ThiefMD.Widgets {
                     }
                     font_chooser.set_font_desc (fontdesc);
 
-                    int res = font_chooser.run ();
-                    if (res != Gtk.ResponseType.CANCEL) {
-                        string new_font = font_chooser.get_font_family ().get_name ();
-                        string font_desc = font_chooser.get_font_desc ().to_string ();
-                        int new_font_size = font_chooser.get_font_size ();
-                        if (new_font_size > Pango.SCALE) {
-                            new_font_size /= Pango.SCALE;
-                        }
-                        debug ("Selected font size: %d", new_font_size);
-                        debug ("Setting font: %s", new_font);
-                        settings.font_family = font_desc;
-                        if (!fonts.contains (new_font)) {
-                            font_selector.append_text (new_font);
-                            fonts.add (new_font);
-                        }
-                        font_selector.set_active (fonts.index_of (new_font));
-                        if (!font_sizes.contains (new_font_size)) {
-                            font_size_selector.append_text (new_font_size.to_string ());
-                            font_sizes.add (new_font_size);
-                        }
-                        settings.font_size = new_font_size;
-                        font_size_selector.set_active (font_sizes.index_of (new_font_size));
-                    } else {
-                        if (settings.font_family == null || settings.font_family == "iA Writer Douspace" || settings.font_family.chug ().chomp () == "") {
-                            font_selector.set_active (0);
-                        } else if (settings.font_family == "Courier Prime") {
-                            font_selector.set_active (1);
+                    font_chooser.response.connect ((response_id) => {
+                        if (response_id != Gtk.ResponseType.CANCEL && response_id != Gtk.ResponseType.DELETE_EVENT) {
+                            string new_font = font_chooser.get_font_family ().get_name ();
+                            string font_desc = font_chooser.get_font_desc ().to_string ();
+                            int new_font_size = font_chooser.get_font_size ();
+                            if (new_font_size > Pango.SCALE) {
+                                new_font_size /= Pango.SCALE;
+                            }
+                            debug ("Selected font size: %d", new_font_size);
+                            debug ("Setting font: %s", new_font);
+                            settings.font_family = font_desc;
+                            if (!fonts.contains (new_font)) {
+                                font_selector.append_text (new_font);
+                                fonts.add (new_font);
+                            }
+                            font_selector.set_active (fonts.index_of (new_font));
+                            if (!font_sizes.contains (new_font_size)) {
+                                font_size_selector.append_text (new_font_size.to_string ());
+                                font_sizes.add (new_font_size);
+                            }
+                            settings.font_size = new_font_size;
+                            font_size_selector.set_active (font_sizes.index_of (new_font_size));
                         } else {
-                            font_selector.set_active (2);
+                            if (settings.font_family == null || settings.font_family == "iA Writer Douspace" || settings.font_family.chug ().chomp () == "") {
+                                font_selector.set_active (0);
+                            } else if (settings.font_family == "Courier Prime") {
+                                font_selector.set_active (1);
+                            } else {
+                                font_selector.set_active (2);
+                            }
                         }
-                    }
-                    font_chooser.destroy ();
+                        font_chooser.destroy ();
+                    });
+
+                    font_chooser.present ();
                 } else if (option >= 0 && option < fonts.size && fonts.get (option) != "Other") {
                     settings.font_family = fonts.get (option);
                     debug ("Setting font to: %s", fonts.get (option));
@@ -194,9 +200,9 @@ namespace ThiefMD.Widgets {
             grid.attach (font_size_selector, 3, 0, 1, 1);
             grid.attach (line_label, 0, 1, 1, 1);
             grid.attach (line_spacing_selector, 1, 1, 1, 1);
-            grid.show_all ();
+            grid.set_visible (true);
 
-            add (grid);
+            append (grid);
         }
     }
     public class CssSelector : Gtk.Box {
@@ -211,21 +217,22 @@ namespace ThiefMD.Widgets {
 
         public void build_ui () {
             app_box = new Gtk.FlowBox ();
-            app_box.orientation = Gtk.Orientation.HORIZONTAL;
-            app_box.margin = 6;
             app_box.max_children_per_line = 3;
             app_box.homogeneous = true;
-            app_box.expand = false;
             app_box.hexpand = true;
+            app_box.margin_top = 6;
+            app_box.margin_bottom = 6;
+            app_box.margin_start = 6;
+            app_box.margin_end = 6;
 
             var none = new CssPreview ("", css_type == "print");
             var modest_splendor = new CssPreview ("modest-splendor", css_type == "print");
-            app_box.add (none);
-            app_box.add (modest_splendor);
+            app_box.append (none);
+            app_box.append (modest_splendor);
 
             load_css ();
 
-            add (app_box);
+            append (app_box);
         }
 
         public void refresh () {
@@ -234,7 +241,6 @@ namespace ThiefMD.Widgets {
             }
 
             load_css ();
-            show_all ();
         }
 
         public static Gee.LinkedList<string> list_css (string css_type = "print") {
@@ -277,12 +283,12 @@ namespace ThiefMD.Widgets {
                         if (css_type == "print" && print_css.query_exists ()) {
                             var new_opt = new CssPreview (theme_pkg, true);
                             new_opt.set_size_request (Constants.CSS_PREVIEW_WIDTH, Constants.CSS_PREVIEW_HEIGHT);
-                            app_box.add (new_opt);
+                            app_box.append (new_opt);
                             wids.add (new_opt);
                         } else if (css_type == "preview" && preview_css.query_exists ()) {
                             var new_opt = new CssPreview (theme_pkg, false);
                             new_opt.set_size_request (Constants.CSS_PREVIEW_WIDTH, Constants.CSS_PREVIEW_HEIGHT);
-                            app_box.add (new_opt);
+                            app_box.append (new_opt);
                             wids.add (new_opt);
                         }
                     }
@@ -307,18 +313,22 @@ namespace ThiefMD.Widgets {
 
         public void build_ui () {
             app_box = new Gtk.Grid ();
-            app_box.margin = 12;
             app_box.row_spacing = 12;
             app_box.column_spacing = 12;
-            app_box.orientation = Orientation.VERTICAL;
             app_box.hexpand = true;
+            app_box.margin_top = 12;
+            app_box.margin_bottom = 12;
+            app_box.margin_start = 12;
+            app_box.margin_end = 12;
 
             preview_items = new Gtk.FlowBox ();
-            preview_items.margin = 6;
             preview_items.max_children_per_line = 3;
             preview_items.homogeneous = true;
-            preview_items.expand = false;
             preview_items.hexpand = true;
+            preview_items.margin_top = 6;
+            preview_items.margin_bottom = 6;
+            preview_items.margin_start = 6;
+            preview_items.margin_end = 6;
 
             app_box.attach (preview_items, 0, 1, 1, 3);
             app_box.hexpand = true;
@@ -328,13 +338,11 @@ namespace ThiefMD.Widgets {
             get_themes.xalign = 0;
 
             // preview_items.add (new UserTheme ());
-            preview_items.add (new DefaultTheme ());
+            preview_items.append (new DefaultTheme ());
             app_box.attach (get_themes, 0, 5, 1, 1);
-            add (app_box);
+            append (app_box);
 
             load_themes ();
-
-            show_all ();
         }
 
         public bool load_themes () {
@@ -347,9 +355,8 @@ namespace ThiefMD.Widgets {
                 ThemePreview dark_preview = new ThemePreview (new_styles, true);
                 ThemePreview light_preview = new ThemePreview (new_styles, false);
 
-                ThemeSelector.instance.preview_items.add (dark_preview);
-                ThemeSelector.instance.preview_items.add (light_preview);
-                ThemeSelector.instance.preview_items.show_all ();
+                ThemeSelector.instance.preview_items.append (dark_preview);
+                ThemeSelector.instance.preview_items.append (light_preview);
             }
 
             return false;

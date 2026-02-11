@@ -146,11 +146,10 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             _sheets_dir = path;
             _view = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            _scroller = new Gtk.ScrolledWindow (null, null);
+            _scroller = new Gtk.ScrolledWindow ();
 
-            _scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
-            _scroller.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
-            _scroller.add (_view);
+            _scroller.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+            _scroller.set_child (_view);
             _scroller.vexpand = true;
             _scroller.hexpand = true;
 
@@ -159,8 +158,7 @@ namespace ThiefMD.Widgets {
                 title = make_title (path.substring (path.last_index_of (Path.DIR_SEPARATOR_S) + 1));
             }
 
-            var bar = new Hdy.HeaderBar ();
-            bar.set_title ("");
+            var bar = new Adw.HeaderBar ();
             var bar_label = new Gtk.Label ("<b>" + title + "</b>");
             bar_label.use_markup = true;
             while (title.length > 12 && get_string_px_width(bar_label, title + "...") > 180) {
@@ -169,22 +167,19 @@ namespace ThiefMD.Widgets {
             }
             bar_label.xalign = 0;
             bar_label.set_ellipsize (Pango.EllipsizeMode.END);
+            var title_widget = new Adw.WindowTitle (title, "");
+            bar.set_title_widget (title_widget);
             bar.pack_start (bar_label);
-            bar.set_show_close_button (false);
+            bar.set_show_start_title_buttons (false);
+            bar.set_show_end_title_buttons (false);
             bar.width_request = settings.view_sheets_width;
 
             new_sheet = new Gtk.MenuButton ();
             new_sheet_widget = new NewSheet ();
             new_sheet.has_tooltip = true;
             new_sheet.tooltip_text = (_("New Sheet"));
-            new_sheet.set_image (new Gtk.Image.from_icon_name ("document-new-symbolic", Gtk.IconSize.BUTTON));
+            new_sheet.set_icon_name ("document-new-symbolic");
             new_sheet.popover = new_sheet_widget;
-            new_sheet.clicked.connect(() => {
-                settings.menu_active = true;
-                new_sheet.popover.hide.connect (() => {
-                    settings.menu_active = false;
-                });
-            });
 
             bar.pack_end (new_sheet);
 
@@ -193,8 +188,8 @@ namespace ThiefMD.Widgets {
             var header_context = bar.get_style_context ();
             header_context.add_class ("thiefmd-toolbar");
 
-            add (bar);
-            add (_scroller);
+            append (bar);
+            append (_scroller);
 
             debug ("Got %s\n", _sheets_dir);
             if (_sheets_dir == "" || !FileUtils.test(path, FileTest.IS_DIR)) {
@@ -281,7 +276,7 @@ namespace ThiefMD.Widgets {
             _empty = new Gtk.Label(_("Select an item from the Library to open or create a new Sheet."));
             _empty.set_ellipsize (Pango.EllipsizeMode.END);
             _empty.lines = 30;
-            _view.add(_empty);
+            _view.append (_empty);
         }
 
         public string guess_extension () {
@@ -368,7 +363,7 @@ namespace ThiefMD.Widgets {
             }
 
             if (_sheets.keys.size == 0 && !am_empty) {
-                _view.add (_empty);
+                _view.append (_empty);
             }
         }
 
@@ -427,7 +422,7 @@ namespace ThiefMD.Widgets {
 
                         Sheet sheet = new Sheet (path, this);
                         _sheets.set (file_name, sheet);
-                        _view.add (sheet);
+                        _view.append (sheet);
 
                         if (!settings.dont_show_tips){
                             if (settings.last_file == path) {
@@ -466,7 +461,7 @@ namespace ThiefMD.Widgets {
 
                             Sheet sheet = new Sheet (path, this);
                             _sheets.set (file_name, sheet);
-                            _view.add (sheet);
+                            _view.append (sheet);
                             metadata.add_sheet (file_name);
 
                             if (!settings.dont_show_tips){
@@ -617,7 +612,7 @@ namespace ThiefMD.Widgets {
                 Sheet show = _sheets.get (s);
                 show.redraw ();
                 _view.remove (show);
-                _view.add (show);
+                _view.append (show);
             }
             _view.show ();
         }

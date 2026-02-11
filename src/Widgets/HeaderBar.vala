@@ -21,8 +21,10 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class Headerbar : Gtk.Revealer {
-        private Hdy.HeaderBar the_bar;
+    public class Headerbar : Gtk.Box {
+        private Gtk.Revealer revealer;
+        private Adw.HeaderBar the_bar;
+        private Adw.WindowTitle window_title;
         private ThiefApp _instance;
         private Gtk.Button change_view_button;
         private Gtk.MenuButton menu_button;
@@ -30,12 +32,15 @@ namespace ThiefMD.Widgets {
         private Gtk.Label spacer;
 
         public Headerbar (ThiefApp instance) {
-            the_bar = new Hdy.HeaderBar ();
+            Object (orientation: Gtk.Orientation.VERTICAL, spacing: 0);
+
+            revealer = new Gtk.Revealer ();
+            the_bar = new Adw.HeaderBar ();
             _instance = instance;
             var header_context = the_bar.get_style_context ();
             header_context.add_class ("thief-toolbar");
 
-            header_context = this.get_style_context ();
+            header_context = revealer.get_style_context ();
             header_context.add_class ("thief-toolbar");
 
             build_ui ();
@@ -43,31 +48,30 @@ namespace ThiefMD.Widgets {
 
         public bool hidden {
             get {
-                return !child_revealed;
+                return !revealer.child_revealed;
             }
         }
 
         public void toggle_headerbar () {
-            if (child_revealed) {
+            if (revealer.child_revealed) {
                 hide_headerbar ();
             } else {
                 show_headerbar ();
             }
-            this.show_all ();
         }
 
         public void hide_headerbar () {
             var settings = AppSettings.get_default ();
             if (settings.hide_toolbar) {
-                if (child_revealed) {
-                    set_reveal_child (false);
+                if (revealer.child_revealed) {
+                    revealer.set_reveal_child (false);
                 }
             }
         }
 
         public void show_headerbar () {
-            if (!child_revealed) {
-                set_reveal_child (true);
+            if (!revealer.child_revealed) {
+                revealer.set_reveal_child (true);
             }
         }
 
@@ -76,7 +80,7 @@ namespace ThiefMD.Widgets {
             change_view_button = new Gtk.Button ();
             change_view_button.has_tooltip = true;
             change_view_button.tooltip_text = (_("Change View"));
-            change_view_button.set_image (new Gtk.Image.from_icon_name("sidebar-show-symbolic", Gtk.IconSize.BUTTON));
+            change_view_button.set_icon_name ("sidebar-show-symbolic");
             change_view_button.clicked.connect (() => {
                 UI.toggle_view();
             });
@@ -90,22 +94,20 @@ namespace ThiefMD.Widgets {
             menu_button = new Gtk.MenuButton ();
             menu_button.has_tooltip = true;
             menu_button.tooltip_text = (_("Settings"));
-            menu_button.set_image (new Gtk.Image.from_icon_name ("open-menu-symbolic", Gtk.IconSize.BUTTON));
-            menu_button.popover = new QuickPreferences (_instance);
-            menu_button.clicked.connect (() => {
-                settings.menu_active = true;
-                menu_button.popover.hide.connect (() => {
-                    settings.menu_active = false;
-                });
-                menu_button.popover.destroy.connect (() => {
-                    settings.menu_active = false;
-                });
+            menu_button.set_icon_name ("open-menu-symbolic");
+            var prefs_popover = new QuickPreferences (_instance);
+            menu_button.set_popover (prefs_popover);
+            prefs_popover.notify["visible"].connect (() => {
+                settings.menu_active = prefs_popover.get_visible ();
+            });
+            prefs_popover.closed.connect (() => {
+                settings.menu_active = false;
             });
 
             sidebar_button = new Gtk.Button ();
             sidebar_button.has_tooltip = true;
             sidebar_button.tooltip_text = (_("Show Notes"));
-            sidebar_button.set_image (new Gtk.Image.from_icon_name ("sidebar-hide-symbolic", Gtk.IconSize.BUTTON));
+            sidebar_button.set_icon_name ("sidebar-hide-symbolic");
             sidebar_button.clicked.connect (() => {
                 if (!ThiefApp.get_instance ().notes.child_revealed) {
                     ThiefApp.get_instance ().notes_widget.show ();
@@ -117,18 +119,21 @@ namespace ThiefMD.Widgets {
                 });
             });
 
+            window_title = new Adw.WindowTitle ("", "");
+            the_bar.set_title_widget (window_title);
+
             the_bar.pack_start (change_view_button);
 
             the_bar.pack_end (sidebar_button);
             the_bar.pack_end (menu_button);
 
-            the_bar.set_show_close_button (true);
+            the_bar.set_show_end_title_buttons (true);
+            the_bar.set_show_start_title_buttons (true);
             settings.changed.connect (update_header);
             update_header ();
-            the_bar.show_all ();
-            add (the_bar);
-            set_reveal_child (true);
-            this.show_all ();
+            revealer.set_child (the_bar);
+            revealer.set_reveal_child (true);
+            append (revealer);
         }
 
         public void update_header () {
@@ -137,20 +142,20 @@ namespace ThiefMD.Widgets {
             if (!settings.brandless) {
                 if (settings.show_filename && settings.last_file != "") {
                     string file_name = settings.last_file.substring(settings.last_file.last_index_of (Path.DIR_SEPARATOR_S) + 1);
-                    the_bar.set_title ("ThiefMD");
+                    window_title.set_title ("ThiefMD");
                     File lf = File.new_for_path (settings.last_file);
                     if (lf.query_exists ()) {
-                        the_bar.set_subtitle (file_name);
+                        window_title.set_subtitle (file_name);
                     } else {
-                        the_bar.set_subtitle ("");
+                        window_title.set_subtitle ("");
                     }
                 } else {
-                    the_bar.set_title ("ThiefMD");
-                    the_bar.set_subtitle ("");
+                    window_title.set_title ("ThiefMD");
+                    window_title.set_subtitle ("");
                 }
             } else {
-                the_bar.set_title ("");
-                the_bar.set_subtitle ("");
+                window_title.set_title ("");
+                window_title.set_subtitle ("");
             }
 
             if (ThiefApp.get_instance ().ready) {

@@ -21,7 +21,8 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class SearchBar : Gtk.Revealer {
+    public class SearchBar : Gtk.Box {
+        private Gtk.Revealer revealer;
         private Gtk.Entry search_text;
         private Gtk.Button next;
         private Gtk.Button prev;
@@ -30,7 +31,9 @@ namespace ThiefMD.Widgets {
         private bool searched = false;
 
         public SearchBar () {
-            transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
+            Object (orientation: Gtk.Orientation.VERTICAL, spacing: 0);
+            revealer = new Gtk.Revealer ();
+            revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
             build_ui ();
         }
 
@@ -46,17 +49,23 @@ namespace ThiefMD.Widgets {
             next = new Gtk.Button ();
             header_context = next.get_style_context ();
             header_context.add_class ("thief-search-button");
-            next.set_image (new Gtk.Image.from_icon_name ("go-next-symbolic", Gtk.IconSize.BUTTON));
+            var next_image = new Gtk.Image.from_icon_name ("go-next-symbolic");
+            next_image.pixel_size = 16;
+            next.set_child (next_image);
             prev = new Gtk.Button ();
             header_context = prev.get_style_context ();
             header_context.add_class ("thief-search-button");
-            prev.set_image (new Gtk.Image.from_icon_name ("go-next-rtl-symbolic", Gtk.IconSize.BUTTON));
-            var close = new Gtk.ModelButton ();
+            var prev_image = new Gtk.Image.from_icon_name ("go-next-rtl-symbolic");
+            prev_image.pixel_size = 16;
+            prev.set_child (prev_image);
+            var close = new Gtk.Button ();
             header_context = close.get_style_context ();
             header_context.add_class ("thief-search-button");
-            close.set_image (new Gtk.Image.from_icon_name ("window-close-symbolic", Gtk.IconSize.BUTTON));
+            var close_image = new Gtk.Image.from_icon_name ("window-close-symbolic");
+            close_image.pixel_size = 16;
+            close.set_child (close_image);
             close.clicked.connect (() => {
-                if (child_revealed) {
+                if (revealer.child_revealed) {
                     deactivate_search ();
                 }
             });
@@ -70,12 +79,12 @@ namespace ThiefMD.Widgets {
 
             //  grid.show_all ();
             box.hexpand = true;
-            box.pack_end (close);
-            box.pack_end (next);
-            box.pack_end (prev);
-            box.pack_end (search_text);
-            box.pack_end (matches);
-            box.show_all ();
+            box.append (matches);
+            box.append (search_text);
+            box.append (prev);
+            box.append (next);
+            box.append (close);
+            box.set_visible (true);
 
             next.clicked.connect (() => {
                 SheetManager.search_next ();
@@ -93,8 +102,9 @@ namespace ThiefMD.Widgets {
                 SheetManager.search_next ();
             });
 
-            add (box);
-            set_reveal_child (false);
+            revealer.set_child (box);
+            revealer.set_reveal_child (false);
+            append (revealer);
             hexpand = true;
         }
 
@@ -110,11 +120,11 @@ namespace ThiefMD.Widgets {
                 matches.label = _("(%d occurences)").printf (match_count);
             }
             debug ("Have %d matches", match_count);
-            box.show_all ();
+            box.show ();
         }
 
         public void toggle_search () {
-            if (child_revealed) {
+            if (revealer.child_revealed) {
                 deactivate_search ();
             } else {
                 activate_search ();
@@ -126,7 +136,7 @@ namespace ThiefMD.Widgets {
         }
 
         public bool search_enabled () {
-            return (child_revealed && search_text.text.chug ().chomp () != "");
+            return (revealer.child_revealed && search_text.text.chug ().chomp () != "");
         }
 
         public string get_search_text () {
@@ -138,14 +148,14 @@ namespace ThiefMD.Widgets {
             searched = false;
             search_text.changed.disconnect (update_text);
             SheetManager.search_for (null);
-            set_reveal_child (false);
+            revealer.set_reveal_child (false);
         }
 
         public void activate_search () {
             set_match_count (-1);
             search_text.changed.connect (update_text);
             search_text.grab_focus_without_selecting ();
-            set_reveal_child (true);
+            revealer.set_reveal_child (true);
         }
 
         private void update_text () {

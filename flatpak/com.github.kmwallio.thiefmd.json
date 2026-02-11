@@ -1,7 +1,7 @@
 {
     "app-id": "com.github.kmwallio.thiefmd",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "44",
+    "runtime-version": "46",
     "sdk": "org.gnome.Sdk",
     "command": "com.github.kmwallio.thiefmd",
     "finish-args": [
@@ -36,20 +36,25 @@
             ],
             "sources": [{
                 "type": "archive",
-                "url": "https://download.gnome.org/sources/gtksourceview/4.8/gtksourceview-4.8.3.tar.xz",
-                "sha256": "c30019506320ca2474d834cced1e2217ea533e00eb2a3f4eb7879007940ec682"
+                "url": "https://download.gnome.org/sources/gtksourceview/5.10/gtksourceview-5.10.0.tar.xz",
+                "sha256": "662f87fa1fbf1e5c39b2d22d2ceae0f7c20f71774eef20f704d82c0b6104823a"
             }]
         },
         "shared-modules/intltool/intltool-0.51.json",
         {
-            "name": "gtkspell",
+            "name": "gspell",
             "cleanup": [
                 "*.a"
             ],
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dgtk_doc=false",
+                "-Dapi_docs=false"
+            ],
             "sources": [{
                 "type": "archive",
-                "url": "https://sourceforge.net/projects/gtkspell/files/3.0.10/gtkspell3-3.0.10.tar.xz",
-                "sha256": "b040f63836b347eb344f5542443dc254621805072f7141d49c067ecb5a375732"
+                "url": "https://download.gnome.org/sources/gspell/1.12/gspell-1.12.0.tar.xz",
+                "sha256": "9f2b9dd1e8c9e1aa3eeb3e5f0a7dc0b321d75b16c838c2f5e7c96b4b4a98c51c"
             }]
         },
         {
@@ -124,7 +129,7 @@
         },
         "shared-modules/libsecret/libsecret.json",
         {
-            "name" : "libhandy",
+            "name" : "libadwaita",
             "buildsystem" : "meson",
             "cleanup": [
                 "*.a"
@@ -132,7 +137,6 @@
             "config-opts" : [
                 "-Dexamples=false",
                 "-Dprofiling=false",
-                "-Dglade_catalog=disabled",
                 "-Dintrospection=enabled",
                 "-Dtests=false",
                 "-Dvapi=true"
@@ -140,8 +144,8 @@
             "sources" : [
                 {
                     "type": "archive",
-                    "url": "https://download.gnome.org/sources/libhandy/1.6/libhandy-1.6.2.tar.xz",
-                    "sha256": "7fa89aaa87966b6d0f5f4ef4d3efdaf654e2b01ea2c7ce2bd70301d1f9f42ca3"
+                    "url": "https://download.gnome.org/sources/libadwaita/1.6/libadwaita-1.6.2.tar.xz",
+                    "sha256": "29f9fda4f0e3a24d8cd88fc5d2187f17e5dc9c8e0938deca2eb56d9c87b945bf"
                 }
             ]
         },

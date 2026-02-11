@@ -59,8 +59,8 @@ namespace ThiefMD.Controllers.UI {
         if (current != null) {
             instance.library_pane.remove (current);
             sheet.width_request = settings.view_sheets_width;
-            instance.library_pane.add (sheet);
-            instance.library_pane.show_all ();
+            instance.library_pane.append (sheet);
+            instance.library_pane.set_visible_child (sheet);
             instance.library_pane.width_request = settings.view_sheets_width + settings.view_library_width;
         }
         settings.sheet_changed ();
@@ -85,7 +85,7 @@ namespace ThiefMD.Controllers.UI {
     //
     // Themeing and Styling of the App
     //
-    private Gtk.SourceStyleSchemeManager thief_schemes;
+    private GtkSource.StyleSchemeManager thief_schemes;
     public List<Ultheme.Parser> user_themes;
     private Thread<bool> theme_worker_thread;
 
@@ -99,7 +99,10 @@ namespace ThiefMD.Controllers.UI {
 
     private void remove_border_color () {
         if (border_provider != null) {
-            Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default(), border_provider);
+            var display = Gdk.Display.get_default ();
+            if (display != null) {
+                Gtk.StyleContext.remove_provider_for_display (display, border_provider);
+            }
             border_provider = null;
         }
     }
@@ -108,11 +111,14 @@ namespace ThiefMD.Controllers.UI {
         remove_border_color ();
         var style_context = ThiefApp.get_instance ().toolbar.get_style_context ();
         border_provider = new Gtk.CssProvider ();
-        var font_color = style_context.get_color (0);
+        var font_color = style_context.get_color ();
         string border_css = ThiefProperties.BUTTON_CSS.printf (font_color.to_string ());
         try {
-            border_provider.load_from_data (border_css);
-            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default(), border_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            var display = Gdk.Display.get_default ();
+            if (display != null) {
+                border_provider.load_from_data ((uint8[]) border_css.data);
+                Gtk.StyleContext.add_provider_for_display (display, border_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            }
         } catch (Error e) {
             warning ("Could not add accessibility css: %s", e.message);
         }
@@ -299,7 +305,10 @@ namespace ThiefMD.Controllers.UI {
     public void load_font () {
         var settings = AppSettings.get_default ();
         if (font_provider != null) {
-            Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), font_provider);
+            var display = Gdk.Display.get_default ();
+            if (display != null) {
+                Gtk.StyleContext.remove_provider_for_display (display, font_provider);
+            }
             font_provider = null;
         }
 
@@ -316,16 +325,19 @@ namespace ThiefMD.Controllers.UI {
 
         try {
             font_provider = new Gtk.CssProvider ();
-            font_provider.load_from_data (new_font);
-            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), font_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            font_provider.load_from_data ((uint8[]) new_font.data);
+            var display = Gdk.Display.get_default ();
+            if (display != null) {
+                Gtk.StyleContext.add_provider_for_display (display, font_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            }
         } catch (Error e) {
             warning ("Error setting font: %s", e.message);
         }
     }
 
-    public Gtk.SourceStyleSchemeManager UserSchemes () {
+    public GtkSource.StyleSchemeManager UserSchemes () {
         if (thief_schemes == null) {
-            thief_schemes = new Gtk.SourceStyleSchemeManager ();
+            thief_schemes = new GtkSource.StyleSchemeManager ();
         }
 
         return thief_schemes;
@@ -376,7 +388,10 @@ namespace ThiefMD.Controllers.UI {
 
     public void clear_css () {
         if (active_provider != null) {
-            Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), active_provider);
+            var display = Gdk.Display.get_default ();
+            if (display != null) {
+                Gtk.StyleContext.remove_provider_for_display (display, active_provider);
+            }
             active_provider = null;
         }
         set_dark_mode_based_on_colors ();
@@ -393,14 +408,20 @@ namespace ThiefMD.Controllers.UI {
         }
 
         if (active_provider != null) {
-            Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), active_provider);
+            var display = Gdk.Display.get_default ();
+            if (display != null) {
+                Gtk.StyleContext.remove_provider_for_display (display, active_provider);
+            }
             active_provider = null;
         }
 
         var provider = new Gtk.CssProvider ();
         provider.load_from_resource ("/com/github/kmwallio/thiefmd/app-stylesheet.css");
-        Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-        active_provider = provider;
+        var display = Gdk.Display.get_default ();
+        if (display != null) {
+            Gtk.StyleContext.add_provider_for_display (display, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            active_provider = provider;
+        }
         Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
         current_palette = null;
     }
@@ -430,15 +451,18 @@ namespace ThiefMD.Controllers.UI {
         );
 
         try {
-            if (active_provider != null) {
-                Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), active_provider);
-                active_provider = null;
+            var display = Gdk.Display.get_default ();
+            if (display != null) {
+                if (active_provider != null) {
+                    Gtk.StyleContext.remove_provider_for_display (display, active_provider);
+                    active_provider = null;
+                }
+                var provider = new Gtk.CssProvider ();
+                provider.load_from_data ((uint8[]) new_css.data);
+                Gtk.StyleContext.add_provider_for_display (display, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+                active_provider = provider;
+                remove_border_color ();
             }
-            var provider = new Gtk.CssProvider ();
-            provider.load_from_data (new_css);
-            Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-            active_provider = provider;
-            remove_border_color ();
         } catch (Error e) {
             warning ("Could not set dynamic css: %s", e.message);
         }
@@ -468,11 +492,11 @@ namespace ThiefMD.Controllers.UI {
     //
     // ThiefMD Custom GtkSourceView Languages
     //
-    private Gtk.SourceLanguageManager thief_languages;
+    private GtkSource.LanguageManager thief_languages;
 
-    public Gtk.SourceLanguageManager get_language_manager () {
+    public GtkSource.LanguageManager get_language_manager () {
         if (thief_languages == null) {
-            thief_languages = new Gtk.SourceLanguageManager ();
+            thief_languages = new GtkSource.LanguageManager ();
             string custom_languages = Path.build_path (
                 Path.DIR_SEPARATOR_S,
                 Build.PKGDATADIR,
@@ -486,16 +510,16 @@ namespace ThiefMD.Controllers.UI {
             var markdown = thief_languages.get_language ("markdown");
             if (markdown == null) {
                 warning ("Could not load custom languages");
-                thief_languages = Gtk.SourceLanguageManager.get_default ();
+                thief_languages = GtkSource.LanguageManager.get_default ();
             }
         }
 
         return thief_languages;
     }
 
-    public Gtk.SourceLanguage get_source_language (string filename = "something.md") {
+    public GtkSource.Language get_source_language (string filename = "something.md") {
         var languages = get_language_manager ();
-        Gtk.SourceLanguage? language = null;
+        GtkSource.Language? language = null;
         string file_name = filename.down ();
 
         if (file_name.has_suffix (".bib") || file_name.has_suffix (".bibtex")) {
@@ -650,7 +674,7 @@ namespace ThiefMD.Controllers.UI {
             current.width_request = settings.view_sheets_width;
             instance.library_box.show ();
             instance.library_box.width_request = settings.view_library_width;
-            instance.library_pane.show_all ();
+            instance.library_pane.set_visible (true);
             instance.library_pane.width_request = settings.view_sheets_width + settings.view_library_width;
         }
         instance.main_content.set_visible_child (instance.editor_widgets);

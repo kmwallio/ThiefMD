@@ -64,9 +64,7 @@ namespace ThiefMD.Widgets {
                 label.xalign = 0;
                 label.set_ellipsize (Pango.EllipsizeMode.END);
                 label.use_markup = true;
-                remove (get_child ());
-                add (label);
-                show_all ();
+                set_child (label);
             }
         }
     }
@@ -151,19 +149,22 @@ namespace ThiefMD.Widgets {
 
             search.activate.connect (update_terms);
 
-            scrolled_results = new Gtk.ScrolledWindow (null, null);
+            scrolled_results = new Gtk.ScrolledWindow ();
             scrolled_results.hexpand = true;
             scrolled_results.vexpand = true;
-            scrolled_results.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+            scrolled_results.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
             var header_context = scrolled_results.get_style_context ();
-            header_context.add_class (Gtk.STYLE_CLASS_FLAT);
+            header_context.add_class ("flat");
             header_context.add_class ("thief-sheets");
 
             search_results = new Gtk.FlowBox ();
             search_results.orientation = Gtk.Orientation.HORIZONTAL;
             search_results.max_children_per_line = 1;
             search_results.column_spacing = 0;
-            search_results.margin = 0;
+            search_results.margin_top = 0;
+            search_results.margin_bottom = 0;
+            search_results.margin_start = 0;
+            search_results.margin_end = 0;
             search_results.row_spacing = 0;
             search_results.homogeneous = true;
             search_results.hexpand = true;
@@ -173,7 +174,7 @@ namespace ThiefMD.Widgets {
             header_context.add_class ("thief-search-results");
 
             search_results.hexpand = true;
-            scrolled_results.add (search_results);
+            scrolled_results.set_child (search_results);
         }
 
         public void create_searchers () {
@@ -248,12 +249,15 @@ namespace ThiefMD.Widgets {
                     SearchResult res = results.remove_at (0);
                     if (res.search_term == active_search_term) {
                         SearchDisplay dis = new SearchDisplay ();
-                        dis.margin = 0;
+                        dis.margin_top = 0;
+                        dis.margin_bottom = 0;
+                        dis.margin_start = 0;
+                        dis.margin_end = 0;
                         dis.file_path = res.file_path;
                         dis.search_term = res.search_term;
                         dis.mini_mark = res.mini_mark;
                         var header_context = dis.get_style_context ();
-                        header_context.add_class (Gtk.STYLE_CLASS_FLAT);
+                        header_context.add_class ("flat");
                         header_context.add_class ("thief-list-sheet");
 
                         string lib_path = get_base_library_path (res.file_path);
@@ -264,7 +268,7 @@ namespace ThiefMD.Widgets {
                         label.xalign = 0;
                         label.set_ellipsize (Pango.EllipsizeMode.END);
                         label.use_markup = true;
-                        dis.add (label);
+                        dis.set_child (label);
                         dis.occurrences = res.occurrences;
                         dis.hexpand = true;
                         dis.file_sheet = res.file_sheet;
@@ -293,7 +297,6 @@ namespace ThiefMD.Widgets {
                         if (add) {
                             search_results.insert (dis, row);
                             displayed.add (dis);
-                            search_results.show_all ();
                             debug ("added result");
                         }
                     }
@@ -370,7 +373,7 @@ namespace ThiefMD.Widgets {
     }
 
     public class SearchWidget : Gtk.Box {
-        Hdy.SearchBar headerbar;
+        Gtk.SearchBar headerbar;
         public SearchBase searcher;
         string scoped_folder;
 
@@ -382,27 +385,19 @@ namespace ThiefMD.Widgets {
         }
 
         private void build_ui () {
-            headerbar = new Hdy.SearchBar ();
-            headerbar.connect_entry (searcher.search);
-            headerbar.set_show_close_button (false);
+            headerbar = new Gtk.SearchBar ();
+            headerbar.set_key_capture_widget (searcher.search);
             headerbar.search_mode_enabled = true;
-            headerbar.add (searcher.search);
-            headerbar.show_all ();
+            headerbar.set_child (searcher.search);
 
-            add (headerbar);
-            add (searcher.scrolled_results);
-            searcher.scrolled_results.show_all ();
-            show_all ();
-
-            delete_event.connect (() => {
-                searcher.searching = false;
-                return false;
-            });
+            append (headerbar);
+            append (searcher.scrolled_results);
         }
     }
 
-    public class SearchWindow : Hdy.Window {
-        Hdy.HeaderBar headerbar;
+    public class SearchWindow : Gtk.ApplicationWindow {
+        Adw.HeaderBar headerbar;
+        Adw.WindowTitle title_widget;
         SearchBase searcher;
         string scoped_folder;
 
@@ -414,29 +409,31 @@ namespace ThiefMD.Widgets {
 
         private void build_ui () {
             var settings = AppSettings.get_default ();
-            headerbar = new Hdy.HeaderBar ();
+            headerbar = new Adw.HeaderBar ();
+            title_widget = new Adw.WindowTitle ("", "");
             if (scoped_folder == null || scoped_folder.chomp ().chug () == "") {
-                headerbar.set_title (_("Library Search"));
+                title_widget.set_title (_("Library Search"));
             } else {
-                headerbar.set_title (get_base_library_path (scoped_folder).replace (Path.DIR_SEPARATOR_S, " " + Path.DIR_SEPARATOR_S + " ") + " " + _("Search"));
+                title_widget.set_title (get_base_library_path (scoped_folder).replace (Path.DIR_SEPARATOR_S, " " + Path.DIR_SEPARATOR_S + " ") + " " + _("Search"));
             }
+            headerbar.set_title_widget (title_widget);
             var header_context = headerbar.get_style_context ();
-            header_context.add_class (Gtk.STYLE_CLASS_FLAT);
+            header_context.add_class ("flat");
             header_context.add_class ("thiefmd-toolbar");
             
 
             Gtk.Box vbox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            vbox.add (headerbar);
-            vbox.add (searcher.scrolled_results);
-            add(vbox);
+            vbox.append (headerbar);
+            vbox.append (searcher.scrolled_results);
+            set_child(vbox);
 
             headerbar.pack_start (searcher.search);
-            headerbar.set_show_close_button (true);
+            headerbar.set_show_start_title_buttons (true);
+            headerbar.set_show_end_title_buttons (true);
             transient_for = ThiefApp.get_instance ();
-            destroy_with_parent = true;
 
             int w, h;
-            ThiefApp.get_instance ().get_size (out w, out h);
+            ThiefApp.get_instance ().get_default_size (out w, out h);
 
             set_default_size(w / 3, h - 50);
 
@@ -453,7 +450,7 @@ namespace ThiefMD.Widgets {
             });
 
             
-            delete_event.connect (() => {
+            close_request.connect (() => {
                 searcher.searching = false;
                 if (live_reload_switch.active) {
                     settings.writing_changed.disconnect (searcher.live_reload);

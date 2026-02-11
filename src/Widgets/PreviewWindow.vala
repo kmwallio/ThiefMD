@@ -22,10 +22,11 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    public class PreviewWindow : Hdy.Window {
-        private Hdy.HeaderBar toolbar;
+    public class PreviewWindow : Gtk.ApplicationWindow {
+        private Adw.HeaderBar toolbar;
         private static PreviewWindow? instance = null;
         private Preview html_view;
+        private Adw.WindowTitle title_widget;
 
         public PreviewWindow () {
             var settings = AppSettings.get_default ();
@@ -42,11 +43,10 @@ namespace ThiefMD.Widgets {
             {
                 if (settings.show_filename && settings.last_file != "") {
                     string file_name = settings.last_file.substring(settings.last_file.last_index_of(Path.DIR_SEPARATOR_S) + 1);
-                    instance.title = _("Preview: ") + file_name;
+                    instance.title_widget.set_title (_("Preview: ") + file_name);
                 } else {
-                    instance.title = _("Preview");
+                    instance.title_widget.set_title (_("Preview"));
                 }
-                instance.toolbar.title = instance.title;
             }
         }
 
@@ -69,39 +69,44 @@ namespace ThiefMD.Widgets {
         protected void build_ui () {
             var settings = AppSettings.get_default ();
             int w, h;
-            toolbar = new Hdy.HeaderBar ();
+            toolbar = new Adw.HeaderBar ();
+            title_widget = new Adw.WindowTitle ("", "");
 
             if (settings.show_filename && settings.last_file != "") {
                 string file_name = settings.last_file.substring(settings.last_file.last_index_of (Path.DIR_SEPARATOR_S) + 1);
-                instance.title = _("Preview: ") + file_name;
+                title = _("Preview: ") + file_name;
             } else {
-                instance.title = _("Preview");
+                title = _("Preview");
             }
-            toolbar.title = title;
+            title_widget.set_title (title);
+            toolbar.set_title_widget (title_widget);
 
             Gtk.Box vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
-            toolbar.set_show_close_button (true);
-            vbox.add (toolbar);
+            toolbar.set_show_start_title_buttons (true);
+            toolbar.set_show_end_title_buttons (true);
+            vbox.append (toolbar);
             html_view = new Preview();
-            vbox.add (html_view);
-            vbox.show_all ();
-            add (vbox);
+            vbox.append (html_view);
+            set_child (vbox);
 
-            delete_event.connect (this.hide_on_delete);
+            close_request.connect (( ) => {
+                hide ();
+                return true;
+            });
             settings.changed.connect (update_preview_title);
 
             UI.update_preview ();
-            ThiefApp.get_instance ().get_size (out w, out h);
+            ThiefApp.get_instance ().get_default_size (out w, out h);
             set_default_size(w, h);
-            show_all ();
+            show ();
             update ();
         }
 
         public bool on_delete_event () {
             var settings = AppSettings.get_default ();
             settings.changed.disconnect (update);
-            remove (html_view);
+            set_child (null);
             instance = null;
             html_view = null;
             return false;

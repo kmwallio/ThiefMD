@@ -482,12 +482,12 @@ namespace ThiefMD.Enrichments {
             }
 
             grammar_line = buffer.create_tag ("grammar_check", "underline", Pango.Underline.ERROR, null);
-            grammar_line.underline_rgba = Gdk.RGBA () { red = 0.0, green = 0.40, blue = 0.133, alpha = 1.0 };
+            grammar_line.underline_rgba = Gdk.RGBA () { red = 0.0f, green = 0.40f, blue = 0.133f, alpha = 1.0f };
 
             grammar_word = buffer.create_tag ("grammar_word", "underline", Pango.Underline.ERROR, null);
-            grammar_word.underline_rgba = Gdk.RGBA () { red = 0.0, green = 0.40, blue = 0.133, alpha = 1.0 };
-            grammar_word.background_rgba = Gdk.RGBA () { red = 0.0, green = 0.40, blue = 0.133, alpha = 1.0 };
-            grammar_word.foreground_rgba = Gdk.RGBA () { red = 0.9, green = 0.9, blue = 0.9, alpha = 1.0 };
+            grammar_word.underline_rgba = Gdk.RGBA () { red = 0.0f, green = 0.40f, blue = 0.133f, alpha = 1.0f };
+            grammar_word.background_rgba = Gdk.RGBA () { red = 0.0f, green = 0.40f, blue = 0.133f, alpha = 1.0f };
+            grammar_word.foreground_rgba = Gdk.RGBA () { red = 0.9f, green = 0.9f, blue = 0.9f, alpha = 1.0f };
             grammar_word.background_set = true;
             grammar_word.foreground_set = true;
 
@@ -506,8 +506,13 @@ namespace ThiefMD.Enrichments {
             last_cursor = -1; // reset to scan whole document on attach
 
             GLib.Idle.add (update_buffer);
-            Hdy.ApplicationWindow? instance = (Hdy.ApplicationWindow?)ThiefApp.get_instance ();
-            instance.destroy.connect (detach);
+            Gtk.ApplicationWindow? instance = (Gtk.ApplicationWindow?)ThiefApp.get_instance ();
+            if (instance != null) {
+                instance.close_request.connect (() => {
+                    detach ();
+                    return false;
+                });
+            }
 
             return true;
         }
@@ -534,9 +539,12 @@ namespace ThiefMD.Enrichments {
                 processor_running = false;
             }
 
-            Hdy.ApplicationWindow? instance = (Hdy.ApplicationWindow?)ThiefApp.get_instance ();
+            Gtk.ApplicationWindow? instance = (Gtk.ApplicationWindow?)ThiefApp.get_instance ();
             if (instance != null) {
-                instance.destroy.connect (detach);
+                instance.close_request.connect (() => {
+                    detach ();
+                    return false;
+                });
             }
 
             if (buffer == null) {

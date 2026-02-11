@@ -23,8 +23,8 @@ using ThiefMD.Controllers;
 using ThiefMD.Exporters;
 
 namespace ThiefMD.Widgets {
-    public class PublisherPreviewWindow : Hdy.Window {
-        public Hdy.HeaderBar headerbar;
+    public class PublisherPreviewWindow : Gtk.ApplicationWindow {
+        public Adw.HeaderBar headerbar;
         public Preview preview;
         private Gtk.Box advanced_options;
         public Gtk.Paned options_pane;
@@ -63,10 +63,10 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             int w, h;
 
-            headerbar = new Hdy.HeaderBar ();
-            headerbar.set_title (_("Publishing Preview"));
-            var header_context = headerbar.get_style_context ();
-            header_context.add_class (Gtk.STYLE_CLASS_FLAT);
+            headerbar = new Adw.HeaderBar ();
+            var window_title = new Adw.WindowTitle (_("Publishing Preview"), "");
+            headerbar.set_title_widget (window_title);
+            headerbar.add_css_class ("flat");
 
             Gee.Set<string> exports = ThiefApp.get_instance ().exporters.get_export_list ();
             Gee.LinkedList<string> exporters = new Gee.LinkedList<string> ();
@@ -155,7 +155,7 @@ namespace ThiefMD.Widgets {
             Gtk.Button export_button = new Gtk.Button.with_label (_("Export"));
             export_button.has_tooltip = true;
             export_button.tooltip_text = (_("Export Item"));
-            export_button.set_image (new Gtk.Image.from_icon_name("document-export", Gtk.IconSize.LARGE_TOOLBAR));
+            export_button.set_icon_name ("document-export");
 
             preview_type.changed.connect (() => {
                 int option = preview_type.get_active ();
@@ -182,19 +182,17 @@ namespace ThiefMD.Widgets {
                         }
                     }
                 }
-                headerbar.show_all ();
             });
 
 
             export_button.clicked.connect (() => {
                 if (exporter != null) {
                     if (!exporter.export ()) {
-                        PublishedStatusWindow status = new PublishedStatusWindow (
-                            this,
-                            _("File not Exported"),
-                            new Gtk.Label (_("ThiefMD could not export the file, please try again.")));
-
-                        status.run ();
+                        var dialog = new Adw.MessageDialog (this, _("File not Exported"), _("ThiefMD could not export the file, please try again."));
+                        dialog.add_response ("close", _("Close"));
+                        dialog.set_default_response ("close");
+                        dialog.set_close_response ("close");
+                        dialog.present ();
                     }
                 }
             });
@@ -203,30 +201,31 @@ namespace ThiefMD.Widgets {
             headerbar.pack_start (preview_css);
 
             headerbar.pack_end (export_button);
-            headerbar.set_show_close_button (true);
-            vbox.add (headerbar);
+            headerbar.set_show_start_title_buttons (true);
+            headerbar.set_show_end_title_buttons (true);
+            vbox.append (headerbar);
 
             title = _("Publishing Preview");
 
-            ThiefApp.get_instance ().get_size (out w, out h);
+            ThiefApp.get_instance ().get_default_size (out w, out h);
 
             w = w - ThiefApp.get_instance ().pane_position;
 
             set_default_size(w, h - 150);
 
-            options_pane.add1 (advanced_options);
-            options_pane.add2 (preview);
+            options_pane.set_start_child (advanced_options);
+            options_pane.set_end_child (preview);
             options_pane.set_position (0);
-            options_pane.get_child1 ().hide ();
-            options_pane.get_child2 ().show ();
-            options_pane.show ();
-            vbox.add (options_pane);
-            delete_event.connect (this.on_delete_event);
+            if (options_pane.get_start_child () != null) {
+                options_pane.get_start_child ().hide ();
+            }
+            if (options_pane.get_end_child () != null) {
+                options_pane.get_end_child ().show ();
+            }
+            vbox.append (options_pane);
+            close_request.connect (this.on_delete_event);
 
-            add (vbox);
-            preview.show_all ();
-            headerbar.show_all ();
-            vbox.show ();
+            set_child (vbox);
         }
 
         public void refresh_preview () {
@@ -239,72 +238,21 @@ namespace ThiefMD.Widgets {
         }
 
         public void show_advanced_options () {
-            options_pane.get_child1 ().show ();
+            var start = options_pane.get_start_child ();
+            if (start != null) {
+                start.show ();
+            }
             options_pane.set_position (250);
         }
 
         public bool on_delete_event () {
-            remove (preview);
+            set_child (null);
             if (exporter != null) {
                 exporter.detach ();
                 exporter = null;
             }
-            show_all ();
 
             return false;
-        }
-    }
-
-    public class PublishedStatusWindow : Gtk.Dialog {
-        private Gtk.Label message;
-
-        public PublishedStatusWindow (PublisherPreviewWindow win, string set_title, Gtk.Label body) {
-            set_transient_for (win);
-            modal = true;
-            title = set_title;
-            message = body;
-            build_ui ();
-        }
-
-        private void build_ui () {
-            window_position = Gtk.WindowPosition.CENTER;
-            this.get_content_area().add (build_message_ui ());
-            show_all ();
-        }
-
-        private Gtk.Grid build_message_ui () {
-            Gtk.Grid grid = new Gtk.Grid ();
-            grid.margin = 12;
-            grid.row_spacing = 12;
-            grid.column_spacing = 12;
-            grid.orientation = Gtk.Orientation.VERTICAL;
-            grid.hexpand = true;
-            grid.vexpand = true;
-
-            try {
-                Gtk.IconTheme icon_theme = Gtk.IconTheme.get_default();
-                var thief_icon = icon_theme.load_icon("com.github.kmwallio.thiefmd", 128, Gtk.IconLookupFlags.FORCE_SVG);
-                var icon = new Gtk.Image.from_pixbuf (thief_icon);
-                grid.attach (icon, 1, 1);
-            } catch (Error e) {
-                warning ("Could not load logo: %s", e.message);
-            }
-
-            grid.attach (message, 1, 2);
-
-            Gtk.Button close = new Gtk.Button.with_label (_("Close"));
-            grid.attach (close, 1, 3);
-
-            close.clicked.connect (() => {
-                this.destroy ();
-            });
-
-            response.connect (() => {
-                this.destroy ();
-            });
-
-            grid.show_all ();
-            return grid;
         }
     }
 }
