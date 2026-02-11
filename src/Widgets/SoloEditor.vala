@@ -36,6 +36,7 @@ namespace ThiefMD {
         public SoloEditor (File fp) {
             file = fp;
             editor = new Editor (file.get_path ());
+            preview_mutex = new TimedMutex (250);
             new KeyBindings (this, false);
             build_ui ();
         }
@@ -94,7 +95,7 @@ namespace ThiefMD {
         }
 
         private void update_preview () {
-            if (preview != null && preview_mutex.can_do_action ()) {
+            if (preview != null && preview_mutex != null && preview_mutex.can_do_action ()) {
                 editor.update_preview ();
                 preview.update_html_view (true, editor.preview_markdown, has_fountain ());
             }

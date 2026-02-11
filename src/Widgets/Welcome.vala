@@ -111,14 +111,11 @@ namespace ThiefMD {
             }
             h_box.append (v_box);
 
-            var winbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            winbox.append (bar);
-            winbox.append (h_box);
-
             close_request.connect (() => {
                 return ThiefApplication.close_window (this);
             });
-            set_child (winbox);
+            set_titlebar (bar);
+            set_child (h_box);
             present ();
         }
     }

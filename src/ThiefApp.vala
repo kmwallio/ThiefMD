@@ -172,9 +172,12 @@ namespace ThiefMD {
             main_content.transition_type = Adw.LeafletTransitionType.SLIDE;
 
             library_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            var library_header = new Adw.HeaderBar ();
-            var library_title = new Adw.WindowTitle (_("Library"), "");
-            library_header.set_title_widget (library_title);
+            var library_header = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+            var library_title = new Gtk.Label (_("Library"));
+            library_title.halign = Gtk.Align.START;
+            library_title.hexpand = true;
+            library_title.xalign = 0;
+            library_header.append (library_title);
 
             var add_library_button = new Gtk.Button ();
             add_library_button.has_tooltip = true;
@@ -193,7 +196,7 @@ namespace ThiefMD {
                 settings.menu_active = false;
             });
 
-            library_header.pack_end (add_library_button);
+            library_header.append (add_library_button);
 
             var library_header_context = library_header.get_style_context ();
             library_header_context.add_class ("thief-library-header");

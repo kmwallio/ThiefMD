@@ -86,6 +86,22 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             settings.changed.connect (update_settings);
 
+            // Sync our local buffer reference with the View's default buffer
+            buffer = (GtkSource.Buffer) this.get_buffer ();
+
+            // Initialize mutex helpers before any debounced work runs
+            disk_change_prompted = new TimedMutex (Constants.AUTOSAVE_TIMEOUT);
+            dynamic_margin_update = new TimedMutex (200);
+            writegood_limit = new TimedMutex (300);
+            preview_mutex = new TimedMutex (250);
+
+            // Initialize spellchecker stub so attach/detach calls are safe
+            spell = new Gspell.Checker ();
+
+            // Initialize optional enrichments to avoid null derefs when toggled
+            writegood = new WriteGood.Checker ();
+            grammar = new GrammarChecker ();
+
             file_mutex = Mutex ();
             #if false
             // GTK4 TODO: rebuild editor context menu with Gtk.PopoverMenu
@@ -432,14 +448,18 @@ namespace ThiefMD.Widgets {
 
                     if (settings.writegood) {
                         writecheck_active = true;
-                        writegood.attach (this);
-                        write_good_recheck ();
+                        if (writegood != null) {
+                            writegood.attach (this);
+                            write_good_recheck ();
+                        }
                     }
 
                     if (settings.grammar && !grammar_active) {
                         grammar_active = true;
-                        grammar.attach (this);
-                        GLib.Idle.add (grammar_recheck);
+                        if (grammar != null) {
+                            grammar.attach (this);
+                            GLib.Idle.add (grammar_recheck);
+                        }
                     }
 
                     if (settings.spellcheck) {
@@ -468,17 +488,17 @@ namespace ThiefMD.Widgets {
                         buffer.changed.disconnect (on_change_notification);
                         settings.changed.disconnect (update_settings);
 
-                        if (settings.writegood) {
+                        if (settings.writegood && writegood != null) {
                             writecheck_active = false;
                             writegood.detach ();
                         }
 
-                        if (settings.grammar) {
+                        if (settings.grammar && grammar != null) {
                             grammar_active = false;
                             grammar.detach ();
                         }
 
-                        if (settings.spellcheck) {
+                        if (settings.spellcheck && spell != null) {
                             spell.detach ();
                         }
                     }
@@ -526,14 +546,18 @@ namespace ThiefMD.Widgets {
                             last_language = language_list.data;
                             spell.set_language (last_language);
                         }
-                        spell.attach (this);
-                        spellcheck_active = true;
+                        if (spell != null) {
+                            spell.attach (this);
+                            spellcheck_active = true;
+                        }
                     } catch (Error e) {
                         warning (e.message);
                     }
                 } else if (!value && spellcheck_active) {
                     debug ("Disable spellcheck\n");
-                    spell.detach ();
+                    if (spell != null) {
+                        spell.detach ();
+                    }
                     spellcheck_active = false;
                 }
             }
@@ -1105,7 +1129,9 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             if (settings.grammar) {
                 if (editable) {
-                    grammar.recheck_all ();
+                    if (grammar != null) {
+                        grammar.recheck_all ();
+                    }
                 }
             }
 
