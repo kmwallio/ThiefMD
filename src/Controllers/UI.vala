@@ -19,6 +19,7 @@
 
 using ThiefMD;
 using ThiefMD.Widgets;
+using Adw;
 
 namespace ThiefMD.Controllers.UI {
     private bool _init = false;
@@ -433,7 +434,7 @@ namespace ThiefMD.Controllers.UI {
             Gtk.StyleContext.add_provider_for_display (display, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
             active_provider = provider;
         }
-        Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
+        Adw.StyleManager.get_default().color_scheme = Adw.ColorScheme.FORCE_LIGHT;
         current_palette = null;
     }
 
@@ -490,12 +491,12 @@ namespace ThiefMD.Controllers.UI {
             color.to_hls (out hue, out lum, out sat);
 
             // Set dark theme
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = (lum < 0.5);
+            Adw.StyleManager.get_default().color_scheme = (lum < 0.5) ? Adw.ColorScheme.FORCE_DARK : Adw.ColorScheme.FORCE_LIGHT;
         } else {
             if (settings.theme_id != "thiefmd") {
-                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_mode;
+                Adw.StyleManager.get_default().color_scheme = settings.dark_mode ? Adw.ColorScheme.FORCE_DARK : Adw.ColorScheme.FORCE_LIGHT;
             } else {
-                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = false;
+                Adw.StyleManager.get_default().color_scheme = Adw.ColorScheme.FORCE_LIGHT;
             }
         }
     }
