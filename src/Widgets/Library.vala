@@ -57,10 +57,18 @@ namespace ThiefMD.Widgets {
         private PreventDelayedDrop _droppable;
         NewFolder folder_popup;
         private LibPair? _drag_source_pair;
+        private Gtk.PopoverMenu? _context_menu;
+        private GLib.SimpleActionGroup _context_actions;
+        private Gdk.Rectangle _last_menu_rect;
+        private bool _has_last_menu_rect = false;
 
         public Library () {
             debug ("Setting up library");
+            _all_sheets = new List<LibPair> ();
             _lib_store = new TreeStore (3, typeof (string), typeof (LibPair), typeof (GLib.Icon));
+            _context_actions = new GLib.SimpleActionGroup ();
+            insert_action_group ("library", _context_actions);
+            setup_context_actions ();
             parse_library ();
             set_model (_lib_store);
             var library_item_display = new TreeViewColumn ();
@@ -75,6 +83,16 @@ namespace ThiefMD.Widgets {
             get_selection ().changed.connect (on_selection);
             folder_popup = new NewFolder ();
             _droppable = new PreventDelayedDrop ();
+
+            var context_click = new Gtk.GestureClick ();
+            context_click.set_button (3);
+            context_click.set_propagation_phase (Gtk.PropagationPhase.CAPTURE);
+            context_click.pressed.connect ((n_press, x, y) => {
+                if (n_press == 1) {
+                    show_context_menu (x, y);
+                }
+            });
+            add_controller (context_click);
 
             // Drag rows to reorder sibling folders
             var drag_source = new Gtk.DragSource ();
@@ -545,6 +563,276 @@ namespace ThiefMD.Widgets {
         //
         // Mouse Click Actions
         //
+
+        private LibPair? current_selection () {
+            if (_selected != null && _all_sheets.find (_selected) != null) {
+                return _selected;
+            }
+
+            return null;
+        }
+
+        private bool ensure_selection_at (double x, double y) {
+            TreePath path;
+            TreeViewColumn column;
+            int cell_x;
+            int cell_y;
+            if (get_path_at_pos ((int) x, (int) y, out path, out column, out cell_x, out cell_y)) {
+                set_cursor (path, column, false);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void show_context_menu (double x, double y) {
+            if (!ensure_selection_at (x, y)) {
+                return;
+            }
+
+            var menu_model = build_context_menu_model ();
+            if (menu_model == null) {
+                return;
+            }
+
+            _last_menu_rect = Gdk.Rectangle ();
+            _last_menu_rect.x = (int) x;
+            _last_menu_rect.y = (int) y;
+            _last_menu_rect.width = 1;
+            _last_menu_rect.height = 1;
+            _has_last_menu_rect = true;
+
+            if (_context_menu != null) {
+                _context_menu.popdown ();
+                _context_menu.unparent ();
+                _context_menu = null;
+            }
+
+            _context_menu = new Gtk.PopoverMenu.from_model (menu_model);
+            _context_menu.set_has_arrow (true);
+            _context_menu.set_pointing_to (_last_menu_rect);
+            _context_menu.set_parent (this);
+            _context_menu.set_autohide (true);
+            _context_menu.popup ();
+        }
+
+        private void append_icon_item (GLib.Menu icon_menu, string label, string value) {
+            var item = new GLib.MenuItem (label, "library.set_icon");
+            item.set_attribute_value ("target", new Variant.string (value));
+            icon_menu.append_item (item);
+        }
+
+        private MenuModel? build_context_menu_model () {
+            var settings = AppSettings.get_default ();
+            LibPair? selection = current_selection ();
+            if (selection == null) {
+                return null;
+            }
+
+            var root = new GLib.Menu ();
+
+            var export_section = new GLib.Menu ();
+            export_section.append (_("Export Preview"), "library.export_preview");
+            export_section.append (_("Writing Statistics"), "library.writing_stats");
+            root.append_section (null, export_section);
+
+            var search_section = new GLib.Menu ();
+            search_section.append (_("Search ") + selection._title, "library.search");
+            root.append_section (null, search_section);
+
+            var folder_section = new GLib.Menu ();
+            folder_section.append (_("Open in File Manager"), "library.open_folder");
+            folder_section.append (_("Create Sub-Folder"), "library.create_folder");
+            if (!settings.is_in_library (selection._path)) {
+                folder_section.append (_("Hide from Library"), "library.hide");
+            }
+            folder_section.append (_("Show Hidden Items"), "library.reveal_hidden");
+            root.append_section (null, folder_section);
+
+            var icon_menu = new GLib.Menu ();
+            append_icon_item (icon_menu, _("None"), "");
+            append_icon_item (icon_menu, _("Folder"), "folder");
+            append_icon_item (icon_menu, _("Reader"), "ephy-reader-mode-symbolic");
+            append_icon_item (icon_menu, _("Love"), "emote-love-symbolic");
+            append_icon_item (icon_menu, _("Game"), "applications-games-symbolic");
+            append_icon_item (icon_menu, _("Art"), "applications-graphics-symbolic");
+            append_icon_item (icon_menu, _("Nature"), "emoji-nature-symbolic");
+            append_icon_item (icon_menu, _("Food"), "emoji-food-symbolic");
+            append_icon_item (icon_menu, _("Help"), "system-help-symbolic");
+            append_icon_item (icon_menu, _("Cool"), "face-cool-symbolic");
+            append_icon_item (icon_menu, _("Angel"), "face-angel-symbolic");
+            append_icon_item (icon_menu, _("Monkey"), "face-monkey-symbolic");
+            append_icon_item (icon_menu, _("WordPress"), "/com/github/kmwallio/thiefmd/icons/wordpress.png");
+            append_icon_item (icon_menu, _("Ghost"), "/com/github/kmwallio/thiefmd/icons/ghost.png");
+            append_icon_item (icon_menu, _("Write Freely"), "/com/github/kmwallio/thiefmd/icons/wf.png");
+            append_icon_item (icon_menu, _("Trash"), "user-trash-symbolic");
+
+            var icon_section = new GLib.Menu ();
+            icon_section.append_submenu (_("Set Project Icon"), icon_menu);
+            root.append_section (null, icon_section);
+
+            if (settings.is_in_library (selection._path)) {
+                var remove_section = new GLib.Menu ();
+                remove_section.append (_("Remove from Library"), "library.remove");
+                root.append_section (null, remove_section);
+            }
+
+            return root;
+        }
+
+        private void setup_context_actions () {
+            var export_preview = new GLib.SimpleAction ("export_preview", null);
+            export_preview.activate.connect ((parameter) => {
+                var settings = AppSettings.get_default ();
+                LibPair? selection = current_selection ();
+                if (selection == null) {
+                    return;
+                }
+                string preview_markdown = build_novel (selection, settings.export_include_metadata_file);
+                PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown, render_fountain (selection));
+                ppw.show ();
+            });
+            _context_actions.add_action (export_preview);
+
+            var writing_stats = new GLib.SimpleAction ("writing_stats", null);
+            writing_stats.activate.connect ((parameter) => {
+                LibPair? selection = current_selection ();
+                if (selection == null) {
+                    return;
+                }
+                ProjectStatitics project_stat_window = new ProjectStatitics (selection._path);
+                project_stat_window.present ();
+                project_stat_window.update_wordcount ();
+            });
+            _context_actions.add_action (writing_stats);
+
+            var search_action = new GLib.SimpleAction ("search", null);
+            search_action.activate.connect ((parameter) => {
+                LibPair? selection = current_selection ();
+                if (selection == null) {
+                    return;
+                }
+                SearchWindow project_search_window = new SearchWindow (selection._path);
+                project_search_window.present ();
+            });
+            _context_actions.add_action (search_action);
+
+            var open_folder = new GLib.SimpleAction ("open_folder", null);
+            open_folder.activate.connect ((parameter) => {
+                LibPair? selection = current_selection ();
+                if (selection == null) {
+                    return;
+                }
+                try {
+                    AppInfo.launch_default_for_uri ("file://%s".printf (selection._path), null);
+                } catch (Error e) {
+                    warning ("Could not open folder: %s", e.message);
+                }
+            });
+            _context_actions.add_action (open_folder);
+
+            var create_folder = new GLib.SimpleAction ("create_folder", null);
+            create_folder.activate.connect ((parameter) => {
+                if (current_selection () == null) {
+                    return;
+                }
+                show_new_folder_popover ();
+            });
+            _context_actions.add_action (create_folder);
+
+            var hide_folder = new GLib.SimpleAction ("hide", null);
+            hide_folder.activate.connect ((parameter) => {
+                var settings = AppSettings.get_default ();
+                LibPair? selection = current_selection ();
+                if (selection == null) {
+                    return;
+                }
+                TreeIter hide_node = _selected_node;
+                selection._sheets.close_active_files ();
+                if (SheetManager._current_sheets == selection._sheets) {
+                    SheetManager.set_sheets (null);
+                }
+                LibPair? parent = get_item (selection._sheets.get_parent_sheets_path ());
+                if (parent != null) {
+                    parent._sheets.add_hidden_item (selection._path);
+                }
+                remove_children (selection._path);
+                _all_sheets.remove (selection);
+                _lib_store.remove (ref hide_node);
+                settings.writing_changed ();
+            });
+            _context_actions.add_action (hide_folder);
+
+            var reveal_hidden = new GLib.SimpleAction ("reveal_hidden", null);
+            reveal_hidden.activate.connect ((parameter) => {
+                var settings = AppSettings.get_default ();
+                LibPair? selection = current_selection ();
+                if (selection == null) {
+                    return;
+                }
+                selection._sheets.remove_hidden_items ();
+                parse_dir (selection._sheets, selection._path, _selected_node);
+                settings.writing_changed ();
+            });
+            _context_actions.add_action (reveal_hidden);
+
+            var set_icon_action = new GLib.SimpleAction ("set_icon", VariantType.STRING);
+            set_icon_action.activate.connect ((parameter) => {
+                if (parameter == null) {
+                    return;
+                }
+                set_selected_icon (parameter.get_string ());
+            });
+            _context_actions.add_action (set_icon_action);
+
+            var remove_action = new GLib.SimpleAction ("remove", null);
+            remove_action.activate.connect ((parameter) => {
+                var settings = AppSettings.get_default ();
+                LibPair? selection = current_selection ();
+                if (selection == null) {
+                    return;
+                }
+                TreeIter remove_node = _selected_node;
+                selection._sheets.close_active_files ();
+                if (SheetManager._current_sheets == selection._sheets) {
+                    SheetManager.set_sheets (null);
+                }
+                remove_children (selection._path);
+                _all_sheets.remove (selection);
+                settings.remove_from_library (selection._path);
+                _lib_store.remove (ref remove_node);
+                settings.writing_changed ();
+            });
+            _context_actions.add_action (remove_action);
+        }
+
+        private void set_selected_icon (string icon_value) {
+            LibPair? selection = current_selection ();
+            if (selection == null) {
+                return;
+            }
+
+            selection._sheets.metadata.icon = icon_value;
+            selection._sheets.persist_metadata ();
+            var settings = AppSettings.get_default ();
+            _lib_store.set (selection._iter, 2, get_icon_for_value (icon_value), -1);
+            settings.writing_changed ();
+        }
+
+        private void show_new_folder_popover () {
+            Gdk.Rectangle rect = _last_menu_rect;
+            if (!_has_last_menu_rect && _selected != null) {
+                TreePath? tree_path = _lib_store.get_path (_selected_node);
+                if (tree_path != null) {
+                    Rectangle r;
+                    this.get_cell_area (tree_path, null, out r);
+                    rect = r;
+                }
+            }
+            folder_popup.set_pointing_to (rect);
+            folder_popup.set_parent (this);
+            folder_popup.popup ();
+        }
 
         #if false
         // GTK4 TODO: context menu and drag-and-drop not yet reimplemented
