@@ -350,7 +350,6 @@ namespace ThiefMD.Controllers.SheetManager {
 
     public static bool load_sheet (Sheet sheet) {
         if (_currentSheet != null && Sheet.areEqual(sheet, _currentSheet.sheet) && _active_editors.size == 1) {
-            _currentSheet.editor.am_active = true;
             debug ("Tried loading current sheet");
             return true;
         }
