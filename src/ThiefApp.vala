@@ -172,12 +172,15 @@ namespace ThiefMD {
             main_content.transition_type = Adw.LeafletTransitionType.SLIDE;
 
             library_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            var library_header = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+            var library_header = new Adw.HeaderBar ();
+            library_header.set_show_start_title_buttons (false);
+            library_header.set_show_end_title_buttons (false);
+
             var library_title = new Gtk.Label (_("Library"));
             library_title.halign = Gtk.Align.START;
             library_title.hexpand = true;
             library_title.xalign = 0;
-            library_header.append (library_title);
+            library_header.set_title_widget (library_title);
 
             var add_library_button = new Gtk.Button ();
             add_library_button.has_tooltip = true;
@@ -196,10 +199,10 @@ namespace ThiefMD {
                 settings.menu_active = false;
             });
 
-            library_header.append (add_library_button);
+            library_header.pack_end (add_library_button);
 
             var library_header_context = library_header.get_style_context ();
-            library_header_context.add_class ("thief-library-header");
+            library_header_context.add_class ("thiefmd-toolbar");
 
             library_box.append (library_header);
             library_box.append (library_view);
@@ -231,6 +234,7 @@ namespace ThiefMD {
 
             main_content.append (library_pane);
             library_pane.width_request = settings.view_library_width + settings.view_sheets_width;
+            editor_widgets.append (toolbar);
             editor_notes_widget.append (SheetManager.get_view ());
             editor_notes_widget.append (notes);
             editor_widgets.append (editor_notes_widget);
@@ -240,7 +244,6 @@ namespace ThiefMD {
             notes.set_reveal_child (false);
 
             desktop_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            desktop_box.append (toolbar);
             desktop_box.append (main_window_horizon_box);
             desktop_box.append (stats_bar);
 
