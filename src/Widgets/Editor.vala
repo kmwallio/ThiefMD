@@ -64,6 +64,7 @@ namespace ThiefMD.Widgets {
         private bool typewriter_active;
         private bool grammar_active = false;
         private bool no_hiding = false;
+        private bool pointer_down = false;
 
         private Gtk.TextTag focus_text;
         private Gtk.TextTag outoffocus_text;
@@ -101,6 +102,23 @@ namespace ThiefMD.Widgets {
             // Initialize optional enrichments to avoid null derefs when toggled
             writegood = new WriteGood.Checker ();
             grammar = new GrammarChecker ();
+
+            var click_controller = new Gtk.GestureClick ();
+            click_controller.pressed.connect ((n_press, x, y) => {
+                pointer_down = true;
+            });
+            click_controller.released.connect ((n_press, x, y) => {
+                pointer_down = false;
+                GLib.Idle.add (() => {
+                    if (settings.typewriter_scrolling) {
+                        move_typewriter_scolling ();
+                    } else {
+                        ensure_cursor_visible ();
+                    }
+                    return false;
+                });
+            });
+            this.add_controller (click_controller);
 
             file_mutex = Mutex ();
             #if false
@@ -1342,6 +1360,10 @@ namespace ThiefMD.Widgets {
                 return false;
             }
 
+            if (pointer_down) {
+                return false;
+            }
+
             var settings = AppSettings.get_default ();
             debug ("move_typewriter_scolling: typewriter_scrolling setting = %s", settings.typewriter_scrolling.to_string ());
             
@@ -1410,6 +1432,10 @@ namespace ThiefMD.Widgets {
             int view_width = this.get_allocated_width ();
             
             debug ("ensure_cursor_visible: view size w=%d, h=%d", view_width, view_height);
+
+            if (pointer_down) {
+                return false;
+            }
             
             // Don't try to scroll if the view isn't actually visible/realized
             if (view_width <= 0 || view_height <= 0) {
