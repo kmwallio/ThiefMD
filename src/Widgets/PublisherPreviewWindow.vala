@@ -203,7 +203,7 @@ namespace ThiefMD.Widgets {
             headerbar.pack_end (export_button);
             headerbar.set_show_start_title_buttons (true);
             headerbar.set_show_end_title_buttons (true);
-            vbox.append (headerbar);
+            set_titlebar (headerbar);
 
             title = _("Publishing Preview");
 

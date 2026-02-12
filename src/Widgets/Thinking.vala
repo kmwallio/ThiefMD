@@ -28,6 +28,7 @@ namespace ThiefMD.Widgets {
         private ThinkingCallback work = null;
         private Mutex running;
         private string message;
+        private MainLoop? loop = null;
 
         public Thinking (string set_title, owned ThinkingCallback callback, Gee.List<string>? messages = null, Gtk.Window? parent = null) {
             set_transient_for ((parent == null) ? ThiefApp.get_instance () : parent);
@@ -47,25 +48,36 @@ namespace ThiefMD.Widgets {
 
         private void build_ui () {
             set_child (build_thinking_ui ());
-            Timeout.add (500, run_and_done);
         }
 
         public void run () {
             present ();
+            loop = new MainLoop (null, false);
+            Timeout.add (25, run_and_done);
+            loop.run ();
+            loop = null;
         }
 
         private bool run_and_done () {
             if (work == null) {
-                return true;
-            } else {
-                if (running.trylock ()) {
-                    debug ("Doing work.");
-                    work ();
-                    running.unlock ();
-                    this.destroy ();
+                if (loop != null) {
+                    loop.quit ();
                 }
+                destroy ();
                 return false;
             }
+
+            if (running.trylock ()) {
+                debug ("Doing work.");
+                work ();
+                running.unlock ();
+                destroy ();
+                if (loop != null) {
+                    loop.quit ();
+                }
+            }
+
+            return false;
         }
 
         private Gtk.Grid build_thinking_ui () {
