@@ -96,7 +96,7 @@ namespace ThiefMD.Widgets {
 
             // Initialize mutex helpers before any debounced work runs
             disk_change_prompted = new TimedMutex (Constants.AUTOSAVE_TIMEOUT);
-            dynamic_margin_update = new TimedMutex (200);
+            dynamic_margin_update = new TimedMutex (250);
             writegood_limit = new TimedMutex (300);
             preview_mutex = new TimedMutex (250);
 
@@ -267,6 +267,20 @@ namespace ThiefMD.Widgets {
                 menu.show_all ();
             });
             #endif
+
+            if (!open_file (file_path)) {
+                settings.validate_library ();
+                string[] library_check = settings.library ();
+                if (!settings.dont_show_tips || library_check.length == 0) {
+                    set_text (Constants.FIRST_USE.printf (ThiefProperties.THIEF_TIPS.get (Random.int_range(0, ThiefProperties.THIEF_TIPS.size))), true);
+                    editable = false;
+                    // Ensure the welcome buffer uses the configured style scheme and markdown highlighting
+                    buffer.set_language (UI.get_source_language ("welcome.md"));
+                    set_scheme (settings.get_valid_theme_id ());
+                }
+            } else {
+                modified_time = new DateTime.now_utc ();
+            }
 
             // GTK4: file loading handled in open_file; constructor no longer performs disk checks.
         }
