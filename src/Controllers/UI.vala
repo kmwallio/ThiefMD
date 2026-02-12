@@ -373,6 +373,7 @@ namespace ThiefMD.Controllers.UI {
         }
 
         SheetManager.redraw_sheets ();
+        SheetManager.reapply_editor_theme ();
 
         // Attempt to wait for app instance to be ready.
         if (!set_scheme) {

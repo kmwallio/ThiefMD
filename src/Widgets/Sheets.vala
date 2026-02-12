@@ -167,9 +167,7 @@ namespace ThiefMD.Widgets {
             }
             bar_label.xalign = 0;
             bar_label.set_ellipsize (Pango.EllipsizeMode.END);
-            var title_widget = new Adw.WindowTitle (title, "");
-            bar.set_title_widget (title_widget);
-            bar.pack_start (bar_label);
+            bar.set_title_widget (bar_label);
             bar.set_show_start_title_buttons (false);
             bar.set_show_end_title_buttons (false);
             bar.width_request = settings.view_sheets_width;

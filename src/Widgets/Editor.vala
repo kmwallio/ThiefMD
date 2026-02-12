@@ -885,7 +885,9 @@ namespace ThiefMD.Widgets {
                 fountain.attach (this);
             } else if (is_markdown_file (filename)) {
                 markdown = new MarkdownEnrichment ();
-                markdown.attach (this);
+                if (markdown.attach (this)) {
+                    markdown.recheck_all ();
+                }
             }
         }
 
@@ -920,32 +922,40 @@ namespace ThiefMD.Widgets {
         }
 
         public void dynamic_margins () {
-            if (!ThiefApp.get_instance ().ready) {
-                return;
-            }
-
             int w, h;
             SoloEditor se = ThiefApplication.get_solo (file);
             if (se == null) {
-                ThiefApp.get_instance ().get_default_size (out w, out h);
+                int alloc_w = this.get_allocated_width ();
+                int alloc_h = this.get_allocated_height ();
+                bool has_alloc = alloc_w > 0 && alloc_h > 0;
+
+                if (has_alloc) {
+                    w = alloc_w;
+                    h = alloc_h;
+                } else {
+                    ThiefApp.get_instance ().get_default_size (out w, out h);
+                }
 
                 int note_w = 0;
                 if (ThiefApp.get_instance ().notes != null) {
                     note_w = (ThiefApp.get_instance ().notes.child_revealed) ? Notes.get_notes_width () : 0;
                 }
-                w = w - ThiefApp.get_instance ().pane_position - note_w;
-                last_height = h;
-
-                if (w == last_width) {
-                    return;
+                w = w - note_w;
+                if (!has_alloc) {
+                    w = w - ThiefApp.get_instance ().pane_position;
                 }
             } else {
                 se.get_editor_size (out w, out h);
-                last_height = h;
+            }
 
-                if (w == last_width) {
-                    return;
-                }
+            if (!this.get_realized () || w <= 0 || h <= 0) {
+                return;
+            }
+
+            last_height = h;
+
+            if (w == last_width) {
+                return;
             }
 
             move_margins ();
@@ -954,24 +964,36 @@ namespace ThiefMD.Widgets {
 
         public void move_margins () {
             var settings = AppSettings.get_default ();
-
-            if (!ThiefApp.get_instance ().ready) {
-                return;
-            }
-
             int w, h, m, p;
             SoloEditor se = ThiefApplication.get_solo (file);
             if (se == null) {
-                ThiefApp.get_instance ().get_default_size (out w, out h);
+                int alloc_w = this.get_allocated_width ();
+                int alloc_h = this.get_allocated_height ();
+                bool has_alloc = alloc_w > 0 && alloc_h > 0;
+
+                if (has_alloc) {
+                    w = alloc_w;
+                    h = alloc_h;
+                } else {
+                    ThiefApp.get_instance ().get_default_size (out w, out h);
+                }
 
                 int note_w = 0;
                 if (ThiefApp.get_instance ().notes != null) {
                     note_w = (ThiefApp.get_instance ().notes.child_revealed) ? Notes.get_notes_width () : 0;
                 }
-                w = w - ThiefApp.get_instance ().pane_position - note_w;
+                w = w - note_w;
+                if (!has_alloc) {
+                    w = w - ThiefApp.get_instance ().pane_position;
+                }
             } else {
                 se.get_editor_size (out w, out h);
             }
+
+            if (!this.get_realized () || w <= 0 || h <= 0) {
+                return;
+            }
+
             last_height = h;
             last_width = w;
 
@@ -1160,7 +1182,7 @@ namespace ThiefMD.Widgets {
             return false;
         }
 
-        public void set_scheme (string id) {
+        public void set_scheme (string id, bool reload_css = true) {
             if (id == "thiefmd") {
                 // Reset application CSS to coded
                 var style_manager = GtkSource.StyleSchemeManager.get_default ();
@@ -1172,7 +1194,9 @@ namespace ThiefMD.Widgets {
                 buffer.set_style_scheme (style);
             }
 
-            UI.load_css_scheme ();
+            if (reload_css) {
+                UI.load_css_scheme ();
+            }
         }
 
         public void remove_focus () {

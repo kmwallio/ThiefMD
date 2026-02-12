@@ -299,6 +299,19 @@ namespace ThiefMD.Controllers.SheetManager {
         }
     }
 
+    public void reapply_editor_theme () {
+        var settings = AppSettings.get_default ();
+        string scheme_id = settings.get_valid_theme_id ();
+
+        foreach (var editor in _active_editors) {
+            editor.editor.set_scheme (scheme_id, false);
+        }
+
+        if (_welcome_screen != null && _welcome_screen.am_active) {
+            _welcome_screen.set_scheme (scheme_id, false);
+        }
+    }
+
     public Sheets? get_sheets () {
         return _current_sheets;
     }
@@ -375,6 +388,12 @@ namespace ThiefMD.Controllers.SheetManager {
             _currentSheet.editor.am_active = true;
             _active_editors.add (_currentSheet);
             settings.last_file = sheet.file_path ();
+
+            // Ensure margins are calculated once the editor is realized
+            Idle.add (() => {
+                _currentSheet.editor.move_margins ();
+                return false;
+            });
         }
 
         debug ("Tried to load %s (%s)\n", sheet.file_path (), (success) ? "success" : "failed");
