@@ -61,6 +61,11 @@ namespace ThiefMD.Widgets {
         private GLib.SimpleActionGroup _context_actions;
         private Gdk.Rectangle _last_menu_rect;
         private bool _has_last_menu_rect = false;
+        private bool _has_hover_row = false;
+        private TreePath? _hover_path = null;
+        private TreePath? _saved_selection_path = null;
+        private bool _suppress_selection = false;
+        private Gtk.CssProvider? _hover_css = null;
 
         public Library () {
             debug ("Setting up library");
@@ -111,12 +116,28 @@ namespace ThiefMD.Widgets {
 
             var drop_target = new Gtk.DropTarget (typeof (string), Gdk.DragAction.MOVE);
             drop_target.set_propagation_phase (Gtk.PropagationPhase.CAPTURE);
+            drop_target.motion.connect ((value, x, y) => {
+                debug ("Library DnD motion x=%.2f y=%.2f", x, y);
+                if (!highlight_hover_row (x, y)) {
+                    debug ("Library DnD motion: no row under pointer");
+                    clear_hover_highlight ();
+                }
+                return Gdk.DragAction.MOVE;
+            });
+            drop_target.leave.connect (() => {
+                debug ("Library DnD leave");
+                clear_hover_highlight ();
+            });
             drop_target.drop.connect ((value, x, y) => {
+                debug ("Library DnD drop x=%.2f y=%.2f", x, y);
                 string? source_path = (string?) value;
                 if (source_path == null) {
+                    clear_hover_highlight ();
                     return false;
                 }
-                return handle_drop (source_path, x, y);
+                bool res = handle_drop (source_path, x, y);
+                clear_hover_highlight ();
+                return res;
             });
             add_controller (drop_target);
 
@@ -834,6 +855,84 @@ namespace ThiefMD.Widgets {
             folder_popup.popup ();
         }
 
+        private string tree_path_to_string (TreePath path) {
+            string? s = path.to_string ();
+            return (s != null) ? s : "<null>";
+        }
+
+        private bool highlight_hover_row (double x, double y) {
+            TreePath dest_path;
+            TreeViewDropPosition pos;
+            if (get_dest_row_at_pos ((int) x, (int) y, out dest_path, out pos)) {
+                debug ("Highlight row path=%s pos=%d", tree_path_to_string (dest_path), (int) pos);
+
+                // Capture current selection once when hover starts
+                if (!_has_hover_row) {
+                    TreeModel model = get_model ();
+                    TreeIter current_iter;
+                    if (get_selection ().get_selected (out model, out current_iter)) {
+                        _saved_selection_path = model.get_path (current_iter);
+                    }
+                }
+
+                // Temporarily select the hover row without triggering selection side-effects
+                _suppress_selection = true;
+                get_selection ().select_path (dest_path);
+                _suppress_selection = false;
+
+                apply_hover_css (true);
+
+                _hover_path = dest_path.copy ();
+                _has_hover_row = true;
+                return true;
+            }
+
+            debug ("Highlight miss at x=%.2f y=%.2f", x, y);
+            return false;
+        }
+
+        private void clear_hover_highlight () {
+            if (_has_hover_row) {
+                debug ("Clearing hover highlight");
+
+                // Restore prior selection if we changed it for hover
+                if (_saved_selection_path != null) {
+                    _suppress_selection = true;
+                    get_selection ().select_path (_saved_selection_path);
+                    _suppress_selection = false;
+                    _saved_selection_path = null;
+                }
+
+                apply_hover_css (false);
+
+                _hover_path = null;
+                _has_hover_row = false;
+            }
+        }
+
+        // Apply a hover class to the treeview so theme CSS can style hovered drop targets.
+        // The class name should be defined in the app stylesheet (UI-controlled colors).
+        private void apply_hover_css (bool enable) {
+            // Avoid recreating providers repeatedly
+            if (_hover_css == null) {
+                _hover_css = new Gtk.CssProvider ();
+                // Minimal rule; actual colors come from theme via class name selectors
+                // Class name: .library-drop-hover { }
+                _hover_css.load_from_data ((uint8[]) ".library-drop-hover{}".data);
+            }
+
+            var style_context = this.get_style_context ();
+            if (enable) {
+                style_context.add_class ("library-drop-hover");
+                var display = Gdk.Display.get_default ();
+                if (display != null) {
+                    Gtk.StyleContext.add_provider_for_display (display, _hover_css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+                }
+            } else {
+                style_context.remove_class ("library-drop-hover");
+            }
+        }
+
         #if false
         // GTK4 TODO: context menu and drag-and-drop not yet reimplemented
         public override bool button_press_event (Gdk.EventButton event) {
@@ -1035,6 +1134,9 @@ namespace ThiefMD.Widgets {
             TreeModel model;
             TreeIter iter;
             if (selected.get_selected (out model, out iter)) {
+                if (_suppress_selection) {
+                    return;
+                }
                 LibPair p = convert_selection (model, iter);
                 _selected = p;
                 _selected_node = iter;
@@ -1082,6 +1184,7 @@ namespace ThiefMD.Widgets {
             // Handle file moves into a library folder (e.g., sheets dragged from sheet list)
             if (!FileUtils.test (source_path, FileTest.IS_DIR)) {
                 string dest_file_path = Path.build_filename (dest._path, source_file.get_basename ());
+                string source_basename = source_file.get_basename ();
 
                 // No-op if already in target folder
                 File? src_parent = source_file.get_parent ();
@@ -1100,11 +1203,15 @@ namespace ThiefMD.Widgets {
                     return false;
                 }
 
-                // Refresh source and destination sheet lists
+                // Update source and destination metadata/orders
                 Sheets? src_sheets = find_sheets_for_path (source_path);
                 if (src_sheets != null) {
+                    src_sheets.metadata.sheet_order.remove (source_basename);
+                    src_sheets.persist_metadata ();
                     src_sheets.refresh ();
                 }
+                dest._sheets.metadata.add_sheet (source_basename);
+                dest._sheets.persist_metadata ();
                 dest._sheets.refresh ();
                 return true;
             }

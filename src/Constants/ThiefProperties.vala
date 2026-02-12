@@ -315,6 +315,12 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
           color: @textColorGlobal;
         }
 
+        .library-drop-hover treeview row:selected,
+        .library-drop-hover treeview row {
+          background: lighter(lighter(@colorPrimaryActive));
+          color: @textColorGlobal;
+        }
+
         treeview.view header button, .thief-library-header button {
             background: lighter(@colorPrimaryActive);
             color: @textColorGlobal;
