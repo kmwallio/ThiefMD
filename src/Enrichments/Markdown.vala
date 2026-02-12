@@ -361,64 +361,43 @@ namespace ThiefMD.Enrichments {
             warning ("Checking for link at cursor offset: %d", cursor_location.get_offset ());
             if (cursor_location.has_tag (markdown_link) || cursor_location.has_tag (markdown_url)) {
                 warning ("Link tag found at click location. Attempting to extract URL...");
-                //
-                // Get into markdown_url
-                //
-                while (!cursor_location.has_tag (markdown_url) && cursor_location.has_tag (markdown_link)) {
-                    if (!cursor_location.forward_char ()) {
-                        return;
-                    }
+                string url = "";
+                Gtk.TextIter line_start = cursor_location;
+                Gtk.TextIter line_end = cursor_location;
+                line_start.set_line_offset (0);
+                line_end.forward_to_line_end ();
+
+                string line_text = buffer.get_text (line_start, line_end, true);
+                MatchInfo match_info;
+                if (is_markdown_url.match_full (line_text, line_text.length, 0,
+                        RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
+                    do {
+                        int start_full_pos, end_full_pos;
+                        int start_url_pos, end_url_pos;
+                        bool full_found = match_info.fetch_pos (0, out start_full_pos, out end_full_pos);
+                        bool url_found = match_info.fetch_pos (2, out start_url_pos, out end_url_pos);
+                        if (!full_found || !url_found) {
+                            continue;
+                        }
+
+                        int start_full_char = line_text.char_count (start_full_pos);
+                        int end_full_char = line_text.char_count (end_full_pos);
+                        int line_offset = line_start.get_offset ();
+                        int cursor_offset = cursor_location.get_offset ();
+
+                        if (cursor_offset >= line_offset + start_full_char &&
+                            cursor_offset <= line_offset + end_full_char) {
+                            url = line_text.substring (start_url_pos, end_url_pos - start_url_pos);
+                            break;
+                        }
+                    } while (match_info.next ());
                 }
 
-                warning ("Extracting URL from markdown tag...");
-
-                Gtk.TextIter start, end;
-                buffer.get_iter_at_offset (out start, cursor_location.get_offset ());
-                buffer.get_iter_at_offset (out end, cursor_location.get_offset ());
-                while (start.has_tag (markdown_url)) {
-                    if (!start.backward_char ()) {
-                        return;
-                    }
-                }
-                warning ("Moved to start of URL tag. Moving forward to start of URL text...");
-                if (!start.forward_chars (2)) {
+                if (url == "") {
+                    warning ("No URL found for click location");
                     return;
                 }
 
-                warning ("Extracting URL text...");
-
-                //
-                // Markdown could end with URL, so it's fine to not be able to go foward
-                //
-                while (end.has_tag (markdown_url)) {
-                    if (!end.forward_char ()) {
-                        break;
-                    }
-                }
-                warning ("Moved to end of URL tag. Extracting text between offsets %d and %d", start.get_offset (), end.get_offset ());
-
-                // If at end of doc check
-                if (!end.backward_char ()) {
-                    return;
-                }
-
-                warning ("Checking if URL ends with ')', which is common in markdown links. If not, adjusting end position...");
-
-                // We weren't at the end, go back one more
-                if (end.get_char () != ')') {
-                    if (!end.backward_char ()) {
-                        return;
-                    }
-                }
-
-                warning ("Final URL extraction offsets: %d to %d", start.get_offset (), end.get_offset ());
-
-                // Illegal state
-                if (end.get_offset () <= start.get_offset ()) {
-                    return;
-                }
-
-                string url = buffer.get_text (start, end, true);
                 warning ("URL Clicked: %s", url);
                 if (url.has_prefix ("https:") || url.has_prefix ("http:") || url.has_prefix ("mailto:") || url.has_prefix ("ftp:") ||
                     url.has_prefix ("sftp:"))
