@@ -22,139 +22,255 @@ using ThiefMD.Widgets;
 using ThiefMD.Controllers;
 using Gtk;
 using Gdk;
+using GLib;
 
 namespace ThiefMD.Widgets {
     /**
      * Library data object
      */
-    private class LibPair : Object {
-        public Sheets _sheets;
-        public string _title;
-        public string _path;
-        public TreeIter _iter; // @TODO: Should be weak?
+    private class LibNode : Object {
+        public Sheets sheets;
+        public string title;
+        public string path;
+        public GLib.Icon icon;
+        public GLib.ListStore children;
+        public LibNode? parent = null;
+        public bool children_built = false;
 
-        public LibPair (string path, TreeIter iter) {
-            if (path.has_suffix (Path.DIR_SEPARATOR_S)) {
-                _path = path.substring(0, path.char_count () - 1);
-            } else {
-                _path = path;
-            }
-            debug ("Got path : %s", _path);
-            _title = _path.substring (_path.last_index_of (Path.DIR_SEPARATOR_S) + 1);
-            _sheets = new Sheets(_path);
-            _iter = iter;
+        public LibNode (string path, GLib.Icon icon) {
+            this.path = path.has_suffix (Path.DIR_SEPARATOR_S) ? path.substring (0, path.char_count () - 1) : path;
+            this.title = this.path.substring (this.path.last_index_of (Path.DIR_SEPARATOR_S) + 1);
+            this.sheets = new Sheets (this.path);
+            this.icon = icon;
+            this.children = new GLib.ListStore (typeof (LibNode));
         }
     }
 
     /**
      * Library or file tree view
      */
-    public class Library : TreeView {
-        private List<LibPair> _all_sheets;
-        private TreeStore _lib_store;
-        private LibPair _selected;
-        private TreeIter _selected_node;
-        private PreventDelayedDrop _droppable;
+    public class Library : Gtk.Box {
+        private List<LibNode> _all_sheets;
+        private GLib.ListStore _root_store;
+        private Gtk.TreeListModel _tree_model;
+        private Gtk.SingleSelection _selection;
+        private Gtk.ListView _list_view;
+        private LibNode? _selected;
         NewFolder folder_popup;
-        private LibPair? _drag_source_pair;
         private Gtk.PopoverMenu? _context_menu;
         private GLib.SimpleActionGroup _context_actions;
         private Gdk.Rectangle _last_menu_rect;
         private bool _has_last_menu_rect = false;
-        private bool _has_hover_row = false;
-        private TreePath? _hover_path = null;
-        private TreePath? _saved_selection_path = null;
-        private bool _suppress_selection = false;
-        private Gtk.CssProvider? _hover_css = null;
 
         public Library () {
+            Object (orientation: Gtk.Orientation.VERTICAL, spacing: 0);
             debug ("Setting up library");
-            _all_sheets = new List<LibPair> ();
-            _lib_store = new TreeStore (3, typeof (string), typeof (LibPair), typeof (GLib.Icon));
+            _all_sheets = new List<LibNode> ();
+            _root_store = new GLib.ListStore (typeof (LibNode));
             _context_actions = new GLib.SimpleActionGroup ();
             insert_action_group ("library", _context_actions);
             setup_context_actions ();
-            parse_library ();
-            set_model (_lib_store);
-            var library_item_display = new TreeViewColumn ();
-            var library_item_text = new CellRendererText ();
-            var library_item_icon = new CellRendererPixbuf ();
-            library_item_display.pack_start (library_item_icon, false);
-            library_item_display.pack_start (library_item_text, true);
-            library_item_display.add_attribute (library_item_text, "text", 0);
-            library_item_display.add_attribute (library_item_icon, "gicon", 2);
-            // insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
-            append_column (library_item_display);
-            get_selection ().changed.connect (on_selection);
             folder_popup = new NewFolder ();
-            _droppable = new PreventDelayedDrop ();
 
-            var context_click = new Gtk.GestureClick ();
-            context_click.set_button (3);
-            context_click.set_propagation_phase (Gtk.PropagationPhase.CAPTURE);
-            context_click.pressed.connect ((n_press, x, y) => {
-                if (n_press == 1) {
-                    show_context_menu (x, y);
-                }
-            });
-            add_controller (context_click);
+            build_models ();
+            build_view ();
+            parse_library ();
+        }
 
-            // Drag rows to reorder sibling folders
-            var drag_source = new Gtk.DragSource ();
-            drag_source.actions = Gdk.DragAction.MOVE;
-            drag_source.set_propagation_phase (Gtk.PropagationPhase.CAPTURE);
-            drag_source.prepare.connect ((x, y) => {
-                if (_selected == null) {
-                    return null;
+        private GLib.ListModel? create_child_model (Object? obj) {
+            LibNode? node = obj as LibNode;
+            if (node == null) {
+                Gtk.TreeListRow? row = obj as Gtk.TreeListRow;
+                if (row != null) {
+                    node = row.get_item () as LibNode;
                 }
-                _drag_source_pair = _selected;
-                Value v = Value (typeof (string));
-                v.set_string (_selected._path);
-                return new Gdk.ContentProvider.for_value (v);
-            });
-            add_controller (drag_source);
+            }
 
-            var drop_target = new Gtk.DropTarget (typeof (string), Gdk.DragAction.MOVE);
-            drop_target.set_propagation_phase (Gtk.PropagationPhase.CAPTURE);
-            drop_target.motion.connect ((value, x, y) => {
-                debug ("Library DnD motion x=%.2f y=%.2f", x, y);
-                if (!highlight_hover_row (x, y)) {
-                    debug ("Library DnD motion: no row under pointer");
-                    clear_hover_highlight ();
-                }
-                return Gdk.DragAction.MOVE;
-            });
-            drop_target.leave.connect (() => {
-                debug ("Library DnD leave");
-                clear_hover_highlight ();
-            });
-            drop_target.drop.connect ((value, x, y) => {
-                debug ("Library DnD drop x=%.2f y=%.2f", x, y);
-                string? source_path = (string?) value;
-                if (source_path == null) {
-                    clear_hover_highlight ();
-                    return false;
-                }
-                bool res = handle_drop (source_path, x, y);
-                clear_hover_highlight ();
-                return res;
-            });
-            add_controller (drop_target);
+            if (node == null) {
+                debug ("create_child_model: obj is null or wrong type");
+                return null;
+            }
 
-            headers_visible = false;
+            debug ("create_child_model for: %s (children_built=%s)", node.path, node.children_built.to_string ());
+
+            if (!node.children_built) {
+                rebuild_children (node);
+            }
+
+            uint n_children = node.children.get_n_items ();
+            debug ("  -> has %u children", n_children);
+
+            if (n_children == 0) {
+                return null;
+            }
+
+            return node.children;
+        }
+
+        private void build_models () {
+            _tree_model = new Gtk.TreeListModel (
+                _root_store,
+                false,
+                true,
+                create_child_model);
+
+            _selection = new Gtk.SingleSelection (_tree_model);
+            _selection.set_can_unselect (false);
+            _selection.selection_changed.connect ((position, n_items) => {
+                on_selection_changed ();
+            });
+        }
+
+        private void setup_row_item (Gtk.SignalListItemFactory factory, GLib.Object obj) {
+            var item = obj as Gtk.ListItem;
+            if (item == null) {
+                return;
+            }
+            var row_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+            row_box.add_css_class ("library-row");
+
+            var icon = new Gtk.Image ();
+            icon.set_pixel_size (18);
+
+            var label = new Gtk.Label ("");
+            label.set_xalign (0);
+            label.set_hexpand (true);
+
+            row_box.append (icon);
+            row_box.append (label);
+
+            var expander = new Gtk.TreeExpander ();
+            expander.set_child (row_box);
+
+            item.set_child (expander);
+        }
+
+        private void bind_row_item (Gtk.SignalListItemFactory factory, GLib.Object obj) {
+            var item = obj as Gtk.ListItem;
+            if (item == null) {
+                return;
+            }
+            var row = item.get_item () as Gtk.TreeListRow;
+            var node = row != null ? row.get_item () as LibNode : null;
+            var expander = item.get_child () as Gtk.TreeExpander;
+            if (expander == null || row == null || node == null) {
+                return;
+            }
+
+            expander.set_list_row (row);
+
+            Gtk.Box? box = expander.get_child () as Gtk.Box;
+            if (box == null) {
+                return;
+            }
+
+            Gtk.Widget? w = box.get_first_child ();
+            Gtk.Image? icon = w as Gtk.Image;
+            Gtk.Label? label = (w != null) ? w.get_next_sibling () as Gtk.Label : null;
+
+            if (icon != null) {
+                icon.set_from_gicon (node.icon);
+            }
+            if (label != null) {
+                label.set_label (node.title);
+            }
+        }
+
+        private void unbind_row_item (Gtk.SignalListItemFactory factory, GLib.Object obj) {
+            var item = obj as Gtk.ListItem;
+            if (item == null) {
+                return;
+            }
+            var expander = item.get_child () as Gtk.TreeExpander;
+            if (expander != null) {
+                expander.set_list_row (null);
+            }
+        }
+
+        private Gtk.SignalListItemFactory create_row_factory () {
+            var factory = new Gtk.SignalListItemFactory ();
+            factory.setup.connect (setup_row_item);
+            factory.bind.connect (bind_row_item);
+            factory.unbind.connect (unbind_row_item);
+            return factory;
+        }
+
+        private void build_view () {
+            var factory = create_row_factory ();
+            _list_view = new Gtk.ListView (_selection, factory);
+            _list_view.set_vexpand (true);
+            _list_view.set_hexpand (true);
+
+            var scroller = new Gtk.ScrolledWindow ();
+            scroller.set_child (_list_view);
+            scroller.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+            append (scroller);
+
+            var right_click = new Gtk.GestureClick ();
+            right_click.set_button (3);
+            right_click.released.connect ((n_press, x, y) => {
+                show_context_menu (x, y);
+            });
+            _list_view.add_controller (right_click);
+
+            var activate = new Gtk.GestureClick ();
+            activate.set_button (1);
+            activate.released.connect ((n_press, x, y) => {
+                on_selection_changed ();
+            });
+            _list_view.add_controller (activate);
+        }
+
+        private LibNode? get_selected_node () {
+            if (_selection == null) {
+                return null;
+            }
+
+            var row = _selection.get_selected_item () as Gtk.TreeListRow;
+            if (row == null) {
+                return null;
+            }
+
+            return row.get_item () as LibNode;
+        }
+
+        private void on_selection_changed () {
+            LibNode? node = get_selected_node ();
+            if (node != null) {
+                _selected = node;
+                debug ("Selected: %s", node.path);
+                SheetManager.set_sheets (node.sheets);
+            }
+        }
+
+        private bool select_node (LibNode node) {
+            if (_tree_model == null || _selection == null) {
+                return false;
+            }
+
+            uint n = _tree_model.get_n_items ();
+            for (uint i = 0; i < n; i++) {
+                var row = _tree_model.get_item (i) as Gtk.TreeListRow;
+                if (row != null && row.get_item () == node) {
+                    _selection.select_item (i, true);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void set_active () {
-            foreach (var pair in _all_sheets) {
-                if (pair._sheets.has_active_sheet ()) {
-                    TreePath? tree_path = _lib_store.get_path (pair._iter);
-                    set_cursor (tree_path, null, false);
+            foreach (var node in _all_sheets) {
+                if (node.sheets.has_active_sheet ()) {
+                    select_node (node);
+                    break;
                 }
             }
         }
 
         //
-        // Library Functiuons
+        // Library Functions
         //
 
         public void new_folder (string folder) {
@@ -163,8 +279,8 @@ namespace ThiefMD.Widgets {
             }
 
             if (_selected != null && _all_sheets.find (_selected) != null) {
-                debug ("Creating %s in %s", folder, _selected._path);
-                string new_folder_path = Path.build_filename (_selected._path, folder);
+                debug ("Creating %s in %s", folder, _selected.path);
+                string new_folder_path = Path.build_filename (_selected.path, folder);
                 File newfolder = File.new_for_path (new_folder_path);
                 if (newfolder.query_exists ()) {
                     return;
@@ -174,7 +290,7 @@ namespace ThiefMD.Widgets {
                 } catch (Error e) {
                     warning ("Could not make new directory: %s", e.message);
                 }
-                parse_dir (_selected._sheets, _selected._path, _selected_node);
+                rebuild_children (_selected);
             }
         }
 
@@ -188,13 +304,14 @@ namespace ThiefMD.Widgets {
                         if (!file_name.has_prefix(".")) {
                             string path = Path.build_filename (str_dir, file_name);
                             if (FileUtils.test (path, FileTest.IS_DIR)) {
-                                LibPair? kid = get_item (path);
+                                LibNode? kid = get_item (path);
                                 if (kid != null) {
-                                    kid._sheets.close_active_files ();
-                                    if (SheetManager._current_sheets == kid._sheets) {
+                                    kid.sheets.close_active_files ();
+                                    if (SheetManager._current_sheets == kid.sheets) {
                                         SheetManager.set_sheets (null);
                                     }
                                     _all_sheets.remove (kid);
+                                    remove_node_from_store (kid);
                                     remove_children (path);
                                 }
                             }
@@ -205,27 +322,28 @@ namespace ThiefMD.Widgets {
                 }
             } else {
                 string rem_kids = str_dir.has_suffix (Path.DIR_SEPARATOR_S) ? str_dir : str_dir + Path.DIR_SEPARATOR_S;
-                Gee.LinkedList<LibPair> bad_kids = new Gee.LinkedList<LibPair> ();
+                Gee.LinkedList<LibNode> bad_kids = new Gee.LinkedList<LibNode> ();
                 foreach (var kid in _all_sheets) {
-                    if (kid._path.has_prefix (rem_kids)) {
+                    if (kid.path.has_prefix (rem_kids)) {
                         bad_kids.add (kid);
                     }
                 }
 
                 foreach (var bad_kid in bad_kids) {
-                    bad_kid._sheets.close_active_files ();
-                    if (SheetManager._current_sheets == bad_kid._sheets) {
+                    bad_kid.sheets.close_active_files ();
+                    if (SheetManager._current_sheets == bad_kid.sheets) {
                         SheetManager.set_sheets (null);
                     }
                     _all_sheets.remove (bad_kid);
+                    remove_node_from_store (bad_kid);
                 }
             }
         }
 
-        private LibPair? get_item (string path) {
-            foreach (LibPair pair in _all_sheets) {
-                if (pair._sheets.get_sheets_path() == path) {
-                    return pair;
+        private LibNode? get_item (string path) {
+            foreach (LibNode node in _all_sheets) {
+                if (node.sheets.get_sheets_path() == path) {
+                    return node;
                 }
             }
 
@@ -233,8 +351,8 @@ namespace ThiefMD.Widgets {
         }
 
         public bool has_sheets (string path) {
-            foreach (LibPair pair in _all_sheets) {
-                if (pair._sheets.get_sheets_path() == path) {
+            foreach (LibNode node in _all_sheets) {
+                if (node.sheets.get_sheets_path() == path) {
                     return true;
                 }
             }
@@ -243,24 +361,24 @@ namespace ThiefMD.Widgets {
         }
 
         public void refresh_sheets (string path) {
-            foreach (LibPair pair in _all_sheets) {
-                string lib_path = pair._sheets.get_sheets_path ();
+            foreach (LibNode node in _all_sheets) {
+                string lib_path = node.sheets.get_sheets_path ();
                 lib_path = lib_path.has_suffix (Path.DIR_SEPARATOR_S) ? lib_path : lib_path + Path.DIR_SEPARATOR_S;
                 string comp_path = path.has_suffix (Path.DIR_SEPARATOR_S) ? path : path + Path.DIR_SEPARATOR_S;
                 if (lib_path == comp_path) {
-                    pair._sheets.refresh ();
+                    node.sheets.refresh ();
                 }
             }
         }
 
         public Sheets get_sheets (string path) {
-            foreach (LibPair pair in _all_sheets) {
-                string lib_path = pair._sheets.get_sheets_path ();
+            foreach (LibNode node in _all_sheets) {
+                string lib_path = node.sheets.get_sheets_path ();
                 lib_path = lib_path.has_suffix (Path.DIR_SEPARATOR_S) ? lib_path : lib_path + Path.DIR_SEPARATOR_S;
                 string comp_path = path.has_suffix (Path.DIR_SEPARATOR_S) ? path : path + Path.DIR_SEPARATOR_S;
                 if (lib_path == comp_path) {
                     debug ("Found %s", path);
-                    return pair._sheets;
+                    return node.sheets;
                 }
             }
 
@@ -273,21 +391,17 @@ namespace ThiefMD.Widgets {
             settings.validate_library ();
             string[] library = settings.library ();
 
-            TreeIter root;
-
             foreach (string lib in library) {
                 if (lib.chomp () == "") {
                     continue;
                 }
                 if (!has_sheets (lib)) {
-                    _lib_store.append (out root, null);
                     debug (lib);
-                    LibPair pair = new LibPair(lib, root);
                     var icon = get_icon_for_folder (lib);
-                    _lib_store.set (root, 0, pair._title, 1, pair, 2, icon, -1);
-                    _all_sheets.append (pair);
-
-                    parse_dir(pair._sheets, lib, root);
+                    LibNode node = new LibNode (lib, icon);
+                    _all_sheets.append (node);
+                    _root_store.append (node);
+                    rebuild_children (node);
                 }
             }
 
@@ -298,86 +412,112 @@ namespace ThiefMD.Widgets {
 
         private bool pick_item () {
             if (_selected == null) {
-                foreach (LibPair pair in _all_sheets) {
-                    TreePath? tree_path = _lib_store.get_path (pair._iter);
-                    if (tree_path != null) {
-                        set_cursor (tree_path, null, false);
-                        break;
-                    }
+                foreach (LibNode node in _all_sheets) {
+                    select_node (node);
+                    break;
                 }
             }
             return false;
         }
 
         public void refresh_dir (Sheets sheet_dir) {
-            LibPair? p = get_item (sheet_dir.get_sheets_path ());
-            if (p != null) {
-                parse_dir (sheet_dir, sheet_dir.get_sheets_path (), p._iter);
+            LibNode? n = get_item (sheet_dir.get_sheets_path ());
+            if (n != null) {
+                rebuild_children (n);
+            }
+        }
+
+        public void expand_all () {
+            if (_tree_model == null) {
+                return;
+            }
+
+            uint n = _tree_model.get_n_items ();
+            for (uint i = 0; i < n; i++) {
+                var row = _tree_model.get_item (i) as Gtk.TreeListRow;
+                if (row != null) {
+                    row.set_expanded (true);
+                }
             }
         }
 
         public void remove_item (string path) {
             var settings = AppSettings.get_default ();
-            LibPair? p = get_item (path);
+            LibNode? n = get_item (path);
 
-            if (p != null) {
+            if (n != null) {
                 remove_children (path);
-                if (p != null) {
-                    _all_sheets.remove (p);
-                    _lib_store.remove (ref p._iter);
-                }
+                _all_sheets.remove (n);
+                remove_node_from_store (n);
                 settings.writing_changed ();
             }
         }
 
-        private void parse_dir (Sheets sheet_dir, string str_dir, TreeIter iter) {
+        private void rebuild_children (LibNode node) {
+            debug ("rebuild_children: %s (already_built=%s)", node.path, node.children_built.to_string ());
             var settings = AppSettings.get_default ();
+            
+            // If already built, only clear if we're forcing a refresh
+            if (node.children_built) {
+                debug ("  -> already built, clearing and rebuilding");
+                while (node.children.get_n_items () > 0) {
+                    node.children.remove (0);
+                }
+                // Also clear from _all_sheets
+                Gee.LinkedList<LibNode> to_remove = new Gee.LinkedList<LibNode> ();
+                foreach (var kid in _all_sheets) {
+                    if (kid.parent == node) {
+                        to_remove.add (kid);
+                    }
+                }
+                foreach (var kid in to_remove) {
+                    _all_sheets.remove (kid);
+                }
+            }
+            
+            node.children_built = true;
+            var sheet_dir = node.sheets;
+            string str_dir = node.path;
             try {
-                // Create child iter
-                TreeIter child;
-
-                // Load ordered folders
+                // Load ordered folders first
                 foreach (var file_name in sheet_dir.metadata.folder_order) {
                     if (!file_name.has_prefix(".") && !sheet_dir.metadata.hidden_folders.contains(file_name)) {
                         string path = Path.build_filename (str_dir, file_name);
                         File file = File.new_for_path (path);
                         if (file.query_exists () && !has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
-                            _lib_store.append (out child, iter);
-                            LibPair pair = new LibPair(path, child);
-                            _all_sheets.append (pair);
-                            // Append dir to list
+                            debug ("  -> adding ordered child: %s", file_name);
                             var icon = get_icon_for_folder (path);
-                            _lib_store.set (child, 0, pair._title, 1, pair, 2, icon, -1);
-
-                            parse_dir (pair._sheets, path, child);
+                            LibNode child = new LibNode (path, icon);
+                            child.parent = node;
+                            node.children.append (child);
+                            _all_sheets.append (child);
+                            // Don't recursively build - let TreeListModel do it lazily
                         } else if (!file.query_exists ()) {
                             remove_children (path);
-                            LibPair p = get_item (path);
+                            LibNode p = get_item (path);
                             if (p != null) {
                                 _all_sheets.remove (p);
-                                _lib_store.remove (ref p._iter);
                             }
                             settings.writing_changed ();
                         }
                     }
                 }
 
-                // Loop through the directory
+                // Then append any new folders
                 Dir dir = Dir.open (str_dir, 0);
                 string? file_name = null;
                 while ((file_name = dir.read_name()) != null) {
                     if (!file_name.has_prefix(".") && !sheet_dir.metadata.hidden_folders.contains(file_name)) {
                         string path = Path.build_filename (str_dir, file_name);
                         if (!has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
-                            _lib_store.append (out child, iter);
-                            LibPair pair = new LibPair(path, child);
-                            _all_sheets.append (pair);
-                            // Append dir to list
+                            debug ("  -> adding new child: %s", file_name);
                             var icon = get_icon_for_folder (path);
-                            _lib_store.set (child, 0, pair._title, 1, pair, 2, icon, -1);
+                            LibNode child = new LibNode (path, icon);
+                            child.parent = node;
+                            node.children.append (child);
+                            _all_sheets.append (child);
                             sheet_dir.metadata.add_folder (file_name);
-
-                            parse_dir (pair._sheets, path, child);
+                            // Don't recursively build - let TreeListModel do it lazily
                         }
                     }
                 }
@@ -388,15 +528,15 @@ namespace ThiefMD.Widgets {
 
         public bool file_in_library (string file_path) {
             bool is_dir = FileUtils.test (file_path, FileTest.IS_DIR);
-            foreach (LibPair p in _all_sheets)
+            foreach (LibNode p in _all_sheets)
             {
                 if (!is_dir) {
-                    if (file_path.down ().has_prefix (p._path.down ()))
+                    if (file_path.down ().has_prefix (p.path.down ()))
                     {
                         return true;
                     }
                 } else {
-                    string lib_path = p._path.down ();
+                    string lib_path = p.path.down ();
                     lib_path = lib_path.has_suffix (Path.DIR_SEPARATOR_S) ? lib_path : lib_path + Path.DIR_SEPARATOR_S;
                     string comp_path = file_path.has_suffix (Path.DIR_SEPARATOR_S) ? file_path.down () : file_path.down () + Path.DIR_SEPARATOR_S;
                     if (comp_path.has_prefix (lib_path)) {
@@ -410,13 +550,13 @@ namespace ThiefMD.Widgets {
         public Sheets? find_sheets_for_path (string file_path) {
             int len = 0;
             Sheets? parent = null;
-            foreach (LibPair p in _all_sheets)
+            foreach (LibNode p in _all_sheets)
             {
-                if (file_path.down ().has_prefix (p._path.down ()))
+                if (file_path.down ().has_prefix (p.path.down ()))
                 {
-                    if (p._path.length > len) {
-                        len = p._path.length;
-                        parent = p._sheets;
+                    if (p.path.length > len) {
+                        len = p.path.length;
+                        parent = p.sheets;
                     }
                 }
             }
@@ -427,13 +567,13 @@ namespace ThiefMD.Widgets {
         public Sheet? find_sheet_for_path (string file_path) {
             int len = 0;
             Sheets? parent = null;
-            foreach (LibPair p in _all_sheets)
+            foreach (LibNode p in _all_sheets)
             {
-                if (file_path.down ().has_prefix (p._path.down ()))
+                if (file_path.down ().has_prefix (p.path.down ()))
                 {
-                    if (p._path.length > len) {
-                        len = p._path.length;
-                        parent = p._sheets;
+                    if (p.path.length > len) {
+                        len = p.path.length;
+                        parent = p.sheets;
                     }
                 }
             }
@@ -451,14 +591,14 @@ namespace ThiefMD.Widgets {
 
         public int get_word_count_for_path (string path) {
             int wc = 0;
-            LibPair? p = get_item (path);
+            LibNode? p = get_item (path);
             if (p != null) {
-                foreach (var file in p._sheets.get_sheets ()) {
+                foreach (var file in p.sheets.get_sheets ()) {
                     wc += file.get_word_count ();
                 }
 
-                foreach (var folder in p._sheets.metadata.folder_order) {
-                    string next_path = Path.build_filename (p._path, folder);
+                foreach (var folder in p.sheets.metadata.folder_order) {
+                    string next_path = Path.build_filename (p.path, folder);
                     if (FileUtils.test (next_path, FileTest.IS_DIR) && !FileUtils.test (next_path, FileTest.IS_SYMLINK)) {
                         wc += get_word_count_for_path (next_path);
                     }
@@ -471,15 +611,15 @@ namespace ThiefMD.Widgets {
         public string get_novel (string path) {
             var settings = AppSettings.get_default ();
             string novel = "";
-            LibPair? p = get_item (path);
+            LibNode? p = get_item (path);
             if (p != null) {
                 novel = build_novel (p, settings.export_include_metadata_file);
             }
             return novel;
         }
 
-        private bool render_fountain (LibPair p, bool metadata = false) {
-            foreach (var file in p._sheets.metadata.sheet_order) {
+        private bool render_fountain (LibNode p, bool metadata = false) {
+            foreach (var file in p.sheets.metadata.sheet_order) {
                 if (!exportable_file (file)) {
                     continue;
                 }
@@ -489,11 +629,11 @@ namespace ThiefMD.Widgets {
                 }
             }
 
-            foreach (var folder in p._sheets.metadata.folder_order) {
-                if (!p._sheets.metadata.hidden_folders.contains (folder)) {
-                    string path = Path.build_filename (p._path, folder);
+            foreach (var folder in p.sheets.metadata.folder_order) {
+                if (!p.sheets.metadata.hidden_folders.contains (folder)) {
+                    string path = Path.build_filename (p.path, folder);
                     if (FileUtils.test (path, FileTest.IS_DIR) && !FileUtils.test (path, FileTest.IS_SYMLINK)) {
-                        LibPair? child = get_item (path);
+                        LibNode? child = get_item (path);
                         return render_fountain (child);
                     }
                 }
@@ -502,18 +642,18 @@ namespace ThiefMD.Widgets {
             return false;
         }
 
-        private string build_novel (LibPair p, bool metadata = false) {
+        private string build_novel (LibNode p, bool metadata = false) {
             StringBuilder markdown = new StringBuilder ();
             var settings = AppSettings.get_default ();
 
-            foreach (var file in p._sheets.metadata.sheet_order) {
+            foreach (var file in p.sheets.metadata.sheet_order) {
                 if (!exportable_file (file)) {
                     continue;
                 }
 
-                string sheet_markdown = FileManager.get_file_contents (Path.build_filename (p._path, file));
+                string sheet_markdown = FileManager.get_file_contents (Path.build_filename (p.path, file));
                 if (settings.export_resolve_paths) {
-                    sheet_markdown = Pandoc.resolve_paths (sheet_markdown, p._path);
+                    sheet_markdown = Pandoc.resolve_paths (sheet_markdown, p.path);
                 }
 
                 if (!metadata) {
@@ -543,8 +683,8 @@ namespace ThiefMD.Widgets {
                 }
             }
 
-            foreach (var folder in p._sheets.metadata.folder_order) {
-                if (!p._sheets.metadata.hidden_folders.contains (folder)) {
+            foreach (var folder in p.sheets.metadata.folder_order) {
+                if (!p.sheets.metadata.hidden_folders.contains (folder)) {
                     if (markdown.len != 0) {
                         if (settings.export_break_folders) {
                             markdown.append ("\n<div style='page-break-before: always'></div>\n");
@@ -552,9 +692,9 @@ namespace ThiefMD.Widgets {
                             markdown.append ("\n\n");
                         }
                     }
-                    string path = Path.build_filename (p._path, folder);
+                    string path = Path.build_filename (p.path, folder);
                     if (FileUtils.test (path, FileTest.IS_DIR) && !FileUtils.test (path, FileTest.IS_SYMLINK)) {
-                        LibPair? child = get_item (path);
+                        LibNode? child = get_item (path);
                         markdown.append (build_novel (child));
                     }
                 }
@@ -566,7 +706,7 @@ namespace ThiefMD.Widgets {
         public Gee.ArrayList<Sheets> get_all_sheets () {
             Gee.ArrayList<Sheets> all_sheets = new Gee.ArrayList<Sheets> ();
             foreach (var p in _all_sheets) {
-                all_sheets.add (p._sheets);
+                all_sheets.add (p.sheets);
             }
             return all_sheets;
         }
@@ -574,8 +714,8 @@ namespace ThiefMD.Widgets {
         public Gee.ArrayList<Sheets> get_all_sheets_for_path (string path) {
             Gee.ArrayList<Sheets> all_sheets = new Gee.ArrayList<Sheets> ();
             foreach (var p in _all_sheets) {
-                if (p._sheets.get_sheets_path ().has_prefix (path)) {
-                    all_sheets.add (p._sheets);
+                if (p.sheets.get_sheets_path ().has_prefix (path)) {
+                    all_sheets.add (p.sheets);
                 }
             }
             return all_sheets;
@@ -585,7 +725,7 @@ namespace ThiefMD.Widgets {
         // Mouse Click Actions
         //
 
-        private LibPair? current_selection () {
+        private LibNode? current_selection () {
             if (_selected != null && _all_sheets.find (_selected) != null) {
                 return _selected;
             }
@@ -593,24 +733,7 @@ namespace ThiefMD.Widgets {
             return null;
         }
 
-        private bool ensure_selection_at (double x, double y) {
-            TreePath path;
-            TreeViewColumn column;
-            int cell_x;
-            int cell_y;
-            if (get_path_at_pos ((int) x, (int) y, out path, out column, out cell_x, out cell_y)) {
-                set_cursor (path, column, false);
-                return true;
-            }
-
-            return false;
-        }
-
         private void show_context_menu (double x, double y) {
-            if (!ensure_selection_at (x, y)) {
-                return;
-            }
-
             var menu_model = build_context_menu_model ();
             if (menu_model == null) {
                 return;
@@ -632,7 +755,7 @@ namespace ThiefMD.Widgets {
             _context_menu = new Gtk.PopoverMenu.from_model (menu_model);
             _context_menu.set_has_arrow (true);
             _context_menu.set_pointing_to (_last_menu_rect);
-            _context_menu.set_parent (this);
+            _context_menu.set_parent (_list_view);
             _context_menu.set_autohide (true);
             _context_menu.popup ();
         }
@@ -645,7 +768,7 @@ namespace ThiefMD.Widgets {
 
         private MenuModel? build_context_menu_model () {
             var settings = AppSettings.get_default ();
-            LibPair? selection = current_selection ();
+            LibNode? selection = current_selection ();
             if (selection == null) {
                 return null;
             }
@@ -658,13 +781,13 @@ namespace ThiefMD.Widgets {
             root.append_section (null, export_section);
 
             var search_section = new GLib.Menu ();
-            search_section.append (_("Search ") + selection._title, "library.search");
+            search_section.append (_("Search ") + selection.title, "library.search");
             root.append_section (null, search_section);
 
             var folder_section = new GLib.Menu ();
             folder_section.append (_("Open in File Manager"), "library.open_folder");
             folder_section.append (_("Create Sub-Folder"), "library.create_folder");
-            if (!settings.is_in_library (selection._path)) {
+            if (!settings.is_in_library (selection.path)) {
                 folder_section.append (_("Hide from Library"), "library.hide");
             }
             folder_section.append (_("Show Hidden Items"), "library.reveal_hidden");
@@ -692,7 +815,7 @@ namespace ThiefMD.Widgets {
             icon_section.append_submenu (_("Set Project Icon"), icon_menu);
             root.append_section (null, icon_section);
 
-            if (settings.is_in_library (selection._path)) {
+            if (settings.is_in_library (selection.path)) {
                 var remove_section = new GLib.Menu ();
                 remove_section.append (_("Remove from Library"), "library.remove");
                 root.append_section (null, remove_section);
@@ -701,11 +824,21 @@ namespace ThiefMD.Widgets {
             return root;
         }
 
+        private void remove_node_from_store (LibNode node) {
+            GLib.ListStore? store = (node.parent != null) ? node.parent.children : _root_store;
+            for (uint i = 0; i < store.get_n_items (); i++) {
+                if (store.get_item (i) == node) {
+                    store.remove (i);
+                    break;
+                }
+            }
+        }
+
         private void setup_context_actions () {
             var export_preview = new GLib.SimpleAction ("export_preview", null);
             export_preview.activate.connect ((parameter) => {
                 var settings = AppSettings.get_default ();
-                LibPair? selection = current_selection ();
+                LibNode? selection = current_selection ();
                 if (selection == null) {
                     return;
                 }
@@ -717,11 +850,11 @@ namespace ThiefMD.Widgets {
 
             var writing_stats = new GLib.SimpleAction ("writing_stats", null);
             writing_stats.activate.connect ((parameter) => {
-                LibPair? selection = current_selection ();
+                LibNode? selection = current_selection ();
                 if (selection == null) {
                     return;
                 }
-                ProjectStatitics project_stat_window = new ProjectStatitics (selection._path);
+                ProjectStatitics project_stat_window = new ProjectStatitics (selection.path);
                 project_stat_window.present ();
                 project_stat_window.update_wordcount ();
             });
@@ -729,23 +862,23 @@ namespace ThiefMD.Widgets {
 
             var search_action = new GLib.SimpleAction ("search", null);
             search_action.activate.connect ((parameter) => {
-                LibPair? selection = current_selection ();
+                LibNode? selection = current_selection ();
                 if (selection == null) {
                     return;
                 }
-                SearchWindow project_search_window = new SearchWindow (selection._path);
+                SearchWindow project_search_window = new SearchWindow (selection.path);
                 project_search_window.present ();
             });
             _context_actions.add_action (search_action);
 
             var open_folder = new GLib.SimpleAction ("open_folder", null);
             open_folder.activate.connect ((parameter) => {
-                LibPair? selection = current_selection ();
+                LibNode? selection = current_selection ();
                 if (selection == null) {
                     return;
                 }
                 try {
-                    AppInfo.launch_default_for_uri ("file://%s".printf (selection._path), null);
+                    AppInfo.launch_default_for_uri ("file://%s".printf (selection.path), null);
                 } catch (Error e) {
                     warning ("Could not open folder: %s", e.message);
                 }
@@ -764,22 +897,21 @@ namespace ThiefMD.Widgets {
             var hide_folder = new GLib.SimpleAction ("hide", null);
             hide_folder.activate.connect ((parameter) => {
                 var settings = AppSettings.get_default ();
-                LibPair? selection = current_selection ();
+                LibNode? selection = current_selection ();
                 if (selection == null) {
                     return;
                 }
-                TreeIter hide_node = _selected_node;
-                selection._sheets.close_active_files ();
-                if (SheetManager._current_sheets == selection._sheets) {
+                selection.sheets.close_active_files ();
+                if (SheetManager._current_sheets == selection.sheets) {
                     SheetManager.set_sheets (null);
                 }
-                LibPair? parent = get_item (selection._sheets.get_parent_sheets_path ());
+                LibNode? parent = selection.parent;
                 if (parent != null) {
-                    parent._sheets.add_hidden_item (selection._path);
+                    parent.sheets.add_hidden_item (selection.path);
                 }
-                remove_children (selection._path);
+                remove_children (selection.path);
                 _all_sheets.remove (selection);
-                _lib_store.remove (ref hide_node);
+                remove_node_from_store (selection);
                 settings.writing_changed ();
             });
             _context_actions.add_action (hide_folder);
@@ -787,12 +919,12 @@ namespace ThiefMD.Widgets {
             var reveal_hidden = new GLib.SimpleAction ("reveal_hidden", null);
             reveal_hidden.activate.connect ((parameter) => {
                 var settings = AppSettings.get_default ();
-                LibPair? selection = current_selection ();
+                LibNode? selection = current_selection ();
                 if (selection == null) {
                     return;
                 }
-                selection._sheets.remove_hidden_items ();
-                parse_dir (selection._sheets, selection._path, _selected_node);
+                selection.sheets.remove_hidden_items ();
+                rebuild_children (selection);
                 settings.writing_changed ();
             });
             _context_actions.add_action (reveal_hidden);
@@ -809,724 +941,49 @@ namespace ThiefMD.Widgets {
             var remove_action = new GLib.SimpleAction ("remove", null);
             remove_action.activate.connect ((parameter) => {
                 var settings = AppSettings.get_default ();
-                LibPair? selection = current_selection ();
+                LibNode? selection = current_selection ();
                 if (selection == null) {
                     return;
                 }
-                TreeIter remove_node = _selected_node;
-                selection._sheets.close_active_files ();
-                if (SheetManager._current_sheets == selection._sheets) {
+                selection.sheets.close_active_files ();
+                if (SheetManager._current_sheets == selection.sheets) {
                     SheetManager.set_sheets (null);
                 }
-                remove_children (selection._path);
+                remove_children (selection.path);
                 _all_sheets.remove (selection);
-                settings.remove_from_library (selection._path);
-                _lib_store.remove (ref remove_node);
+                settings.remove_from_library (selection.path);
+                remove_node_from_store (selection);
                 settings.writing_changed ();
             });
             _context_actions.add_action (remove_action);
         }
 
         private void set_selected_icon (string icon_value) {
-            LibPair? selection = current_selection ();
+            LibNode? selection = current_selection ();
             if (selection == null) {
                 return;
             }
 
-            selection._sheets.metadata.icon = icon_value;
-            selection._sheets.persist_metadata ();
+            selection.sheets.metadata.icon = icon_value;
+            selection.sheets.persist_metadata ();
+            selection.icon = get_icon_for_value (icon_value);
             var settings = AppSettings.get_default ();
-            _lib_store.set (selection._iter, 2, get_icon_for_value (icon_value), -1);
             settings.writing_changed ();
+            _list_view.queue_draw ();
         }
 
         private void show_new_folder_popover () {
             Gdk.Rectangle rect = _last_menu_rect;
-            if (!_has_last_menu_rect && _selected != null) {
-                TreePath? tree_path = _lib_store.get_path (_selected_node);
-                if (tree_path != null) {
-                    Rectangle r;
-                    this.get_cell_area (tree_path, null, out r);
-                    rect = r;
-                }
+            if (!_has_last_menu_rect) {
+                rect = Gdk.Rectangle ();
+                rect.x = 0;
+                rect.y = 0;
+                rect.width = 1;
+                rect.height = 1;
             }
             folder_popup.set_pointing_to (rect);
-            folder_popup.set_parent (this);
+            folder_popup.set_parent (_list_view);
             folder_popup.popup ();
         }
-
-        private string tree_path_to_string (TreePath path) {
-            string? s = path.to_string ();
-            return (s != null) ? s : "<null>";
-        }
-
-        private bool highlight_hover_row (double x, double y) {
-            TreePath dest_path;
-            TreeViewDropPosition pos;
-            if (get_dest_row_at_pos ((int) x, (int) y, out dest_path, out pos)) {
-                debug ("Highlight row path=%s pos=%d", tree_path_to_string (dest_path), (int) pos);
-
-                // Capture current selection once when hover starts
-                if (!_has_hover_row) {
-                    TreeModel model = get_model ();
-                    TreeIter current_iter;
-                    if (get_selection ().get_selected (out model, out current_iter)) {
-                        _saved_selection_path = model.get_path (current_iter);
-                    }
-                }
-
-                // Temporarily select the hover row without triggering selection side-effects
-                _suppress_selection = true;
-                get_selection ().select_path (dest_path);
-                _suppress_selection = false;
-
-                apply_hover_css (true);
-
-                _hover_path = dest_path.copy ();
-                _has_hover_row = true;
-                return true;
-            }
-
-            debug ("Highlight miss at x=%.2f y=%.2f", x, y);
-            return false;
-        }
-
-        private void clear_hover_highlight () {
-            if (_has_hover_row) {
-                debug ("Clearing hover highlight");
-
-                // Restore prior selection if we changed it for hover
-                if (_saved_selection_path != null) {
-                    _suppress_selection = true;
-                    get_selection ().select_path (_saved_selection_path);
-                    _suppress_selection = false;
-                    _saved_selection_path = null;
-                }
-
-                apply_hover_css (false);
-
-                _hover_path = null;
-                _has_hover_row = false;
-            }
-        }
-
-        // Apply a hover class to the treeview so theme CSS can style hovered drop targets.
-        // The class name should be defined in the app stylesheet (UI-controlled colors).
-        private void apply_hover_css (bool enable) {
-            // Avoid recreating providers repeatedly
-            if (_hover_css == null) {
-                _hover_css = new Gtk.CssProvider ();
-                // Minimal rule; actual colors come from theme via class name selectors
-                // Class name: .library-drop-hover { }
-                _hover_css.load_from_data ((uint8[]) ".library-drop-hover{}".data);
-            }
-
-            var style_context = this.get_style_context ();
-            if (enable) {
-                style_context.add_class ("library-drop-hover");
-                var display = Gdk.Display.get_default ();
-                if (display != null) {
-                    Gtk.StyleContext.add_provider_for_display (display, _hover_css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-                }
-            } else {
-                style_context.remove_class ("library-drop-hover");
-            }
-        }
-
-        #if false
-        // GTK4 TODO: context menu and drag-and-drop not yet reimplemented
-        public override bool button_press_event (Gdk.EventButton event) {
-            base.button_press_event (event);
-
-            if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3) {
-                var settings = AppSettings.get_default ();
-                Gtk.Menu menu = new Gtk.Menu ();
-
-                Gtk.MenuItem menu_preview_item = new Gtk.MenuItem.with_label (_("Export Preview"));
-                menu_preview_item.activate.connect (() => {
-                    if (_selected != null && _all_sheets.find (_selected) != null) {
-                        string preview_markdown = build_novel (_selected, settings.export_include_metadata_file);
-                        PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown, render_fountain (_selected));
-                        ppw.show ();
-                    }
-                });
-                menu.add (menu_preview_item);
-
-                Gtk.MenuItem menu_writing_stats = new Gtk.MenuItem.with_label (_("Writing Statistics"));
-                menu_writing_stats.activate.connect (() => {
-                    if (_selected != null && _all_sheets.find (_selected) != null) {
-                        ProjectStatitics project_stat_window = new ProjectStatitics (_selected._path);
-                        project_stat_window.show_all ();
-                        project_stat_window.update_wordcount ();
-                    }
-                });
-                menu.add (menu_writing_stats);
-
-                menu.add (new Gtk.SeparatorMenuItem ());
-
-                if (_selected != null && _all_sheets.find (_selected) != null) {
-                    Gtk.MenuItem menu_search = new Gtk.MenuItem.with_label (_("Search ") + _selected._title);
-                    menu_search.activate.connect (() => {
-                        if (_selected != null && _all_sheets.find (_selected) != null) {
-                            SearchWindow project_search_window = new SearchWindow (_selected._path);
-                            project_search_window.show_all ();
-                        }
-                    });
-                    menu.add (menu_search);
-
-                    menu.add (new Gtk.SeparatorMenuItem ());
-                }
-
-                Gtk.MenuItem menu_open_item = new Gtk.MenuItem.with_label (_("Open in File Manager"));
-                menu_open_item.activate.connect (() => {
-                    if (_selected != null && _all_sheets.find (_selected) != null) {
-                        try {
-                            AppInfo.launch_default_for_uri ("file://%s".printf (_selected._path), null);
-                        } catch (Error e) {
-                            warning ("Could not open folder: %s", e.message);
-                        }
-                    }
-                });
-                menu.add (menu_open_item);
-
-                Gtk.MenuItem menu_add_item = new Gtk.MenuItem.with_label (_("Create Sub-Folder"));
-                menu_add_item.activate.connect (() => {
-                    if (_selected != null && _all_sheets.find (_selected) != null) {
-                        TreePath? tree_path = _lib_store.get_path (_selected_node);
-                        Rectangle r;
-                        this.get_cell_area (tree_path, null, out r);
-                        r.x += settings.view_library_width / 2;
-                        r.y += 20;
-                        folder_popup.set_pointing_to (r);
-                        folder_popup.set_relative_to (this);
-                        folder_popup.popup ();
-                        //ThiefApp.get_instance ().refresh_library ();
-                    }
-                });
-                menu.add (menu_add_item);
-
-                if (_selected != null && !settings.is_in_library (_selected._path)) {
-                    Gtk.MenuItem menu_hide_item = new Gtk.MenuItem.with_label (_("Hide from Library"));
-                    menu_hide_item.activate.connect (() => {
-                        TreeIter hide_node = _selected_node;
-                        if (_selected != null && _all_sheets.find (_selected) != null) {
-                            debug ("Hiding %s", _selected._path);
-                            _selected._sheets.close_active_files ();
-                            if (SheetManager._current_sheets == _selected._sheets) {
-                                SheetManager.set_sheets (null);
-                            }
-                            LibPair? parent = get_item (_selected._sheets.get_parent_sheets_path ());
-                            if (parent != null) {
-                                parent._sheets.add_hidden_item (_selected._path);
-                            }
-                            // Always touch lib store last as it changes selection
-                            remove_children (_selected._path);
-                            _all_sheets.remove (_selected);
-                            _lib_store.remove (ref hide_node);
-                            settings.writing_changed ();
-                        }
-                    });
-
-                    menu.add (menu_hide_item);
-                }
-
-                Gtk.MenuItem menu_reveal_items = new Gtk.MenuItem.with_label (_("Show Hidden Items"));
-                menu_reveal_items.activate.connect (() => {
-                    if (_selected != null && _all_sheets.find (_selected) != null) {
-                        _selected._sheets.remove_hidden_items ();
-                        parse_dir (_selected._sheets, _selected._path, _selected_node);
-                    }
-                    settings.writing_changed ();
-                });
-                menu.add (menu_reveal_items);
-
-                if (_selected != null && _all_sheets.find (_selected) != null) {
-                    menu.add (new Gtk.SeparatorMenuItem ());
-                    Gtk.MenuItem set_icon = new Gtk.MenuItem.with_label (_("Set Project Icon"));
-                    Gtk.Menu icon_menu = new Gtk.Menu ();
-                    {
-                        var no_icon = set_icon_option (_("None"), "", _selected._sheets);
-                        icon_menu.add (no_icon);
-
-                        var folder_icon = set_icon_option (_("Folder"), "folder", _selected._sheets);
-                        icon_menu.add (folder_icon);
-
-                        var reader_icon = set_icon_option (_("Reader"), "ephy-reader-mode-symbolic", _selected._sheets);
-                        icon_menu.add (reader_icon);
-
-                        var love_icon = set_icon_option (_("Love"), "emote-love-symbolic", _selected._sheets);
-                        icon_menu.add (love_icon);
-
-                        var game_icon = set_icon_option (_("Game"), "applications-games-symbolic", _selected._sheets);
-                        icon_menu.add (game_icon);
-                        
-                        var art_icon = set_icon_option (_("Art"), "applications-graphics-symbolic", _selected._sheets);
-                        icon_menu.add (art_icon);
-
-                        var nature_icon = set_icon_option (_("Nature"), "emoji-nature-symbolic", _selected._sheets);
-                        icon_menu.add (nature_icon);
-
-                        var food_icon = set_icon_option (_("Food"), "emoji-food-symbolic", _selected._sheets);
-                        icon_menu.add (food_icon);
-
-                        var help_icon = set_icon_option (_("Help"), "system-help-symbolic", _selected._sheets);
-                        icon_menu.add (help_icon);
-
-                        var cool_icon = set_icon_option (_("Cool"), "face-cool-symbolic", _selected._sheets);
-                        icon_menu.add (cool_icon);
-
-                        var angel_icon = set_icon_option (_("Angel"), "face-angel-symbolic", _selected._sheets);
-                        icon_menu.add (angel_icon);
-
-                        var monkey_icon = set_icon_option (_("Monkey"), "face-monkey-symbolic", _selected._sheets);
-                        icon_menu.add (monkey_icon);
-
-                        var wordpress_icon = set_icon_option (_("WordPress"), "/com/github/kmwallio/thiefmd/icons/wordpress.png", _selected._sheets);
-                        icon_menu.add (wordpress_icon);
-
-                        var ghost_icon = set_icon_option (_("Ghost"), "/com/github/kmwallio/thiefmd/icons/ghost.png", _selected._sheets);
-                        icon_menu.add (ghost_icon);
-
-                        var writefreely_icon = set_icon_option (_("Write Freely"), "/com/github/kmwallio/thiefmd/icons/wf.png", _selected._sheets);
-                        icon_menu.add (writefreely_icon);
-
-                        var trash_icon = set_icon_option (_("Trash"), "user-trash-symbolic", _selected._sheets);
-                        icon_menu.add (trash_icon);
-                    }
-                    set_icon.submenu = icon_menu;
-                    menu.add (set_icon);
-                }
-
-                if (_selected != null && settings.is_in_library (_selected._path)) {
-                    menu.add (new Gtk.SeparatorMenuItem ());
-
-                    Gtk.MenuItem menu_remove_item = new Gtk.MenuItem.with_label (_("Remove from Library"));
-                    menu_remove_item.activate.connect (() => {
-                        TreeIter remove_node = _selected_node;
-                        if (_selected != null && _all_sheets.find (_selected) != null) {
-                            debug ("Removing %s", _selected._path);
-                            _selected._sheets.close_active_files ();
-                            if (SheetManager._current_sheets == _selected._sheets) {
-                                SheetManager.set_sheets (null);
-                            }
-                            // Always touch lib store last as it changes selection
-                            remove_children (_selected._path);
-                            _all_sheets.remove (_selected);
-                            settings.remove_from_library (_selected._path);
-                            _lib_store.remove (ref remove_node);
-                            settings.writing_changed ();
-                        }
-                    });
-                    menu.add (menu_remove_item);
-                }
-
-                menu.attach_to_widget (this, null);
-                menu.show_all ();
-                menu.popup_at_pointer (event);
-            } else if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 1) {
-                UI.show_sheets ();
-            }
-            return true;
-        }
-        #endif
-
-        private void on_selection (TreeSelection selected) {
-            TreeModel model;
-            TreeIter iter;
-            if (selected.get_selected (out model, out iter)) {
-                if (_suppress_selection) {
-                    return;
-                }
-                LibPair p = convert_selection (model, iter);
-                _selected = p;
-                _selected_node = iter;
-                debug ("Selected: %s", p._path);
-                SheetManager.set_sheets(p._sheets);
-                return;
-            }
-        }
-
-        private LibPair convert_selection (TreeModel model, TreeIter iter) {
-            LibPair p;
-            string title = "";
-            model.get (iter, 0, out title, 1, out p);
-            return p;
-        }
-
-        private bool handle_drop (string source_path, double x, double y) {
-            if (!_droppable.can_get_drop ()) {
-                return false;
-            }
-
-            TreeModel model = get_model ();
-            TreePath dest_path;
-            TreeViewDropPosition pos;
-            if (!get_dest_row_at_pos ((int) x, (int) y, out dest_path, out pos)) {
-                return false;
-            }
-
-            TreeIter dest_iter;
-            if (!model.get_iter (out dest_iter, dest_path)) {
-                return false;
-            }
-
-            LibPair dest = convert_selection (model, dest_iter);
-            LibPair? source = get_item (source_path);
-            if (dest == null) {
-                return false;
-            }
-
-            File source_file = File.new_for_path (source_path);
-            if (!source_file.query_exists ()) {
-                return false;
-            }
-
-            // Handle file moves into a library folder (e.g., sheets dragged from sheet list)
-            if (!FileUtils.test (source_path, FileTest.IS_DIR)) {
-                string dest_file_path = Path.build_filename (dest._path, source_file.get_basename ());
-                string source_basename = source_file.get_basename ();
-
-                // No-op if already in target folder
-                File? src_parent = source_file.get_parent ();
-                if (src_parent != null && src_parent.get_path () == dest._path) {
-                    return false;
-                }
-
-                try {
-                    FileManager.move_item (source_path, dest._path);
-                    File notes_page = File.new_for_path (source_path + ".notes");
-                    if (notes_page.query_exists ()) {
-                        FileManager.move_item (notes_page.get_path (), dest._path);
-                    }
-                } catch (Error e) {
-                    warning ("Failed to move %s to %s: %s", source_path, dest_file_path, e.message);
-                    return false;
-                }
-
-                // Update source and destination metadata/orders
-                Sheets? src_sheets = find_sheets_for_path (source_path);
-                if (src_sheets != null) {
-                    src_sheets.metadata.sheet_order.remove (source_basename);
-                    src_sheets.persist_metadata ();
-                    src_sheets.refresh ();
-                }
-                dest._sheets.metadata.add_sheet (source_basename);
-                dest._sheets.persist_metadata ();
-                dest._sheets.refresh ();
-                return true;
-            }
-
-            if (source == null) {
-                return false;
-            }
-
-            // Only reorder siblings inside the same parent directory
-            File src_file = File.new_for_path (source._path);
-            File dest_file = File.new_for_path (dest._path);
-            File? src_parent = src_file.get_parent ();
-            File? dest_parent = dest_file.get_parent ();
-            if (src_parent == null || dest_parent == null || src_parent.get_path () != dest_parent.get_path ()) {
-                return false;
-            }
-
-            LibPair? parent = get_item (src_parent.get_path ());
-            if (parent == null) {
-                return false;
-            }
-
-            if (pos == TreeViewDropPosition.AFTER || pos == TreeViewDropPosition.INTO_OR_AFTER) {
-                parent._sheets.move_folder_after (dest_file.get_basename (), src_file.get_basename ());
-                _lib_store.move_after (ref source._iter, dest_iter);
-            } else {
-                parent._sheets.move_folder_before (dest_file.get_basename (), src_file.get_basename ());
-                _lib_store.move_before (ref source._iter, dest_iter);
-            }
-
-            // Keep selection on the moved item
-            TreePath? new_path = _lib_store.get_path (source._iter);
-            if (new_path != null) {
-                set_cursor (new_path, null, false);
-            }
-
-            return true;
-        }
-
-        //
-        // @TODO: GTK4 Drag and Drop Support
-        //
-        /*
-        // Highlight current tree item sheet is over
-        private bool on_drag_motion (
-            Widget widget,
-            DragContext context,
-            int x,
-            int y,
-            uint time)
-        {
-            return false;
-        }
-
-
-        private void on_drag_leave (Widget widget, DragContext context, uint time) {
-            debug ("%s: on_drag_leave", widget.name);
-        }
-
-        private bool on_drag_drop (
-            Widget widget,
-            DragContext context,
-            int x,
-            int y,
-            uint time)
-        {
-            debug ("%s: on_drag_drop", widget.name);
-
-            TreePath? path;
-            TreeViewDropPosition pos;
-            bool is_valid_drop_site = false;
-
-            if ((context.list_targets() != null) &&
-                 get_dest_row_at_pos (x, y, out path, out pos)) 
-            {
-                var target_type = (Atom) context.list_targets().nth_data (Target.STRING);
-
-                debug ("Requested STRING, got: %s", target_type.name());
-
-                if (!target_type.name ().ascii_up ().contains ("STRING"))
-                {
-                    target_type = (Atom) context.list_targets().nth_data (Target.URI);
-                    debug ("Requested URI, got: %s", target_type.name());
-                }
-
-                // Request the data from the source.
-                Gtk.drag_get_data (
-                    widget,         // will receive 'drag_data_received' signal
-                    context,        // represents the current state of the DnD
-                    target_type,    // the target type we want
-                    time            // time stamp
-                    );
-
-                is_valid_drop_site = true;
-            }
-
-            return is_valid_drop_site;
-        }
-
-        private void move_folder (
-            ref TreeIter source_iter,
-            ref TreeIter dest_iter,
-            LibPair source,
-            LibPair dest,
-            TreeViewDropPosition pos)
-        {
-            if (source == null || dest == null) {
-                warning ("Could not determine drag source or destination");
-                return;
-            }
-
-            File p1 = File.new_for_path (source._path);
-            File p2 = File.new_for_path (dest._path);
-
-            if (p1.get_parent ().get_path () != p2.get_parent ().get_path ()) {
-                warning ("Can only reorder library items for items at the same level");
-                return;
-            }
-
-            LibPair parent = get_item (p1.get_parent ().get_path ());
-            if (parent == null) {
-                warning ("Could not find parent metadata file");
-                return;
-            }
-
-            if (pos == TreeViewDropPosition.AFTER || pos == TreeViewDropPosition.INTO_OR_AFTER) {
-                debug ("Moving %s after %s", source._path, dest._path);
-                parent._sheets.move_folder_after (p2.get_basename (), p1.get_basename ());
-                _lib_store.move_after (ref source_iter, dest_iter);
-            } else {
-                debug ("Moving %s before %s", source._path, dest._path);
-                parent._sheets.move_folder_before (p2.get_basename (), p1.get_basename ());
-                _lib_store.move_before (ref source_iter, dest_iter);
-            }
-        }
-
-        private void on_drag_data_received (
-            Widget widget,
-            DragContext context,
-            int x,
-            int y,
-            SelectionData selection_data,
-            uint target_type,
-            uint time)
-        {
-            debug ("%s: on_drag_data_received", widget.name);
-            if (!_droppable.can_get_drop ()) {
-                Gtk.drag_finish (context, false, false, time);
-                return;
-            }
-
-            bool dnd_success = false;
-            bool delete_selection_data = false;
-            bool item_in_library = false;
-            string file_to_move = "";
-            File? file = null;
-            TreePath? path;
-            TreeViewDropPosition pos;
-            TreeIter dest_iter;
-            LibPair? p = null;
-
-            if (get_dest_row_at_pos (x, y, out path, out pos)){
-                string title;
-                _lib_store.get_iter (out dest_iter, path);
-                _lib_store.get (dest_iter, 0, out title, 1, out p);
-                debug ("Got location %s", p._path);
-                if (selection_data == null || selection_data.get_length () < 0) {
-                    move_folder (ref _selected_node, ref dest_iter, _selected, p, pos);
-                    Gtk.drag_finish (context, false, false, time);
-                    return;
-                }
-            }
-
-            // Deal with what we are given from source
-            if ((selection_data != null) && (selection_data.get_length() >= 0)) 
-            {
-                if (context.get_suggested_action() == DragAction.MOVE)
-                {
-                    delete_selection_data = true;
-                }
-
-                file = dnd_get_file (selection_data, target_type);
-                debug ("Got drag data: %s", file.get_path ());
-                file_to_move = file.get_path ();
-                item_in_library = file_in_library (file_to_move);
-
-                debug ("Item in library: %s", item_in_library ? "yes" : "no");
-
-                if (item_in_library && delete_selection_data && !FileUtils.test(file_to_move, FileTest.IS_DIR))
-                {
-                    dnd_success = true;
-                }
-            }
-
-            // This isn't in our library, check if it's a folder or file
-            if (!item_in_library)
-            {
-                debug ("Item not in library");
-                delete_selection_data = false;
-                dnd_success = false;
-                if (file.query_exists ())
-                {
-                    debug ("Item found");
-                    if (FileUtils.test(file_to_move, FileTest.IS_DIR))
-                    {
-                        var settings = AppSettings.get_default ();
-                        // Just add to library, no prompt 😅
-                        if (settings.add_to_library (file_to_move))
-                        {
-                            ThiefApp instance = ThiefApp.get_instance ();
-                            instance.refresh_library ();
-                        }
-                    }
-                    else
-                    {
-                        // Requires path to drag to
-                        if (p == null) {
-                            Gtk.drag_finish (context, false, false, time);
-                            return;
-                        }
-
-                        if (can_open_file (file_to_move)) {
-                            debug ("Prompting for action");
-                            Dialog prompt = new Dialog.with_buttons (
-                                "Move into Library",
-                                ThiefApp.get_instance (),
-                                DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                _("Copy"),
-                                Gtk.ResponseType.NO,
-                                _("Move"),
-                                Gtk.ResponseType.YES);
-
-                            prompt.response.connect((response_id) =>
-                            {
-                                prompt.close();
-                                if (response_id == Gtk.ResponseType.NO)
-                                {
-                                    try
-                                    {
-                                        debug ("Copying %s to %s", file_to_move, p._path);
-                                        FileManager.copy_item (file_to_move, p._path);
-                                    }
-                                    catch (Error e)
-                                    {
-                                        warning ("Hit failure trying to move item in library: %s", e.message);
-                                    }
-                                }
-                                else if (response_id == Gtk.ResponseType.YES)
-                                {
-                                    try
-                                    {
-                                        debug ("Moving %s to %s", file_to_move, p._path);
-                                        FileManager.move_item (file_to_move, p._path);
-                                    }
-                                    catch (Error e)
-                                    {
-                                        warning ("Hit failure trying to move item in library: %s", e.message);
-                                    }
-                                }
-                                refresh_sheets (p._path);
-                            });
-
-                            prompt.show_all ();
-                        } else {
-                            warning ("Importing file");
-                            FileManager.import_file (file.get_path (), p._sheets);
-                            parse_dir (_selected._sheets, _selected._path, _selected_node);
-                        }
-                    }
-                }
-                else
-                {
-                    warning ("Item not found");
-                }
-            }
-
-            // Default behavior
-            if (dnd_success)
-            {
-                // Requires path to drag to
-                if (p == null) {
-                    Gtk.drag_finish (context, false, false, time);
-                    return;
-                }
-
-                try
-                {
-                    debug ("Moving %s to %s", file_to_move, p._path);
-                    FileManager.move_item (file_to_move, p._path);
-                    File notes_page = File.new_for_path (file_to_move + ".notes");
-                    if (notes_page.query_exists ()) {
-                        FileManager.move_item (notes_page.get_path (), p._path);
-                    }
-                    refresh_sheets (p._path);
-                    File? parent = file.get_parent ();
-                    if (parent != null)
-                    {
-                        refresh_sheets (parent.get_path ());
-                    }
-                    UI.set_sheets (SheetManager.get_sheets ());
-                }
-                catch (Error e)
-                {
-                    warning ("Hit failure trying to move item in library: %s", e.message);
-                    delete_selection_data = false;
-                    dnd_success = false;
-                }
-            }
-            else
-            {
-                delete_selection_data = false;
-            }
-
-            Gtk.drag_finish (context, dnd_success, delete_selection_data, time);
-        }
-        */
     }
 }
