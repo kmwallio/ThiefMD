@@ -27,6 +27,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 using ThiefMD.Controllers;
+using Adw;
 
 namespace ThiefMD {
     namespace Widgets {
@@ -163,7 +164,7 @@ namespace ThiefMD {
         }
     }
 
-    public class ThiefApp : Hdy.ApplicationWindow {
+    public class ThiefApp : Adw.ApplicationWindow {
         public int pane_position = 200;
         public Notes notes;
         public Library library;
