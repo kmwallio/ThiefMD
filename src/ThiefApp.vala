@@ -244,7 +244,7 @@ namespace ThiefMD {
             library_split = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             library_split.hexpand = true;
             library_split.vexpand = true;
-            library_split.set_shrink_start_child (true);
+            library_split.set_shrink_start_child (false);
             library_split.set_shrink_end_child (true);
             library_split.set_resize_start_child (true);
             library_split.set_resize_end_child (true);
@@ -279,11 +279,11 @@ namespace ThiefMD {
                 }
 
                 int new_library_width = current_pos;
-                if (new_library_width < 50) {
-                    new_library_width = 50;
+                if (new_library_width < 150) {
+                    new_library_width = 150;
                 }
 
-                int max_library_width = stack_width - 50;
+                int max_library_width = stack_width - 150;
                 if (max_library_width < 50) {
                     max_library_width = 50;
                 }
