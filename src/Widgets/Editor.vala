@@ -112,6 +112,13 @@ namespace ThiefMD.Widgets {
                 pointer_down = true;
             });
             click_controller.released.connect ((n_press, x, y) => {
+                // Check for Ctrl+Click on markdown links
+                var event = click_controller.get_current_event ();
+                if (event != null && markdown != null) {
+                    var state = event.get_modifier_state ();
+                    markdown.handle_click (x, y, state);
+                }
+                
                 pointer_down = false;
                 GLib.Idle.add (() => {
                     if (settings.typewriter_scrolling) {

@@ -344,20 +344,23 @@ namespace ThiefMD.Enrichments {
             checking_copy = "";
         }
 
-        /*public bool is_linked_clicked (Gdk.EventButton event) {
-            if ((event.state & Gdk.ModifierType.BUTTON1_MASK) != 0 && !buffer.has_selection && (event.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
-                markdown.link_clicked ();
+        public void handle_click (double x, double y, Gdk.ModifierType state) {
+            // Only handle clicks with Ctrl held and no selection
+            if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && !buffer.has_selection) {
+                warning ("Ctrl+Click detected at coordinates: (%f, %f)", x, y);
+                // Convert click coordinates to text position
+                Gtk.TextIter click_iter;
+                int buffer_x, buffer_y;
+                view.window_to_buffer_coords (Gtk.TextWindowType.WIDGET, (int)x, (int)y, out buffer_x, out buffer_y);
+                view.get_iter_at_location (out click_iter, buffer_x, buffer_y);
+                link_clicked_at_iter (click_iter);
             }
-
-            return false;
         }
 
-        public void link_clicked () {
-            Gtk.TextIter cursor_location;
-            var cursor = buffer.get_insert ();
-            buffer.get_iter_at_mark (out cursor_location, cursor);
+        public void link_clicked_at_iter (Gtk.TextIter cursor_location) {
+            warning ("Checking for link at cursor offset: %d", cursor_location.get_offset ());
             if (cursor_location.has_tag (markdown_link) || cursor_location.has_tag (markdown_url)) {
-                warning ("at url");
+                warning ("Link tag found at click location. Attempting to extract URL...");
                 //
                 // Get into markdown_url
                 //
@@ -367,6 +370,8 @@ namespace ThiefMD.Enrichments {
                     }
                 }
 
+                warning ("Extracting URL from markdown tag...");
+
                 Gtk.TextIter start, end;
                 buffer.get_iter_at_offset (out start, cursor_location.get_offset ());
                 buffer.get_iter_at_offset (out end, cursor_location.get_offset ());
@@ -375,9 +380,12 @@ namespace ThiefMD.Enrichments {
                         return;
                     }
                 }
+                warning ("Moved to start of URL tag. Moving forward to start of URL text...");
                 if (!start.forward_chars (2)) {
                     return;
                 }
+
+                warning ("Extracting URL text...");
 
                 //
                 // Markdown could end with URL, so it's fine to not be able to go foward
@@ -387,11 +395,14 @@ namespace ThiefMD.Enrichments {
                         break;
                     }
                 }
+                warning ("Moved to end of URL tag. Extracting text between offsets %d and %d", start.get_offset (), end.get_offset ());
 
                 // If at end of doc check
                 if (!end.backward_char ()) {
                     return;
                 }
+
+                warning ("Checking if URL ends with ')', which is common in markdown links. If not, adjusting end position...");
 
                 // We weren't at the end, go back one more
                 if (end.get_char () != ')') {
@@ -400,12 +411,15 @@ namespace ThiefMD.Enrichments {
                     }
                 }
 
+                warning ("Final URL extraction offsets: %d to %d", start.get_offset (), end.get_offset ());
+
                 // Illegal state
                 if (end.get_offset () <= start.get_offset ()) {
                     return;
                 }
 
                 string url = buffer.get_text (start, end, true);
+                warning ("URL Clicked: %s", url);
                 if (url.has_prefix ("https:") || url.has_prefix ("http:") || url.has_prefix ("mailto:") || url.has_prefix ("ftp:") ||
                     url.has_prefix ("sftp:"))
                 {
@@ -414,11 +428,10 @@ namespace ThiefMD.Enrichments {
                     } catch (Error e) {
                         warning ("No app to handle urls: %s", e.message);
                     }
+                    return;
                 }
-                string possible = try_possible_urls (url);
-                warning ("trying %s", url);
+                string possible = get_possible_markdown_url (url);
                 if (possible != "") {
-                    warning ("Found %s", possible);
                     var thief_instance = ThiefApp.get_instance ();
                     if (thief_instance.library.file_in_library (possible)) {
                         var load_sheet = thief_instance.library.find_sheet_for_path (possible);
@@ -435,14 +448,24 @@ namespace ThiefMD.Enrichments {
                                 warning ("No app to handle urls: %s", e.message);
                             }
                         }
-                    } else {
-                        warning ("File not in library");
                     }
                 }
-            } else {
-                warning ("Not at url");
             }
-        }*/
+            else
+            {
+                // log text around click
+                var next = cursor_location.copy ();
+                next.forward_line ();
+                warning ("No link at click location. Text around click: %s", buffer.get_text (cursor_location, next, true));
+            }
+        }
+
+        public void link_clicked () {
+            Gtk.TextIter cursor_location;
+            var cursor = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_location, cursor);
+            link_clicked_at_iter (cursor_location);
+        }
 
         private void update_link_text (Gtk.TextIter start_region, Gtk.TextIter end_region) {
             var settings = AppSettings.get_default ();
