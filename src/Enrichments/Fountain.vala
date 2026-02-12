@@ -505,9 +505,55 @@ namespace ThiefMD.Enrichments {
 
             completion_key_controller = new Gtk.EventControllerKey ();
             completion_key_controller.key_released.connect ((keyval, _keycode, _state) => {
-                if (completion_limit.can_do_action ()) {
+                // If popup is visible, update it as they type
+                if (completion_popover != null && completion_popover.get_visible ()) {
+                    uint32 unicode_char = Gdk.keyval_to_unicode (keyval);
+                    // Continue updating for uppercase letters, backspace, delete
+                    if ((unicode_char >= 'A' && unicode_char <= 'Z') || 
+                        keyval == Gdk.Key.BackSpace || keyval == Gdk.Key.Delete) {
+                        if (completion_limit.can_do_action ()) {
+                            maybe_update_character_completion ();
+                        }
+                    }
+                } else if (completion_limit.can_do_action ()) {
+                    // Show popup if not visible
                     maybe_show_character_completion (keyval);
                 }
+            });
+            completion_key_controller.key_pressed.connect ((keyval, _keycode, _state) => {
+                // Dismiss popup if user types something that would break character context
+                if (completion_popover != null && completion_popover.get_visible ()) {
+                    // Check if the keypress would invalidate the character context
+                    uint32 unicode_char = Gdk.keyval_to_unicode (keyval);
+                    if (unicode_char != 0) {
+                        // Lowercase letters break character names (which must be uppercase)
+                        if (unicode_char >= 'a' && unicode_char <= 'z') {
+                            debug ("Fountain completion: dismissing popup - lowercase typed");
+                            completion_popover.popdown ();
+                            view.set_data<bool> ("completion-active", false);
+                            return false;
+                        }
+                        // Newline dismisses the popup
+                        if (unicode_char == '\n' || unicode_char == '\r') {
+                            debug ("Fountain completion: dismissing popup - newline typed");
+                            completion_popover.popdown ();
+                            view.set_data<bool> ("completion-active", false);
+                            return false;
+                        }
+                    }
+                    // Navigation and special keys dismiss
+                    if (keyval == Gdk.Key.Escape || keyval == Gdk.Key.Left || 
+                        keyval == Gdk.Key.Right || keyval == Gdk.Key.Up || 
+                        keyval == Gdk.Key.Down || keyval == Gdk.Key.Home || 
+                        keyval == Gdk.Key.End || keyval == Gdk.Key.Page_Up || 
+                        keyval == Gdk.Key.Page_Down) {
+                        debug ("Fountain completion: dismissing popup - navigation key pressed");
+                        completion_popover.popdown ();
+                        view.set_data<bool> ("completion-active", false);
+                        return keyval == Gdk.Key.Escape;
+                    }
+                }
+                return false;
             });
             view.add_controller (completion_key_controller);
 
@@ -534,6 +580,36 @@ namespace ThiefMD.Enrichments {
             }
 
             debug ("Fountain completion: showing popup for prefix '%s'", prefix);
+            // Disable typewriter scrolling immediately to prevent scrolling before popup appears
+            view.set_data<bool> ("completion-active", true);
+            show_custom_completion_popup (prefix, prefix_start);
+        }
+
+        private void maybe_update_character_completion () {
+            if (view == null || buffer == null) {
+                return;
+            }
+
+            Gtk.TextIter iter;
+            var cursor = buffer.get_insert ();
+            buffer.get_iter_at_mark (out iter, cursor);
+
+            Gtk.TextIter prefix_start;
+            string prefix;
+            if (!is_character_context (iter, out prefix_start, out prefix, 2)) {
+                debug ("Fountain completion: no longer in character context, dismissing");
+                if (completion_popover != null) {
+                    completion_popover.popdown ();
+                }
+                view.set_data<bool> ("completion-active", false);
+                return;
+            }
+
+            debug ("Fountain completion: updating popup for prefix '%s'", prefix);
+            // Close existing popup and show updated one
+            if (completion_popover != null) {
+                completion_popover.popdown ();
+            }
             show_custom_completion_popup (prefix, prefix_start);
         }
 
@@ -575,6 +651,7 @@ namespace ThiefMD.Enrichments {
 
             if (characters.size == 0) {
                 debug ("Fountain completion: no matches for prefix '%s'", prefix);
+                view.set_data<bool> ("completion-active", false);
                 return;
             }
 
@@ -591,11 +668,13 @@ namespace ThiefMD.Enrichments {
                 Gtk.TextIter check_prefix_start;
                 string check_prefix;
                 if (!is_character_context (cursor_iter, out check_prefix_start, out check_prefix, 2)) {
+                    view.set_data<bool> ("completion-active", false);
                     return false;
                 }
 
                 if (check_prefix != prefix) {
                     debug ("Fountain completion: prefix changed from '%s' to '%s', not showing popup", prefix, check_prefix);
+                    view.set_data<bool> ("completion-active", false);
                     return false;
                 }
 
@@ -629,12 +708,22 @@ namespace ThiefMD.Enrichments {
                         buffer.begin_user_action ();
                         buffer.delete (ref start_iter, ref current_cursor_iter);
                         buffer.insert (ref start_iter, label.get_text (), label.get_text ().length);
+                        buffer.place_cursor (start_iter);
                         buffer.end_user_action ();
+
+                        // Ensure cursor is visible before re-enabling typewriter scrolling
+                        view.scroll_to_mark (buffer.get_insert (), 0.0, false, 0.0, 0.0);
                     }
-                    view.set_data<bool> ("completion-active", false);
+                    
+                    // Close popover first, then re-enable typewriter scrolling after a brief delay
                     if (completion_popover != null) {
                         completion_popover.popdown ();
                     }
+                    
+                    GLib.Idle.add (() => {
+                        view.set_data<bool> ("completion-active", false);
+                        return false;
+                    });
                 });
 
                 var scrolled = new Gtk.ScrolledWindow ();
@@ -647,8 +736,7 @@ namespace ThiefMD.Enrichments {
                 completion_popover.set_child (scrolled);
                 completion_popover.set_autohide (true);
 
-                // Disable typewriter scrolling while popup is visible
-                view.set_data<bool> ("completion-active", true);
+                // Re-enable typewriter scrolling when popup is closed
                 completion_popover.closed.connect (() => {
                     view.set_data<bool> ("completion-active", false);
                     debug ("Fountain completion: popup closed, typewriter scrolling re-enabled");
@@ -774,10 +862,6 @@ namespace ThiefMD.Enrichments {
         private void calculate_margins () {
             var settings = AppSettings.get_default ();
             int f_w = (int)(settings.get_css_font_size () * ((settings.fullscreen ? 1.4 : 1)));
-            if (completion_popover != null) {
-                completion_popover.unparent ();
-                completion_popover = null;
-            }
 
             int hashtag_w = f_w;
             int space_w = f_w;
