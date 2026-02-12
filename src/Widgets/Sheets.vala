@@ -167,9 +167,14 @@ namespace ThiefMD.Widgets {
             }
             bar_label.xalign = 0;
             bar_label.set_ellipsize (Pango.EllipsizeMode.END);
-            bar.set_title_widget (bar_label);
+            bar_label.set_hexpand (false);
+            bar.pack_start (bar_label);
+            var window_title = new Adw.WindowTitle ("", "");
+            bar.set_title_widget (window_title);
             bar.set_show_start_title_buttons (false);
-            bar.set_show_end_title_buttons (false);
+            // Keep the end container visible for our custom button while hiding window controls
+            bar.set_show_end_title_buttons (true);
+            bar.set_decoration_layout (null);
             bar.width_request = settings.view_sheets_width;
 
             new_sheet = new Gtk.MenuButton ();
