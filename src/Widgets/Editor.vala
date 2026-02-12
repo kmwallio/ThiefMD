@@ -65,6 +65,10 @@ namespace ThiefMD.Widgets {
         private bool grammar_active = false;
         private bool no_hiding = false;
         private bool pointer_down = false;
+        private bool selection_dragging = false;
+        private double drag_start_y = 0.0;
+        private double drag_pointer_y = 0.0;
+        private uint drag_scroll_source = 0;
 
         private Gtk.TextTag focus_text;
         private Gtk.TextTag outoffocus_text;
@@ -119,6 +123,27 @@ namespace ThiefMD.Widgets {
                 });
             });
             this.add_controller (click_controller);
+
+            var drag_controller = new Gtk.GestureDrag ();
+            drag_controller.drag_begin.connect ((start_x, start_y) => {
+                selection_dragging = true;
+                drag_start_y = start_y;
+                drag_pointer_y = start_y;
+                if (drag_scroll_source == 0) {
+                    drag_scroll_source = Timeout.add (30, drag_autoscroll);
+                }
+            });
+            drag_controller.drag_update.connect ((offset_x, offset_y) => {
+                drag_pointer_y = drag_start_y + offset_y;
+            });
+            drag_controller.drag_end.connect ((offset_x, offset_y) => {
+                selection_dragging = false;
+                if (drag_scroll_source != 0) {
+                    Source.remove (drag_scroll_source);
+                    drag_scroll_source = 0;
+                }
+            });
+            this.add_controller (drag_controller);
 
             file_mutex = Mutex ();
             #if false
@@ -1355,12 +1380,16 @@ namespace ThiefMD.Widgets {
 
         public bool move_typewriter_scolling () {
             debug ("move_typewriter_scolling: Called! has_selection=%s", buffer.has_selection.to_string ());
+
+            if (selection_dragging) {
+                return false;
+            }
             
-            if (buffer.has_selection) {
+            if (buffer.has_selection && !selection_dragging) {
                 return false;
             }
 
-            if (pointer_down) {
+            if (pointer_down && !selection_dragging) {
                 return false;
             }
 
@@ -1433,7 +1462,11 @@ namespace ThiefMD.Widgets {
             
             debug ("ensure_cursor_visible: view size w=%d, h=%d", view_width, view_height);
 
-            if (pointer_down) {
+            if (selection_dragging) {
+                return false;
+            }
+
+            if (pointer_down && !selection_dragging) {
                 return false;
             }
             
@@ -1493,6 +1526,52 @@ namespace ThiefMD.Widgets {
                 parent = parent.get_parent ();
             }
             
+            return true;
+        }
+
+        private bool drag_autoscroll () {
+            if (!selection_dragging) {
+                drag_scroll_source = 0;
+                return false;
+            }
+
+            int view_height = this.get_allocated_height ();
+            if (view_height <= 0) {
+                return true;
+            }
+
+            const int edge_px = 28;
+            const double scroll_step = 14.0;
+
+            double direction = 0.0;
+            if (drag_pointer_y < edge_px) {
+                direction = -scroll_step;
+            } else if (drag_pointer_y > view_height - edge_px) {
+                direction = scroll_step;
+            }
+
+            if (direction == 0.0) {
+                return true;
+            }
+
+            Gtk.Widget? parent = this.get_parent ();
+            while (parent != null) {
+                if (parent is Gtk.ScrolledWindow) {
+                    Gtk.ScrolledWindow scrolled = (Gtk.ScrolledWindow) parent;
+                    Gtk.Adjustment vadjust = scrolled.get_vadjustment ();
+                    if (vadjust != null) {
+                        double current_value = vadjust.get_value ();
+                        double page_size = vadjust.get_page_size ();
+                        double lower = vadjust.get_lower ();
+                        double upper = vadjust.get_upper ();
+                        double new_value = (current_value + direction).clamp (lower, upper - page_size);
+                        vadjust.set_value (new_value);
+                    }
+                    break;
+                }
+                parent = parent.get_parent ();
+            }
+
             return true;
         }
 
