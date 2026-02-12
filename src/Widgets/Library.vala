@@ -56,6 +56,7 @@ namespace ThiefMD.Widgets {
         private TreeIter _selected_node;
         private PreventDelayedDrop _droppable;
         NewFolder folder_popup;
+        private LibPair? _drag_source_pair;
 
         public Library () {
             debug ("Setting up library");
@@ -74,6 +75,32 @@ namespace ThiefMD.Widgets {
             get_selection ().changed.connect (on_selection);
             folder_popup = new NewFolder ();
             _droppable = new PreventDelayedDrop ();
+
+            // Drag rows to reorder sibling folders
+            var drag_source = new Gtk.DragSource ();
+            drag_source.actions = Gdk.DragAction.MOVE;
+            drag_source.set_propagation_phase (Gtk.PropagationPhase.CAPTURE);
+            drag_source.prepare.connect ((x, y) => {
+                if (_selected == null) {
+                    return null;
+                }
+                _drag_source_pair = _selected;
+                Value v = Value (typeof (string));
+                v.set_string (_selected._path);
+                return new Gdk.ContentProvider.for_value (v);
+            });
+            add_controller (drag_source);
+
+            var drop_target = new Gtk.DropTarget (typeof (string), Gdk.DragAction.MOVE);
+            drop_target.set_propagation_phase (Gtk.PropagationPhase.CAPTURE);
+            drop_target.drop.connect ((value, x, y) => {
+                string? source_path = (string?) value;
+                if (source_path == null) {
+                    return false;
+                }
+                return handle_drop (source_path, x, y);
+            });
+            add_controller (drop_target);
 
             headers_visible = false;
         }
@@ -734,6 +761,99 @@ namespace ThiefMD.Widgets {
             string title = "";
             model.get (iter, 0, out title, 1, out p);
             return p;
+        }
+
+        private bool handle_drop (string source_path, double x, double y) {
+            if (!_droppable.can_get_drop ()) {
+                return false;
+            }
+
+            TreeModel model = get_model ();
+            TreePath dest_path;
+            TreeViewDropPosition pos;
+            if (!get_dest_row_at_pos ((int) x, (int) y, out dest_path, out pos)) {
+                return false;
+            }
+
+            TreeIter dest_iter;
+            if (!model.get_iter (out dest_iter, dest_path)) {
+                return false;
+            }
+
+            LibPair dest = convert_selection (model, dest_iter);
+            LibPair? source = get_item (source_path);
+            if (dest == null) {
+                return false;
+            }
+
+            File source_file = File.new_for_path (source_path);
+            if (!source_file.query_exists ()) {
+                return false;
+            }
+
+            // Handle file moves into a library folder (e.g., sheets dragged from sheet list)
+            if (!FileUtils.test (source_path, FileTest.IS_DIR)) {
+                string dest_file_path = Path.build_filename (dest._path, source_file.get_basename ());
+
+                // No-op if already in target folder
+                File? src_parent = source_file.get_parent ();
+                if (src_parent != null && src_parent.get_path () == dest._path) {
+                    return false;
+                }
+
+                try {
+                    FileManager.move_item (source_path, dest._path);
+                    File notes_page = File.new_for_path (source_path + ".notes");
+                    if (notes_page.query_exists ()) {
+                        FileManager.move_item (notes_page.get_path (), dest._path);
+                    }
+                } catch (Error e) {
+                    warning ("Failed to move %s to %s: %s", source_path, dest_file_path, e.message);
+                    return false;
+                }
+
+                // Refresh source and destination sheet lists
+                Sheets? src_sheets = find_sheets_for_path (source_path);
+                if (src_sheets != null) {
+                    src_sheets.refresh ();
+                }
+                dest._sheets.refresh ();
+                return true;
+            }
+
+            if (source == null) {
+                return false;
+            }
+
+            // Only reorder siblings inside the same parent directory
+            File src_file = File.new_for_path (source._path);
+            File dest_file = File.new_for_path (dest._path);
+            File? src_parent = src_file.get_parent ();
+            File? dest_parent = dest_file.get_parent ();
+            if (src_parent == null || dest_parent == null || src_parent.get_path () != dest_parent.get_path ()) {
+                return false;
+            }
+
+            LibPair? parent = get_item (src_parent.get_path ());
+            if (parent == null) {
+                return false;
+            }
+
+            if (pos == TreeViewDropPosition.AFTER || pos == TreeViewDropPosition.INTO_OR_AFTER) {
+                parent._sheets.move_folder_after (dest_file.get_basename (), src_file.get_basename ());
+                _lib_store.move_after (ref source._iter, dest_iter);
+            } else {
+                parent._sheets.move_folder_before (dest_file.get_basename (), src_file.get_basename ());
+                _lib_store.move_before (ref source._iter, dest_iter);
+            }
+
+            // Keep selection on the moved item
+            TreePath? new_path = _lib_store.get_path (source._iter);
+            if (new_path != null) {
+                set_cursor (new_path, null, false);
+            }
+
+            return true;
         }
 
         //
