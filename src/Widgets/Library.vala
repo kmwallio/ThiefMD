@@ -299,6 +299,27 @@ namespace ThiefMD.Widgets {
             var right_click = new Gtk.GestureClick ();
             right_click.set_button (3);
             right_click.released.connect ((n_press, x, y) => {
+                // Find and select the row at the click position before showing menu
+                var picked = _list_view.pick (x, y, Gtk.PickFlags.DEFAULT);
+                if (picked != null) {
+                    // Walk up the widget tree to find the ListItem
+                    var widget = picked;
+                    while (widget != null && !(widget is Gtk.ListItem)) {
+                        widget = widget.get_parent ();
+                    }
+                    
+                    if (widget is Gtk.ListItem) {
+                        var list_item = (Gtk.ListItem) widget;
+                        var row = list_item.get_item () as Gtk.TreeListRow;
+                        if (row != null) {
+                            var node = row.get_item () as LibNode;
+                            if (node != null) {
+                                _selected = node;
+                                select_node (node);
+                            }
+                        }
+                    }
+                }
                 show_context_menu (x, y);
             });
             _list_view.add_controller (right_click);
