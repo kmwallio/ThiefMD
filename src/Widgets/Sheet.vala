@@ -81,6 +81,29 @@ namespace ThiefMD.Widgets {
                 active = active_sheet;
             });
 
+            // Drag source for moving/reordering sheets
+            var drag_source = new Gtk.DragSource ();
+            // Capture events before the toggle button consumes them so active sheets still drag
+            drag_source.set_propagation_phase (Gtk.PropagationPhase.CAPTURE);
+            drag_source.actions = Gdk.DragAction.MOVE;
+            drag_source.prepare.connect ((x, y) => {
+                Value v = Value (typeof (string));
+                v.set_string (_sheet_path);
+                return new Gdk.ContentProvider.for_value (v);
+            });
+            add_controller (drag_source);
+
+            // Drop target to accept moved sheets
+            var drop_target = new Gtk.DropTarget (typeof (string), Gdk.DragAction.MOVE);
+            drop_target.drop.connect ((value, x, y) => {
+                string? source_path = (string?) value;
+                if (source_path == null) {
+                    return false;
+                }
+                return handle_drop (source_path, y);
+            });
+            add_controller (drop_target);
+
             // @TODO: GTK4 Add ability to be dragged
             /*
             Gtk.drag_source_set (
@@ -130,6 +153,76 @@ namespace ThiefMD.Widgets {
             }
 
             debug ("Creating %s\n", sheet_path);
+        }
+
+        private bool handle_drop (string source_path, double y) {
+            if (_parent == null || source_path == "") {
+                return false;
+            }
+
+            var source_file = File.new_for_path (source_path);
+            if (!source_file.query_exists ()) {
+                return false;
+            }
+
+            string source_dir = "";
+            var parent_dir = source_file.get_parent ();
+            if (parent_dir != null) {
+                source_dir = parent_dir.get_path ();
+            }
+
+            string dest_dir = _parent.get_sheets_path ();
+            string source_name = source_file.get_basename ();
+            string dest_name = File.new_for_path (_sheet_path).get_basename ();
+
+            // Reorder within the same folder
+            if (source_dir == dest_dir) {
+                if (source_name == dest_name) {
+                    return false;
+                }
+                int halfway = get_allocated_height () / 2;
+                if (y > halfway) {
+                    _parent.move_sheet_after (dest_name, source_name);
+                } else {
+                    _parent.move_sheet_before (dest_name, source_name);
+                }
+                return true;
+            }
+
+            // Move across folders
+            string dest_path = Path.build_filename (dest_dir, source_name);
+            try {
+                source_file.move (File.new_for_path (dest_path), FileCopyFlags.OVERWRITE, null, null);
+            } catch (Error e) {
+                warning ("Could not move %s to %s: %s", source_path, dest_path, e.message);
+                return false;
+            }
+
+            // Remove from the origin sheets view/metadata if we can find it
+            var library = ThiefApp.get_instance ().library;
+            Sheets? origin_sheets = library.find_sheets_for_path (source_dir);
+            if (origin_sheets != null && origin_sheets != _parent) {
+                Sheet? origin_sheet = library.find_sheet_for_path (source_path);
+                if (origin_sheet != null) {
+                    origin_sheets.remove_sheet (origin_sheet);
+                    origin_sheets.persist_metadata ();
+                } else {
+                    origin_sheets.refresh ();
+                }
+            }
+
+            // Reload destination and order near the drop target
+            _parent.refresh ();
+            if (FileUtils.test (dest_path, FileTest.IS_REGULAR)) {
+                if (y > (get_allocated_height () / 2)) {
+                    _parent.move_sheet_after (dest_name, source_name);
+                } else {
+                    _parent.move_sheet_before (dest_name, source_name);
+                }
+            }
+            _parent.persist_metadata ();
+
+            return true;
         }
 
         public Sheets get_parent_sheets () {

@@ -621,6 +621,10 @@ namespace ThiefMD.Widgets {
             save_metadata_file (metadata.notes != "");
         }
 
+        public void persist_metadata () {
+            save_metadata_file (true);
+        }
+
         private void save_library_order () {
             save_metadata_file ();
         }
