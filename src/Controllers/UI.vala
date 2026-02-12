@@ -511,7 +511,7 @@ namespace ThiefMD.Controllers.UI {
             string custom_languages = Path.build_path (
                 Path.DIR_SEPARATOR_S,
                 Build.PKGDATADIR,
-                "gtksourceview-4",
+                "gtksourceview-5",
                 "language-specs");
             string[] language_paths = {
                 custom_languages

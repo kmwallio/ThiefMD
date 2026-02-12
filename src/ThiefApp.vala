@@ -451,6 +451,14 @@ namespace ThiefMD {
             UI.load_font ();
             UI.load_css_scheme ();
 
+            Timeout.add (350, () => {
+                if (!ready) {
+                    return false;
+                }
+                settings.changed ();
+                return false;
+            });
+
             show_touch_friendly = false;
 
             close_request.connect (() => {
