@@ -23,99 +23,219 @@ using ThiefMD.Controllers;
 using GtkSource;
 
 namespace ThiefMD.Enrichments {
-    /* GTK4 TODO: GtkSourceView 5 API changes - GtkSource.CompletionProvider removed
-    public class BibTexCompletionProvider : GtkSource.CompletionProvider, Object {
+    /**
+     * Citation proposal class for GtkSourceView 5 completion.
+     * 
+     * Represents a single citation from a BibTeX file that can be
+     * inserted into the document.
+     */
+    public class CitationProposal : Object, GtkSource.CompletionProposal {
+        public string citation { get; set; }
+        public string title { get; set; }
+        public string typed_prefix { get; set; }
+
+        public CitationProposal (string citation, string title, string typed_prefix = "") {
+            this.citation = citation;
+            this.title = title;
+            this.typed_prefix = typed_prefix;
+        }
+
+        public virtual string? get_typed_text () {
+            return typed_prefix;
+        }
+    }
+
+    /**
+     * BibTeX completion provider for GtkSourceView 5.
+     * 
+     * Provides auto-completion for BibTeX citations when typing '@' followed
+     * by citation keys. The provider searches for a .bib file in the current
+     * document's directory and offers matching citations.
+     * 
+     * Usage example:
+     * {{{
+     *   var completion = source_view.get_completion();
+     *   var bibtex_provider = new BibTexCompletionProvider();
+     *   completion.add_provider(bibtex_provider);
+     * }}}
+     * 
+     * Compatible with GTK4 and GtkSourceView 5.
+     */
+    public class BibTexCompletionProvider : Object, GtkSource.CompletionProvider {
+        private GLib.ListStore? current_proposals = null;
+        private string last_bib_file = "";
+        private BibTex.Parser? bib_parser = null;
+
         public BibTexCompletionProvider () {
         }
 
-        public override string get_name () {
+        public virtual string? get_title () {
             return _("Citations");
         }
 
-        public override bool match (GtkSource.CompletionContext context) {
-            Gtk.TextIter? start = null, sanity = null;
-            if (context.get_iter (out start) && context.get_iter (out sanity)) {
-                if (start.backward_char ()) {
-                    if (start.get_char () == '@') {
-                        if (!start.backward_char ()) {
-                            return true;
-                        }
-                        return start.get_char ().isspace () || !start.get_char ().isalnum ();
-                    }
-                    unichar check = start.get_char ();
-                    for (int i = 0; i < 10; i++) {
-                        if (check == ' ' || check == '@' || check == '\n' || check == '\t') {
-                            break;
-                        }
-                        if (!start.backward_char ()) {
-                            break;
-                        }
-                        check = start.get_char ();
-                    }
-
-                    if (start.get_char () == '@') {
-                        if (!start.backward_char ()) {
-                            return true;
-                        }
-                        return start.get_char ().isspace () || !start.get_char ().isalnum ();
-                    }
-                }
-            }
-
-            return false;
+        public virtual int get_priority (GtkSource.CompletionContext context) {
+            return 100;
         }
 
-        public override void populate (GtkSource.CompletionContext context) {
-            List<GtkSource.CompletionItem> completions = new List<GtkSource.CompletionItem> ();
-            Gtk.TextIter? start = null, end = null;
-            if (context.get_iter (out start) && context.get_iter (out end)) {
-                string prefix = "";
-                for (int i = 0; i < 10 && start.backward_char (); i++) {
-                    unichar check = start.get_char ();
-                    if (check == ' ' || check == '@' || check == '\n' || check == '\t') {
+        public virtual bool is_trigger (Gtk.TextIter iter, unichar ch) {
+            // Trigger on '@' character
+            if (ch == '@') {
+                return true;
+            }
+            // Also trigger on alphanumeric characters after '@'
+            if (ch.isalnum () || ch == '_' || ch == '-') {
+                Gtk.TextIter check = iter;
+                // Look back to see if there's an '@' character
+                for (int i = 0; i < 20 && check.backward_char (); i++) {
+                    unichar c = check.get_char ();
+                    if (c == '@') {
+                        return true;
+                    }
+                    if (c.isspace () || c == '\n' || c == '\r') {
                         break;
                     }
                 }
-                start.forward_char ();
-                if (start.get_offset () < end.get_offset ()) {
-                    prefix = start.get_text (end);
-                }
-
-                var settings = AppSettings.get_default ();
-                string bib_file = find_bibtex_for_sheet (settings.last_file);
-                if (bib_file != "") {
-                    BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
-                    bib_parser.parse_file ();
-                    var cite_labels = bib_parser.get_labels ();
-                    if (!cite_labels.is_empty) {
-                        foreach (var citation in cite_labels) {
-                            if (citation.down ().has_prefix (prefix.down ()) && citation.down () != prefix.down ()) {
-                                var com_item = new GtkSource.CompletionItem ();
-                                string title = bib_parser.get_title (citation);
-                                if (title.length > Constants.CITATION_TITLE_MAX_LEN) {
-                                    title = title.substring (0, Constants.CITATION_TITLE_MAX_LEN - 3) + "...";
-                                }
-                                com_item.text = citation;
-                                com_item.label = citation + ": " + title;
-                                com_item.info = bib_parser.get_title (citation);
-                                com_item.markup = "<b>" + citation + "</b>: <i>" + title + "</i>";
-                                completions.append (com_item);
-                            }
-                        }
-                    }
-                }
             }
-            context.add_proposals (this, completions, true);
-        }
-
-        public override bool activate_proposal (GtkSource.CompletionProposal proposal, Gtk.TextIter iter) {
             return false;
         }
+
+        private string get_prefix_at_iter (Gtk.TextIter iter) {
+            Gtk.TextIter start = iter;
+            // Move backwards to find the start of the word after '@'
+            for (int i = 0; i < 100 && start.backward_char (); i++) {
+                unichar c = start.get_char ();
+                if (c == '@') {
+                    start.forward_char (); // Move past '@'
+                    break;
+                }
+                if (c.isspace () || c == '\n' || c == '\r') {
+                    return "";
+                }
+            }
+            
+            if (start.get_offset () < iter.get_offset ()) {
+                return start.get_text (iter);
+            }
+            return "";
+        }
+
+        public async virtual GLib.ListModel populate_async (GtkSource.CompletionContext context, GLib.Cancellable? cancellable) throws GLib.Error {
+            var proposals = new GLib.ListStore (typeof (CitationProposal));
+            
+            Gtk.TextIter begin, end;
+            if (!context.get_bounds (out begin, out end)) {
+                return proposals;
+            }
+            
+            // Use the end iterator as the current position
+            Gtk.TextIter iter = end;
+
+            string prefix = get_prefix_at_iter (iter);
+            
+            var settings = AppSettings.get_default ();
+            string bib_file = find_bibtex_for_sheet (settings.last_file);
+            
+            if (bib_file == "") {
+                return proposals;
+            }
+
+            // Parse BibTeX file if needed
+            if (bib_file != last_bib_file || bib_parser == null) {
+                bib_parser = new BibTex.Parser (bib_file);
+                bib_parser.parse_file ();
+                last_bib_file = bib_file;
+            }
+
+            var cite_labels = bib_parser.get_labels ();
+            if (cite_labels.is_empty) {
+                return proposals;
+            }
+
+            // Add matching citations
+            foreach (var citation in cite_labels) {
+                if (prefix == "" || citation.down ().has_prefix (prefix.down ())) {
+                    string full_title = bib_parser.get_title (citation);
+                    string display_title = full_title;
+                    if (full_title.length > Constants.CITATION_TITLE_MAX_LEN) {
+                        display_title = full_title.substring (0, Constants.CITATION_TITLE_MAX_LEN - 3) + "...";
+                    }
+                    proposals.append (new CitationProposal (citation, display_title, prefix));
+                }
+            }
+
+            current_proposals = proposals;
+            return proposals;
+        }
+
+        public virtual void refilter (GtkSource.CompletionContext context, GLib.ListModel model) {
+            // Refiltering is handled by populate_async in this implementation
+        }
+
+        public virtual void activate (GtkSource.CompletionContext context, GtkSource.CompletionProposal proposal) {
+            var citation_proposal = proposal as CitationProposal;
+            if (citation_proposal == null) {
+                return;
+            }
+
+            Gtk.TextIter begin, end;
+            if (!context.get_bounds (out begin, out end)) {
+                return;
+            }
+            
+            // Use the end iterator as the current position
+            Gtk.TextIter iter = end;
+
+            var buffer = iter.get_buffer ();
+            if (buffer == null) {
+                return;
+            }
+
+            // Find the start of the current word (after '@')
+            Gtk.TextIter start = iter;
+            for (int i = 0; i < 100 && start.backward_char (); i++) {
+                unichar c = start.get_char ();
+                if (c == '@') {
+                    start.forward_char (); // Position after '@'
+                    break;
+                }
+                if (c.isspace () || c == '\n' || c == '\r') {
+                    break;
+                }
+            }
+
+            // Delete the current prefix and insert the citation
+            buffer.begin_user_action ();
+            buffer.delete (ref start, ref iter);
+            buffer.insert (ref start, citation_proposal.citation, citation_proposal.citation.length);
+            buffer.end_user_action ();
+        }
+
+        public virtual void display (GtkSource.CompletionContext context, GtkSource.CompletionProposal proposal, GtkSource.CompletionCell cell) {
+            var citation_proposal = proposal as CitationProposal;
+            if (citation_proposal == null) {
+                return;
+            }
+
+            var column = cell.get_column ();
+            switch (column) {
+                case GtkSource.CompletionColumn.TYPED_TEXT:
+                    cell.set_text (citation_proposal.citation);
+                    break;
+                case GtkSource.CompletionColumn.COMMENT:
+                    cell.set_text (citation_proposal.title);
+                    break;
+                case GtkSource.CompletionColumn.DETAILS:
+                    // Could show additional details here
+                    break;
+                default:
+                    break;
+            }
+        }
     }
-    */
 
     public class MarkdownEnrichment : Object {
         private GtkSource.CompletionWords? source_completion;
+        private BibTexCompletionProvider? bibtex_provider;
         private unowned GtkSource.View view;
         private unowned Gtk.TextBuffer buffer;
         private Mutex checking;
@@ -782,6 +902,9 @@ namespace ThiefMD.Enrichments {
 
             last_cursor = -1;
 
+            // Attach BibTeX completion provider if experimental mode and bibtex file exists
+            update_bibtex_provider ();
+
             return true;
         }
 
@@ -797,6 +920,9 @@ namespace ThiefMD.Enrichments {
                 markdown_url.invisible = false;
                 markdown_url.invisible_set = false;
             }
+
+            // Update BibTeX provider based on experimental mode
+            update_bibtex_provider ();
 
             double r, g, b;
             if (!settings.focus_mode) {
@@ -815,6 +941,32 @@ namespace ThiefMD.Enrichments {
             }
 
             recalculate_margins ();
+        }
+
+        private void update_bibtex_provider () {
+            if (view == null) {
+                return;
+            }
+
+            var settings = AppSettings.get_default ();
+            string bib_file = find_bibtex_for_sheet (settings.last_file);
+            var completion = view.get_completion ();
+
+            if (completion == null) {
+                return;
+            }
+
+            // Remove existing provider if present
+            if (bibtex_provider != null) {
+                completion.remove_provider (bibtex_provider);
+                bibtex_provider = null;
+            }
+
+            // Add provider if experimental mode is enabled and bibtex file exists
+            if (settings.experimental && bib_file != "") {
+                bibtex_provider = new BibTexCompletionProvider ();
+                completion.add_provider (bibtex_provider);
+            }
         }
 
         private int get_string_px_width (string str) {
@@ -928,6 +1080,16 @@ namespace ThiefMD.Enrichments {
 
         public void detach () {
             var settings = AppSettings.get_default ();
+            
+            // Remove BibTeX completion provider if present
+            if (bibtex_provider != null && view != null) {
+                var completion = view.get_completion ();
+                if (completion != null) {
+                    completion.remove_provider (bibtex_provider);
+                }
+                bibtex_provider = null;
+            }
+
             Gtk.TextIter start, end;
             buffer.get_bounds (out start, out end);
 

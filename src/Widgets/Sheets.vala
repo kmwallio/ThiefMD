@@ -169,7 +169,6 @@ namespace ThiefMD.Widgets {
             bar_label.hexpand = true;
             bar_label.xalign = 0;
             bar_label.set_ellipsize (Pango.EllipsizeMode.END);
-            bar.pack_start (bar_label);
             var window_title = new Adw.WindowTitle ("", "");
             bar.set_title_widget (window_title);
             bar.set_show_start_title_buttons (false);
@@ -189,7 +188,8 @@ namespace ThiefMD.Widgets {
             new_sheet.margin_start = 5;
             new_sheet.margin_end = 15;
 
-            bar.pack_end (new_sheet);
+            bar.pack_start (new_sheet);
+            bar.pack_start (bar_label);
 
             var header_context = bar.get_style_context ();
             header_context.add_class ("thiefmd-toolbar");
