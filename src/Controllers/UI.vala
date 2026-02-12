@@ -335,6 +335,19 @@ namespace ThiefMD.Controllers.UI {
     public GtkSource.StyleSchemeManager UserSchemes () {
         if (thief_schemes == null) {
             thief_schemes = new GtkSource.StyleSchemeManager ();
+
+            // Include default paths + user schemes + build/install scheme dir
+            var default_paths = GtkSource.StyleSchemeManager.get_default ().get_search_path ();
+            var custom_path = Path.build_filename (Build.PKGDATADIR, "gtksourceview-5", "styles");
+
+            string[] paths = new string[default_paths.length + 2];
+            for (int i = 0; i < default_paths.length; i++) {
+                paths[i] = default_paths[i];
+            }
+            paths[default_paths.length] = UserData.scheme_path;
+            paths[default_paths.length + 1] = custom_path;
+
+            thief_schemes.set_search_path (paths);
         }
 
         return thief_schemes;

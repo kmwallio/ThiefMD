@@ -1185,7 +1185,7 @@ namespace ThiefMD.Widgets {
         public void set_scheme (string id, bool reload_css = true) {
             if (id == "thiefmd") {
                 // Reset application CSS to coded
-                var style_manager = GtkSource.StyleSchemeManager.get_default ();
+                var style_manager = UI.UserSchemes ();
                 var style = style_manager.get_scheme (id);
                 buffer.set_style_scheme (style);
             } else {
