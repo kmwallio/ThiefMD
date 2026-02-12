@@ -389,6 +389,10 @@ namespace ThiefMD.Widgets {
                 return active;
             }
             set {
+                // Log the Editor's own vscroll policy (GtkSourceView is a Scrollable)
+                Gtk.ScrollablePolicy vpolicy = this.vscroll_policy;
+                print ("Editor am_active: GtkSourceView vscroll policy = %s", vpolicy.to_string ());
+
                 var settings = AppSettings.get_default ();
                 if (value){
                     bool move_screen = false;
@@ -437,13 +441,13 @@ namespace ThiefMD.Widgets {
 
                     typewriter_active = settings.typewriter_scrolling;
                     if (typewriter_active) {
+                        debug ("File open: connecting typewriter scrolling signals");
                         Timeout.add(Constants.TYPEWRITER_UPDATE_TIME, move_typewriter_scolling);
                         buffer.notify["cursor-position"].connect (move_typewriter_scolling_void);
                     }
 
                     if (settings.autosave) {
                         Timeout.add (Constants.AUTOSAVE_TIMEOUT, autosave);
-                        buffer.notify["cursor-position"].disconnect (move_typewriter_scolling_void);
                     }
 
                     if (settings.writegood) {
@@ -703,11 +707,18 @@ namespace ThiefMD.Widgets {
 
             modified_time = new DateTime.now_utc ();
             should_scroll = true;
+            
+            // Only ensure cursor visibility when typewriter mode is disabled
+            // When typewriter mode is enabled, move_typewriter_scolling handles scrolling
+            var settings = AppSettings.get_default ();
+            if (!settings.typewriter_scrolling) {
+                debug ("on_text_modified: Calling ensure_cursor_visible (typewriter mode disabled)");
+                ensure_cursor_visible ();
+            }
 
             // Mark as we should save the file
             // If no autosave, schedule a save.
             if (!should_save) {
-                var settings = AppSettings.get_default ();
                 if (!settings.autosave) {
                     Timeout.add (Constants.AUTOSAVE_TIMEOUT, autosave);
                 }
@@ -1099,11 +1110,29 @@ namespace ThiefMD.Widgets {
         private void typewriter_scrolling () {
             var settings = AppSettings.get_default ();
 
-            // Check for typewriter scrolling and adjust bottom margin to
-            // compensate
+            // For typewriter mode, set margins to allow content centering
             if (settings.typewriter_scrolling) {
-                bottom_margin = (int)(last_height * (1 - Constants.TYPEWRITER_POSITION)) - 20;
-                top_margin = (int)(last_height * Constants.TYPEWRITER_POSITION) - 20;
+                // Calculate margins based on the visible viewport (page_size)
+                // Try to get parent ScrolledWindow to find actual page_size
+                double page_size = last_height; // fallback to allocated height
+                Gtk.Widget? parent = this.get_parent ();
+                while (parent != null) {
+                    if (parent is Gtk.ScrolledWindow) {
+                        Gtk.ScrolledWindow scrolled = (Gtk.ScrolledWindow) parent;
+                        Gtk.Adjustment vadjust = scrolled.get_vadjustment ();
+                        if (vadjust != null) {
+                            page_size = vadjust.get_page_size ();
+                        }
+                        break;
+                    }
+                    parent = parent.get_parent ();
+                }
+                
+                // Set margins to 20% of the visible viewport height
+                int margin = (int)(page_size * 0.20);
+                bottom_margin = margin;
+                top_margin = margin;
+                debug ("typewriter_scrolling: Set margins to %d based on page_size %.0f", margin, page_size);
             } else {
                 bottom_margin = Constants.BOTTOM_MARGIN;
                 top_margin = Constants.TOP_MARGIN;
@@ -1138,16 +1167,17 @@ namespace ThiefMD.Widgets {
 
             typewriter_scrolling ();
             if (!typewriter_active && settings.typewriter_scrolling) {
+                debug ("Settings: enabling typewriter scrolling - connecting signal");
                 typewriter_active = true;
                 Timeout.add(Constants.TYPEWRITER_UPDATE_TIME, move_typewriter_scolling);
+                buffer.notify["cursor-position"].connect (move_typewriter_scolling_void);
                 queue_draw ();
-                should_scroll = true;
                 move_typewriter_scolling ();
             } else if (typewriter_active && !settings.typewriter_scrolling) {
+                debug ("Settings: disabling typewriter scrolling - disconnecting signal");
                 typewriter_active = false;
+                buffer.notify["cursor-position"].disconnect (move_typewriter_scolling_void);
                 queue_draw ();
-                should_scroll = true;
-                move_typewriter_scolling ();
             }
 
             if (settings.focus_mode) {
@@ -1301,23 +1331,137 @@ namespace ThiefMD.Widgets {
         }
 
         public void move_typewriter_scolling_void () {
+            debug ("move_typewriter_scolling_void: Called from signal");
             move_typewriter_scolling ();
         }
 
         public bool move_typewriter_scolling () {
-            if (!active || buffer.has_selection) {
+            debug ("move_typewriter_scolling: Called! has_selection=%s", buffer.has_selection.to_string ());
+            
+            if (buffer.has_selection) {
                 return false;
             }
 
             var settings = AppSettings.get_default ();
-            var cursor = buffer.get_insert ();
-
-            if (should_scroll) {
-                this.scroll_to_mark(cursor, 0.0, true, 0.0, Constants.TYPEWRITER_POSITION);
-                should_scroll = false;
+            debug ("move_typewriter_scolling: typewriter_scrolling setting = %s", settings.typewriter_scrolling.to_string ());
+            
+            if (settings.typewriter_scrolling) {
+                var cursor = buffer.get_insert ();
+                Gtk.TextIter cursor_iter;
+                buffer.get_iter_at_mark (out cursor_iter, cursor);
+                
+                int line = cursor_iter.get_line ();
+                debug ("move_typewriter_scolling: Cursor at line %d", line + 1);
+                
+                // Get cursor position relative to the entire document (not viewport)
+                Gdk.Rectangle cursor_loc;
+                this.get_iter_location (cursor_iter, out cursor_loc);
+                
+                // Find parent ScrolledWindow and adjust it
+                Gtk.Widget? parent = this.get_parent ();
+                while (parent != null) {
+                    if (parent is Gtk.ScrolledWindow) {
+                        Gtk.ScrolledWindow scrolled = (Gtk.ScrolledWindow) parent;
+                        Gtk.Adjustment vadjust = scrolled.get_vadjustment ();
+                        if (vadjust != null) {
+                            double current_value = vadjust.get_value ();
+                            double page_size = vadjust.get_page_size ();
+                            double lower = vadjust.get_lower ();
+                            double upper = vadjust.get_upper ();
+                            
+                            debug ("move_typewriter_scolling: cursor_loc.y=%d, page_size=%.0f, TYPEWRITER_POSITION=%.2f", 
+                                   cursor_loc.y, page_size, Constants.TYPEWRITER_POSITION);
+                            debug ("move_typewriter_scolling: current scroll=%.0f, lower=%.0f, upper=%.0f", 
+                                   current_value, lower, upper);
+                            
+                            // cursor_loc.y is absolute position in document
+                            // page_size is the visible viewport height
+                            // We want cursor to appear at (page_size * TYPEWRITER_POSITION) from top of viewport
+                            // So scroll_value should be: cursor_loc.y - (page_size * TYPEWRITER_POSITION)
+                            double target_scroll = cursor_loc.y - (page_size * Constants.TYPEWRITER_POSITION);
+                            
+                            // Clamp to valid range
+                            double new_value = target_scroll.clamp(lower, upper - page_size);
+                            
+                            debug ("move_typewriter_scolling: target_scroll=%.0f, new_value=%.0f (was %.0f)", 
+                                   target_scroll, new_value, current_value);
+                            
+                            vadjust.set_value (new_value);
+                        }
+                        break;
+                    }
+                    parent = parent.get_parent ();
+                }
+                
+                return true;
             }
 
-            return settings.typewriter_scrolling;
+            return false;
+        }
+
+        public bool ensure_cursor_visible () {
+            int view_height = this.get_allocated_height ();
+            int view_width = this.get_allocated_width ();
+            
+            debug ("ensure_cursor_visible: view size w=%d, h=%d", view_width, view_height);
+            
+            // Don't try to scroll if the view isn't actually visible/realized
+            if (view_width <= 0 || view_height <= 0) {
+                debug ("ensure_cursor_visible: View not realized");
+                return false;
+            }
+
+            var cursor = buffer.get_insert ();
+            Gtk.TextIter cursor_iter;
+            buffer.get_iter_at_mark (out cursor_iter, cursor);
+            
+            int line = cursor_iter.get_line ();
+            int col = cursor_iter.get_line_offset ();
+            debug ("ensure_cursor_visible: Cursor at line %d, col %d", line + 1, col + 1);
+            
+            // Get cursor location on screen
+            Gdk.Rectangle cursor_loc;
+            this.get_iter_location (cursor_iter, out cursor_loc);
+            debug ("ensure_cursor_visible: Cursor location y=%d, height=%d", cursor_loc.y, cursor_loc.height);
+            
+            // Find parent ScrolledWindow and scroll it to keep cursor visible
+            Gtk.Widget? parent = this.get_parent ();
+            while (parent != null) {
+                if (parent is Gtk.ScrolledWindow) {
+                    Gtk.ScrolledWindow scrolled = (Gtk.ScrolledWindow) parent;
+                    Gtk.Adjustment vadjust = scrolled.get_vadjustment ();
+                    if (vadjust != null) {
+                        double current_value = vadjust.get_value ();
+                        double page_size = vadjust.get_page_size ();
+                        double lower = vadjust.get_lower ();
+                        double upper = vadjust.get_upper ();
+                        
+                        // Convert cursor screen position to adjustment value
+                        double cursor_top = cursor_loc.y;
+                        double cursor_bottom = cursor_loc.y + cursor_loc.height;
+                        
+                        // Check if cursor is visible in current viewport
+                        bool is_visible = (current_value <= cursor_top && cursor_bottom <= current_value + page_size);
+                        
+                        debug ("ensure_cursor_visible: scroll adj value=%.0f, page=%.0f, cursor_top=%.0f, cursor_bottom=%.0f, visible=%s", 
+                               current_value, page_size, cursor_top, cursor_bottom, is_visible.to_string ());
+                        
+                        if (!is_visible) {
+                            // Scroll to show cursor with some margin
+                            double margin = 50;
+                            double new_value = cursor_top - margin;
+                            new_value = new_value.clamp(lower, upper - page_size);
+                            
+                            debug ("ensure_cursor_visible: Scrolling to %.0f (was %.0f)", new_value, current_value);
+                            vadjust.set_value (new_value);
+                        }
+                    }
+                    break;
+                }
+                parent = parent.get_parent ();
+            }
+            
+            return true;
         }
 
         /* GTK4 TODO: Context menu needs Gtk4 PopoverMenu/GMenu reimplementation

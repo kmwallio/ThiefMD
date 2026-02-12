@@ -60,7 +60,7 @@ namespace ThiefMD.Controllers.SheetManager {
         if (_view == null) {
             _welcome_screen = new Widgets.Editor ("");
             _view = new Gtk.ScrolledWindow ();
-            _view.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+            _view.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
             _view_container = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             _view.hexpand = true;
             _view.vexpand = true;
@@ -350,6 +350,7 @@ namespace ThiefMD.Controllers.SheetManager {
 
     public static bool load_sheet (Sheet sheet) {
         if (_currentSheet != null && Sheet.areEqual(sheet, _currentSheet.sheet) && _active_editors.size == 1) {
+            _currentSheet.editor.am_active = true;
             debug ("Tried loading current sheet");
             return true;
         }

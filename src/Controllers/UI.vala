@@ -59,7 +59,7 @@ namespace ThiefMD.Controllers.UI {
         var old = current;
         sheet.width_request = settings.view_sheets_width;
         instance.library_split.set_end_child (sheet);
-            instance.set_library_split_position_silent (settings.view_library_width);
+        instance.set_library_split_position_silent (settings.view_library_width);
         instance.library_pane.set_visible_child (instance.library_split);
         settings.sheet_changed ();
         current = sheet;
