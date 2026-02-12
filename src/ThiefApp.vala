@@ -293,8 +293,8 @@ namespace ThiefMD {
                 }
 
                 int sheets_width = stack_width - new_library_width;
-                if (sheets_width < 50) {
-                    sheets_width = 50;
+                if (sheets_width < 150) {
+                    sheets_width = 150;
                 }
 
                 s.view_library_width = new_library_width;

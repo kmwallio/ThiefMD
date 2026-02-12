@@ -165,17 +165,18 @@ namespace ThiefMD.Widgets {
                 title = title.substring (0, title.length - 2);
                 bar_label.set_markup ("<b>" + title + "...</b>");
             }
+            bar_label.halign = Gtk.Align.START;
+            bar_label.hexpand = true;
             bar_label.xalign = 0;
             bar_label.set_ellipsize (Pango.EllipsizeMode.END);
-            bar_label.set_hexpand (false);
             bar.pack_start (bar_label);
             var window_title = new Adw.WindowTitle ("", "");
             bar.set_title_widget (window_title);
             bar.set_show_start_title_buttons (false);
             // Keep the end container visible for our custom button while hiding window controls
-            bar.set_show_end_title_buttons (true);
+            bar.set_show_end_title_buttons (false);
             bar.set_decoration_layout (null);
-            bar.width_request = settings.view_sheets_width;
+            bar.set_hexpand (true);
 
             new_sheet = new Gtk.MenuButton ();
             new_sheet_widget = new NewSheet ();
@@ -183,10 +184,12 @@ namespace ThiefMD.Widgets {
             new_sheet.tooltip_text = (_("New Sheet"));
             new_sheet.set_icon_name ("document-new-symbolic");
             new_sheet.popover = new_sheet_widget;
+            new_sheet.hexpand = false;
+            new_sheet.vexpand = false;
+            new_sheet.margin_start = 5;
+            new_sheet.margin_end = 15;
 
             bar.pack_end (new_sheet);
-
-            bar_label.width_request = settings.view_sheets_width - 20;
 
             var header_context = bar.get_style_context ();
             header_context.add_class ("thiefmd-toolbar");
