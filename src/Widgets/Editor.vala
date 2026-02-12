@@ -1388,6 +1388,12 @@ namespace ThiefMD.Widgets {
         public bool move_typewriter_scolling () {
             debug ("move_typewriter_scolling: Called! has_selection=%s", buffer.has_selection.to_string ());
 
+            // Don't scroll if completion popup is active
+            if (this.get_data<bool> ("completion-active")) {
+                debug ("move_typewriter_scolling: Skipping - completion popup is active");
+                return false;
+            }
+
             if (selection_dragging) {
                 return false;
             }
