@@ -87,18 +87,14 @@ namespace ThiefMD.Widgets {
             }
 
             if (node == null) {
-                debug ("create_child_model: obj is null or wrong type");
                 return null;
             }
-
-            debug ("create_child_model for: %s (children_built=%s)", node.path, node.children_built.to_string ());
 
             if (!node.children_built) {
                 rebuild_children (node);
             }
 
             uint n_children = node.children.get_n_items ();
-            debug ("  -> has %u children", n_children);
 
             if (n_children == 0) {
                 return null;
@@ -174,6 +170,38 @@ namespace ThiefMD.Widgets {
             if (label != null) {
                 label.set_label (node.title);
             }
+
+            // Drag source for moving folders (future feature)
+            var drag_source = new Gtk.DragSource ();
+            drag_source.actions = Gdk.DragAction.MOVE;
+            drag_source.prepare.connect ((x, y) => {
+                Value v = Value (typeof (string));
+                v.set_string (node.path);
+                return new Gdk.ContentProvider.for_value (v);
+            });
+            box.add_controller (drag_source);
+
+            // Drop target to accept sheets being moved into folders
+            var drop_target = new Gtk.DropTarget (typeof (string), Gdk.DragAction.MOVE);
+            drop_target.drop.connect ((value, x, y) => {
+                string? source_path = (string?) value;
+                if (source_path == null) {
+                    return false;
+                }
+                return handle_library_drop (source_path, node);
+            });
+            box.add_controller (drop_target);
+
+            // Motion controller for hover effects during drag
+            var motion = new Gtk.EventControllerMotion ();
+            drop_target.enter.connect ((x, y) => {
+                box.add_css_class ("library-drop-hover");
+                return Gdk.DragAction.MOVE;
+            });
+            drop_target.leave.connect (() => {
+                box.remove_css_class ("library-drop-hover");
+            });
+            box.add_controller (motion);
         }
 
         private void unbind_row_item (Gtk.SignalListItemFactory factory, GLib.Object obj) {
@@ -184,7 +212,69 @@ namespace ThiefMD.Widgets {
             var expander = item.get_child () as Gtk.TreeExpander;
             if (expander != null) {
                 expander.set_list_row (null);
+
+                // Clean up CSS classes
+                Gtk.Box? box = expander.get_child () as Gtk.Box;
+                if (box != null) {
+                    box.remove_css_class ("library-drop-hover");
+                }
             }
+        }
+
+        private bool handle_library_drop (string source_path, LibNode target_node) {
+            var source_file = File.new_for_path (source_path);
+            if (!source_file.query_exists ()) {
+                return false;
+            }
+
+            // Check if source is a regular file (sheet)
+            if (!FileUtils.test (source_path, FileTest.IS_REGULAR)) {
+                // For now, only support dropping sheets into folders
+                // Folder dragging/reordering can be added later
+                return false;
+            }
+
+            string source_dir = "";
+            var parent_dir = source_file.get_parent ();
+            if (parent_dir != null) {
+                source_dir = parent_dir.get_path ();
+            }
+
+            string dest_dir = target_node.path;
+            string source_name = source_file.get_basename ();
+
+            // Don't drop into the same folder
+            if (source_dir == dest_dir) {
+                return false;
+            }
+
+            // Move the file
+            string dest_path = Path.build_filename (dest_dir, source_name);
+            try {
+                source_file.move (File.new_for_path (dest_path), FileCopyFlags.OVERWRITE, null, null);
+            } catch (Error e) {
+                warning ("Could not move %s to %s: %s", source_path, dest_path, e.message);
+                return false;
+            }
+
+            // Update origin sheets metadata
+            var library = ThiefApp.get_instance ().library;
+            Sheets? origin_sheets = library.find_sheets_for_path (source_dir);
+            if (origin_sheets != null) {
+                var origin_sheet = library.find_sheet_for_path (source_path);
+                if (origin_sheet != null) {
+                    origin_sheets.remove_sheet (origin_sheet);
+                    origin_sheets.persist_metadata ();
+                } else {
+                    origin_sheets.refresh ();
+                }
+            }
+
+            // Refresh destination
+            target_node.sheets.refresh ();
+            target_node.sheets.persist_metadata ();
+
+            return true;
         }
 
         private Gtk.SignalListItemFactory create_row_factory () {
@@ -454,12 +544,10 @@ namespace ThiefMD.Widgets {
         }
 
         private void rebuild_children (LibNode node) {
-            debug ("rebuild_children: %s (already_built=%s)", node.path, node.children_built.to_string ());
             var settings = AppSettings.get_default ();
             
             // If already built, only clear if we're forcing a refresh
             if (node.children_built) {
-                debug ("  -> already built, clearing and rebuilding");
                 while (node.children.get_n_items () > 0) {
                     node.children.remove (0);
                 }
@@ -485,7 +573,6 @@ namespace ThiefMD.Widgets {
                         string path = Path.build_filename (str_dir, file_name);
                         File file = File.new_for_path (path);
                         if (file.query_exists () && !has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
-                            debug ("  -> adding ordered child: %s", file_name);
                             var icon = get_icon_for_folder (path);
                             LibNode child = new LibNode (path, icon);
                             child.parent = node;
@@ -510,7 +597,6 @@ namespace ThiefMD.Widgets {
                     if (!file_name.has_prefix(".") && !sheet_dir.metadata.hidden_folders.contains(file_name)) {
                         string path = Path.build_filename (str_dir, file_name);
                         if (!has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
-                            debug ("  -> adding new child: %s", file_name);
                             var icon = get_icon_for_folder (path);
                             LibNode child = new LibNode (path, icon);
                             child.parent = node;

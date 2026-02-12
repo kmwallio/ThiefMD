@@ -61,6 +61,11 @@ actionbar,
     margin-top: 1.5rem;
 }
 
+.library-drop-hover {
+    background: alpha(@selectionColor, 0.2);
+    border-left: 3px solid @selectionColor;
+}
+
 .thief-search-results {
   padding: 0;
   margin: 0;

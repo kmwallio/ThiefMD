@@ -282,11 +282,11 @@ namespace ThiefMD {
                 }
 
                 int new_library_width = current_pos;
-                if (new_library_width < 150) {
-                    new_library_width = 150;
+                if (new_library_width < 100) {
+                    new_library_width = 100;
                 }
 
-                int max_library_width = stack_width - 150;
+                int max_library_width = stack_width - 100;
                 if (max_library_width < 50) {
                     max_library_width = 50;
                 }
@@ -296,8 +296,8 @@ namespace ThiefMD {
                 }
 
                 int sheets_width = stack_width - new_library_width;
-                if (sheets_width < 150) {
-                    sheets_width = 150;
+                if (sheets_width < 100) {
+                    sheets_width = 100;
                 }
 
                 s.view_library_width = new_library_width;
