@@ -56,13 +56,10 @@ namespace ThiefMD.Controllers.UI {
         }
         ThiefApp instance = ThiefApp.get_instance ();
         var old = current;
-        if (current != null) {
-            instance.library_pane.remove (current);
-            sheet.width_request = settings.view_sheets_width;
-            instance.library_pane.append (sheet);
-            instance.library_pane.set_visible_child (sheet);
-            instance.library_pane.width_request = settings.view_sheets_width + settings.view_library_width;
-        }
+        sheet.width_request = settings.view_sheets_width;
+        instance.library_split.set_end_child (sheet);
+            instance.set_library_split_position_silent (settings.view_library_width);
+        instance.library_pane.set_visible_child (instance.library_split);
         settings.sheet_changed ();
         current = sheet;
         return (Sheets) old;
@@ -548,13 +545,8 @@ namespace ThiefMD.Controllers.UI {
 
     public void focus_editor () {
         var settings = AppSettings.get_default ();
-        ThiefApp instance = ThiefApp.get_instance ();
-        if (instance.main_content != null) {
-            instance.main_content.set_visible_child (instance.editor_widgets);
-            if (instance.main_content.folded) {
-                settings.view_state = 2;
-            }
-        }
+        settings.view_state = 2;
+        show_view ();
     }
 
     public void show_editor () {
@@ -589,28 +581,8 @@ namespace ThiefMD.Controllers.UI {
         }
 
         instance.hide_search ();
-        if (instance.main_content != null && instance.main_content.folded) {
-            settings.view_state = (settings.view_state + 1) % 3;
-            if (settings.view_state == 0) {
-                show_sheets_and_library ();
-                instance.main_content.set_visible_child (instance.library_pane);
-                instance.library_pane.set_visible_child (instance.library_box);
-            } else if (settings.view_state == 1) {
-                show_sheets_and_library ();
-                instance.main_content.set_visible_child (instance.library_pane);
-                if (current != null) {
-                    instance.library_pane.set_visible_child (current);
-                }
-                if (!instance.library_pane.folded) {
-                    toggle_view ();
-                }
-            } else {
-                instance.main_content.set_visible_child (instance.editor_widgets);
-            }
-        } else {
-            settings.view_state = (settings.view_state + 1) % 3;
-            show_view ();
-        }
+        settings.view_state = (settings.view_state + 1) % 3;
+        show_view ();
     }
 
     public void show_view () {
@@ -624,7 +596,9 @@ namespace ThiefMD.Controllers.UI {
         if (!ThiefApp.get_instance ().ready) {
             return;
         }
-        ThiefApp.get_instance ().hide_search ();
+        var instance = ThiefApp.get_instance ();
+        instance.show_touch_friendly = settings.view_state == 2;
+        instance.hide_search ();
         if (settings.view_state == 0) {
             show_sheets_and_library ();
         } else if (settings.view_state == 1) {
@@ -641,10 +615,13 @@ namespace ThiefMD.Controllers.UI {
         if (current != null) {
             current.show ();
             current.width_request = settings.view_sheets_width;
-            instance.library_pane.set_visible_child (current);
+            instance.library_split.set_end_child (current);
+            instance.library_split.set_position (settings.view_library_width);
+            instance.library_pane.set_visible_child (instance.library_split);
             instance.library_pane.show ();
         }
-        instance.main_content.set_visible_child (instance.library_pane);
+        instance.library_box.show ();
+        instance.main_content.set_position (settings.view_library_width + settings.view_sheets_width);
     }
 
     public void hide_library () {
@@ -653,16 +630,13 @@ namespace ThiefMD.Controllers.UI {
         if (current != null) {
             current.show ();
             current.width_request = settings.view_sheets_width;
-            instance.library_pane.set_visible_child (current);
-            instance.library_box.hide ();
-            instance.library_pane.width_request = settings.view_sheets_width;
-            instance.main_content.set_visible_child (instance.editor_widgets);
-            instance.library_pane.show ();
+            instance.library_split.set_end_child (current);
         }
-        
-        if (instance.ready && instance.main_content.folded) {
-            settings.view_state += 1;
-        }
+        instance.library_box.hide ();
+            instance.set_library_split_position_silent (0);
+        instance.library_pane.set_visible_child (instance.library_split);
+        instance.library_pane.show ();
+            instance.set_main_position_silent (settings.view_sheets_width);
     }
 
     // Show all three panels
@@ -674,15 +648,18 @@ namespace ThiefMD.Controllers.UI {
             current.width_request = settings.view_sheets_width;
             instance.library_box.show ();
             instance.library_box.width_request = settings.view_library_width;
+                instance.set_library_split_position_silent (settings.view_library_width);
             instance.library_pane.set_visible (true);
-            instance.library_pane.width_request = settings.view_sheets_width + settings.view_library_width;
+            instance.library_pane.set_visible_child (instance.library_split);
         }
-        instance.main_content.set_visible_child (instance.editor_widgets);
+        instance.library_pane.show ();
+            instance.set_main_position_silent (settings.view_library_width + settings.view_sheets_width);
     }
 
     // Show just the Editor
     public void hide_sheets () {
         ThiefApp instance = ThiefApp.get_instance ();
         instance.library_pane.hide ();
+            instance.set_main_position_silent (0);
     }
 }

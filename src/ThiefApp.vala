@@ -28,8 +28,9 @@ namespace ThiefMD {
         private static bool am_hidden = false;
         public Headerbar toolbar;
         public Library library;
-        public Adw.Leaflet main_content;
-        public Adw.Leaflet library_pane;
+        public Gtk.Paned main_content;
+        public Gtk.Stack library_pane;
+        public Gtk.Paned library_split;
         public Gtk.ScrolledWindow library_view;
         public SearchBar search_bar;
         public StatisticsBar stats_bar;
@@ -50,6 +51,22 @@ namespace ThiefMD {
         private Gtk.Box desktop_box;
         private Sheets start_sheet;
         private Mutex rebuild_ui;
+        private bool updating_sizes = false;
+        private bool suppress_position_save = false;
+        private int last_library_position = -1;
+        private int last_main_position = -1;
+
+        public void set_library_split_position_silent (int pos) {
+            suppress_position_save = true;
+            library_split.set_position (pos);
+            suppress_position_save = false;
+        }
+
+        public void set_main_position_silent (int pos) {
+            suppress_position_save = true;
+            main_content.set_position (pos);
+            suppress_position_save = false;
+        }
 
         public ThiefApp (Gtk.Application app) {
             Object (application: app);
@@ -131,9 +148,10 @@ namespace ThiefMD {
                 return;
             }
             search_widget = new SearchWidget ();
-            library_pane.append (search_widget);
+            library_pane.add_named (search_widget, "search");
             library_pane.set_visible_child (search_widget);
-            main_content.set_visible_child (library_pane);
+            library_pane.show ();
+            set_main_position_silent (pane_position);
         }
 
         public void hide_search () {
@@ -142,6 +160,7 @@ namespace ThiefMD {
             }
             search_widget.searcher.searching = false;
             library_pane.remove (search_widget);
+            library_pane.set_visible_child (library_split);
             search_widget = null;
         }
 
@@ -160,16 +179,16 @@ namespace ThiefMD {
             var notes_context = notes_widget.get_style_context ();
             notes_context.add_class ("thief-notes");
 
-            library_pane = new Adw.Leaflet ();
-            library_pane.transition_type = Adw.LeafletTransitionType.SLIDE;
+            library_pane = new Gtk.Stack ();
             library_view = new Gtk.ScrolledWindow ();
             library_view.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
             main_window_horizon_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             notes = new Gtk.Revealer ();
             notes.set_transition_type (Gtk.RevealerTransitionType.SLIDE_LEFT);
             notes.set_reveal_child (false);
-            main_content = new Adw.Leaflet ();
-            main_content.transition_type = Adw.LeafletTransitionType.SLIDE;
+            main_content = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+            main_content.hexpand = true;
+            main_content.vexpand = true;
 
             library_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             var library_header = new Adw.HeaderBar ();
@@ -221,9 +240,68 @@ namespace ThiefMD {
             library_view.width_request = settings.view_library_width;
             stats_bar = new StatisticsBar ();
             start_sheet = library.get_sheets (start_dir);
-            library_pane.append (library_box);
             start_sheet.width_request = settings.view_sheets_width;
-            library_pane.append (start_sheet);
+            library_split = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+            library_split.hexpand = true;
+            library_split.vexpand = true;
+            library_split.set_shrink_start_child (true);
+            library_split.set_shrink_end_child (true);
+            library_split.set_resize_start_child (true);
+            library_split.set_resize_end_child (true);
+            library_split.set_start_child (library_box);
+            library_split.set_end_child (start_sheet);
+            set_library_split_position_silent (settings.view_library_width);
+
+            library_pane.add_named (library_split, "library");
+            library_pane.set_visible_child (library_split);
+
+            library_split.notify["position"].connect (() => {
+                if (!ready) {
+                    return;
+                }
+                if (updating_sizes) {
+                    return;
+                }
+                if (suppress_position_save) {
+                    return;
+                }
+                int current_pos = library_split.position;
+                if (current_pos == last_library_position) {
+                    return;
+                }
+                updating_sizes = true;
+                var s = AppSettings.get_default ();
+
+                int stack_width = library_split.get_allocated_width ();
+                if (stack_width <= 0) {
+                    updating_sizes = false;
+                    return;
+                }
+
+                int new_library_width = current_pos;
+                if (new_library_width < 50) {
+                    new_library_width = 50;
+                }
+
+                int max_library_width = stack_width - 50;
+                if (max_library_width < 50) {
+                    max_library_width = 50;
+                }
+
+                if (new_library_width > max_library_width) {
+                    new_library_width = max_library_width;
+                }
+
+                int sheets_width = stack_width - new_library_width;
+                if (sheets_width < 50) {
+                    sheets_width = 50;
+                }
+
+                s.view_library_width = new_library_width;
+                s.view_sheets_width = sheets_width;
+                last_library_position = new_library_width;
+                updating_sizes = false;
+            });
             var toolbar_context = toolbar.get_style_context ();
             toolbar_context.add_class("thiefmd-toolbar");
         }
@@ -232,13 +310,63 @@ namespace ThiefMD {
             var settings = AppSettings.get_default ();
             debug ("Building desktop UI");
 
-            main_content.append (library_pane);
-            library_pane.width_request = settings.view_library_width + settings.view_sheets_width;
+            main_content.set_shrink_start_child (true);
+            main_content.set_shrink_end_child (true);
+            main_content.set_resize_start_child (true);
+            main_content.set_resize_end_child (true);
+            main_content.set_start_child (library_pane);
             editor_widgets.append (toolbar);
             editor_notes_widget.append (SheetManager.get_view ());
             editor_notes_widget.append (notes);
             editor_widgets.append (editor_notes_widget);
-            main_content.append (editor_widgets);
+            main_content.set_end_child (editor_widgets);
+            set_main_position_silent (settings.view_library_width + settings.view_sheets_width);
+            last_main_position = main_content.position;
+            main_content.notify["position"].connect (() => {
+                if (!ready) {
+                    return;
+                }
+                if (updating_sizes) {
+                    return;
+                }
+                if (suppress_position_save) {
+                    return;
+                }
+                int current_pos = main_content.position;
+                if (current_pos == last_main_position) {
+                    return;
+                }
+                updating_sizes = true;
+                var s = AppSettings.get_default ();
+                int left_width = current_pos;
+                if (left_width < 100) {
+                    left_width = 100;
+                }
+
+                int lib_width = library_split.position;
+                if (lib_width < 50) {
+                    lib_width = 50;
+                }
+
+                int max_lib = left_width - 50;
+                if (max_lib < 50) {
+                    max_lib = 50;
+                }
+
+                if (lib_width > max_lib) {
+                    lib_width = max_lib;
+                }
+
+                int sheets_width = left_width - lib_width;
+                if (sheets_width < 50) {
+                    sheets_width = 50;
+                }
+
+                s.view_library_width = lib_width;
+                s.view_sheets_width = sheets_width;
+                last_main_position = current_pos;
+                updating_sizes = false;
+            });
             main_window_horizon_box.append (main_content);
             notes.set_child (notes_widget);
             notes.set_reveal_child (false);
@@ -323,50 +451,7 @@ namespace ThiefMD {
             UI.load_font ();
             UI.load_css_scheme ();
 
-            Timeout.add (350, () => {
-                if (!ready) {
-                    return false;
-                }
-                if (main_content.folded) {
-                    show_touch_friendly = true;
-                    library_pane.hexpand = true;
-                    library.hexpand = true;
-                    library_view.hexpand = true;
-                    UI.widen_sheets ();
-                    settings.changed ();
-                } else {
-                    show_touch_friendly = false;
-                    library_pane.hexpand = false;
-                    library.hexpand = false;
-                    library_view.hexpand = false;
-                    library.width_request = settings.view_library_width;
-                    UI.shrink_sheets ();
-                    settings.changed ();
-                }
-                return false;
-            });
-
-            main_content.notify["folded"].connect (() => {
-                if (!ready) {
-                    return;
-                }
-                if (main_content.folded && !show_touch_friendly) {
-                    show_touch_friendly = true;
-                    library_pane.hexpand = true;
-                    library.hexpand = true;
-                    library_view.hexpand = true;
-                    UI.widen_sheets ();
-                    settings.changed ();
-                } else if (!main_content.folded && show_touch_friendly) {
-                    show_touch_friendly = false;
-                    library_pane.hexpand = false;
-                    library.hexpand = false;
-                    library_view.hexpand = false;
-                    library.width_request = settings.view_library_width;
-                    UI.shrink_sheets ();
-                    settings.changed ();
-                }
-            });
+            show_touch_friendly = false;
 
             close_request.connect (() => {
                 bool can_close = ThiefApplication.close_window (this);

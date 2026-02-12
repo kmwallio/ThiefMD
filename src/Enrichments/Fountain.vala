@@ -366,7 +366,7 @@ namespace ThiefMD.Enrichments {
                 debug ("%s Hashtag: %d, Space: %d, AvgChar: %d", font_desc.get_family (), hashtag_w, space_w, avg_w);
             }
 
-            if (ThiefApp.get_instance ().main_content.folded) {
+            if (ThiefApp.get_instance ().show_touch_friendly) {
                 // Character
                 tag_character.left_margin = (avg_w * 8);
                 tag_parenthetical.left_margin = (avg_w * 6);
