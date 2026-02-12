@@ -37,6 +37,7 @@ namespace ThiefMD.Widgets {
         private string _sheet_title;
         private string _sheet_date;
         private string _notes_path;
+        private bool _preview_loaded;
         public ThiefNotes metadata;
 
         // Change style depending on sheet available in the editor
@@ -104,37 +105,17 @@ namespace ThiefMD.Widgets {
             });
             add_controller (drop_target);
 
-            // @TODO: GTK4 Add ability to be dragged
-            /*
-            Gtk.drag_source_set (
-                this,                      // widget will be drag-able
-                Gdk.ModifierType.BUTTON1_MASK, // modifier that will start a drag
-                target_list,               // lists of target to support
-                Gdk.DragAction.MOVE            // what to do with data after dropped
-            );
-
-            // All possible source signals
-            this.drag_begin.connect(on_drag_begin);
-            this.drag_data_get.connect(on_drag_data_get);
-            this.drag_data_delete.connect(on_drag_data_delete);
-            this.drag_end.connect(on_drag_end);
-
-            // Add ability to be dropped on
-            Gtk.drag_dest_set (
-                this,                          // widget will be drag-able
-                DestDefaults.ALL,              // modifier that will start a drag
-                target_list,                   // lists of target to support
-                Gdk.DragAction.MOVE            // what to do with data after dropped
-            );
-            this.drag_motion.connect(this.on_drag_motion);
-            this.drag_leave.connect(this.on_drag_leave);
-            this.drag_drop.connect(this.on_drag_drop);
-            this.drag_data_received.connect(this.on_drag_data_received);
-            */
-
-            // Load minimark if file has content
-            redraw ();
+            // Deferred preview generation to avoid reading large files at startup
+            _preview_loaded = false;
+            _word_count = -1; // Mark as not yet calculated
             set_visible (true);
+            
+            // Generate preview when sheet becomes visible
+            map.connect (() => {
+                if (!_preview_loaded) {
+                    lazy_load_preview ();
+                }
+            });
 
             // Load file ordering information
             metadata = null;
@@ -237,12 +218,28 @@ namespace ThiefMD.Widgets {
             return _sheet_path.substring (_sheet_path.last_index_of (Path.DIR_SEPARATOR_S) + 1);
         }
 
-        public void redraw () {
+        private void lazy_load_preview () {
+            // Use idle callback to avoid blocking UI during startup
+            GLib.Idle.add (() => {
+                load_preview_sync ();
+                return false;
+            });
+        }
+        
+        private void load_preview_sync () {
+            if (_preview_loaded) {
+                return;
+            }
+            
             var settings = AppSettings.get_default ();
             string file_contents = FileManager.get_file_lines_yaml (_sheet_path, settings.num_preview_lines, true, out _sheet_title, out _sheet_date);
             string file_title = "<b>" + _sheet_path.substring(_sheet_path.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "</b>";
 
-            _word_count = FileManager.get_word_count (_sheet_path);
+            // Only calculate word count if needed (negative value means not calculated)
+            if (_word_count < 0) {
+                _word_count = FileManager.get_word_count (_sheet_path);
+            }
+            
             if (file_contents.chomp() != "" && settings.num_preview_lines != 0) {
                 string content_preview = "<small>" + SheetManager.mini_mark(file_contents) + "</small>";
                 if (settings.show_sheet_filenames) {
@@ -255,9 +252,17 @@ namespace ThiefMD.Widgets {
             }
 
             _label.set_label (_label_buffer);
-
             _label.width_request = settings.view_sheets_width - 10;
             width_request = settings.view_sheets_width;
+            _preview_loaded = true;
+        }
+
+        public void redraw () {
+            // Force reload of preview
+            _preview_loaded = false;
+            load_preview_sync ();
+            
+            var settings = AppSettings.get_default ();
             settings.writing_changed ();
         }
 
@@ -290,6 +295,10 @@ namespace ThiefMD.Widgets {
         }
 
         public int get_word_count () {
+            // Lazy load word count if not yet calculated
+            if (_word_count < 0) {
+                _word_count = FileManager.get_word_count (_sheet_path);
+            }
             return _word_count;
         }
 
