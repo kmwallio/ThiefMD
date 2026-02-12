@@ -848,17 +848,7 @@ namespace ThiefMD.Widgets {
                     debug ("%s opened", file_name);
                     res = true;
                     buffer.set_language (UI.get_source_language (opened_filename));
-                    if (is_fountain (filename)) {
-                        if (text.contains ("\r\n")) {
-                            text.replace ("\r\n", "\n");
-                            set_text (text, true);
-                        }
-                        fountain = new FountainEnrichment ();
-                        fountain.attach (this);
-                    }
-                    if (markdown != null) {
-                        markdown.reset ();
-                    }
+                    setup_enrichments_for_file (filename, text);
                 } catch (Error e) {
                     warning ("Error: %s", e.message);
                     SheetManager.show_error ("Unexpected Error: " + e.message);
@@ -867,6 +857,36 @@ namespace ThiefMD.Widgets {
             }
 
             return res;
+        }
+
+        private bool is_markdown_file (string filename) {
+            string check = filename.down ();
+            return check.has_suffix (".md") || check.has_suffix (".markdown");
+        }
+
+        private void setup_enrichments_for_file (string filename, string text) {
+            // Detach any previous enrichments before switching file types
+            if (fountain != null) {
+                fountain.detach ();
+                fountain = null;
+            }
+            if (markdown != null) {
+                markdown.detach ();
+                markdown = null;
+            }
+
+            if (is_fountain (filename)) {
+                // Normalize Windows newlines for fountain parsing
+                if (text.contains ("\r\n")) {
+                    text.replace ("\r\n", "\n");
+                    set_text (text, true);
+                }
+                fountain = new FountainEnrichment ();
+                fountain.attach (this);
+            } else if (is_markdown_file (filename)) {
+                markdown = new MarkdownEnrichment ();
+                markdown.attach (this);
+            }
         }
 
         public void set_text (string text, bool opening = true) {

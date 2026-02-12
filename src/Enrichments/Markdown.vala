@@ -715,6 +715,8 @@ namespace ThiefMD.Enrichments {
         private void cursor_update_heading_margins () {
             var settings = AppSettings.get_default ();
 
+            debug ("settings.experimental: %s", settings.experimental ? "true" : "false");
+
             if (settings.experimental) {
                 var cursor = buffer.get_insert ();
                 Gtk.TextIter cursor_location;
@@ -842,6 +844,8 @@ namespace ThiefMD.Enrichments {
             space_w = f_w;
             avg_w = f_w;
 
+            debug ("Recalculate margins");
+
             if (view.get_realized ()) {
                 var font_desc = Pango.FontDescription.from_string (settings.font_family);
                 font_desc.set_size ((int)(f_w * Pango.SCALE * Pango.Scale.LARGE));
@@ -875,6 +879,12 @@ namespace ThiefMD.Enrichments {
                     heading_text[3].left_margin = m;
                     heading_text[4].left_margin = m;
                     heading_text[5].left_margin = m;
+                    heading_text[0].left_margin_set = true;
+                    heading_text[1].left_margin_set = true;
+                    heading_text[2].left_margin_set = true;
+                    heading_text[3].left_margin_set = true;
+                    heading_text[4].left_margin_set = true;
+                    heading_text[5].left_margin_set = true;
                     heading_text[0].indent_set = false;
                     heading_text[1].indent_set = false;
                     heading_text[2].indent_set = false;
@@ -888,6 +898,12 @@ namespace ThiefMD.Enrichments {
                     heading_text[3].left_margin = m - ((hashtag_w * 4) + space_w);
                     heading_text[4].left_margin = m - ((hashtag_w * 5) + space_w);
                     heading_text[5].left_margin = m - ((hashtag_w * 6) + space_w);
+                    heading_text[0].left_margin_set = true;
+                    heading_text[1].left_margin_set = true;
+                    heading_text[2].left_margin_set = true;
+                    heading_text[3].left_margin_set = true;
+                    heading_text[4].left_margin_set = true;
+                    heading_text[5].left_margin_set = true;
                     heading_text[0].indent = -((hashtag_w * 1) + space_w);
                     heading_text[1].indent = -((hashtag_w * 2) + space_w);
                     heading_text[2].indent = -((hashtag_w * 3) + space_w);
@@ -900,6 +916,12 @@ namespace ThiefMD.Enrichments {
                     heading_text[3].indent_set = true;
                     heading_text[4].indent_set = true;
                     heading_text[5].indent_set = true;
+                    heading_text[0].accumulative_margin = false;
+                    heading_text[1].accumulative_margin = false;
+                    heading_text[2].accumulative_margin = false;
+                    heading_text[3].accumulative_margin = false;
+                    heading_text[4].accumulative_margin = false;
+                    heading_text[5].accumulative_margin = false;
                 }
             }
         }
