@@ -1369,7 +1369,7 @@ namespace ThiefMD.Widgets {
                             double lower = vadjust.get_lower ();
                             double upper = vadjust.get_upper ();
                             
-                            debug ("move_typewriter_scolling: cursor_loc.y=%d, page_size=%.0f, TYPEWRITER_POSITION=%.2f", 
+                            debug ("move_typewriter_scolling: cursor_loc.y=%d, page_size=%.0f (viewport height), TYPEWRITER_POSITION=%.2f", 
                                    cursor_loc.y, page_size, Constants.TYPEWRITER_POSITION);
                             debug ("move_typewriter_scolling: current scroll=%.0f, lower=%.0f, upper=%.0f", 
                                    current_value, lower, upper);
@@ -1383,8 +1383,14 @@ namespace ThiefMD.Widgets {
                             // Clamp to valid range
                             double new_value = target_scroll.clamp(lower, upper - page_size);
                             
+                            // Calculate actual position cursor will be at
+                            double cursor_viewport_pos = cursor_loc.y - new_value;
+                            double cursor_percentage = cursor_viewport_pos / page_size;
+                            
                             debug ("move_typewriter_scolling: target_scroll=%.0f, new_value=%.0f (was %.0f)", 
                                    target_scroll, new_value, current_value);
+                            debug ("move_typewriter_scolling: Cursor will be at %.0f px from top (%.1f%% of viewport)", 
+                                   cursor_viewport_pos, cursor_percentage * 100.0);
                             
                             vadjust.set_value (new_value);
                         }
