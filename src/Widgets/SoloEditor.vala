@@ -80,9 +80,21 @@ namespace ThiefMD {
             close_request.connect (this.on_delete_event);
         }
 
+        private uint solo_resize_timeout_id = 0;
+        
         public override void size_allocate (int width, int height, int baseline) {
             base.size_allocate (width, height, baseline);
-            editor.dynamic_margins ();
+            
+            // Debounce resize events
+            if (solo_resize_timeout_id != 0) {
+                Source.remove (solo_resize_timeout_id);
+            }
+            
+            solo_resize_timeout_id = Timeout.add (50, () => {
+                solo_resize_timeout_id = 0;
+                editor.dynamic_margins ();
+                return false;
+            });
         }
 
         private void populate_header () {

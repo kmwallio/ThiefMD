@@ -266,9 +266,12 @@ namespace ThiefMD {
                     return;
                 }
                 int current_pos = library_split.position;
+                
+                // Debounce rapid changes
                 if (current_pos == last_library_position) {
                     return;
                 }
+                
                 updating_sizes = true;
                 var s = AppSettings.get_default ();
 
@@ -333,9 +336,12 @@ namespace ThiefMD {
                     return;
                 }
                 int current_pos = main_content.position;
+                
+                // Debounce rapid changes
                 if (current_pos == last_main_position) {
                     return;
                 }
+                
                 updating_sizes = true;
                 var s = AppSettings.get_default ();
                 int left_width = current_pos;

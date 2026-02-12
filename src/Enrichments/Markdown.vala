@@ -723,8 +723,21 @@ namespace ThiefMD.Enrichments {
             int current_cursor = cursor_iter.get_offset ();
 
             tag_code_blocks ();
-            if (last_cursor == -1) {
+            
+            // For large documents, optimize by processing visible area + buffer
+            if (last_cursor == -1 || buffer.get_char_count () > 10000) {
                 buffer.get_bounds (out start, out end);
+                
+                // For very large files (>10k chars), just process around cursor
+                if (buffer.get_char_count () > 10000 && last_cursor != -1) {
+                    buffer.get_iter_at_mark (out start, cursor);
+                    buffer.get_iter_at_mark (out end, cursor);
+                    
+                    // Get a larger chunk around cursor for large files
+                    for (int i = 0; i < 50 && start.backward_line (); i++) {}
+                    for (int i = 0; i < 50 && end.forward_line (); i++) {}
+                }
+                
                 run_between_start_and_end (start, end);
             } else {
                 //

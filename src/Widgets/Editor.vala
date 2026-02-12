@@ -840,15 +840,29 @@ namespace ThiefMD.Widgets {
                     string text;
                     FileInfo last_modified = file.query_info (FileAttribute.TIME_MODIFIED, FileQueryInfoFlags.NONE);
                     file_modified_time = last_modified.get_modification_date_time ();
+                    int64 file_size = last_modified.get_size ();
 
                     string filename = file.get_path ();
                     GLib.FileUtils.get_contents (filename, out text);
+                    
+                    // For large files, defer markdown processing
+                    bool defer_enrichments = file_size > 100000; // 100KB threshold
+                    
                     set_text (text, true);
                     editable = true;
-                    debug ("%s opened", file_name);
+                    debug ("%s opened (size: %lld bytes)", file_name, file_size);
                     res = true;
                     buffer.set_language (UI.get_source_language (opened_filename));
-                    setup_enrichments_for_file (filename, text);
+                    
+                    if (defer_enrichments) {
+                        // Process enrichments after a delay for large files
+                        Timeout.add (100, () => {
+                            setup_enrichments_for_file (filename, text);
+                            return false;
+                        });
+                    } else {
+                        setup_enrichments_for_file (filename, text);
+                    }
                 } catch (Error e) {
                     warning ("Error: %s", e.message);
                     SheetManager.show_error ("Unexpected Error: " + e.message);
@@ -916,9 +930,21 @@ namespace ThiefMD.Widgets {
             });
         }
 
+        private uint resize_timeout_id = 0;
+        
         public override void size_allocate (int width, int height, int baseline) {
             base.size_allocate (width, height, baseline);
-            dynamic_margins ();
+            
+            // Debounce resize events to avoid excessive recalculations
+            if (resize_timeout_id != 0) {
+                Source.remove (resize_timeout_id);
+            }
+            
+            resize_timeout_id = Timeout.add (50, () => {
+                resize_timeout_id = 0;
+                dynamic_margins ();
+                return false;
+            });
         }
 
         public void dynamic_margins () {
@@ -954,12 +980,13 @@ namespace ThiefMD.Widgets {
 
             last_height = h;
 
+            // Only update if width actually changed
             if (w == last_width) {
                 return;
             }
 
+            // Single call to move_margins is sufficient
             move_margins ();
-            idle_margins ();
         }
 
         public void move_margins () {
@@ -1050,6 +1077,11 @@ namespace ThiefMD.Widgets {
                         return false;
                     });
                 }
+                return;
+            }
+
+            // Only recheck if we're active to avoid reprocessing on background editors
+            if (!am_active) {
                 return;
             }
 
