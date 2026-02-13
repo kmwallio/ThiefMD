@@ -420,10 +420,9 @@ namespace ThiefMD.Widgets {
             var header_context = headerbar.get_style_context ();
             header_context.add_class ("flat");
             header_context.add_class ("thiefmd-toolbar");
-            
+            set_titlebar (headerbar);
 
             Gtk.Box vbox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            vbox.append (headerbar);
             vbox.append (searcher.scrolled_results);
             set_child(vbox);
 

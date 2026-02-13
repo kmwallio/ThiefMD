@@ -31,13 +31,16 @@ namespace ThiefMD.Widgets {
         }
 
         private void build_ui () {
+            set_titlebar (null);
             Gtk.Box vbox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+            show_menubar = false;
             headerbar = new Adw.HeaderBar ();
             title_widget = new Adw.WindowTitle ("Cheat Sheet", "");
             headerbar.set_title_widget (title_widget);
             var header_context = headerbar.get_style_context ();
             header_context.add_class ("flat");
             header_context.add_class ("thiefmd-toolbar");
+            set_titlebar (headerbar);
 
             var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
             box.margin_top = 12;
