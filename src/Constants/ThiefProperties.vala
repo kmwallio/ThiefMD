@@ -235,6 +235,13 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
           color: @textColorGlobal;
         }
 
+        .quickprefs togglebutton:checked,
+        .quickprefs button.toggle:checked {
+            background: lighter(@colorPrimary);
+            color: @textColorPrimary;
+            border-left: 3px solid @selectionColor;
+        }
+
         .thiefmd-toolbar:backdrop, .thief-toolbar:backdrop, .thiefmd-toolbar:backdrop button {
           background-image: linear-gradient(lighter(@colorPrimary), @colorPrimary 50%%);
           color: mix(@textColorGlobal, @colorPrimary, 0.5);

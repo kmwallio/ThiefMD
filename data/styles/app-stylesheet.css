@@ -40,6 +40,14 @@ menu {
     color: @textColorPrimary;
 }
 
+/* Ensure QuickPreferences toggle buttons show their active state even with custom CSS overrides */
+.quickprefs togglebutton:checked,
+.quickprefs button.toggle:checked {
+    background: lighter(@colorPrimary);
+    color: @textColorPrimary;
+    border-left: 3px solid @selectionColor;
+}
+
 .thiefmd-toolbar:backdrop, .thief-toolbar:backdrop, .thiefmd-toolbar:backdrop button {
     background-image: linear-gradient(lighter(@colorPrimary), @colorPrimary 50%);
     color: mix(@textColorPrimary, @colorPrimary, 0.5);

@@ -144,6 +144,8 @@ namespace ThiefMD.Widgets {
             menu_box.margin_bottom = 6;
             menu_box.margin_start = 6;
             menu_box.margin_end = 6;
+            // Add a CSS class so popover buttons can be styled consistently, even with custom themes
+            menu_box.add_css_class ("quickprefs");
             menu_box.append (_typewriter_button);
             menu_box.append (_spellcheck_button);
             if (GrammarThinking.language_supported (settings.spellcheck_language)) {
