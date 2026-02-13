@@ -152,6 +152,8 @@ namespace ThiefMD.Widgets {
             });
             this.add_controller (drag_controller);
 
+            setup_drop_target ();
+
             file_mutex = Mutex ();
             #if false
             // GTK4 TODO: rebuild editor context menu with Gtk.PopoverMenu
@@ -317,31 +319,158 @@ namespace ThiefMD.Widgets {
         }
         */
 
-        /* GTK4 TODO: Drag-and-drop not yet reimplemented
-        private void on_drag_data_received (
-            Gtk.Widget widget,
-            DragContext context,
-            int x,
-            int y,
-            Gtk.SelectionData selection_data,
-            uint target_type,
-            uint time)
-        {
-            int mid =  get_allocated_height () / 2;
-            debug ("%s: data (m: %d, %d)", widget.name, mid, y);
+        private void setup_drop_target () {
+            var drop_target = new Gtk.DropTarget (Type.INVALID, Gdk.DragAction.COPY);
+            drop_target.set_gtypes ({ typeof (File), typeof (string) });
+            drop_target.drop.connect ((value, x, y) => {
+                return handle_drop_value (value, x, y);
+            });
+            add_controller (drop_target);
+        }
 
-            string data = (string) selection_data.get_data();
-            string raw_data = data;
-            debug ("Got: %s", data);
+        private void get_drop_iter_at (double x, double y, out Gtk.TextIter drop_iter) {
+            int trailing = 0;
+            this.get_iter_at_position (out drop_iter, out trailing, (int) x, (int) y);
 
-            if (data != null) {
-                data = data.chomp ();
-            } else {
-                data = "";
+            Gdk.Rectangle rect;
+            this.get_iter_location (drop_iter, out rect);
+            int win_x = 0;
+            int win_y = 0;
+            this.buffer_to_window_coords (Gtk.TextWindowType.TEXT, rect.x, rect.y, out win_x, out win_y);
+
+            int line_height = rect.height;
+            if (line_height > 0) {
+                int adjusted_y = (int) y - (line_height / 2);
+                if (adjusted_y < 0) {
+                    adjusted_y = 0;
+                }
+                this.get_iter_at_position (out drop_iter, out trailing, (int) x, adjusted_y);
+            }
+        }
+
+        private bool handle_drop_value (Value value, double x, double y) {
+            var paths = new Gee.ArrayList<string> ();
+            if (value.type () == typeof (File)) {
+                var dropped_file = (File) value;
+                string? path = dropped_file.get_path ();
+                if (path != null && path.chomp () != "") {
+                    paths.add (path);
+                }
+            } else if (value.type () == typeof (string)) {
+                string drop_text = (string) value;
+                if (drop_text != null) {
+                    collect_drop_paths_from_text (drop_text, paths);
+                }
             }
 
-            if (data.has_prefix ("file://")) {
-                data = data.substring ("file://".length);
+            bool inserted = false;
+            if (paths.size > 0) {
+                StringBuilder combined = new StringBuilder ();
+                foreach (var path in paths) {
+                    string insert = build_drop_insert (path);
+                    if (insert == "") {
+                        continue;
+                    }
+
+                    if (combined.len > 0) {
+                        bool ends_with_newline = combined.str.has_suffix ("\n");
+                        bool starts_with_newline = insert.has_prefix ("\n");
+                        if (!ends_with_newline && !starts_with_newline) {
+                            combined.append ("\n");
+                        }
+                    }
+                    combined.append (insert);
+                }
+
+                if (combined.len > 0) {
+                    disk_change_prompted.can_do_action ();
+                    Gtk.TextIter drop_iter;
+                    get_drop_iter_at (x, y, out drop_iter);
+                    buffer.insert (ref drop_iter, combined.str, (int) combined.len);
+                    buffer.place_cursor (drop_iter);
+                    inserted = true;
+                }
+            }
+
+            if (!inserted && value.type () == typeof (string)) {
+                string drop_text = (string) value;
+                if (drop_text != null && drop_text.chomp () != "") {
+                    string? drop_path = extract_drop_path (drop_text);
+                    if (drop_path != null) {
+                        string insert = build_drop_insert (drop_path);
+                        if (insert != "") {
+                            disk_change_prompted.can_do_action ();
+                            Gtk.TextIter drop_iter;
+                            get_drop_iter_at (x, y, out drop_iter);
+                            buffer.insert (ref drop_iter, insert, (int) insert.length);
+                            buffer.place_cursor (drop_iter);
+                            return true;
+                        }
+                    }
+
+                    disk_change_prompted.can_do_action ();
+                    Gtk.TextIter drop_iter;
+                    get_drop_iter_at (x, y, out drop_iter);
+                    buffer.insert (ref drop_iter, drop_text, drop_text.length);
+                    buffer.place_cursor (drop_iter);
+                    return true;
+                }
+            }
+
+            return inserted;
+        }
+
+        private void collect_drop_paths_from_text (string drop_text, Gee.ArrayList<string> paths) {
+            string cleaned = drop_text.replace ("\r", "");
+            string[] lines = cleaned.split ("\n");
+            if (lines.length <= 1) {
+                string? single = extract_drop_path (drop_text);
+                if (single != null) {
+                    paths.add (single);
+                }
+                return;
+            }
+
+            foreach (var line in lines) {
+                if (line == null) {
+                    continue;
+                }
+                string trimmed = line.chomp ();
+                if (trimmed == "" || trimmed.has_prefix ("#")) {
+                    continue;
+                }
+                string? path = extract_drop_path (trimmed);
+                if (path != null) {
+                    paths.add (path);
+                }
+            }
+        }
+
+        private string? extract_drop_path (string text) {
+            string trimmed = text.chomp ();
+            if (trimmed == "") {
+                return null;
+            }
+
+            if (trimmed.has_prefix ("file://") || trimmed.has_prefix ("file:")) {
+                File file_from_uri = File.new_for_uri (trimmed);
+                string? uri_path = file_from_uri.get_path ();
+                if (uri_path != null && uri_path.chomp () != "") {
+                    return uri_path;
+                }
+                return null;
+            }
+
+            if (FileUtils.test (trimmed, FileTest.EXISTS)) {
+                return trimmed;
+            }
+
+            return null;
+        }
+
+        private string build_drop_insert (string data) {
+            if (data == null || data.chomp () == "") {
+                return "";
             }
 
             string ext = data.substring (data.last_index_of (".") + 1).down ().chug ().chomp ();
@@ -350,7 +479,7 @@ namespace ThiefMD.Widgets {
                 ext == "jpg" || ext == "gif" ||
                 ext == "svg" || ext == "bmp")
             {
-                insert = "![](" + get_base_library_path(data) + ")\n";
+                insert = "![](" + get_base_library_path (data) + ")\n";
             } else if (ext == "yml" || ext == "js" || ext == "hpp" || ext == "coffee" || ext == "sh" ||
                         ext == "vala" || ext == "c" || ext == "vapi" || ext == "ts" || ext == "toml" || ext == "ps1" ||
                         ext == "cpp" || ext == "rb" || ext == "css" || ext == "php" || ext == "scss" || ext == "less" ||
@@ -358,8 +487,8 @@ namespace ThiefMD.Widgets {
                         ext == "pm" || ext == "h" || ext == "log" || ext == "rs")
             {
                 if (file.query_exists () &&
-                    (!FileUtils.test(data, FileTest.IS_DIR)) &&
-                    (FileUtils.test(data, FileTest.IS_REGULAR)))
+                    (!FileUtils.test (data, FileTest.IS_DIR)) &&
+                    (FileUtils.test (data, FileTest.IS_REGULAR)))
                 {
                     string code_data = FileManager.get_file_contents (data);
                     if (code_data.chug ().chomp () != "") {
@@ -368,43 +497,27 @@ namespace ThiefMD.Widgets {
                         insert += "\n```\n";
                     }
                 }
-            } else if (ext == "pdf" || ext == "docx" || ext == "pptx" || ext == "html" || ext == "odt") {
-                insert = "[" + data.substring (data.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "](" + get_base_library_path(data) + ")\n";
+            } else if (ext == "pdf" || ext == "docx" || ext == "pptx" ||
+                        ext == "html" || ext == "odt" || ext == "md" ||
+                        ext == "markdown" || ext == "txt" || ext == "" ||
+                        ext == "doc" || ext == "xls" || ext == "xlsx" || ext == "ppt") {
+                insert = "[" + data.substring (data.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "](" + get_base_library_path (data) + ")\n";
             } else if (ext == "csv") {
                 if (file.query_exists () &&
-                    (!FileUtils.test(data, FileTest.IS_DIR)) &&
-                    (FileUtils.test(data, FileTest.IS_REGULAR)))
+                    (!FileUtils.test (data, FileTest.IS_DIR)) &&
+                    (FileUtils.test (data, FileTest.IS_REGULAR)))
                 {
                     string code_data = FileManager.get_file_contents (data);
                     if (code_data.chug ().chomp () != "") {
-                        insert = "\n" + csv_to_md(code_data) + "\n";
+                        insert = "\n" + csv_to_md (code_data) + "\n";
                     }
                 }
+            } else {
+                insert = "[" + data.substring (data.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "](" + get_base_library_path (data) + ")\n";
             }
 
-            if (insert != "") {
-                Timeout.add (100, () => {
-                    int start_of_raw = buffer.cursor_position - raw_data.length;
-                    string wowzers = get_buffer_text ().substring (start_of_raw, raw_data.length);
-                    if (wowzers == raw_data) {
-                        disk_change_prompted.can_do_action ();
-                        debug ("Found raw_data");
-                        Gtk.TextIter start, end;
-                        buffer.get_bounds (out start, out end);
-                        start.forward_chars (start_of_raw);
-                        end = start;
-                        end.forward_chars (raw_data.length);
-                        buffer.delete (ref start, ref end);
-                        buffer.insert_at_cursor (insert, insert.length);
-                    } else {
-                        debug ("Found: %s", wowzers);
-                    }
-                    return false;
-                });
-            }
-            return;
+            return insert;
         }
-        */
 
         public signal void changed ();
 
