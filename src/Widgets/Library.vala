@@ -864,12 +864,20 @@ namespace ThiefMD.Widgets {
             _context_menu.set_pointing_to (_last_menu_rect);
             _context_menu.set_parent (_list_view);
             _context_menu.set_autohide (true);
+            _context_menu.set_flags (Gtk.PopoverMenuFlags.NESTED);
             _context_menu.popup ();
         }
 
         private void append_icon_item (GLib.Menu icon_menu, string label, string value) {
             var item = new GLib.MenuItem (label, "library.set_icon");
             item.set_attribute_value ("target", new Variant.string (value));
+            
+            // Add icon preview to menu item
+            GLib.Icon? icon = get_icon_for_value (value);
+            if (icon != null) {
+                item.set_icon (icon);
+            }
+            
             icon_menu.append_item (item);
         }
 
@@ -1076,7 +1084,16 @@ namespace ThiefMD.Widgets {
             selection.icon = get_icon_for_value (icon_value);
             var settings = AppSettings.get_default ();
             settings.writing_changed ();
-            _list_view.queue_draw ();
+            
+            // Force ListView to rebind the item by notifying the model
+            // Find the position of the changed item
+            GLib.ListStore? store = (selection.parent != null) ? selection.parent.children : _root_store;
+            for (uint i = 0; i < store.get_n_items (); i++) {
+                if (store.get_item (i) == selection) {
+                    store.items_changed (i, 1, 1);
+                    break;
+                }
+            }
         }
 
         private void show_new_folder_popover () {
