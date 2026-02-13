@@ -244,9 +244,9 @@ namespace ThiefMD {
             library_split = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
             library_split.hexpand = true;
             library_split.vexpand = true;
-            library_split.set_shrink_start_child (false);
+            library_split.set_shrink_start_child (true);
             library_split.set_shrink_end_child (true);
-            library_split.set_resize_start_child (true);
+            library_split.set_resize_start_child (false);
             library_split.set_resize_end_child (true);
             library_split.set_start_child (library_box);
             library_split.set_end_child (start_sheet);

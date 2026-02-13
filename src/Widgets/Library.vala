@@ -65,6 +65,8 @@ namespace ThiefMD.Widgets {
 
         public Library () {
             Object (orientation: Gtk.Orientation.VERTICAL, spacing: 0);
+            hexpand = true;
+            vexpand = true;
             debug ("Setting up library");
             _all_sheets = new List<LibNode> ();
             _root_store = new GLib.ListStore (typeof (LibNode));
@@ -295,6 +297,8 @@ namespace ThiefMD.Widgets {
             var scroller = new Gtk.ScrolledWindow ();
             scroller.set_child (_list_view);
             scroller.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+            scroller.hexpand = true;
+            scroller.vexpand = true;
             append (scroller);
 
             var right_click = new Gtk.GestureClick ();
