@@ -240,6 +240,15 @@ namespace ThiefMD.Enrichments {
         private unowned Gtk.TextBuffer buffer;
         private Mutex checking;
         private bool markup_inserted_around_selection;
+        private Gtk.EventControllerKey? markup_key_controller;
+        private ulong markup_cursor_handler_id = 0;
+        private int markup_start_offset = -1;
+        private int markup_end_offset = -1;
+        private bool markup_is_link = false;
+        private int link_text_start_offset = -1;
+        private int link_text_end_offset = -1;
+        private int link_url_start_offset = -1;
+        private int link_url_end_offset = -1;
         private bool cursor_at_interesting_location = false;
         public bool active_selection = false;
 
@@ -774,6 +783,142 @@ namespace ThiefMD.Enrichments {
 
         /* GTK4 TODO: key handling to be redone with Gtk.EventControllerKey */
 
+        private void clear_markup_navigation () {
+            markup_inserted_around_selection = false;
+            markup_is_link = false;
+            markup_start_offset = -1;
+            markup_end_offset = -1;
+            link_text_start_offset = -1;
+            link_text_end_offset = -1;
+            link_url_start_offset = -1;
+            link_url_end_offset = -1;
+        }
+
+        private bool handle_markup_navigation_key (uint keyval) {
+            if (!markup_inserted_around_selection) {
+                return false;
+            }
+
+            if (keyval != Gdk.Key.Left && keyval != Gdk.Key.Right) {
+                return false;
+            }
+
+            Gtk.TextIter cursor_iter;
+            var cursor = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_iter, cursor);
+            int cursor_offset = cursor_iter.get_offset ();
+
+            if (cursor_offset < markup_start_offset || cursor_offset > markup_end_offset) {
+                clear_markup_navigation ();
+                return false;
+            }
+
+            if (markup_is_link && keyval == Gdk.Key.Right) {
+                if (cursor_offset >= link_text_start_offset && cursor_offset <= link_text_end_offset) {
+                    Gtk.TextIter target;
+                    buffer.get_iter_at_offset (out target, link_url_start_offset);
+                    buffer.place_cursor (target);
+                    return true;
+                }
+            }
+
+            Gtk.TextIter target;
+            if (keyval == Gdk.Key.Left) {
+                buffer.get_iter_at_offset (out target, markup_start_offset);
+            } else {
+                buffer.get_iter_at_offset (out target, markup_end_offset);
+            }
+            buffer.place_cursor (target);
+            clear_markup_navigation ();
+            return true;
+        }
+
+        private void handle_markup_cursor_position () {
+            if (!markup_inserted_around_selection) {
+                return;
+            }
+
+            Gtk.TextIter cursor_iter;
+            var cursor = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_iter, cursor);
+            int cursor_offset = cursor_iter.get_offset ();
+            if (cursor_offset < markup_start_offset || cursor_offset > markup_end_offset) {
+                clear_markup_navigation ();
+            }
+        }
+
+        private void set_generic_markup_range (int start_offset, int end_offset) {
+            markup_start_offset = start_offset;
+            markup_end_offset = end_offset;
+            markup_is_link = false;
+            markup_inserted_around_selection = true;
+        }
+
+        private void record_link_markup_at_cursor (Gtk.TextIter cursor_iter) {
+            Gtk.TextIter scan = cursor_iter;
+            bool found_open = false;
+            for (int i = 0; i < 256 && scan.backward_char (); i++) {
+                unichar c = scan.get_char ();
+                if (c == '\n' || c == '\r') {
+                    break;
+                }
+                if (c == '[') {
+                    found_open = true;
+                    break;
+                }
+            }
+            if (!found_open || scan.get_char () != '[') {
+                return;
+            }
+
+            int link_open = scan.get_offset ();
+            Gtk.TextIter close = scan;
+            if (!close.forward_char ()) {
+                return;
+            }
+            while (close.get_char () != ']' && close.forward_char ()) {
+                if (close.get_char () == '\n' || close.get_char () == '\r') {
+                    return;
+                }
+            }
+            if (close.get_char () != ']') {
+                return;
+            }
+            int link_close = close.get_offset ();
+
+            Gtk.TextIter paren_open = close;
+            if (!paren_open.forward_char ()) {
+                return;
+            }
+            if (paren_open.get_char () != '(') {
+                return;
+            }
+            int url_open = paren_open.get_offset ();
+
+            Gtk.TextIter paren_close = paren_open;
+            if (!paren_close.forward_char ()) {
+                return;
+            }
+            while (paren_close.get_char () != ')' && paren_close.forward_char ()) {
+                if (paren_close.get_char () == '\n' || paren_close.get_char () == '\r') {
+                    return;
+                }
+            }
+            if (paren_close.get_char () != ')') {
+                return;
+            }
+            int url_close = paren_close.get_offset ();
+
+            markup_start_offset = link_open;
+            markup_end_offset = url_close + 1;
+            link_text_start_offset = link_open + 1;
+            link_text_end_offset = link_close;
+            link_url_start_offset = url_open + 1;
+            link_url_end_offset = url_close;
+            markup_is_link = true;
+            markup_inserted_around_selection = true;
+        }
+
         private void insert_markup_around_cursor (string markup) {
             if (!buffer.get_has_selection ()) {
                 Gtk.TextIter iter;
@@ -782,6 +927,8 @@ namespace ThiefMD.Enrichments {
                 if (buffer.cursor_position - markup.length > 0) {
                     buffer.place_cursor (iter);
                 }
+                int cursor_pos = buffer.cursor_position;
+                set_generic_markup_range (cursor_pos - markup.length, cursor_pos + markup.length);
             } else {
                 Gtk.TextIter iter_start, iter_end;
                 if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
@@ -791,7 +938,7 @@ namespace ThiefMD.Enrichments {
                         buffer.get_selection_bounds (out iter_start, out iter_end);
                         iter_end.backward_chars (markup.length);
                         buffer.select_range (iter_start, iter_end);
-                        markup_inserted_around_selection = true;
+                        set_generic_markup_range (iter_start.get_offset () - markup.length, iter_end.get_offset () + markup.length);
                     }
                 }
             }
@@ -823,6 +970,7 @@ namespace ThiefMD.Enrichments {
                                 buffer.get_selection_bounds (out iter_start, out iter_end);
                                 iter_end.backward_chars (1);
                                 buffer.place_cursor (iter_end);
+                                record_link_markup_at_cursor (iter_end);
                             }
                         } else {
                             buffer.insert (ref iter_start, "[](", -1);
@@ -831,6 +979,7 @@ namespace ThiefMD.Enrichments {
                                 buffer.get_selection_bounds (out iter_start, out iter_end);
                                 iter_start.backward_chars (2);
                                 buffer.place_cursor (iter_start);
+                                record_link_markup_at_cursor (iter_start);
                             }
                         }
                     } catch (Error e) {
@@ -844,6 +993,7 @@ namespace ThiefMD.Enrichments {
                 buffer.get_iter_at_mark (out start, cursor);
                 start.backward_chars (3);
                 buffer.place_cursor (start);
+                record_link_markup_at_cursor (start);
             }
         }
 
@@ -919,6 +1069,13 @@ namespace ThiefMD.Enrichments {
 
             // Attach BibTeX completion provider if experimental mode and bibtex file exists
             update_bibtex_provider ();
+
+            markup_key_controller = new Gtk.EventControllerKey ();
+            markup_key_controller.key_pressed.connect ((keyval, _keycode, _state) => {
+                return handle_markup_navigation_key (keyval);
+            });
+            view.add_controller (markup_key_controller);
+            markup_cursor_handler_id = buffer.notify["cursor-position"].connect (handle_markup_cursor_position);
 
             return true;
         }
@@ -1127,6 +1284,15 @@ namespace ThiefMD.Enrichments {
 
             settings.changed.disconnect (settings_updated);
             buffer.notify["cursor-position"].disconnect (cursor_update_heading_margins);
+            if (markup_cursor_handler_id != 0) {
+                SignalHandler.disconnect (buffer, markup_cursor_handler_id);
+                markup_cursor_handler_id = 0;
+            }
+            if (markup_key_controller != null) {
+                view.remove_controller (markup_key_controller);
+                markup_key_controller = null;
+            }
+            clear_markup_navigation ();
             view = null;
             buffer = null;
             last_cursor = -1;
