@@ -29,14 +29,15 @@ namespace ThiefMD {
 
         private void build_ui () {
             var settings = AppSettings.get_default ();
-            var h_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            var h_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             var v_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
             v_box.margin_top = 6;
             v_box.margin_bottom = 6;
             v_box.margin_start = 6;
             v_box.margin_end = 6;
             v_box.hexpand = true;
-            v_box.vexpand = true;
+            v_box.vexpand = false;
+            v_box.valign = Gtk.Align.CENTER;
 
             Adw.HeaderBar bar = new Adw.HeaderBar ();
             var title_widget = new Adw.WindowTitle (_("Welcome to ThiefMD"), "");
@@ -49,7 +50,7 @@ namespace ThiefMD {
 
             var add_library_button = new Gtk.Button ();
             add_library_button.hexpand = true;
-            add_library_button.vexpand = true;
+            add_library_button.vexpand = false;
             add_library_button.has_tooltip = true;
             add_library_button.tooltip_text = (_("Add Folder to Library"));
             var add_library_content = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
@@ -79,7 +80,7 @@ namespace ThiefMD {
 
             var open_solo_editor = new Gtk.Button ();
             open_solo_editor.hexpand = true;
-            open_solo_editor.vexpand = true;
+            open_solo_editor.vexpand = false;
             open_solo_editor.has_tooltip = true;
             open_solo_editor.tooltip_text = (_("Open File"));
             var open_solo_content = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
@@ -102,9 +103,13 @@ namespace ThiefMD {
 
             v_box.append (open_solo_editor);
 
-            // Try to load library image
+            // Try to load library image as a responsive hero
             try {
-                var library = new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/library.png");
+                var library = new Gtk.Picture.for_resource ("/com/github/kmwallio/thiefmd/icons/library.png");
+                library.hexpand = true;
+                library.vexpand = true;
+                library.set_size_request (520, 0); // give it breathing room horizontally
+                library.content_fit = Gtk.ContentFit.SCALE_DOWN;
                 h_box.append (library);
             } catch (Error e) {
                 warning ("Could not load logo: %s", e.message);
@@ -116,7 +121,45 @@ namespace ThiefMD {
             });
             set_titlebar (bar);
             set_child (h_box);
+
+            set_sensible_default_size ();
             present ();
+        }
+
+        private void set_sensible_default_size () {
+            // Aim for a large-but-not-fullscreen window to showcase the hero image
+            int target_w = 512;
+            int target_h = 430;
+
+            var display = this.get_display ();
+            if (display != null) {
+                Gdk.Monitor? monitor = null;
+
+                // Prefer the monitor that will contain this surface; fall back to the first monitor
+                var surface = this.get_surface ();
+                if (surface != null) {
+                    monitor = display.get_monitor_at_surface (surface);
+                }
+
+                if (monitor == null) {
+                    var monitors = display.get_monitors ();
+                    if (monitors != null && monitors.get_n_items () > 0) {
+                        monitor = monitors.get_item (0) as Gdk.Monitor;
+                    }
+                }
+
+                if (monitor != null) {
+                    Gdk.Rectangle geo = monitor.get_geometry ();
+                    // Cap at 90% of the monitor, but allow generous max bounds
+                    target_w = (int) Math.fmin ((double) geo.width * 0.90, 512.0);
+                    target_h = (int) Math.fmin ((double) geo.height * 0.85, 430.0);
+                    // Ensure we are not too small to show the image and controls
+                    target_w = int.max (target_w, 512);
+                    target_h = int.max (target_h, 430);
+                }
+            }
+
+            set_default_size (target_w, target_h);
         }
     }
 }

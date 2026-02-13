@@ -68,6 +68,9 @@ if linkgrammar.found() == false
     linkgrammar = cc.find_library('link-grammar', required: true)
 endif
 
+# Math helpers
+libm = cc.find_library('m', required: true)
+
 # Let's define our executable
 add_project_arguments(['--vapidir', join_paths(meson.current_source_dir(), 'vapi')], language: 'vala')
 
@@ -162,7 +165,8 @@ executable(
         dependency('libsecret-1'),
         dependency('libadwaita-1'),
         libmarkdown,
-        linkgrammar
+        linkgrammar,
+        libm
     ],
     vala_args: [
         meson.source_root() + '/vapi/config.vapi',
