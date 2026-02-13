@@ -781,8 +781,6 @@ namespace ThiefMD.Enrichments {
             checking.unlock ();
         }
 
-        /* GTK4 TODO: key handling to be redone with Gtk.EventControllerKey */
-
         private void clear_markup_navigation () {
             markup_inserted_around_selection = false;
             markup_is_link = false;
