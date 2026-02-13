@@ -74,6 +74,26 @@ actionbar,
     border-left: 3px solid @selectionColor;
 }
 
+/* Library list (Gtk.ListView) styling */
+listview row .library-row {
+    background: @windowColor;
+    color: darker(@colorPrimaryActive);
+    padding: 6px 8px;
+    border-bottom: 1px solid alpha(@textColorPrimary, 0.2);
+}
+
+listview row:hover .library-row {
+    background: lighter(@windowColor);
+    color: @textColorPrimary;
+}
+
+listview row:selected .library-row,
+listview row:focus-within .library-row {
+    background: @colorPrimaryActive;
+    color: @textColorActive;
+    border-left: 5px solid @selectionColor;
+}
+
 .thief-search-results {
   padding: 0;
   margin: 0;

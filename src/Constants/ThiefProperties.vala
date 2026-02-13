@@ -333,6 +333,34 @@ The `markdown` editor worth stealing. *Focus* more on **writing**.
           border-left: 3px solid @selectionColor;
         }
 
+        /* Match list view container background to the library header */
+        listview,
+        listview > overlay,
+        listview > viewport,
+        listview > stack,
+        listview > revealer,
+        listview > scrolledwindow,
+        listview > scrollbar {
+            background: lighter(@colorPrimaryActive);
+        }
+
+        /* Library list (Gtk.ListView) styling */
+        listview row .library-row {
+            background: lighter(@colorPrimaryActive);
+            color: @textColorGlobal;
+        }
+
+        listview row:hover .library-row {
+            background: lighter(@colorPrimary);
+            color: @textColorPrimary;
+        }
+
+        listview row:selected .library-row,
+        listview row:focus-within .library-row {
+            background: lighter(@colorPrimary);
+            color: @textColorGlobal;
+        }
+
         treeview.view header button, .thief-library-header button {
             background: lighter(@colorPrimaryActive);
             color: @textColorGlobal;

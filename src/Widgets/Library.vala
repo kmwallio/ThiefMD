@@ -569,6 +569,30 @@ namespace ThiefMD.Widgets {
             }
         }
 
+        private bool child_already_attached (LibNode parent, string path) {
+            for (uint i = 0; i < parent.children.get_n_items (); i++) {
+                LibNode? kid = parent.children.get_item (i) as LibNode;
+                if (kid != null && kid.path == path) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void reparent_node (LibNode child, LibNode new_parent) {
+            // Remove from old store (root or previous parent)
+            GLib.ListStore? old_store = (child.parent != null) ? child.parent.children : _root_store;
+            for (uint i = 0; i < old_store.get_n_items (); i++) {
+                if (old_store.get_item (i) == child) {
+                    old_store.remove (i);
+                    break;
+                }
+            }
+
+            child.parent = new_parent;
+            new_parent.children.append (child);
+        }
+
         private void rebuild_children (LibNode node) {
             var settings = AppSettings.get_default ();
             
@@ -598,13 +622,22 @@ namespace ThiefMD.Widgets {
                     if (!file_name.has_prefix(".") && !sheet_dir.metadata.hidden_folders.contains(file_name)) {
                         string path = Path.build_filename (str_dir, file_name);
                         File file = File.new_for_path (path);
-                        if (file.query_exists () && !has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
-                            var icon = get_icon_for_folder (path);
-                            LibNode child = new LibNode (path, icon);
-                            child.parent = node;
-                            node.children.append (child);
-                            _all_sheets.append (child);
-                            // Don't recursively build - let TreeListModel do it lazily
+                        if (file.query_exists () && FileUtils.test(path, FileTest.IS_DIR)) {
+                            if (child_already_attached (node, path)) {
+                                continue;
+                            }
+
+                            LibNode? existing = get_item (path);
+                            if (existing != null) {
+                                reparent_node (existing, node);
+                            } else {
+                                var icon = get_icon_for_folder (path);
+                                LibNode child = new LibNode (path, icon);
+                                child.parent = node;
+                                node.children.append (child);
+                                _all_sheets.append (child);
+                                // Don't recursively build - let TreeListModel do it lazily
+                            }
                         } else if (!file.query_exists ()) {
                             remove_children (path);
                             LibNode p = get_item (path);
@@ -622,14 +655,23 @@ namespace ThiefMD.Widgets {
                 while ((file_name = dir.read_name()) != null) {
                     if (!file_name.has_prefix(".") && !sheet_dir.metadata.hidden_folders.contains(file_name)) {
                         string path = Path.build_filename (str_dir, file_name);
-                        if (!has_sheets (path) && FileUtils.test(path, FileTest.IS_DIR)) {
-                            var icon = get_icon_for_folder (path);
-                            LibNode child = new LibNode (path, icon);
-                            child.parent = node;
-                            node.children.append (child);
-                            _all_sheets.append (child);
-                            sheet_dir.metadata.add_folder (file_name);
-                            // Don't recursively build - let TreeListModel do it lazily
+                        if (FileUtils.test(path, FileTest.IS_DIR)) {
+                            if (child_already_attached (node, path)) {
+                                continue;
+                            }
+
+                            LibNode? existing = get_item (path);
+                            if (existing != null) {
+                                reparent_node (existing, node);
+                            } else if (!has_sheets (path)) {
+                                var icon = get_icon_for_folder (path);
+                                LibNode child = new LibNode (path, icon);
+                                child.parent = node;
+                                node.children.append (child);
+                                _all_sheets.append (child);
+                                sheet_dir.metadata.add_folder (file_name);
+                                // Don't recursively build - let TreeListModel do it lazily
+                            }
                         }
                     }
                 }

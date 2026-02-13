@@ -279,10 +279,32 @@ namespace ThiefMD.Widgets {
         }
 
         private void show_empty () {
-            _empty = new Gtk.Label(_("Select an item from the Library to open or create a new Sheet."));
-            _empty.set_ellipsize (Pango.EllipsizeMode.END);
-            _empty.lines = 30;
-            _view.append (_empty);
+            if (_empty == null) {
+                _empty = new Gtk.Label(_("Select an item from the Library to open or create a new Sheet."));
+                _empty.set_ellipsize (Pango.EllipsizeMode.END);
+                _empty.lines = 30;
+                _empty.set_margin_top (12); // avoid header overlap
+                _empty.set_margin_start (6);
+                _empty.set_margin_end (6);
+            }
+
+            if (_empty.get_parent () == null) {
+                _view.append (_empty);
+            }
+        }
+
+        private void remove_empty_label () {
+            if (_empty != null && _empty.get_parent () != null) {
+                _view.remove (_empty);
+            }
+        }
+
+        private void update_empty_label_state () {
+            if (_sheets != null && _sheets.keys.size > 0) {
+                remove_empty_label ();
+            } else {
+                show_empty ();
+            }
         }
 
         public string guess_extension () {
@@ -310,9 +332,7 @@ namespace ThiefMD.Widgets {
                 _sheets.unset (sheet.file_name (), out val);
                 _view.remove (val);
                 metadata.sheet_order.remove (sheet.file_name ());
-                if (_sheets.is_empty) {
-                    show_empty ();
-                }
+                update_empty_label_state ();
             }
         }
 
@@ -364,13 +384,7 @@ namespace ThiefMD.Widgets {
             }
             reload_sheets ();
 
-            if (am_empty && (_sheets.keys.size != 0)) {
-                _view.remove (_empty);
-            }
-
-            if (_sheets.keys.size == 0 && !am_empty) {
-                _view.append (_empty);
-            }
+            update_empty_label_state ();
         }
 
         public List<Sheet> get_sheets () {
@@ -385,9 +399,7 @@ namespace ThiefMD.Widgets {
 
         public void load_sheets () {
             var settings = AppSettings.get_default ();
-            if (_empty != null) {
-                _view.remove (_empty);
-            }
+            remove_empty_label ();
 
             if (_sheets != null) {
                 foreach (var sheet in _sheets) {
@@ -429,6 +441,7 @@ namespace ThiefMD.Widgets {
                         Sheet sheet = new Sheet (path, this);
                         _sheets.set (file_name, sheet);
                         _view.append (sheet);
+                        remove_empty_label ();
 
                         if (!settings.dont_show_tips){
                             if (settings.last_file == path) {
@@ -443,9 +456,9 @@ namespace ThiefMD.Widgets {
             // Load anything new in the folder
             reload_sheets ();
 
-            if (metadata.sheet_order.size == 0) {
-                show_empty();
-            } else if (settings.save_library_order || metadata.notes != "") {
+            update_empty_label_state ();
+
+            if (metadata.sheet_order.size != 0 && (settings.save_library_order || metadata.notes != "")) {
                 save_library_order ();
             }
         }
@@ -469,6 +482,7 @@ namespace ThiefMD.Widgets {
                             _sheets.set (file_name, sheet);
                             _view.append (sheet);
                             metadata.add_sheet (file_name);
+                            remove_empty_label ();
 
                             if (!settings.dont_show_tips){
                                 if (settings.last_file == path) {
@@ -482,6 +496,8 @@ namespace ThiefMD.Widgets {
             } catch (Error e) {
                 warning (e.message);
             }
+
+            update_empty_label_state ();
         }
 
         public void sort_sheets_by_date (bool asc = true) {
