@@ -62,6 +62,9 @@ namespace ThiefMD.Widgets {
         private bool spellcheck_active = false;
         private bool writecheck_active;
         private bool typewriter_active;
+        private uint typewriter_timeout_id = 0;
+        private int64 typewriter_last_edit_time = 0;
+        private const int TYPEWRITER_IDLE_TIMEOUT_MS = 2000;
         private bool grammar_active = false;
         private bool no_hiding = false;
         private bool pointer_down = false;
@@ -619,8 +622,9 @@ namespace ThiefMD.Widgets {
                     typewriter_active = settings.typewriter_scrolling;
                     if (typewriter_active) {
                         debug ("File open: connecting typewriter scrolling signals");
-                        Timeout.add(Constants.TYPEWRITER_UPDATE_TIME, move_typewriter_scolling);
                         buffer.notify["cursor-position"].connect (move_typewriter_scolling_void);
+                    } else {
+                        stop_typewriter_timer ();
                     }
 
                     if (settings.autosave) {
@@ -668,6 +672,8 @@ namespace ThiefMD.Widgets {
 
                         buffer.changed.disconnect (on_change_notification);
                         settings.changed.disconnect (update_settings);
+
+                        stop_typewriter_timer ();
 
                         if (settings.writegood && writegood != null) {
                             writecheck_active = false;
@@ -884,6 +890,7 @@ namespace ThiefMD.Widgets {
 
             modified_time = new DateTime.now_utc ();
             should_scroll = true;
+            track_typewriter_edit_activity ();
             
             // Only ensure cursor visibility when typewriter mode is disabled
             // When typewriter mode is enabled, move_typewriter_scolling handles scrolling
@@ -1316,6 +1323,57 @@ namespace ThiefMD.Widgets {
             }
         }
 
+        private void track_typewriter_edit_activity () {
+            var settings = AppSettings.get_default ();
+            if (!typewriter_active || !settings.typewriter_scrolling) {
+                return;
+            }
+
+            typewriter_last_edit_time = GLib.get_monotonic_time ();
+            start_typewriter_timer_if_needed ();
+        }
+
+        private void start_typewriter_timer_if_needed () {
+            if (typewriter_timeout_id != 0) {
+                return;
+            }
+
+            typewriter_timeout_id = Timeout.add (Constants.TYPEWRITER_UPDATE_TIME, typewriter_timer_tick);
+        }
+
+        private void stop_typewriter_timer () {
+            if (typewriter_timeout_id != 0) {
+                Source.remove (typewriter_timeout_id);
+                typewriter_timeout_id = 0;
+            }
+
+            typewriter_last_edit_time = 0;
+        }
+
+        private bool typewriter_timer_tick () {
+            var settings = AppSettings.get_default ();
+            if (!typewriter_active || !settings.typewriter_scrolling || !am_active) {
+                stop_typewriter_timer ();
+                return false;
+            }
+
+            int64 last_edit = typewriter_last_edit_time;
+            if (last_edit == 0) {
+                stop_typewriter_timer ();
+                return false;
+            }
+
+            int64 now = GLib.get_monotonic_time ();
+            int64 elapsed_us = now - last_edit;
+            if (elapsed_us > TYPEWRITER_IDLE_TIMEOUT_MS * 1000) {
+                stop_typewriter_timer ();
+                return false;
+            }
+
+            move_typewriter_scolling ();
+            return true;
+        }
+
         private void update_settings () {
             var settings = AppSettings.get_default ();
             // Wrap long lines at word boundaries so the full file stays visible without horizontal scrolling
@@ -1346,13 +1404,13 @@ namespace ThiefMD.Widgets {
             if (!typewriter_active && settings.typewriter_scrolling) {
                 debug ("Settings: enabling typewriter scrolling - connecting signal");
                 typewriter_active = true;
-                Timeout.add(Constants.TYPEWRITER_UPDATE_TIME, move_typewriter_scolling);
                 buffer.notify["cursor-position"].connect (move_typewriter_scolling_void);
                 queue_draw ();
                 move_typewriter_scolling ();
             } else if (typewriter_active && !settings.typewriter_scrolling) {
                 debug ("Settings: disabling typewriter scrolling - disconnecting signal");
                 typewriter_active = false;
+                stop_typewriter_timer ();
                 buffer.notify["cursor-position"].disconnect (move_typewriter_scolling_void);
                 queue_draw ();
             }
