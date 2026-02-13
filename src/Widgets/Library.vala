@@ -58,6 +58,7 @@ namespace ThiefMD.Widgets {
         private LibNode? _selected;
         NewFolder folder_popup;
         private Gtk.PopoverMenu? _context_menu;
+        private Gtk.Popover? _icon_popover;
         private GLib.SimpleActionGroup _context_actions;
         private Gdk.Rectangle _last_menu_rect;
         private bool _has_last_menu_rect = false;
@@ -868,17 +869,76 @@ namespace ThiefMD.Widgets {
             _context_menu.popup ();
         }
 
-        private void append_icon_item (GLib.Menu icon_menu, string label, string value) {
-            var item = new GLib.MenuItem (label, "library.set_icon");
-            item.set_attribute_value ("target", new Variant.string (value));
+        private Gtk.Popover build_icon_selector_popover () {
+            var popover = new Gtk.Popover ();
+            var scroller = new Gtk.ScrolledWindow ();
+            scroller.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+            scroller.set_min_content_width (320);
+            scroller.set_min_content_height (250);
             
-            // Add icon preview to menu item
-            GLib.Icon? icon = get_icon_for_value (value);
-            if (icon != null) {
-                item.set_icon (icon);
+            var grid = new Gtk.Grid ();
+            grid.set_column_spacing (6);
+            grid.set_row_spacing (6);
+            grid.set_margin_top (6);
+            grid.set_margin_bottom (6);
+            grid.set_margin_start (6);
+            grid.set_margin_end (6);
+            
+            string[] labels = { _("None"), _("Folder"), _("Reader"), _("Love"), _("Game"), _("Art"), 
+                              _("Nature"), _("Food"), _("Help"), _("Cool"), _("Angel"), _("Monkey"),
+                              _("WordPress"), _("Ghost"), _("Write Freely"), _("Trash") };
+            string[] values = { "", "folder", "ephy-reader-mode-symbolic", "emote-love-symbolic",
+                              "applications-games-symbolic", "applications-graphics-symbolic",
+                              "emoji-nature-symbolic", "emoji-food-symbolic", "system-help-symbolic",
+                              "face-cool-symbolic", "face-angel-symbolic", "face-monkey-symbolic",
+                              "/com/github/kmwallio/thiefmd/icons/wordpress.png",
+                              "/com/github/kmwallio/thiefmd/icons/ghost.png",
+                              "/com/github/kmwallio/thiefmd/icons/wf.png",
+                              "user-trash-symbolic" };
+            
+            int row = 0;
+            int col = 0;
+            for (int i = 0; i < labels.length; i++) {
+                var button = new Gtk.Button ();
+                var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 3);
+                box.set_homogeneous (false);
+                
+                var image = new Gtk.Image ();
+                image.set_pixel_size (32);
+                GLib.Icon? icon = get_icon_for_value (values[i]);
+                if (icon != null) {
+                    image.set_from_gicon (icon);
+                }
+                
+                var label = new Gtk.Label (labels[i]);
+                label.set_wrap (true);
+                label.set_justify (Gtk.Justification.CENTER);
+                label.set_max_width_chars (8);
+                
+                box.append (image);
+                box.append (label);
+                button.set_child (box);
+                
+                var icon_value = values[i];
+                button.clicked.connect (() => {
+                    set_selected_icon (icon_value);
+                    if (_icon_popover != null) {
+                        _icon_popover.popdown ();
+                    }
+                });
+                
+                grid.attach (button, col, row, 1, 1);
+                
+                col++;
+                if (col >= 4) {
+                    col = 0;
+                    row++;
+                }
             }
             
-            icon_menu.append_item (item);
+            scroller.set_child (grid);
+            popover.set_child (scroller);
+            return popover;
         }
 
         private MenuModel? build_context_menu_model () {
@@ -908,26 +968,8 @@ namespace ThiefMD.Widgets {
             folder_section.append (_("Show Hidden Items"), "library.reveal_hidden");
             root.append_section (null, folder_section);
 
-            var icon_menu = new GLib.Menu ();
-            append_icon_item (icon_menu, _("None"), "");
-            append_icon_item (icon_menu, _("Folder"), "folder");
-            append_icon_item (icon_menu, _("Reader"), "ephy-reader-mode-symbolic");
-            append_icon_item (icon_menu, _("Love"), "emote-love-symbolic");
-            append_icon_item (icon_menu, _("Game"), "applications-games-symbolic");
-            append_icon_item (icon_menu, _("Art"), "applications-graphics-symbolic");
-            append_icon_item (icon_menu, _("Nature"), "emoji-nature-symbolic");
-            append_icon_item (icon_menu, _("Food"), "emoji-food-symbolic");
-            append_icon_item (icon_menu, _("Help"), "system-help-symbolic");
-            append_icon_item (icon_menu, _("Cool"), "face-cool-symbolic");
-            append_icon_item (icon_menu, _("Angel"), "face-angel-symbolic");
-            append_icon_item (icon_menu, _("Monkey"), "face-monkey-symbolic");
-            append_icon_item (icon_menu, _("WordPress"), "/com/github/kmwallio/thiefmd/icons/wordpress.png");
-            append_icon_item (icon_menu, _("Ghost"), "/com/github/kmwallio/thiefmd/icons/ghost.png");
-            append_icon_item (icon_menu, _("Write Freely"), "/com/github/kmwallio/thiefmd/icons/wf.png");
-            append_icon_item (icon_menu, _("Trash"), "user-trash-symbolic");
-
             var icon_section = new GLib.Menu ();
-            icon_section.append_submenu (_("Set Project Icon"), icon_menu);
+            icon_section.append (_("Set Project Icon"), "library.show_icon_selector");
             root.append_section (null, icon_section);
 
             if (settings.is_in_library (selection.path)) {
@@ -1052,6 +1094,21 @@ namespace ThiefMD.Widgets {
                 set_selected_icon (parameter.get_string ());
             });
             _context_actions.add_action (set_icon_action);
+
+            var show_icon_selector = new GLib.SimpleAction ("show_icon_selector", null);
+            show_icon_selector.activate.connect ((parameter) => {
+                if (_icon_popover != null) {
+                    _icon_popover.popdown ();
+                    _icon_popover.unparent ();
+                    _icon_popover = null;
+                }
+                
+                _icon_popover = build_icon_selector_popover ();
+                _icon_popover.set_pointing_to (_last_menu_rect);
+                _icon_popover.set_parent (_list_view);
+                _icon_popover.popup ();
+            });
+            _context_actions.add_action (show_icon_selector);
 
             var remove_action = new GLib.SimpleAction ("remove", null);
             remove_action.activate.connect ((parameter) => {
