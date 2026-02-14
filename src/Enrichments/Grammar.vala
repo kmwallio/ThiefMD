@@ -67,6 +67,7 @@ namespace ThiefMD.Enrichments {
         private bool processor_running;
         private Gee.ConcurrentSet<GrammarUpdateRequest> send_to_processor;
         private Gee.ConcurrentSet<GrammarUpdateRequest> send_to_buffer;
+        private ulong close_request_handler_id = 0;
 
         public GrammarChecker () {
             checking = Mutex ();
@@ -508,7 +509,10 @@ namespace ThiefMD.Enrichments {
             GLib.Idle.add (update_buffer);
             Gtk.ApplicationWindow? instance = (Gtk.ApplicationWindow?)ThiefApp.get_instance ();
             if (instance != null) {
-                instance.close_request.connect (() => {
+                if (close_request_handler_id != 0) {
+                    instance.disconnect (close_request_handler_id);
+                }
+                close_request_handler_id = instance.close_request.connect (() => {
                     detach ();
                     return false;
                 });
@@ -540,11 +544,9 @@ namespace ThiefMD.Enrichments {
             }
 
             Gtk.ApplicationWindow? instance = (Gtk.ApplicationWindow?)ThiefApp.get_instance ();
-            if (instance != null) {
-                instance.close_request.connect (() => {
-                    detach ();
-                    return false;
-                });
+            if (instance != null && close_request_handler_id != 0) {
+                instance.disconnect (close_request_handler_id);
+                close_request_handler_id = 0;
             }
 
             if (buffer == null) {

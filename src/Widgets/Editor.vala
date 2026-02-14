@@ -76,6 +76,15 @@ namespace ThiefMD.Widgets {
         private Gtk.TextTag focus_text;
         private Gtk.TextTag outoffocus_text;
 
+        // Word count tracking
+        private int _buffer_word_count = 0;
+        private TimedMutex word_count_update_limit;
+        private Thread<void>? word_count_thread = null;
+        private Mutex word_count_mutex;
+        private bool word_count_processing = false;
+        private int _pending_word_count = 0;
+        private string _text_to_count = "";
+
         //
         // Optional Enrichments
         //
@@ -102,6 +111,8 @@ namespace ThiefMD.Widgets {
             dynamic_margin_update = new TimedMutex (250);
             writegood_limit = new TimedMutex (300);
             preview_mutex = new TimedMutex (250);
+            word_count_update_limit = new TimedMutex (500);
+            word_count_mutex = Mutex ();
 
             // Initialize spellchecker stub so attach/detach calls are safe
             spell = new Gspell.Checker ();
@@ -710,6 +721,64 @@ namespace ThiefMD.Widgets {
             return buffer.get_text (start, end, true);
         }
 
+        public int get_buffer_word_count () {
+            return _buffer_word_count;
+        }
+
+        private void update_buffer_word_count () {
+            if (!word_count_update_limit.can_do_action ()) {
+                return;
+            }
+            
+            word_count_mutex.lock ();
+            if (word_count_processing) {
+                // Already counting, skip this update
+                word_count_mutex.unlock ();
+                return;
+            }
+            
+            // Join any previous thread
+            if (word_count_thread != null) {
+                word_count_thread.join ();
+            }
+            
+            // Capture buffer text on main thread before spawning worker
+            // This is critical - GTK operations must happen on the main thread
+            _text_to_count = get_buffer_text ();
+            
+            word_count_processing = true;
+            word_count_mutex.unlock ();
+            
+            // Spawn background thread to calculate word count
+            word_count_thread = new Thread<void> ("word-counter", count_words_background);
+            GLib.Idle.add (apply_word_count_result);
+        }
+        
+        private void count_words_background () {
+            _pending_word_count = FileManager.get_word_count_from_string (_text_to_count);
+            word_count_processing = false;
+            Thread.exit (0);
+        }
+        
+        private bool apply_word_count_result () {
+            word_count_mutex.lock ();
+            bool still_processing = word_count_processing;
+            word_count_mutex.unlock ();
+            
+            if (still_processing) {
+                // Keep checking until processing is complete
+                return true;
+            }
+            
+            // Update the count on the main thread
+            _buffer_word_count = _pending_word_count;
+            
+            var settings = AppSettings.get_default ();
+            settings.writing_changed ();
+            
+            return false;
+        }
+
         public bool spellcheck {
             set {
                 if (value && !spellcheck_active) {
@@ -887,6 +956,9 @@ namespace ThiefMD.Widgets {
             }
 
             idle_margins ();
+
+            // Update word count from buffer
+            update_buffer_word_count ();
 
             modified_time = new DateTime.now_utc ();
             should_scroll = true;
@@ -1111,6 +1183,8 @@ namespace ThiefMD.Widgets {
             if (opening) {
                 buffer.set_max_undo_levels (Constants.MAX_UNDO_LEVELS);
                 buffer.changed.connect (on_text_modified);
+                // Initialize word count on file open
+                _buffer_word_count = FileManager.get_word_count_from_string (text);
             }
 
             Gtk.TextIter? start = null;
@@ -1960,6 +2034,15 @@ namespace ThiefMD.Widgets {
 
         public void clean () {
             editable = false;
+            
+            // Clean up word count thread
+            word_count_mutex.lock ();
+            if (word_count_thread != null) {
+                word_count_thread.join ();
+                word_count_thread = null;
+            }
+            word_count_mutex.unlock ();
+            
             spell.detach ();
             if (fountain != null) {
                 fountain.detach ();

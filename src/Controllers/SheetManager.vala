@@ -171,7 +171,8 @@ namespace ThiefMD.Controllers.SheetManager {
     public void get_word_count_stats (out int word_count, out int reading_hours, out int reading_minutes, out int reading_seconds) {
         word_count = 0;
         foreach (var editor in _active_editors) {
-            word_count += editor.sheet.get_word_count ();
+            // Use buffer word count instead of reading from disk
+            word_count += editor.editor.get_buffer_word_count ();
         }
         int timereadings = word_count / Constants.WORDS_PER_SECOND;
         reading_hours = timereadings / 3600;
