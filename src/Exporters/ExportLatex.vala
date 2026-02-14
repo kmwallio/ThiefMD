@@ -56,7 +56,7 @@ namespace ThiefMD.Exporters {
             tex_filter.add_mime_type ("application/x-tex");
             tex_filter.add_pattern ("*.tex");
 
-            File new_novel = Dialogs.get_target_save_file_with_extension (
+            File? new_novel = Dialogs.get_target_save_file_with_extension (
                 _("Export LaTeX"),
                 tex_filter,
                 "tex");

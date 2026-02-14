@@ -78,7 +78,7 @@ namespace ThiefMD.Controllers.Dialogs {
         return file;
     }
 
-    public File get_target_save_file_with_extension (
+    public File? get_target_save_file_with_extension (
         string title,
         Gtk.FileFilter filter,
         string ext)
@@ -100,7 +100,7 @@ namespace ThiefMD.Controllers.Dialogs {
         return (file != null) ? file.get_path () : "";
     }
 
-    public File display_open_dialog (string ext = "") {
+    public File? display_open_dialog (string ext = "") {
         var dialog = build_dialog (_("Open file"));
         if (ext != "") {
             var filter = new Gtk.FileFilter ();
@@ -115,7 +115,7 @@ namespace ThiefMD.Controllers.Dialogs {
         return run_open_dialog (dialog);
     }
 
-    public File display_save_dialog (bool epub_ext = true) {
+    public File? display_save_dialog (bool epub_ext = true) {
         var dialog = build_dialog (_("Save file"));
 
         var pdf = new Gtk.FileFilter ();

@@ -57,7 +57,7 @@ namespace ThiefMD.Widgets {
 
             _create.clicked.connect (new_file);
             _import.clicked.connect (() => {
-                File import_file = Dialogs.display_open_dialog (ThiefProperties.SUPPORTED_IMPORT_FILES);
+                File? import_file = Dialogs.display_open_dialog (ThiefProperties.SUPPORTED_IMPORT_FILES);
                 if (import_file != null && import_file.query_exists () && SheetManager.get_sheets () != null) {
                     this.hide ();
                     FileManager.import_file (import_file.get_path (), SheetManager.get_sheets ());

@@ -94,7 +94,7 @@ namespace ThiefMD {
             open_solo_content.halign = Gtk.Align.START;
             open_solo_editor.set_child (open_solo_content);
             open_solo_editor.clicked.connect (() => {
-                File open_file = Dialogs.display_open_dialog (ThiefProperties.SUPPORTED_OPEN_FILES);
+                File? open_file = Dialogs.display_open_dialog (ThiefProperties.SUPPORTED_OPEN_FILES);
                 if (open_file != null && open_file.query_exists ()) {
                     ThiefApplication.open_file (open_file);
                     this.close ();

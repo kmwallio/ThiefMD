@@ -431,6 +431,7 @@ namespace ThiefMD {
             // MouseMotionListener has members to keep state, so reference needs to
             // be kept or variables will be freed.
             mouse_listener = new MouseMotionListener (this);
+            mouse_listener.attach (desktop_box);
 
             UserData.create_data_directories ();
 

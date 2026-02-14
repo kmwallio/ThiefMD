@@ -89,7 +89,7 @@ namespace ThiefMD.Exporters {
             pdf.add_mime_type ("application/pdf");
             pdf.add_pattern ("*.pdf");
 
-            File new_novel = Dialogs.get_target_save_file_with_extension (
+            File? new_novel = Dialogs.get_target_save_file_with_extension (
                 _("Export PDF"),
                 pdf,
                 "pdf");
