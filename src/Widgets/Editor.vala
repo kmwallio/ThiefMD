@@ -65,6 +65,8 @@ namespace ThiefMD.Widgets {
         private uint typewriter_timeout_id = 0;
         private int64 typewriter_last_edit_time = 0;
         private const int TYPEWRITER_IDLE_TIMEOUT_MS = 2000;
+        private int64 typewriter_last_click_time = 0;
+        private const int TYPEWRITER_CLICK_PAUSE_MS = 300;
         private bool grammar_active = false;
         private bool no_hiding = false;
         private bool pointer_down = false;
@@ -83,6 +85,9 @@ namespace ThiefMD.Widgets {
         private Mutex word_count_mutex;
         private bool word_count_processing = false;
         private int _pending_word_count = 0;
+
+        // Context menu
+        private EditorContextMenu? context_menu_helper = null;
         private string _text_to_count = "";
 
         //
@@ -122,6 +127,7 @@ namespace ThiefMD.Widgets {
             grammar = new GrammarChecker ();
 
             var click_controller = new Gtk.GestureClick ();
+            click_controller.set_button (1);
             click_controller.pressed.connect ((n_press, x, y) => {
                 pointer_down = true;
             });
@@ -132,6 +138,9 @@ namespace ThiefMD.Widgets {
                     var state = event.get_modifier_state ();
                     markdown.handle_click (x, y, state);
                 }
+                
+                // Pause typewriter scrolling for 300ms after click to allow double-click/selection
+                pause_typewriter_scrolling_on_click ();
                 
                 pointer_down = false;
                 GLib.Idle.add (() => {
@@ -167,6 +176,7 @@ namespace ThiefMD.Widgets {
             this.add_controller (drag_controller);
 
             setup_drop_target ();
+            context_menu_helper = new EditorContextMenu (this);
 
             file_mutex = Mutex ();
             #if false
@@ -916,6 +926,200 @@ namespace ThiefMD.Widgets {
             }
         }
 
+        public void insert_datetime () {
+            if (file == null || opened_filename == "" || !file.query_exists ()) {
+                return;
+            }
+
+            var parent = file.get_parent ();
+            if (parent == null) {
+                return;
+            }
+
+            string parent_path = parent.get_path ().down ();
+            bool am_iso8601 = parent_path.contains ("content");
+
+            DateTime now = new DateTime.now_local ();
+            string new_text = now.format ("%F %T");
+
+            if (am_iso8601) {
+                new_text = now.format ("%FT%T%z");
+            }
+
+            disk_change_prompted.can_do_action ();
+            insert_at_cursor (new_text);
+        }
+
+        public void insert_yaml_frontmatter () {
+            if (file == null || opened_filename == "" || !file.query_exists ()) {
+                return;
+            }
+
+            if (get_buffer_text ().has_prefix ("---")) {
+                return;
+            }
+
+            var settings = AppSettings.get_default ();
+            Regex date = null;
+            try {
+                date = new Regex ("([0-9]{4}-[0-9]{1,2}-[0-9]{1,2}-?)?(.*?)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            } catch (Error e) {
+                warning ("Could not compile regex: %s", e.message);
+            }
+
+            DateTime now = new DateTime.now_local ();
+            string current_time = now.format ("%F %T");
+
+            var parent = file.get_parent ();
+            if (parent == null) {
+                return;
+            }
+
+            string parent_folder = parent.get_basename ().down ();
+            string page_type = (parent_folder.contains ("post") || parent_folder.contains ("draft")) ? "post" : "page";
+            string current_title = file.get_basename ();
+            string parent_path = parent.get_path ().down ();
+            if (parent_path.contains ("content")) {
+                int content_idx = parent_path.last_index_of ("content");
+                if (content_idx != -1) {
+                    page_type = parent_path.substring (content_idx + 8, -1).replace ("/", "").replace ("\\", "");
+                }
+            }
+
+            string frontmatter =
+"---\n" +
+"title: \"" + current_title + "\"\n" +
+"date: " + current_time + "\n" +
+"type: \"" + page_type + "\"\n" +
+"draft: true\n" +
+"tags: []\n" +
+"categories: []\n" +
+"summary: \"\"\n" +
+"---\n\n";
+
+            if (date != null) {
+                try {
+                    MatchInfo match_info;
+                    if (date.match (parent_path, 0, out match_info)) {
+                        string extracted = match_info.fetch (2);
+                        if (extracted != null && extracted != "") {
+                            current_title = extracted.replace ("/", "");
+                        }
+                    }
+                } catch (Error e) {
+                    warning ("Could not look for weekly filename title");
+                }
+            }
+
+            var display = Gdk.Display.get_default ();
+            if (display != null) {
+                var clipboard = display.get_clipboard ();
+                clipboard.set_text (current_title);
+            }
+
+            insert_at_cursor (frontmatter);
+            Gtk.TextIter cursor;
+            buffer.get_start_iter (out cursor);
+            cursor.forward_lines (9);
+            buffer.place_cursor (cursor);
+        }
+
+        public void insert_citation (string citation) {
+            if (citation == "") {
+                return;
+            }
+
+            string insert_citation_string = citation;
+            var cursor = buffer.get_insert ();
+            Gtk.TextIter start;
+            buffer.get_iter_at_mark (out start, cursor);
+            if (start.backward_char ()) {
+                if (start.get_char () != '@') {
+                    insert_citation_string = "@" + insert_citation_string;
+                }
+            }
+            insert_at_cursor (insert_citation_string);
+        }
+
+        public Gee.HashMap<string, string> get_citation_labels () {
+            var labels = new Gee.HashMap<string, string> ();
+            if (file == null || opened_filename == "") {
+                return labels;
+            }
+
+            string bib_file = "";
+            if (!Pandoc.get_bibtex_path (get_buffer_text (), ref bib_file)) {
+                bib_file = find_bibtex_for_sheet_local (opened_filename);
+            } else {
+                bib_file = Pandoc.find_file (bib_file);
+            }
+
+            if (bib_file == "") {
+                return labels;
+            }
+
+            try {
+                BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
+                bib_parser.parse_file ();
+                var cite_labels = bib_parser.get_labels ();
+                foreach (var label in cite_labels) {
+                    labels.set (label, bib_parser.get_title (label));
+                }
+            } catch (Error e) {
+                warning ("Could not parse bibliography: %s", e.message);
+            }
+
+            return labels;
+        }
+
+        private string find_bibtex_for_sheet_local (string path = "") {
+            string result = "";
+            string search_path = Path.get_dirname (path);
+            if (search_path == "") {
+                Sheet? search_sheet = SheetManager.get_sheet ();
+                if (search_sheet != null) {
+                    search_path = Path.get_dirname (search_sheet.file_path ());
+                }
+            }
+            if (search_path != "") {
+                int idx = 0;
+                while (search_path != "") {
+                    try {
+                        Dir dir = Dir.open (search_path, 0);
+                        string? file_name = null;
+                        while ((file_name = dir.read_name ()) != null) {
+                            if (!file_name.has_prefix (".")) {
+                                string file_path = Path.build_filename (search_path, file_name);
+                                if (is_bibtex_file (file_path)) {
+                                    result = file_path;
+                                    break;
+                                }
+                            }
+                        }
+                    } catch (Error e) {
+                        warning ("Could not scan directory: %s", e.message);
+                        break;
+                    }
+                    if (result != "") {
+                        break;
+                    }
+                    idx = search_path.last_index_of_char (Path.DIR_SEPARATOR);
+                    if (idx != -1) {
+                        search_path = search_path[0:idx];
+                    } else {
+                        search_path = "";
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private bool is_bibtex_file (string file_name) {
+            string check = file_name.down ();
+            return check.has_suffix (".bib") || check.has_suffix (".bibtex");
+        }
+
         private bool writecheck_scheduled = false;
         private void write_good_recheck () {
             if (writegood_limit.can_do_action () && writecheck_active) {
@@ -1641,7 +1845,22 @@ namespace ThiefMD.Widgets {
 
         public void move_typewriter_scolling_void () {
             debug ("move_typewriter_scolling_void: Called from signal");
-            move_typewriter_scolling ();
+            if (!should_pause_typewriter_scrolling ()) {
+                move_typewriter_scolling ();
+            }
+        }
+
+        private void pause_typewriter_scrolling_on_click () {
+            typewriter_last_click_time = GLib.get_monotonic_time ();
+        }
+
+        private bool should_pause_typewriter_scrolling () {
+            if (typewriter_last_click_time == 0) {
+                return false;
+            }
+            int64 now = GLib.get_monotonic_time ();
+            int64 elapsed_us = now - typewriter_last_click_time;
+            return elapsed_us < (TYPEWRITER_CLICK_PAUSE_MS * 1000);
         }
 
         public bool move_typewriter_scolling () {
