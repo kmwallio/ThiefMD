@@ -448,13 +448,14 @@ namespace ThiefMD.Controllers.FileManager {
     }
 
     public int get_word_count (string file_path) {
+        DataInputStream? input = null;
         try {
             var file = File.new_for_path (file_path);
             if (!file.query_exists ()) {
                 return 0;
             }
 
-            var input = new DataInputStream (file.read ());
+            input = new DataInputStream (file.read ());
             int word_count = 0;
             string? line;
             bool in_yaml = false;
@@ -534,6 +535,14 @@ namespace ThiefMD.Controllers.FileManager {
             return word_count;
         } catch (Error e) {
             warning ("Could not get word count for %s: %s", file_path, e.message);
+        } finally {
+            if (input != null) {
+                try {
+                    input.close ();
+                } catch (Error e) {
+                    warning ("Could not close word count stream: %s", e.message);
+                }
+            }
         }
 
         return 0;
@@ -774,6 +783,7 @@ namespace ThiefMD.Controllers.FileManager {
         var markdown = new StringBuilder ();
         string temp_title = "";
         string temp_date = "";
+        DataInputStream? input = null;
 
         try {
             // Compile regex once
@@ -790,7 +800,7 @@ namespace ThiefMD.Controllers.FileManager {
             }
 
             debug ("Reading %s", file.get_path ());
-            var input = new DataInputStream (file.read ());
+            input = new DataInputStream (file.read ());
             int lines_read = 0;
             string? line;
             bool in_yaml = false;
@@ -874,6 +884,14 @@ namespace ThiefMD.Controllers.FileManager {
 
         } catch (Error e) {
             warning ("Error reading %s: %s", file_path, e.message);
+        } finally {
+            if (input != null) {
+                try {
+                    input.close ();
+                } catch (Error e) {
+                    warning ("Could not close file lines stream: %s", e.message);
+                }
+            }
         }
 
         title = temp_title;
@@ -919,6 +937,7 @@ namespace ThiefMD.Controllers.FileManager {
     public string get_file_lines (string file_path, int lines, bool non_empty = true) {
         var lock = new FileLock ();
         string file_contents = "";
+        DataInputStream? input = null;
 
         if (lines <= 0) {
             return get_file_contents(file_path);
@@ -931,7 +950,7 @@ namespace ThiefMD.Controllers.FileManager {
                 string filename = file.get_path ();
                 debug ("Reading %s\n", filename);
 
-                var input = new DataInputStream (file.read ());
+                input = new DataInputStream (file.read ());
                 int lines_read = 0;
                 string line;
 
@@ -951,6 +970,14 @@ namespace ThiefMD.Controllers.FileManager {
             }
         } catch (Error e) {
             warning ("Error: %s", e.message);
+        } finally {
+            if (input != null) {
+                try {
+                    input.close ();
+                } catch (Error e) {
+                    warning ("Could not close file lines internal stream: %s", e.message);
+                }
+            }
         }
 
         return file_contents;
