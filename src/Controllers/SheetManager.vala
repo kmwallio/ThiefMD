@@ -262,7 +262,7 @@ namespace ThiefMD.Controllers.SheetManager {
         StringBuilder builder = new StringBuilder ();
         int i = 0;
         foreach (var sp in _active_editors) {
-            string text = (Sheet.areEqual(sp.sheet, _currentSheet.sheet)) ? sp.editor.active_markdown () : sp.editor.get_buffer_text ();
+            string text = ((Sheet.areEqual(sp.sheet, _currentSheet.sheet)) ? sp.editor.active_markdown () : sp.editor.get_buffer_text ()).replace (ThiefProperties.THIEF_MARK_CONST, "");
             string title, date;
             builder.append (i == 0 ?
                 text

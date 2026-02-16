@@ -386,7 +386,7 @@ namespace ThiefMD.Widgets {
 
             var actions_section = new GLib.Menu ();
             actions_section.append (_("Preview"), "sheet.preview");
-            actions_section.append (_("Export"), "sheet.export");
+            actions_section.append (_("Publisher Preview"), "sheet.publisher_preview");
             actions_section.append (_("Copy File Path"), "sheet.copy_path");
             root.append_section (null, actions_section);
 
@@ -446,13 +446,13 @@ namespace ThiefMD.Widgets {
             });
             _context_actions.add_action (preview_action);
 
-            var export_action = new GLib.SimpleAction ("export", null);
-            export_action.activate.connect ((parameter) => {
+            var publisher_preview_action = new GLib.SimpleAction ("publisher_preview", null);
+            publisher_preview_action.activate.connect ((parameter) => {
                 string preview_markdown = FileManager.get_file_contents (_sheet_path);
                 PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown, is_fountain (_sheet_path));
                 ppw.show ();
             });
-            _context_actions.add_action (export_action);
+            _context_actions.add_action (publisher_preview_action);
 
             var copy_path_action = new GLib.SimpleAction ("copy_path", null);
             copy_path_action.activate.connect ((parameter) => {
