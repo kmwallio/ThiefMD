@@ -119,10 +119,8 @@ namespace ThiefMD.Widgets {
             word_count_update_limit = new TimedMutex (500);
             word_count_mutex = Mutex ();
 
-            // Initialize spell checking with libspelling
-            var spell_checker = Spelling.Checker.get_default ();
-            spell_adapter = new Spelling.TextBufferAdapter (buffer, spell_checker);
-            spell_adapter.set_enabled (true);  // Enable by default
+            // Initialize spell checking with libspelling (lazily created when enabled)
+            // spell_adapter created in spellcheck property setter
 
             // Initialize optional enrichments to avoid null derefs when toggled
             writegood = new WriteGood.Checker ();
@@ -311,6 +309,12 @@ namespace ThiefMD.Widgets {
             }
 
             // GTK4: file loading handled in open_file; constructor no longer performs disk checks.
+            
+            // Initialize spell checking after everything else is set up
+            GLib.Idle.add (() => {
+                spellcheck_enable ();
+                return false;
+            });
         }
 
         /* GTK4 TODO: motion_notify_event replaced by Gtk.EventController
@@ -670,12 +674,7 @@ namespace ThiefMD.Widgets {
                         }
                     }
 
-                    if (settings.spellcheck) {
-                        if (spell_adapter != null) {
-                            spell_adapter.set_enabled (true);
-                        }
-                        spellcheck_active = true;
-                    }
+                    // Spell checking is handled by lazy initialization in the Idle callback below
 
                     //
                     // Register for redrawing of window for handling margins and other
@@ -800,47 +799,83 @@ namespace ThiefMD.Widgets {
         public bool spellcheck {
             set {
                 if (value && !spellcheck_active) {
-                    debug ("Activate spellcheck\\n");
-                    try {
-                        var settings = AppSettings.get_default ();
-                        var last_language = settings.spellcheck_language;
-                        
-                        if (spell_adapter != null) {
-                            var provider = Spelling.Provider.get_default ();
-                            var languages_model = provider.list_languages ();
-                            uint n_items = languages_model.get_n_items ();
-                            
-                            // Try to set to saved language, otherwise use first available
-                            bool language_found = false;
-                            for (uint i = 0; i < n_items; i++) {
-                                var lang_obj = languages_model.get_object (i);
-                                if (lang_obj is Spelling.Language) {
-                                    var lang = (Spelling.Language)lang_obj;
-                                    if (last_language == lang.get_code ()) {
-                                        spell_adapter.set_language (last_language);
-                                        language_found = true;
-                                        break;
+                    if (spell_adapter == null) {
+                        try {
+                            var spell_checker = Spelling.Checker.get_default ();
+                            if (spell_checker == null) {
+                                warning ("spell_checker is null");
+                                return;
+                            }
+                            spell_adapter = new Spelling.TextBufferAdapter (buffer, spell_checker);
+                            if (spell_adapter == null) {
+                                warning ("spell_adapter creation failed");
+                                return;
+                            }
+                        } catch (Error e) {
+                            warning ("Error creating spell adapter: %s", e.message);
+                            return;
+                        }
+                    }
+                    
+                    if (spell_adapter != null) {
+                        try {
+                            // Try to set saved language, otherwise use first available
+                            try {
+                                var settings = AppSettings.get_default ();
+                                var last_language = settings.spellcheck_language;
+                                var provider = Spelling.Provider.get_default ();
+                                if (provider != null) {
+                                    var languages_model = provider.list_languages ();
+                                    uint n_items = languages_model.get_n_items ();
+                                    
+                                    if (n_items > 0) {
+                                        // Try to set to saved language, otherwise use first available
+                                        bool language_found = false;
+                                        for (uint i = 0; i < n_items; i++) {
+                                            var lang_obj = languages_model.get_object (i);
+                                            if (lang_obj is Spelling.Language) {
+                                                var lang = (Spelling.Language)lang_obj;
+                                                if (last_language != null && last_language == lang.get_code ()) {
+                                                    spell_adapter.set_language (last_language);
+                                                    language_found = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        
+                                        // Use first language if saved one not found
+                                        if (!language_found) {
+                                            var first_lang = languages_model.get_object (0);
+                                            if (first_lang is Spelling.Language) {
+                                                var lang = (Spelling.Language)first_lang;
+                                                spell_adapter.set_language (lang.get_code ());
+                                            }
+                                        }
                                     }
                                 }
-                            }
-                            
-                            // Use first language if saved one not found
-                            if (!language_found && n_items > 0) {
-                                var first_lang = languages_model.get_object (0);
-                                if (first_lang is Spelling.Language) {
-                                    var lang = (Spelling.Language)first_lang;
-                                    spell_adapter.set_language (lang.get_code ());
-                                }
+                            } catch (Error e) {
+                                debug ("Error setting language: %s", e.message);
                             }
                             
                             spell_adapter.set_enabled (true);
+                            
+                            // Defer invalidate_all to background to avoid blocking UI with large files
+                            new Thread<bool> (null, () => {
+                                spell_adapter.invalidate_all ();
+                                return true;
+                            });
+                            
                             spellcheck_active = true;
+                            
+                            // Refresh context menu now that spell adapter is available
+                            if (context_menu_helper != null) {
+                                context_menu_helper.refresh_context_menu ();
+                            }
+                        } catch (Error e) {
+                            warning ("Error enabling spellcheck: %s", e.message);
                         }
-                    } catch (Error e) {
-                        warning (e.message);
                     }
                 } else if (!value && spellcheck_active) {
-                    debug ("Disable spellcheck\\n");
                     if (spell_adapter != null) {
                         spell_adapter.set_enabled (false);
                     }

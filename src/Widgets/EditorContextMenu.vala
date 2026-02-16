@@ -18,7 +18,7 @@
 using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
-    // Context menu functionality for Editor - split out to avoid modifying existing code structure
+    // Context menufunctionality for Editor - split out to avoid modifying existing code structure
     public class EditorContextMenu : Object {
         private unowned Editor editor;
         private GLib.SimpleActionGroup context_actions;
@@ -28,9 +28,13 @@ namespace ThiefMD.Widgets {
             editor = ed;
             context_actions = new GLib.SimpleActionGroup ();
             editor.insert_action_group ("editor", context_actions);
-
+            
             setup_actions ();
-            setup_menu_refresh ();
+            setup_context_menu_signal ();
+        }
+
+        public void refresh_context_menu () {
+            debug ("refresh_context_menu called");
             update_extra_menu ();
         }
 
@@ -63,36 +67,49 @@ namespace ThiefMD.Widgets {
             context_actions.add_action (insert_citation_action);
         }
 
-        private void setup_menu_refresh () {
-            menu_refresh_controller = new Gtk.GestureClick ();
-            menu_refresh_controller.set_button (3);
-            menu_refresh_controller.set_propagation_phase (Gtk.PropagationPhase.CAPTURE);
-            menu_refresh_controller.released.connect ((n_press, x, y) => {
-                update_extra_menu ();
-            });
-            editor.add_controller (menu_refresh_controller);
+        private void setup_context_menu_signal () {
+            // Note: We'll set the extra menu once on startup
+            // GTK4's set_extra_menu() handles context menu extension for us
+            update_extra_menu ();
+            debug ("Context menu initialized");
         }
 
         private void update_extra_menu () {
-            if (editor.file_path == "" || !editor.editable) {
+            debug ("update_extra_menu called!");
+            if (!editor.editable) {
+                debug ("update_extra_menu: editor not editable");
                 editor.set_extra_menu (null);
                 return;
             }
 
             var menu_model = build_extra_menu_model ();
+            debug ("update_extra_menu: menu_model = %s, n_items = %u", 
+                menu_model != null ? "not null" : "null",
+                menu_model != null ? menu_model.get_n_items () : 0);
             editor.set_extra_menu (menu_model);
         }
 
         private MenuModel? build_extra_menu_model () {
             var root = new GLib.Menu ();
 
-            // Add spelling corrections if available and spell checking is enabled
+            // Add spelling corrections if a misspelled word is at cursor
+            // Use libspelling's built-in menu model for corrections
             var spell_adapter = editor.get_spell_adapter ();
+            debug ("build_extra_menu: spell_adapter = %s", spell_adapter != null ? "not null" : "null");
+            
             if (spell_adapter != null && spell_adapter.get_enabled ()) {
-                var corrections_menu = spell_adapter.get_menu_model ();
-                if (corrections_menu != null && corrections_menu.get_n_items () > 0) {
-                    root.append_section (null, corrections_menu);
+                debug ("build_extra_menu: spell adapter is enabled, getting menu model...");
+                var spell_menu = spell_adapter.get_menu_model ();
+                debug ("build_extra_menu: spell_menu = %s", spell_menu != null ? "not null" : "null");
+                if (spell_menu != null) {
+                    debug ("build_extra_menu: spell menu has %u items", spell_menu.get_n_items ());
                 }
+                
+                if (spell_menu != null) {
+                    root.append_section (null, spell_menu);
+                }
+
+                editor.insert_action_group ("spelling", spell_adapter);
             }
 
             var insert_section = new GLib.Menu ();
@@ -102,6 +119,7 @@ namespace ThiefMD.Widgets {
 
             var citations = editor.get_citation_labels ();
             if (citations.size > 0) {
+                debug ("build_extra_menu: found %u citations", citations.size);
                 var citation_menu = new GLib.Menu ();
                 foreach (var label in citations.keys) {
                     string title = citations.get (label);
@@ -125,6 +143,7 @@ namespace ThiefMD.Widgets {
             file_section.append (_("Split File Here..."), "editor.split_file");
             root.append_section (null, file_section);
 
+            debug ("build_extra_menu: final root menu has %u items", root.get_n_items ());
             return root;
         }
 
@@ -278,6 +297,32 @@ namespace ThiefMD.Widgets {
                 );
                 error_dialog.add_response ("ok", _("OK"));
                 error_dialog.present ();
+            }
+        }
+
+        private void replace_misspelled_word (string replacement) {
+            // Get the cursor position
+            var cursor_mark = editor.buffer.get_insert ();
+            Gtk.TextIter cursor;
+            editor.buffer.get_iter_at_mark (out cursor, cursor_mark);
+
+            // Move to start of word
+            var word_start = cursor;
+            var word_end = cursor;
+            
+            if (!word_start.backward_word_start ()) {
+                word_start = cursor;
+            }
+            if (!word_end.forward_word_end ()) {
+                word_end = cursor;
+            }
+
+            // Replace the word if we found it
+            if (!word_start.equal (word_end)) {
+                editor.buffer.begin_user_action ();
+                editor.buffer.delete (ref word_start, ref word_end);
+                editor.buffer.insert (ref word_start, replacement, -1);
+                editor.buffer.end_user_action ();
             }
         }
     }
