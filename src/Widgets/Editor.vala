@@ -122,7 +122,7 @@ namespace ThiefMD.Widgets {
             // Initialize spell checking with libspelling
             var spell_checker = Spelling.Checker.get_default ();
             spell_adapter = new Spelling.TextBufferAdapter (buffer, spell_checker);
-            spell_adapter.set_enabled (false);  // Disabled by default
+            spell_adapter.set_enabled (true);  // Enable by default
 
             // Initialize optional enrichments to avoid null derefs when toggled
             writegood = new WriteGood.Checker ();
@@ -737,6 +737,10 @@ namespace ThiefMD.Widgets {
 
         public int get_buffer_word_count () {
             return _buffer_word_count;
+        }
+
+        public unowned Spelling.TextBufferAdapter? get_spell_adapter () {
+            return spell_adapter;
         }
 
         private void update_buffer_word_count () {

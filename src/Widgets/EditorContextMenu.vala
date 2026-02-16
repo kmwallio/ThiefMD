@@ -86,6 +86,15 @@ namespace ThiefMD.Widgets {
         private MenuModel? build_extra_menu_model () {
             var root = new GLib.Menu ();
 
+            // Add spelling corrections if available and spell checking is enabled
+            var spell_adapter = editor.get_spell_adapter ();
+            if (spell_adapter != null && spell_adapter.get_enabled ()) {
+                var corrections_menu = spell_adapter.get_menu_model ();
+                if (corrections_menu != null && corrections_menu.get_n_items () > 0) {
+                    root.append_section (null, corrections_menu);
+                }
+            }
+
             var insert_section = new GLib.Menu ();
             insert_section.append (_("Insert Datetime"), "editor.insert_datetime");
             insert_section.append (_("Insert YAML Frontmatter"), "editor.insert_frontmatter");
