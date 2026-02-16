@@ -23,6 +23,7 @@ namespace ThiefMD.Controllers.Dialogs {
     private Gtk.FileDialog build_dialog (string title) {
         var dialog = new Gtk.FileDialog ();
         dialog.set_title (title);
+        dialog.set_modal (true);
         return dialog;
     }
 
