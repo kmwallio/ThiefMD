@@ -32,6 +32,11 @@
         },
         {
             "type": "file",
+            "url": "https://files.pythonhosted.org/packages/cd/8a/37362fc2b949d5f733a8b0f2ff51ba423914cabefe69f1d1b6aab710f5fe/pybind11-3.0.1-py3-none-any.whl",
+            "sha256": "aa8f0aa6e0a94d3b64adfc38f560f33f15e589be2175e103c0a33c6bce55ee89"
+        },
+        {
+            "type": "file",
             "url": "https://files.pythonhosted.org/packages/21/0e/8459ca4413e1a21a06c97d134bfaf18adfd27cea068813dc0faae06cbf00/cssselect2-0.9.0-py3-none-any.whl",
             "sha256": "6a99e5f91f9a016a304dd929b0966ca464bcfda15177b6fb4a118fc0fb5d9563"
         },
