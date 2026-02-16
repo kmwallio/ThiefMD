@@ -112,9 +112,11 @@ meson
 ninja-build
 valac
 cmake
-libgspell-1-dev
+libspelling-1-dev
 libwebkitgtk-6.0-dev
 libmarkdown2-dev
+libjson-glib-dev
+libglib2.0-dev
 libxml2-dev
 libarchive-dev
 libgtk-4-dev
@@ -136,8 +138,10 @@ libmarkdown-devel
 webkitgtk6.0-devel
 gtk4-devel
 gtksourceview5-devel
-gspell-devel
+libspelling-devel
 libarchive-devel
+json-glib-devel
+glib2-devel
 libxml2-devel
 libgee-devel
 libsecret-devel
