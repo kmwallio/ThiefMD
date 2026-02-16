@@ -36,15 +36,3 @@ jobs:
 
       - name: Test
         run: ./build/tests/tests
-
-      - name: Install flatpak and flatpak builder
-        run: sudo apt-get install flatpak flatpak-builder
-
-      - name: Add flathub repository
-        run: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-
-      - name: Install dependencies for flatpak build
-        run: flatpak install flathub org.gnome.Platform//49 org.gnome.Sdk//49 --assumeyes
-
-      - name: Build flatpak
-        run: cd flatpak && flatpak-builder --force-clean --install-deps-from=flathub --user --install --repo=repo build-dir com.github.kmwallio.thiefmd.json
