@@ -1,7 +1,7 @@
 {
     "app-id": "com.github.kmwallio.thiefmd",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "46",
+    "runtime-version": "49",
     "sdk": "org.gnome.Sdk",
     "command": "com.github.kmwallio.thiefmd",
     "finish-args": [
@@ -36,25 +36,25 @@
             ],
             "sources": [{
                 "type": "archive",
-                "url": "https://download.gnome.org/sources/gtksourceview/5.10/gtksourceview-5.10.0.tar.xz",
-                "sha256": "662f87fa1fbf1e5c39b2d22d2ceae0f7c20f71774eef20f704d82c0b6104823a"
+                "url": "https://download.gnome.org/sources/gtksourceview/5.14/gtksourceview-5.14.2.tar.xz",
+                "sha256": "1a6d387a68075f8aefd4e752cf487177c4a6823b14ff8a434986858aeaef6264"
             }]
         },
         "shared-modules/intltool/intltool-0.51.json",
         {
-            "name": "gspell",
+            "name": "libspelling",
             "cleanup": [
                 "*.a"
             ],
             "buildsystem": "meson",
             "config-opts": [
-                "-Dgtk_doc=false",
-                "-Dapi_docs=false"
+                "-Dintrospection=enabled",
+                "-Dvapi=true"
             ],
             "sources": [{
-                "type": "archive",
-                "url": "https://download.gnome.org/sources/gspell/1.12/gspell-1.12.0.tar.xz",
-                "sha256": "9f2b9dd1e8c9e1aa3eeb3e5f0a7dc0b321d75b16c838c2f5e7c96b4b4a98c51c"
+                "type": "git",
+                "url": "https://gitlab.gnome.org/GNOME/libspelling.git",
+                "tag": "0.4.10"
             }]
         },
         {
@@ -64,14 +64,14 @@
                 "*.a"
             ],
             "build-commands": [
-                "./configure.sh --prefix=/app --enable-all-features --github-checkbox --with-fenced-code --shared",
+                "./configure.sh --prefix=/app --enable-all-features --with-fenced-code --shared",
                 "sed -e 's|/sbin/ldconfig|/sbin/ldconfig -n|' -i librarian.sh",
                 "make install"
             ],
             "sources": [{
                 "type": "archive",
-                "url": "http://www.pell.portland.or.us/~orc/Code/discount/discount-2.2.7b.tar.bz2",
-                "sha256": "b9368cc2063831635f9e790d0c4c338c2b4b72658cdc244323241bfcddf6ffd5"
+                "url": "https://www.pell.portland.or.us/~orc/Code/discount/discount-3.0.1.2.tar.bz2",
+                "sha256": "ec670ca34fba6dd99cf30170b98f57fbd84ed51528cc3ae732b5ec298e738d9d"
             }]
         },
         {
@@ -88,8 +88,8 @@
             ],
             "sources": [{
                 "type": "archive",
-                "url": "https://github.com/jgm/pandoc/releases/download/2.18/pandoc-2.18-linux-amd64.tar.gz",
-                "sha256": "103df36dc21081b7205d763ef7705e340eb0ea7e18694239b328a549892cc007"
+                "url": "https://github.com/jgm/pandoc/releases/download/3.1.12/pandoc-3.1.12-linux-amd64.tar.gz",
+                "sha256": "e30d20cc3f9aefa117bf2183fe74cfc7cb043237d56eb63272b82bf76b537991"
             }]
         },
         {
@@ -106,8 +106,8 @@
             ],
             "sources": [{
                 "type": "archive",
-                "url": "https://github.com/jgm/pandoc/releases/download/2.18/pandoc-2.18-linux-arm64.tar.gz",
-                "sha256": "a48160539c27c6a35413667b064f9af154d59ad592563dcaab8a07d427bda594"
+                "url": "https://github.com/jgm/pandoc/releases/download/3.1.12/pandoc-3.1.12-linux-arm64.tar.gz",
+                "sha256": "5e27952bee7ddc88e5629bf86252233b418abdf8f7f66c86c412805469afd560"
             }]
         },
         {
@@ -122,12 +122,11 @@
             "sources" : [
                 {
                     "type" : "archive",
-                    "url" : "https://github.com/opencog/link-grammar/archive/refs/tags/link-grammar-5.10.5.tar.gz",
-                    "sha256" : "523182a1c77bd41b1bc4ab56ead2b0e7e6bec42e1af9a55c225fbacecd81c416"
+                    "url" : "https://github.com/opencog/link-grammar/archive/refs/tags/link-grammar-5.13.0.tar.gz",
+                    "sha256" : "a545b7efb7aceab2d8ad301466f199778a3da712928999ed8d66deb32ca3184f"
                 }
             ]
         },
-        "shared-modules/libsecret/libsecret.json",
         {
             "name" : "libadwaita",
             "buildsystem" : "meson",
@@ -145,7 +144,7 @@
                 {
                     "type": "archive",
                     "url": "https://download.gnome.org/sources/libadwaita/1.6/libadwaita-1.6.2.tar.xz",
-                    "sha256": "29f9fda4f0e3a24d8cd88fc5d2187f17e5dc9c8e0938deca2eb56d9c87b945bf"
+                    "sha256": "7542f8354e6808dd4e9a31551bbdfc0170735e4af4d1b3e69186500ccb9c01eb"
                 }
             ]
         },
@@ -170,6 +169,7 @@
             ]
         },
         "python3-weasyprint.json",
+        "shared-modules/libsecret/libsecret.json",
         {
             "name": "thiefmd",
             "cleanup": [
