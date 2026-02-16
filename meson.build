@@ -71,6 +71,9 @@ endif
 # Math helpers
 libm = cc.find_library('m', required: true)
 
+# Spell checking
+libspelling = dependency('libspelling-1', required: true)
+
 # Let's define our executable
 add_project_arguments(['--vapidir', join_paths(meson.current_source_dir(), 'vapi')], language: 'vala')
 
@@ -150,7 +153,6 @@ executable(
     'src/forem/src/Forem3.vala',
     'src/hashnode/src/Hashnode3.vala',
     'src/bibtex/src/BibTex.vala',
-    'src/Compat/GspellStub.vala',
     asresources,
     c_args: c_args,
     dependencies: [
@@ -167,12 +169,14 @@ executable(
         dependency('libadwaita-1'),
         libmarkdown,
         linkgrammar,
-        libm
+        libm,
+        libspelling
     ],
     vala_args: [
         meson.source_root() + '/vapi/config.vapi',
         meson.source_root() + '/vapi/libmarkdown.vapi',
-        meson.source_root() + '/vapi/linkgrammar.vapi'
+        meson.source_root() + '/vapi/linkgrammar.vapi',
+        meson.source_root() + '/vapi/libspelling-1.vapi'
     ],
     install : true
 )

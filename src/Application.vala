@@ -138,6 +138,7 @@ namespace ThiefMD {
             var app = new ThiefApplication ();
             app.startup.connect (() => {
                 Adw.init ();
+                Spelling.init ();
             });
             return app.run (args);
         }

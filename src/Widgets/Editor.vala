@@ -18,7 +18,7 @@
  */
 
 using ThiefMD.Controllers;
-using Gspell;
+using Spelling;
 using Gdk;
 using ThiefMD.Enrichments;
 
@@ -50,7 +50,7 @@ namespace ThiefMD.Widgets {
         // UI Items
         //
 
-        private Gspell.Checker? spell = null;
+        private Spelling.TextBufferAdapter? spell_adapter = null;
         public WriteGood.Checker writegood = null;
         public GrammarChecker grammar = null;
         private TimedMutex writegood_limit;
@@ -119,8 +119,10 @@ namespace ThiefMD.Widgets {
             word_count_update_limit = new TimedMutex (500);
             word_count_mutex = Mutex ();
 
-            // Initialize spellchecker stub so attach/detach calls are safe
-            spell = new Gspell.Checker ();
+            // Initialize spell checking with libspelling
+            var spell_checker = Spelling.Checker.get_default ();
+            spell_adapter = new Spelling.TextBufferAdapter (buffer, spell_checker);
+            spell_adapter.set_enabled (false);  // Disabled by default
 
             // Initialize optional enrichments to avoid null derefs when toggled
             writegood = new WriteGood.Checker ();
@@ -669,7 +671,9 @@ namespace ThiefMD.Widgets {
                     }
 
                     if (settings.spellcheck) {
-                        spell.attach (this);
+                        if (spell_adapter != null) {
+                            spell_adapter.set_enabled (true);
+                        }
                         spellcheck_active = true;
                     }
 
@@ -706,8 +710,8 @@ namespace ThiefMD.Widgets {
                             grammar.detach ();
                         }
 
-                        if (settings.spellcheck && spell != null) {
-                            spell.detach ();
+                        if (settings.spellcheck && spell_adapter != null) {
+                            spell_adapter.set_enabled (false);
                         }
                     }
                     editable = false;
@@ -792,37 +796,49 @@ namespace ThiefMD.Widgets {
         public bool spellcheck {
             set {
                 if (value && !spellcheck_active) {
-                    debug ("Activate spellcheck\n");
+                    debug ("Activate spellcheck\\n");
                     try {
                         var settings = AppSettings.get_default ();
                         var last_language = settings.spellcheck_language;
-                        bool language_set = false;
-                        var language_list = Gspell.Checker.get_language_list ();
-                        foreach (var element in language_list) {
-                            if (last_language == element) {
-                                language_set = true;
-                                spell.set_language (last_language);
-                                break;
+                        
+                        if (spell_adapter != null) {
+                            var provider = Spelling.Provider.get_default ();
+                            var languages_model = provider.list_languages ();
+                            uint n_items = languages_model.get_n_items ();
+                            
+                            // Try to set to saved language, otherwise use first available
+                            bool language_found = false;
+                            for (uint i = 0; i < n_items; i++) {
+                                var lang_obj = languages_model.get_object (i);
+                                if (lang_obj is Spelling.Language) {
+                                    var lang = (Spelling.Language)lang_obj;
+                                    if (last_language == lang.get_code ()) {
+                                        spell_adapter.set_language (last_language);
+                                        language_found = true;
+                                        break;
+                                    }
+                                }
                             }
-                        }
-
-                        if (language_list.length () == 0) {
-                            spell.set_language (null);
-                        } else if (!language_set) {
-                            last_language = language_list.data;
-                            spell.set_language (last_language);
-                        }
-                        if (spell != null) {
-                            spell.attach (this);
+                            
+                            // Use first language if saved one not found
+                            if (!language_found && n_items > 0) {
+                                var first_lang = languages_model.get_object (0);
+                                if (first_lang is Spelling.Language) {
+                                    var lang = (Spelling.Language)first_lang;
+                                    spell_adapter.set_language (lang.get_code ());
+                                }
+                            }
+                            
+                            spell_adapter.set_enabled (true);
                             spellcheck_active = true;
                         }
                     } catch (Error e) {
                         warning (e.message);
                     }
                 } else if (!value && spellcheck_active) {
-                    debug ("Disable spellcheck\n");
-                    if (spell != null) {
-                        spell.detach ();
+                    debug ("Disable spellcheck\\n");
+                    if (spell_adapter != null) {
+                        spell_adapter.set_enabled (false);
                     }
                     spellcheck_active = false;
                 }
@@ -908,7 +924,7 @@ namespace ThiefMD.Widgets {
             settings.window_height = h;
 
             if (spellcheck_active && buffer.text != "") {
-                spell.recheck_all ();
+                // Gspell automatically rechecks, no manual call needed
             }
 
             return settings.autosave;
@@ -2262,7 +2278,9 @@ namespace ThiefMD.Widgets {
             }
             word_count_mutex.unlock ();
             
-            spell.detach ();
+            if (spell_adapter != null) {
+                spell_adapter.set_enabled (false);
+            }
             if (fountain != null) {
                 fountain.detach ();
                 fountain = null;
@@ -2276,7 +2294,6 @@ namespace ThiefMD.Widgets {
 
             preview_markdown = "";
             buffer.text = "";
-            spell.dispose ();
             buffer.dispose ();
             file = null;
         }

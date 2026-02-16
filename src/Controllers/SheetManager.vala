@@ -19,7 +19,6 @@
 
 using ThiefMD;
 using ThiefMD.Widgets;
-using Gspell;
 
 namespace ThiefMD.Controllers.SheetManager {
     private SheetPair? _currentSheet;
