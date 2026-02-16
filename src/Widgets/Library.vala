@@ -251,6 +251,37 @@ namespace ThiefMD.Widgets {
                 return false;
             }
 
+            // Show confirmation dialog
+            Gtk.Window? parent_window = null;
+            var root = get_root ();
+            if (root is Gtk.Window) {
+                parent_window = root as Gtk.Window;
+            }
+
+            if (parent_window != null) {
+                var dialog = new Dialogs.Dialog.display_move_confirm (
+                    parent_window,
+                    source_name,
+                    File.new_for_path (dest_dir).get_basename ()
+                );
+                
+                dialog.response.connect ((response_id) => {
+                    if (response_id == "move") {
+                        perform_file_move (source_path, source_file, dest_dir, source_name, source_dir, target_node);
+                    }
+                    dialog.close ();
+                });
+                
+                dialog.present ();
+                return true;
+            } else {
+                // If we can't get parent window, perform move directly
+                return perform_file_move (source_path, source_file, dest_dir, source_name, source_dir, target_node);
+            }
+        }
+
+        private bool perform_file_move (string source_path, File source_file, string dest_dir, 
+                                       string source_name, string source_dir, LibNode target_node) {
             // Move the file
             string dest_path = Path.build_filename (dest_dir, source_name);
             try {

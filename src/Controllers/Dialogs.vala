@@ -152,5 +152,18 @@ namespace ThiefMD.Controllers.Dialogs {
             set_default_response ("save");
             set_close_response ("cancel");
         }
+
+        public Dialog.display_move_confirm (Gtk.Window parent, string filename, string dest_folder) {
+            Object (transient_for: parent, modal: true);
+            set_heading (_("Move file to another folder?"));
+            set_body (_("Moving \"%s\" to \"%s\"").printf (filename, dest_folder));
+
+            add_response ("cancel", _("_Cancel"));
+            add_response ("move", _("_Move"));
+
+            set_response_appearance ("move", Adw.ResponseAppearance.SUGGESTED);
+            set_default_response ("move");
+            set_close_response ("cancel");
+        }
     }
 }

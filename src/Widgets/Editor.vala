@@ -118,6 +118,7 @@ namespace ThiefMD.Widgets {
             preview_mutex = new TimedMutex (250);
             word_count_update_limit = new TimedMutex (500);
             word_count_mutex = Mutex ();
+            vexpand = true;
 
             // Initialize spell checking with libspelling (lazily created when enabled)
             // spell_adapter created in spellcheck property setter
