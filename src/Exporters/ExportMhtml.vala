@@ -58,7 +58,7 @@ namespace ThiefMD.Exporters {
             mhtml_filter.add_pattern ("*.mhtml");
             mhtml_filter.add_pattern ("*.mht");
 
-            File new_novel = Dialogs.get_target_save_file_with_extension (
+            File? new_novel = Dialogs.get_target_save_file_with_extension (
                 _("Export MHTML"),
                 mhtml_filter,
                 "mhtml");

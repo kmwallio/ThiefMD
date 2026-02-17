@@ -1,0 +1,20 @@
+name: ThiefFlatpak
+
+on: [push]
+
+jobs:
+  flatpak:
+    name: "Flatpak"
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-49
+      options: --privileged
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'true'
+    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      with:
+        bundle: thiefmd.flatpak
+        manifest-path: ./flatpak/com.github.kmwallio.thiefmd.json
+        cache-key: flatpak-builder-${{ github.sha }}

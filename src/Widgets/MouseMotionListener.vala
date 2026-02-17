@@ -28,11 +28,12 @@ using Gtk;
 namespace ThiefMD.Widgets {
     public class MouseMotionListener : Object {
         private ThiefApp instance;
+        private Gtk.EventControllerMotion motion_controller;
+
         public MouseMotionListener (ThiefApp thiefapp) {
             instance = thiefapp;
             still_in_motion = new TimedMutex (Constants.MOUSE_IN_MOTION_TIME);
             clear_bar = new TimedMutex (Constants.MOUSE_MOTION_CHECK_TIME);
-            instance.motion_notify_event.connect (mouse_movement);
         }
 
         private TimedMutex still_in_motion;
@@ -41,35 +42,51 @@ namespace ThiefMD.Widgets {
         private double mouse_y = 0;
         private double last_x = 0;
         private double last_y = 0;
-        private bool mouse_movement (EventMotion event) {
+
+        public void attach (Gtk.Widget target) {
+            motion_controller = new Gtk.EventControllerMotion ();
+            motion_controller.motion.connect ((x, y) => {
+                handle_motion (x, y);
+            });
+            target.add_controller (motion_controller);
+        }
+
+        private void handle_motion (double x, double y) {
             var settings = AppSettings.get_default ();
-            last_x = event.x_root;
-            last_y = event.y_root;
+            last_x = x;
+            last_y = y;
 
             if (!settings.hide_toolbar) {
-                return false;
+                return;
             }
 
             if (!still_in_motion.can_do_action ()) {
-                return false;
+                return;
             }
 
-            double d_x = (mouse_x - last_x).abs ();
-            double d_y = (mouse_y - last_y).abs ();
+            // Avoid flickering by only reacting to meaningful travel and when near the top edge.
+            double d_x = Math.fabs (mouse_x - last_x);
+            double d_y = Math.fabs (mouse_y - last_y);
             double d = (d_x * d_x) + (d_y * d_y);
             if (d < Constants.MOUSE_SENSITIVITY) {
-                return false;
+                return;
             }
-            debug ("Distance: %f", d);
 
-            if (instance.toolbar.hidden){
+            // Only reveal when the pointer is near the top region of the window.
+            double reveal_zone = instance.toolbar.get_allocated_height ();
+            if (reveal_zone <= 0) {
+                reveal_zone = 80;
+            }
+            if (last_y > reveal_zone + Constants.TOP_MARGIN) {
+                return;
+            }
+
+            if (instance.toolbar.hidden) {
                 instance.toolbar.show_headerbar ();
                 if (clear_bar.can_do_action ()) {
                     Timeout.add (Constants.MOUSE_MOTION_CHECK_TIME + 100, hide_the_bar);
                 }
             }
-
-            return false;
         }
 
         private bool hide_the_bar () {

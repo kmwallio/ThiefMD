@@ -59,7 +59,7 @@ namespace ThiefMD.Exporters {
             fountain_filter.add_pattern ("*.fountain");
             fountain_filter.add_pattern ("*.spmd");
 
-            File new_script = Dialogs.get_target_save_file_with_extension (
+            File? new_script = Dialogs.get_target_save_file_with_extension (
                 _("Export Fountain"),
                 fountain_filter,
                 "fountain");

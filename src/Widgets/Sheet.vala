@@ -37,7 +37,11 @@ namespace ThiefMD.Widgets {
         private string _sheet_title;
         private string _sheet_date;
         private string _notes_path;
+        private bool _preview_loaded;
         public ThiefNotes metadata;
+        private Gtk.PopoverMenu? _context_menu;
+        private GLib.SimpleActionGroup _context_actions;
+        private Gdk.Rectangle _last_menu_rect;
 
         // Change style depending on sheet available in the editor
         public bool active_sheet {
@@ -70,10 +74,9 @@ namespace ThiefMD.Widgets {
             _label.use_markup = true;
             _label.set_ellipsize (Pango.EllipsizeMode.END);
             _label.xalign = 0;
-            add (_label);
+            set_child (_label);
 
             var header_context = this.get_style_context ();
-            header_context.add_class (Gtk.STYLE_CLASS_FLAT);
             header_context.add_class ("thief-list-sheet");
 
             clicked.connect (() => {
@@ -82,35 +85,45 @@ namespace ThiefMD.Widgets {
                 active = active_sheet;
             });
 
-            // Add ability to be dragged
-            Gtk.drag_source_set (
-                this,                      // widget will be drag-able
-                Gdk.ModifierType.BUTTON1_MASK, // modifier that will start a drag
-                target_list,               // lists of target to support
-                Gdk.DragAction.MOVE            // what to do with data after dropped
-            );
+            // Drag source for moving/reordering sheets
+            var drag_source = new Gtk.DragSource ();
+            // Capture events before the toggle button consumes them so active sheets still drag
+            drag_source.set_propagation_phase (Gtk.PropagationPhase.CAPTURE);
+            drag_source.actions = Gdk.DragAction.MOVE;
+            drag_source.prepare.connect ((x, y) => {
+                Value v = Value (typeof (string));
+                v.set_string (_sheet_path);
+                return new Gdk.ContentProvider.for_value (v);
+            });
+            add_controller (drag_source);
 
-            // All possible source signals
-            this.drag_begin.connect(on_drag_begin);
-            this.drag_data_get.connect(on_drag_data_get);
-            this.drag_data_delete.connect(on_drag_data_delete);
-            this.drag_end.connect(on_drag_end);
+            // Drop target to accept moved sheets
+            var drop_target = new Gtk.DropTarget (typeof (string), Gdk.DragAction.MOVE);
+            drop_target.drop.connect ((value, x, y) => {
+                string? source_path = (string?) value;
+                if (source_path == null) {
+                    return false;
+                }
+                return handle_drop (source_path, y);
+            });
+            add_controller (drop_target);
 
-            // Add ability to be dropped on
-            Gtk.drag_dest_set (
-                this,                          // widget will be drag-able
-                DestDefaults.ALL,              // modifier that will start a drag
-                target_list,                   // lists of target to support
-                Gdk.DragAction.MOVE            // what to do with data after dropped
-            );
-            this.drag_motion.connect(this.on_drag_motion);
-            this.drag_leave.connect(this.on_drag_leave);
-            this.drag_drop.connect(this.on_drag_drop);
-            this.drag_data_received.connect(this.on_drag_data_received);
+            _context_actions = new GLib.SimpleActionGroup ();
+            insert_action_group ("sheet", _context_actions);
+            setup_context_actions ();
+            setup_context_menu_controller ();
 
-            // Load minimark if file has content
-            redraw ();
-            show_all ();
+            // Deferred preview generation to avoid reading large files at startup
+            _preview_loaded = false;
+            _word_count = -1; // Mark as not yet calculated
+            set_visible (true);
+            
+            // Generate preview when sheet becomes visible
+            map.connect (() => {
+                if (!_preview_loaded) {
+                    lazy_load_preview ();
+                }
+            });
 
             // Load file ordering information
             metadata = null;
@@ -131,6 +144,76 @@ namespace ThiefMD.Widgets {
             debug ("Creating %s\n", sheet_path);
         }
 
+        private bool handle_drop (string source_path, double y) {
+            if (_parent == null || source_path == "") {
+                return false;
+            }
+
+            var source_file = File.new_for_path (source_path);
+            if (!source_file.query_exists ()) {
+                return false;
+            }
+
+            string source_dir = "";
+            var parent_dir = source_file.get_parent ();
+            if (parent_dir != null) {
+                source_dir = parent_dir.get_path ();
+            }
+
+            string dest_dir = _parent.get_sheets_path ();
+            string source_name = source_file.get_basename ();
+            string dest_name = File.new_for_path (_sheet_path).get_basename ();
+
+            // Reorder within the same folder
+            if (source_dir == dest_dir) {
+                if (source_name == dest_name) {
+                    return false;
+                }
+                int halfway = get_allocated_height () / 2;
+                if (y > halfway) {
+                    _parent.move_sheet_after (dest_name, source_name);
+                } else {
+                    _parent.move_sheet_before (dest_name, source_name);
+                }
+                return true;
+            }
+
+            // Move across folders
+            string dest_path = Path.build_filename (dest_dir, source_name);
+            try {
+                source_file.move (File.new_for_path (dest_path), FileCopyFlags.OVERWRITE, null, null);
+            } catch (Error e) {
+                warning ("Could not move %s to %s: %s", source_path, dest_path, e.message);
+                return false;
+            }
+
+            // Remove from the origin sheets view/metadata if we can find it
+            var library = ThiefApp.get_instance ().library;
+            Sheets? origin_sheets = library.find_sheets_for_path (source_dir);
+            if (origin_sheets != null && origin_sheets != _parent) {
+                Sheet? origin_sheet = library.find_sheet_for_path (source_path);
+                if (origin_sheet != null) {
+                    origin_sheets.remove_sheet (origin_sheet);
+                    origin_sheets.persist_metadata ();
+                } else {
+                    origin_sheets.refresh ();
+                }
+            }
+
+            // Reload destination and order near the drop target
+            _parent.refresh ();
+            if (FileUtils.test (dest_path, FileTest.IS_REGULAR)) {
+                if (y > (get_allocated_height () / 2)) {
+                    _parent.move_sheet_after (dest_name, source_name);
+                } else {
+                    _parent.move_sheet_before (dest_name, source_name);
+                }
+            }
+            _parent.persist_metadata ();
+
+            return true;
+        }
+
         public Sheets get_parent_sheets () {
             return _parent;
         }
@@ -143,21 +226,51 @@ namespace ThiefMD.Widgets {
             return _sheet_path.substring (_sheet_path.last_index_of (Path.DIR_SEPARATOR_S) + 1);
         }
 
-        public void redraw () {
+        private void lazy_load_preview () {
+            // Use idle callback to avoid blocking UI during startup
+            GLib.Idle.add (() => {
+                load_preview_sync ();
+                return false;
+            });
+        }
+        
+        private void load_preview_sync () {
+            if (_preview_loaded) {
+                return;
+            }
+            
             var settings = AppSettings.get_default ();
             string file_contents = FileManager.get_file_lines_yaml (_sheet_path, settings.num_preview_lines, true, out _sheet_title, out _sheet_date);
+            string file_title = "<b>" + _sheet_path.substring(_sheet_path.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "</b>";
 
-            _word_count = FileManager.get_word_count (_sheet_path);
+            // Only calculate word count if needed (negative value means not calculated)
+            if (_word_count < 0) {
+                _word_count = FileManager.get_word_count (_sheet_path);
+            }
+            
             if (file_contents.chomp() != "" && settings.num_preview_lines != 0) {
-                _label_buffer = "<small>" + SheetManager.mini_mark(file_contents) + "</small>";
+                string content_preview = "<small>" + SheetManager.mini_mark(file_contents) + "</small>";
+                if (settings.show_sheet_filenames) {
+                    _label_buffer = file_title + "\n" + content_preview;
+                } else {
+                    _label_buffer = content_preview;
+                }
             } else {
-                _label_buffer = "<b>" + _sheet_path.substring(_sheet_path.last_index_of (Path.DIR_SEPARATOR_S) + 1) + "</b>";
+                _label_buffer = file_title;
             }
 
             _label.set_label (_label_buffer);
-
             _label.width_request = settings.view_sheets_width - 10;
             width_request = settings.view_sheets_width;
+            _preview_loaded = true;
+        }
+
+        public void redraw () {
+            // Force reload of preview
+            _preview_loaded = false;
+            load_preview_sync ();
+            
+            var settings = AppSettings.get_default ();
             settings.writing_changed ();
         }
 
@@ -190,6 +303,10 @@ namespace ThiefMD.Widgets {
         }
 
         public int get_word_count () {
+            // Lazy load word count if not yet calculated
+            if (_word_count < 0) {
+                _word_count = FileManager.get_word_count (_sheet_path);
+            }
             return _word_count;
         }
 
@@ -205,275 +322,161 @@ namespace ThiefMD.Widgets {
         // Click Menu Options
         //
 
-        public override bool button_press_event(Gdk.EventButton event) {
-            base.button_press_event (event);
-
-            if (event.type == Gdk.EventType.BUTTON_PRESS && event.button == 3) {
-                Gtk.Menu menu = new Gtk.Menu ();
-                menu.attach_to_widget (this, null);
-
-                Gtk.MenuItem sort_sheets = new Gtk.MenuItem.with_label (_("Sort by"));
-                Gtk.Menu sort_menu = new Gtk.Menu ();
-                {
-                    Gtk.MenuItem sort_sheets_by_name = new Gtk.MenuItem.with_label (_("Sort by Filename Ascending"));
-                    sort_menu.add (sort_sheets_by_name);
-                    sort_sheets_by_name.activate.connect (() => {
-                        _parent.sort_sheets_by_name ();
-                    });
-
-                    Gtk.MenuItem sort_sheets_by_name_desc = new Gtk.MenuItem.with_label (_("Sort by Filename Descending"));
-                    sort_menu.add (sort_sheets_by_name_desc);
-                    sort_sheets_by_name_desc.activate.connect (() => {
-                        _parent.sort_sheets_by_name (false);
-                    });
-
-                    sort_menu.add (new Gtk.SeparatorMenuItem ());
-                    Gtk.MenuItem sort_sheets_by_title = new Gtk.MenuItem.with_label (_("Sort by Title Ascending"));
-                    sort_menu.add (sort_sheets_by_title);
-                    sort_sheets_by_title.activate.connect (() => {
-                        _parent.sort_sheets_by_title ();
-                    });
-
-                    Gtk.MenuItem sort_sheets_by_title_desc = new Gtk.MenuItem.with_label (_("Sort by Title Descending"));
-                    sort_menu.add (sort_sheets_by_title_desc);
-                    sort_sheets_by_title_desc.activate.connect (() => {
-                        _parent.sort_sheets_by_title (false);
-                    });
-
-                    sort_menu.add (new Gtk.SeparatorMenuItem ());
-                    Gtk.MenuItem sort_sheets_by_date = new Gtk.MenuItem.with_label (_("Sort by Date Ascending"));
-                    sort_menu.add (sort_sheets_by_date);
-                    sort_sheets_by_date.activate.connect (() => {
-                        _parent.sort_sheets_by_date ();
-                    });
-
-                    Gtk.MenuItem sort_sheets_by_date_desc = new Gtk.MenuItem.with_label (_("Sort by Date Descending"));
-                    sort_menu.add (sort_sheets_by_date_desc);
-                    sort_sheets_by_date_desc.activate.connect (() => {
-                        _parent.sort_sheets_by_date (false);
-                    });
-                }
-                sort_sheets.submenu = sort_menu;
-                menu.add (sort_sheets);
-
-                /*
-                menu.add (new Gtk.SeparatorMenuItem ());
-
-                Gtk.MenuItem menu_new_window = new Gtk.MenuItem.with_label (_("Open in Separate Window"));
-                menu.add (menu_new_window);
-                menu_new_window.activate.connect (() => {
-                    File target = File.new_for_path (_sheet_path);
-                    ThiefApplication.open_file (target);
-                });
-                menu.add (menu_new_window);
-                */
-
-                menu.add (new Gtk.SeparatorMenuItem ());
-
-                Gtk.MenuItem menu_preview_sheet = new Gtk.MenuItem.with_label (_("Preview"));
-                menu.add (menu_preview_sheet);
-                menu_preview_sheet.activate.connect (() => {
-                    this.clicked ();
-                    PreviewWindow pvw = PreviewWindow.get_instance ();
-                    pvw.show_all ();
-                });
-
-                Gtk.MenuItem menu_export_sheet = new Gtk.MenuItem.with_label (_("Export"));
-                menu.add (menu_export_sheet);
-                menu_export_sheet.activate.connect (() => {
-                    string preview_markdown = FileManager.get_file_contents (_sheet_path);
-                    PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown, is_fountain (_sheet_path));
-                    ppw.show ();
-                });
-
-                Gtk.MenuItem copy_file_path = new Gtk.MenuItem.with_label (_("Copy File Path"));
-                menu.add (copy_file_path);
-                copy_file_path.activate.connect (() => {
-                    string file_path = _sheet_path;
-                    var copy = Gtk.Clipboard.get_default (Gdk.Display.get_default ());
-                    copy.set_text (file_path, file_path.length);
-                });
-
-                menu.add (new Gtk.SeparatorMenuItem ());
-
-                //  Gtk.MenuItem menu_rename = new Gtk.MenuItem.with_label (_("Rename File"));
-                //  menu_rename.activate.connect (() => {
-
-                //  });
-                //  menu.add (menu_rename);
-
-                Gtk.MenuItem menu_danger_zone = new Gtk.MenuItem.with_label (_("Danger Zone"));
-                menu_danger_zone.set_sensitive (false);
-                menu.add (menu_danger_zone);
-
-                menu.add (new Gtk.SeparatorMenuItem ());
-
-                Gtk.MenuItem menu_delete_sheet = new Gtk.MenuItem.with_label (_("Move to Trash"));
-                menu_delete_sheet.activate.connect (() => {
-                    debug ("Got remove for sheet %s", _sheet_path);
-                    _parent.remove_sheet (this);
-                    SheetManager.close_active_file (_sheet_path);
-                    FileManager.move_to_trash (_sheet_path);
-                    File metadata_file = File.new_for_path (_notes_path);
-                    if (metadata_file.query_exists ()) {
-                        FileManager.move_to_trash (_notes_path);
-                    }
-                });
-                menu.add (menu_delete_sheet);
-                menu.show_all ();
-                menu.popup_at_pointer (event);
-            }
-
-            return true;
+        private void setup_context_menu_controller () {
+            var right_click = new Gtk.GestureClick ();
+            right_click.set_button (3);
+            right_click.released.connect ((n_press, x, y) => {
+                show_context_menu (x, y);
+            });
+            add_controller (right_click);
         }
 
-        //
-        // Drag Support
-        //
-
-        private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
-            debug ("%s: on_drag_begin", widget.name);
-        }
-
-        private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context,
-            Gtk.SelectionData selection_data,
-            uint target_type, uint time)
-        {
-            debug ("%s: on_drag_data_get for %s", widget.name, _sheet_path);
-
-            switch (target_type) {
-                case Target.STRING:
-                    selection_data.set (
-                        selection_data.get_target(),
-                        BYTE_BITS,
-                        (uchar [])_sheet_path.to_utf8());
-                break;
-                default:
-                    debug ("No known action to take.");
-                break;
-            }
-
-            debug ("Done moving");
-        }
-
-        private void on_drag_data_delete (Gtk.Widget widget, Gdk.DragContext context) {
-            debug ("%s: on_drag_data_delete for %s", widget.name, _sheet_path);
-        }
-
-        private void on_drag_end (Gtk.Widget widget, Gdk.DragContext context) {
-            debug ("%s: on_drag_end for %s", widget.name, _sheet_path);
-        }
-
-        //
-        // Drop support
-        //
-
-        private bool on_drag_motion (
-            Widget widget,
-            DragContext context,
-            int x,
-            int y,
-            uint time)
-        {
-            int mid =  get_allocated_height () / 2;
-            // warning ("%s: motion (m: %d, %d)", widget.name, mid, y);
-            var header_context = this.get_style_context ();
-
-            if (y < mid && !header_context.has_class ("thief-drop-below")) {
-                if (header_context.has_class ("thief-drop-above")) {
-                    header_context.remove_class ("thief-drop-above");
-                }
-                header_context.add_class ("thief-drop-below");
-            }
-
-            if (y > mid && !header_context.has_class ("thief-drop-above")) {
-                if (header_context.has_class ("thief-drop-below")) {
-                    header_context.remove_class ("thief-drop-below");
-                }
-                header_context.add_class ("thief-drop-above");
-            }
-
-            return false;
-        }
-
-        private void on_drag_leave (Widget widget, DragContext context, uint time) {
-            debug ("%s: on_drag_leave", widget.name);
-            var header_context = this.get_style_context ();
-            if (header_context.has_class ("thief-drop-above")) {
-                header_context.remove_class ("thief-drop-above");
-            }
-
-            if (header_context.has_class ("thief-drop-below")) {
-                header_context.remove_class ("thief-drop-below");
-            }
-        }
-
-        private bool on_drag_drop (
-            Widget widget,
-            DragContext context,
-            int x,
-            int y,
-            uint time)
-        {
-            debug ("%s: drop (%d, %d)", widget.name, x, y);
-            var target_type = (Atom) context.list_targets().nth_data (Target.STRING);
-
-            // Request the data from the source.
-            Gtk.drag_get_data (
-                widget,         // will receive 'drag_data_received' signal
-                context,        // represents the current state of the DnD
-                target_type,    // the target type we want
-                time            // time stamp
-                );
-
-            bool is_valid_drop_site = target_type.name ().ascii_up ().contains ("STRING");
-
-            return is_valid_drop_site;
-        }
-
-        private void on_drag_data_received (
-            Widget widget,
-            DragContext context,
-            int x,
-            int y,
-            SelectionData selection_data,
-            uint target_type,
-            uint time)
-        {
-            var header_context = this.get_style_context ();
-
-            int mid =  get_allocated_height () / 2;
-            debug ("%s: data (m: %d, %d)", widget.name, mid, y);
-
-            if (header_context.has_class ("thief-drop-above")) {
-                header_context.remove_class ("thief-drop-above");
-            }
-
-            if (header_context.has_class ("thief-drop-below")) {
-                header_context.remove_class ("thief-drop-below");
-            }
-
-            File file = dnd_get_file (selection_data, target_type);
-            debug ("Got file: %s", file.get_path ());
-            if (!file.query_exists ()) {
-                Gtk.drag_finish (context, false, false, time);
+        private void show_context_menu (double x, double y) {
+            var menu_model = build_context_menu_model ();
+            if (menu_model == null) {
                 return;
             }
 
-            if (ThiefApp.get_instance ().library.file_in_library (file.get_path ())) {
-                if (y > mid) {
-                    _parent.move_sheet_after (this.file_name (), file.get_basename ());
-                } else {
-                    _parent.move_sheet_before (this.file_name (), file.get_basename ());
-                }
-            } else {
-                debug ("Importing file");
-                FileManager.import_file (file.get_path (), _parent);
+            _last_menu_rect = Gdk.Rectangle ();
+            _last_menu_rect.x = (int) x;
+            _last_menu_rect.y = (int) y;
+            _last_menu_rect.width = 1;
+            _last_menu_rect.height = 1;
+            if (_context_menu != null) {
+                _context_menu.popdown ();
+                _context_menu.unparent ();
+                _context_menu = null;
             }
 
+            _context_menu = new Gtk.PopoverMenu.from_model (menu_model);
+            _context_menu.set_has_arrow (true);
+            _context_menu.set_pointing_to (_last_menu_rect);
+            _context_menu.set_parent (this);
+            _context_menu.set_autohide (true);
+            _context_menu.set_flags (Gtk.PopoverMenuFlags.NESTED);
+            _context_menu.popup ();
+        }
 
-            Gtk.drag_finish (context, false, false, time);
-            return;
+        private MenuModel? build_context_menu_model () {
+            if (_parent == null) {
+                return null;
+            }
+
+            var root = new GLib.Menu ();
+
+            var sort_menu = new GLib.Menu ();
+            var sort_name_section = new GLib.Menu ();
+            sort_name_section.append (_("Sort by Filename Ascending"), "sheet.sort_filename_asc");
+            sort_name_section.append (_("Sort by Filename Descending"), "sheet.sort_filename_desc");
+            sort_menu.append_section (null, sort_name_section);
+
+            var sort_title_section = new GLib.Menu ();
+            sort_title_section.append (_("Sort by Title Ascending"), "sheet.sort_title_asc");
+            sort_title_section.append (_("Sort by Title Descending"), "sheet.sort_title_desc");
+            sort_menu.append_section (null, sort_title_section);
+
+            var sort_date_section = new GLib.Menu ();
+            sort_date_section.append (_("Sort by Date Ascending"), "sheet.sort_date_asc");
+            sort_date_section.append (_("Sort by Date Descending"), "sheet.sort_date_desc");
+            sort_menu.append_section (null, sort_date_section);
+
+            var sort_item = new GLib.MenuItem (_("Sort by"), null);
+            sort_item.set_submenu (sort_menu);
+            root.append_item (sort_item);
+
+            var actions_section = new GLib.Menu ();
+            actions_section.append (_("Preview"), "sheet.preview");
+            actions_section.append (_("Publisher Preview"), "sheet.publisher_preview");
+            actions_section.append (_("Copy File Path"), "sheet.copy_path");
+            root.append_section (null, actions_section);
+
+            var danger_section = new GLib.Menu ();
+            var danger_item = new GLib.MenuItem (_("Danger Zone"), null);
+            danger_item.set_attribute_value ("enabled", new GLib.Variant.boolean (false));
+            danger_section.append_item (danger_item);
+            danger_section.append (_("Move to Trash"), "sheet.move_to_trash");
+            root.append_section (null, danger_section);
+
+            return root;
+        }
+
+        private void setup_context_actions () {
+            var sort_filename_asc = new GLib.SimpleAction ("sort_filename_asc", null);
+            sort_filename_asc.activate.connect ((parameter) => {
+                _parent.sort_sheets_by_name ();
+            });
+            _context_actions.add_action (sort_filename_asc);
+
+            var sort_filename_desc = new GLib.SimpleAction ("sort_filename_desc", null);
+            sort_filename_desc.activate.connect ((parameter) => {
+                _parent.sort_sheets_by_name (false);
+            });
+            _context_actions.add_action (sort_filename_desc);
+
+            var sort_title_asc = new GLib.SimpleAction ("sort_title_asc", null);
+            sort_title_asc.activate.connect ((parameter) => {
+                _parent.sort_sheets_by_title ();
+            });
+            _context_actions.add_action (sort_title_asc);
+
+            var sort_title_desc = new GLib.SimpleAction ("sort_title_desc", null);
+            sort_title_desc.activate.connect ((parameter) => {
+                _parent.sort_sheets_by_title (false);
+            });
+            _context_actions.add_action (sort_title_desc);
+
+            var sort_date_asc = new GLib.SimpleAction ("sort_date_asc", null);
+            sort_date_asc.activate.connect ((parameter) => {
+                _parent.sort_sheets_by_date ();
+            });
+            _context_actions.add_action (sort_date_asc);
+
+            var sort_date_desc = new GLib.SimpleAction ("sort_date_desc", null);
+            sort_date_desc.activate.connect ((parameter) => {
+                _parent.sort_sheets_by_date (false);
+            });
+            _context_actions.add_action (sort_date_desc);
+
+            var preview_action = new GLib.SimpleAction ("preview", null);
+            preview_action.activate.connect ((parameter) => {
+                SheetManager.load_sheet (this);
+                active = active_sheet;
+                PreviewWindow pvw = PreviewWindow.get_instance ();
+                pvw.show ();
+            });
+            _context_actions.add_action (preview_action);
+
+            var publisher_preview_action = new GLib.SimpleAction ("publisher_preview", null);
+            publisher_preview_action.activate.connect ((parameter) => {
+                string preview_markdown = FileManager.get_file_contents (_sheet_path);
+                PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown, is_fountain (_sheet_path));
+                ppw.show ();
+            });
+            _context_actions.add_action (publisher_preview_action);
+
+            var copy_path_action = new GLib.SimpleAction ("copy_path", null);
+            copy_path_action.activate.connect ((parameter) => {
+                string file_path = _sheet_path;
+                var display = Gdk.Display.get_default ();
+                if (display != null) {
+                    var copy = display.get_clipboard ();
+                    copy.set_text (file_path);
+                }
+            });
+            _context_actions.add_action (copy_path_action);
+
+            var move_to_trash_action = new GLib.SimpleAction ("move_to_trash", null);
+            move_to_trash_action.activate.connect ((parameter) => {
+                debug ("Got remove for sheet %s", _sheet_path);
+                _parent.remove_sheet (this);
+                SheetManager.close_active_file (_sheet_path);
+                FileManager.move_to_trash (_sheet_path);
+                File metadata_file = File.new_for_path (_notes_path);
+                if (metadata_file.query_exists ()) {
+                    FileManager.move_to_trash (_notes_path);
+                }
+            });
+            _context_actions.add_action (move_to_trash_action);
         }
 
         public static bool areEqual (Sheet a, Sheet b) {

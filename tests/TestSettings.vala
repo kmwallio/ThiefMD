@@ -27,6 +27,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 using ThiefMD.Controllers;
+using Adw;
 
 namespace ThiefMD {
     namespace Widgets {
@@ -153,17 +154,17 @@ namespace ThiefMD {
     }
 
     public class UI {
-        public static Gtk.SourceStyleSchemeManager thief_schemes = null;
-        public static Gtk.SourceStyleSchemeManager UserSchemes () {
+        public static GtkSource.StyleSchemeManager thief_schemes = null;
+        public static GtkSource.StyleSchemeManager UserSchemes () {
             if (thief_schemes == null) {
-                thief_schemes = new Gtk.SourceStyleSchemeManager ();
+                thief_schemes = new GtkSource.StyleSchemeManager ();
             }
     
             return thief_schemes;
         }
     }
 
-    public class ThiefApp : Hdy.ApplicationWindow {
+    public class ThiefApp : Adw.ApplicationWindow {
         public int pane_position = 200;
         public Notes notes;
         public Library library;
@@ -289,6 +290,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public bool dark_mode { get; set; default = false; }
         public bool ui_editor_theme { get; set; default = false; }
         public bool save_library_order { get; set; default = true; }
+        public bool show_sheet_filenames { get; set; default = true; }
         public bool export_break_folders { get; set; default = false; }
         public bool export_break_sheets { get; set; default = false; }
         public bool export_resolve_paths { get; set; default = false; }

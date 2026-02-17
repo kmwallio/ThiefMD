@@ -22,23 +22,29 @@ using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
     public class DefaultTheme : Gtk.ToggleButton {
-        private Gtk.SourceView view;
-        private Gtk.SourceBuffer buffer;
+        private GtkSource.View view;
+        private GtkSource.Buffer buffer;
 
         public DefaultTheme () {
             var settings = AppSettings.get_default ();
-            margin = 0;
-            view = new Gtk.SourceView ();
-            view.margin = 0;
-            buffer = new Gtk.SourceBuffer.with_language (UI.get_source_language ());
+            margin_top = 0;
+            margin_bottom = 0;
+            margin_start = 0;
+            margin_end = 0;
+            view = new GtkSource.View ();
+            view.margin_top = 0;
+            view.margin_bottom = 0;
+            view.margin_start = 0;
+            view.margin_end = 0;
+            buffer = new GtkSource.Buffer.with_language (UI.get_source_language ());
             buffer.highlight_syntax = true;
             view.editable = false;
             view.set_buffer (buffer);
             view.set_wrap_mode (Gtk.WrapMode.WORD);
             buffer.text = ThiefProperties.PREVIEW_TEXT.printf(ThiefProperties.NAME);
-            add (view);
+            set_child (view);
 
-            var style_manager = Gtk.SourceStyleSchemeManager.get_default ();
+            var style_manager = GtkSource.StyleSchemeManager.get_default ();
             var style = style_manager.get_scheme ("thiefmd");
             buffer.set_style_scheme (style);
 
@@ -55,7 +61,7 @@ namespace ThiefMD.Widgets {
 
             set_preview_state ();
 
-            show_all ();
+            set_visible (true);
         }
 
         private void set_preview_state () {

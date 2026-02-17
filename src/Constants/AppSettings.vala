@@ -64,7 +64,7 @@ namespace ThiefMD {
 
         // Typewriter Position
         public const int TYPEWRITER_UPDATE_TIME = 500;
-        public const double TYPEWRITER_POSITION = 0.45;
+        public const double TYPEWRITER_POSITION = 0.20;
 
         // Number of lines to preview
         public const int SHEET_PREVIEW_LINES = 3;
@@ -136,6 +136,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
         public bool dark_mode { get; set; }
         public bool ui_editor_theme { get; set; }
         public bool save_library_order { get; set; }
+        public bool show_sheet_filenames { get; set; }
         public bool export_break_folders { get; set; }
         public bool export_break_sheets { get; set; }
         public bool export_resolve_paths { get; set; }
@@ -379,6 +380,7 @@ First time here?  Drag a folder into the library, or click on the Folder icon to
             app_settings.bind ("ui-editor-theme", this, "ui_editor_theme", SettingsBindFlags.DEFAULT);
             app_settings.bind ("brandless", this, "brandless", SettingsBindFlags.DEFAULT);
             app_settings.bind ("save-library-order", this, "save_library_order", SettingsBindFlags.DEFAULT);
+            app_settings.bind ("show-sheet-filenames", this, "show_sheet_filenames", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-break-folders", this, "export_break_folders", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-break-sheets", this, "export_break_sheets", SettingsBindFlags.DEFAULT);
             app_settings.bind ("export-resolve-paths", this, "export_resolve_paths", SettingsBindFlags.DEFAULT);

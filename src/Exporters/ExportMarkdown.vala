@@ -57,7 +57,7 @@ namespace ThiefMD.Exporters {
             markdown_filter.add_pattern ("*.md");
             markdown_filter.add_pattern ("*.markdown");
 
-            File new_novel = Dialogs.get_target_save_file_with_extension (
+            File? new_novel = Dialogs.get_target_save_file_with_extension (
                 _("Export Markdown"),
                 markdown_filter,
                 "md");

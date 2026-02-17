@@ -17,61 +17,30 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Gtk;
-using Gdk;
-
 namespace ThiefMD {
     public const int BYTE_BITS = 8;
     public const int WORD_BITS = 16;
     public const int DWORD_BITS = 32;
 
-    public enum Target {
-        STRING,
-        URI
-    }
+    /* GTK4 TODO: replace legacy target entries with Gtk.DropTarget usage */
 
-    public const TargetEntry[] target_list = {
-        { "STRING" , 0, Target.STRING },
-        { "text/uri-list", 0, Target.URI }
-    };
-
-    public static File dnd_get_file (SelectionData selection_data, uint target_type) {
-        File file;
-        string file_to_parse = "";
-        // Check that we got the format we can use
-        switch (target_type)
-        {
-            case Target.URI:
-                file_to_parse = (string) selection_data.get_data();
-            break;
-            case Target.STRING:
-                file_to_parse = (string) selection_data.get_data();
-            break;
-            default:
-                warning ("Invalid data type");
-            break;
+    public static File dnd_get_file_from_string (string selection_text) {
+        string file_to_parse = selection_text.chomp ();
+        if (file_to_parse == "") {
+            return File.new_for_path ("/dev/null/thiefmd");
         }
 
-        file_to_parse = file_to_parse.chomp ();
-        if (file_to_parse != "")
-        {
-            if (file_to_parse.has_prefix ("file"))
-            {
-                file = File.new_for_uri (file_to_parse.chomp ());
-                string? check_path = file.get_path ();
-                if ((check_path == null) || (check_path.chomp () == ""))
-                {
-                    file_to_parse = "/dev/null/thiefmd";
-                }
-                else
-                {
-                    file_to_parse = check_path.chomp ();
-                }
+        if (file_to_parse.has_prefix ("file")) {
+            var file = File.new_for_uri (file_to_parse);
+            string? check_path = file.get_path ();
+            if (check_path != null && check_path.chomp () != "") {
+                file_to_parse = check_path.chomp ();
+            } else {
+                file_to_parse = "/dev/null/thiefmd";
             }
         }
 
-        file = File.new_for_path (file_to_parse);
-        return file;
+        return File.new_for_path (file_to_parse);
     }
 
     public class PreventDelayedDrop : TimedMutex {

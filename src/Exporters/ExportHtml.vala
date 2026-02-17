@@ -58,7 +58,7 @@ namespace ThiefMD.Exporters {
             html_filter.add_pattern ("*.html");
             html_filter.add_pattern ("*.htm");
 
-            File new_novel = Dialogs.get_target_save_file_with_extension (
+            File? new_novel = Dialogs.get_target_save_file_with_extension (
                 _("Export HTML"),
                 html_filter,
                 "html");

@@ -146,11 +146,10 @@ namespace ThiefMD.Widgets {
             var settings = AppSettings.get_default ();
             _sheets_dir = path;
             _view = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            _scroller = new Gtk.ScrolledWindow (null, null);
+            _scroller = new Gtk.ScrolledWindow ();
 
-            _scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
-            _scroller.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
-            _scroller.add (_view);
+            _scroller.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+            _scroller.set_child (_view);
             _scroller.vexpand = true;
             _scroller.hexpand = true;
 
@@ -159,42 +158,44 @@ namespace ThiefMD.Widgets {
                 title = make_title (path.substring (path.last_index_of (Path.DIR_SEPARATOR_S) + 1));
             }
 
-            var bar = new Hdy.HeaderBar ();
-            bar.set_title ("");
+            var bar = new Adw.HeaderBar ();
             var bar_label = new Gtk.Label ("<b>" + title + "</b>");
             bar_label.use_markup = true;
             while (title.length > 12 && get_string_px_width(bar_label, title + "...") > 180) {
                 title = title.substring (0, title.length - 2);
                 bar_label.set_markup ("<b>" + title + "...</b>");
             }
+            bar_label.halign = Gtk.Align.START;
+            bar_label.hexpand = true;
             bar_label.xalign = 0;
             bar_label.set_ellipsize (Pango.EllipsizeMode.END);
-            bar.pack_start (bar_label);
-            bar.set_show_close_button (false);
-            bar.width_request = settings.view_sheets_width;
+            var window_title = new Adw.WindowTitle ("", "");
+            bar.set_title_widget (window_title);
+            bar.set_show_start_title_buttons (false);
+            // Keep the end container visible for our custom button while hiding window controls
+            bar.set_show_end_title_buttons (false);
+            bar.set_decoration_layout (null);
+            bar.set_hexpand (true);
 
             new_sheet = new Gtk.MenuButton ();
             new_sheet_widget = new NewSheet ();
             new_sheet.has_tooltip = true;
             new_sheet.tooltip_text = (_("New Sheet"));
-            new_sheet.set_image (new Gtk.Image.from_icon_name ("document-new-symbolic", Gtk.IconSize.BUTTON));
+            new_sheet.set_icon_name ("document-new-symbolic");
             new_sheet.popover = new_sheet_widget;
-            new_sheet.clicked.connect(() => {
-                settings.menu_active = true;
-                new_sheet.popover.hide.connect (() => {
-                    settings.menu_active = false;
-                });
-            });
+            new_sheet.hexpand = false;
+            new_sheet.vexpand = false;
+            new_sheet.margin_start = 5;
+            new_sheet.margin_end = 15;
 
-            bar.pack_end (new_sheet);
-
-            bar_label.width_request = settings.view_sheets_width - 20;
+            bar.pack_start (new_sheet);
+            bar.pack_start (bar_label);
 
             var header_context = bar.get_style_context ();
             header_context.add_class ("thiefmd-toolbar");
 
-            add (bar);
-            add (_scroller);
+            append (bar);
+            append (_scroller);
 
             debug ("Got %s\n", _sheets_dir);
             if (_sheets_dir == "" || !FileUtils.test(path, FileTest.IS_DIR)) {
@@ -278,10 +279,32 @@ namespace ThiefMD.Widgets {
         }
 
         private void show_empty () {
-            _empty = new Gtk.Label(_("Select an item from the Library to open or create a new Sheet."));
-            _empty.set_ellipsize (Pango.EllipsizeMode.END);
-            _empty.lines = 30;
-            _view.add(_empty);
+            if (_empty == null) {
+                _empty = new Gtk.Label(_("Select an item from the Library to open or create a new Sheet."));
+                _empty.set_ellipsize (Pango.EllipsizeMode.END);
+                _empty.lines = 30;
+                _empty.set_margin_top (12); // avoid header overlap
+                _empty.set_margin_start (6);
+                _empty.set_margin_end (6);
+            }
+
+            if (_empty.get_parent () == null) {
+                _view.append (_empty);
+            }
+        }
+
+        private void remove_empty_label () {
+            if (_empty != null && _empty.get_parent () != null) {
+                _view.remove (_empty);
+            }
+        }
+
+        private void update_empty_label_state () {
+            if (_sheets != null && _sheets.keys.size > 0) {
+                remove_empty_label ();
+            } else {
+                show_empty ();
+            }
         }
 
         public string guess_extension () {
@@ -309,9 +332,7 @@ namespace ThiefMD.Widgets {
                 _sheets.unset (sheet.file_name (), out val);
                 _view.remove (val);
                 metadata.sheet_order.remove (sheet.file_name ());
-                if (_sheets.is_empty) {
-                    show_empty ();
-                }
+                update_empty_label_state ();
             }
         }
 
@@ -363,13 +384,7 @@ namespace ThiefMD.Widgets {
             }
             reload_sheets ();
 
-            if (am_empty && (_sheets.keys.size != 0)) {
-                _view.remove (_empty);
-            }
-
-            if (_sheets.keys.size == 0 && !am_empty) {
-                _view.add (_empty);
-            }
+            update_empty_label_state ();
         }
 
         public List<Sheet> get_sheets () {
@@ -384,9 +399,7 @@ namespace ThiefMD.Widgets {
 
         public void load_sheets () {
             var settings = AppSettings.get_default ();
-            if (_empty != null) {
-                _view.remove (_empty);
-            }
+            remove_empty_label ();
 
             if (_sheets != null) {
                 foreach (var sheet in _sheets) {
@@ -427,7 +440,8 @@ namespace ThiefMD.Widgets {
 
                         Sheet sheet = new Sheet (path, this);
                         _sheets.set (file_name, sheet);
-                        _view.add (sheet);
+                        _view.append (sheet);
+                        remove_empty_label ();
 
                         if (!settings.dont_show_tips){
                             if (settings.last_file == path) {
@@ -442,9 +456,9 @@ namespace ThiefMD.Widgets {
             // Load anything new in the folder
             reload_sheets ();
 
-            if (metadata.sheet_order.size == 0) {
-                show_empty();
-            } else if (settings.save_library_order || metadata.notes != "") {
+            update_empty_label_state ();
+
+            if (metadata.sheet_order.size != 0 && (settings.save_library_order || metadata.notes != "")) {
                 save_library_order ();
             }
         }
@@ -466,8 +480,9 @@ namespace ThiefMD.Widgets {
 
                             Sheet sheet = new Sheet (path, this);
                             _sheets.set (file_name, sheet);
-                            _view.add (sheet);
+                            _view.append (sheet);
                             metadata.add_sheet (file_name);
+                            remove_empty_label ();
 
                             if (!settings.dont_show_tips){
                                 if (settings.last_file == path) {
@@ -481,6 +496,8 @@ namespace ThiefMD.Widgets {
             } catch (Error e) {
                 warning (e.message);
             }
+
+            update_empty_label_state ();
         }
 
         public void sort_sheets_by_date (bool asc = true) {
@@ -617,13 +634,17 @@ namespace ThiefMD.Widgets {
                 Sheet show = _sheets.get (s);
                 show.redraw ();
                 _view.remove (show);
-                _view.add (show);
+                _view.append (show);
             }
             _view.show ();
         }
 
         public void save_notes () {
             save_metadata_file (metadata.notes != "");
+        }
+
+        public void persist_metadata () {
+            save_metadata_file (true);
         }
 
         private void save_library_order () {

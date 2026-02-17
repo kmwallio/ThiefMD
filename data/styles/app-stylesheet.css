@@ -40,6 +40,14 @@ menu {
     color: @textColorPrimary;
 }
 
+/* Ensure QuickPreferences toggle buttons show their active state even with custom CSS overrides */
+.quickprefs togglebutton:checked,
+.quickprefs button.toggle:checked {
+    background: lighter(@colorPrimary);
+    color: @textColorPrimary;
+    border-left: 3px solid @selectionColor;
+}
+
 .thiefmd-toolbar:backdrop, .thief-toolbar:backdrop, .thiefmd-toolbar:backdrop button {
     background-image: linear-gradient(lighter(@colorPrimary), @colorPrimary 50%);
     color: mix(@textColorPrimary, @colorPrimary, 0.5);
@@ -59,6 +67,31 @@ actionbar,
 
 .thief-drop-below {
     margin-top: 1.5rem;
+}
+
+.library-drop-hover {
+    background: alpha(@selectionColor, 0.2);
+    border-left: 3px solid @selectionColor;
+}
+
+/* Library list (Gtk.ListView) styling */
+listview row .library-row {
+    background: @windowColor;
+    color: darker(@colorPrimaryActive);
+    padding: 6px 8px;
+    border-bottom: 1px solid alpha(@textColorPrimary, 0.2);
+}
+
+listview row:hover .library-row {
+    background: lighter(@windowColor);
+    color: @textColorPrimary;
+}
+
+listview row:selected .library-row,
+listview row:focus-within .library-row {
+    background: @colorPrimaryActive;
+    color: @textColorActive;
+    border-left: 5px solid @selectionColor;
 }
 
 .thief-search-results {

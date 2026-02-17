@@ -22,7 +22,9 @@ using ThiefMD.Controllers;
 
 namespace ThiefMD.Widgets {
     public class CssPreview : Gtk.ToggleButton {
-        private Gtk.OffscreenWindow prev_window;
+        /* GTK4 TODO: Gtk.OffscreenSurface not available - preview not rendered
+        private Gtk.OffscreenSurface prev_window;
+        */
         private Preview preview;
         private bool print_css;
         private string css_name;
@@ -31,17 +33,21 @@ namespace ThiefMD.Widgets {
             preview = new Preview ();
             css_name = css;
             print_css = is_print;
-            prev_window = new Gtk.OffscreenWindow ();
+            /* GTK4 TODO: Gtk.OffscreenSurface not available
+            prev_window = new Gtk.OffscreenSurface ();
+            */
             preview.print_only = is_print;
             preview.override_css = css;
             preview.update_html_view (false, ThiefProperties.PREVIEW_CSS_MARKDOWN.printf (make_title(css != "" ? css : "None")));
             preview.hexpand = true;
             preview.vexpand = false;
             preview.zoom_level = 0.25;
+            /* GTK4 TODO: Gtk.OffscreenSurface not available
             prev_window.set_size_request (Constants.CSS_PREVIEW_WIDTH, Constants.CSS_PREVIEW_HEIGHT);
+            */
             set_size_request (Constants.CSS_PREVIEW_WIDTH, Constants.CSS_PREVIEW_HEIGHT);
 
-            add (preview);
+            set_child (preview);
 
             clicked.connect (() => {
                 switch_to_this_css ();
@@ -78,8 +84,8 @@ namespace ThiefMD.Widgets {
 
     public class ThemePreview : Gtk.ToggleButton {
         private Ultheme.Parser theme;
-        private Gtk.SourceView view;
-        private Gtk.SourceBuffer buffer;
+        private GtkSource.View view;
+        private GtkSource.Buffer buffer;
         private bool am_dark;
         private Ultheme.HexColorPalette palette;
 
@@ -88,16 +94,14 @@ namespace ThiefMD.Widgets {
             theme = parser;
             am_dark = is_dark;
 
-            margin = 0;
-            view = new Gtk.SourceView ();
-            view.margin = 0;
-            buffer = new Gtk.SourceBuffer.with_language (UI.get_source_language ());
+            view = new GtkSource.View ();
+            buffer = new GtkSource.Buffer.with_language (UI.get_source_language ());
             buffer.highlight_syntax = true;
             view.editable = false;
             view.set_buffer (buffer);
             view.set_wrap_mode (Gtk.WrapMode.WORD);
             buffer.text = ThiefProperties.PREVIEW_TEXT.printf(theme.get_theme_name ());
-            add (view);
+            set_child (view);
 
             if (am_dark) {
                 string dark_path = Path.build_filename (UserData.scheme_path, theme.get_dark_theme_id () + ".xml");
@@ -132,8 +136,6 @@ namespace ThiefMD.Widgets {
             settings.changed.connect (() => {
                 set_preview_state ();
             });
-
-            show_all ();
         }
 
         private void set_preview_state () {

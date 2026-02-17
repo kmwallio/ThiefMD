@@ -8,7 +8,9 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
         
       - name: Add vala next
         run: sudo add-apt-repository ppa:vala-team/daily
@@ -17,13 +19,7 @@ jobs:
         run: sudo apt-get update
 
       - name: Install build essentials
-        run: sudo apt-get install build-essential meson ninja-build valac cmake libgtkspell3-3-dev libwebkit2gtk-4.1-dev libmarkdown2-dev libxml2-dev libarchive-dev libgtk-3-dev libgee-0.8-dev libgtksourceview-4-dev libsecret-1-dev libhandy-1-dev liblink-grammar-dev libjson-glib-dev
-
-      - name: Init submodules
-        run: git submodule init
-
-      - name: Update submodules
-        run: git submodule update --remote --recursive
+        run: sudo apt-get install build-essential meson ninja-build valac cmake libgspell-1-dev libwebkitgtk-6.0-dev libmarkdown2-dev libxml2-dev libarchive-dev libgtk-4-dev libgee-0.8-dev libgtksourceview-5-dev libsecret-1-dev libadwaita-1-dev liblink-grammar-dev libjson-glib-dev libspelling-1-dev
 
       - name: Setup Build
         run: meson build

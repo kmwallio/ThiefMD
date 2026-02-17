@@ -34,7 +34,10 @@ namespace ThiefMD.Widgets {
             _create = new Gtk.Button.with_label (_("mkdir"));
 
             var menu_grid = new Gtk.Grid ();
-            menu_grid.margin = 6;
+            menu_grid.margin_top = 6;
+            menu_grid.margin_bottom = 6;
+            menu_grid.margin_start = 6;
+            menu_grid.margin_end = 6;
             menu_grid.row_spacing = 6;
             menu_grid.column_spacing = 12;
             menu_grid.orientation = Gtk.Orientation.HORIZONTAL;
@@ -42,9 +45,7 @@ namespace ThiefMD.Widgets {
             menu_grid.attach (_file_name, 0, 0, 2, 1);
             menu_grid.attach (_create, 3, 0, 1, 1);
 
-            menu_grid.show_all ();
-
-            add (menu_grid);
+            set_child (menu_grid);
 
             _create.clicked.connect (new_folder);
         }

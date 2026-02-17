@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.kmwallio.thiefmd', ['vala', 'c'],
-    version: '0.2.7'
+    version: '0.3.0'
 )
 
 # Application ID
@@ -68,6 +68,12 @@ if linkgrammar.found() == false
     linkgrammar = cc.find_library('link-grammar', required: true)
 endif
 
+# Math helpers
+libm = cc.find_library('m', required: true)
+
+# Spell checking
+libspelling = dependency('libspelling-1', required: true)
+
 # Let's define our executable
 add_project_arguments(['--vapidir', join_paths(meson.current_source_dir(), 'vapi')], language: 'vala')
 
@@ -111,6 +117,7 @@ executable(
     'src/Widgets/Sheets.vala',
     'src/Widgets/Sheet.vala',
     'src/Widgets/Editor.vala',
+    'src/Widgets/EditorContextMenu.vala',
     'src/Widgets/Library.vala',
     'src/Widgets/Notes.vala',
     'src/Widgets/NewFolder.vala',
@@ -119,6 +126,7 @@ executable(
     'src/Widgets/Preview.vala',
     'src/Widgets/PreviewWindow.vala',
     'src/Widgets/PublisherPreviewWindow.vala',
+    'src/Widgets/PublishedStatusWindow.vala',
     'src/Widgets/KeyBindings.vala',
     'src/Widgets/ProjectStatistics.vala',
     'src/Widgets/QuickPreferences.vala',
@@ -149,23 +157,26 @@ executable(
     c_args: c_args,
     dependencies: [
         dependency('gobject-2.0'),
-        dependency('gtksourceview-4'),
-        dependency('gtk+-3.0'),
-        dependency('gtkspell3-3.0'),
-        dependency('webkit2gtk-4.1'),
+        dependency('gio-2.0'),
+        dependency('gtksourceview-5'),
+        dependency('gtk4'),
+        dependency('webkitgtk-6.0'),
         dependency('json-glib-1.0'),
         dependency('gee-0.8'),
         dependency('libarchive'),
         dependency('libxml-2.0'),
         dependency('libsecret-1'),
-        dependency('libhandy-1'),
+        dependency('libadwaita-1'),
         libmarkdown,
-        linkgrammar
+        linkgrammar,
+        libm,
+        libspelling
     ],
     vala_args: [
         meson.source_root() + '/vapi/config.vapi',
         meson.source_root() + '/vapi/libmarkdown.vapi',
-        meson.source_root() + '/vapi/linkgrammar.vapi'
+        meson.source_root() + '/vapi/linkgrammar.vapi',
+        meson.source_root() + '/vapi/libspelling-1.vapi'
     ],
     install : true
 )

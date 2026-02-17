@@ -113,6 +113,10 @@
             <default>false</default>
             <summary>Persist Library Order between launches</summary>
         </key>
+        <key name="show-sheet-filenames" type="b">
+            <default>false</default>
+            <summary>Always show sheet filenames</summary>
+        </key>
         <key name="spacing" type="i">
             <default>4</default>
             <summary>The spacing on the Editor View's lines</summary>
