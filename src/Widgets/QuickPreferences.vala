@@ -135,8 +135,7 @@ namespace ThiefMD.Widgets {
             about_button.has_tooltip = true;
             about_button.tooltip_text = _("About ThiefMD");
             about_button.clicked.connect (() => {
-                About abt = new About();
-                abt.run ();
+                new About ().present (ThiefApp.get_instance ());
             });
 
             menu_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
