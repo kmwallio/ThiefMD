@@ -196,11 +196,99 @@ namespace ThiefMD.Connections {
             dialog.response.connect ((response_id) => {
                 if (response_id == Gtk.ResponseType.ACCEPT) {
                     debug ("Data from callback");
-                    data = new ConnectionData ();
-                    data.connection_type = CONNECTION_TYPE;
-                    data.user = username_entry.text;
-                    data.auth = password_entry.text;
-                    data.endpoint = endpoint_entry.text;
+                    // Try to authenticate and get the session cookie
+                    Ghost.Client temp_client = new Ghost.Client (
+                        endpoint_entry.text,
+                        username_entry.text,
+                        password_entry.text);
+
+                    if (temp_client.authenticate ()) {
+                        // Check if 2FA is required
+                        if (temp_client.requires_2fa) {
+                            // Create 2FA dialog
+                            Gtk.Grid twofa_grid = new Gtk.Grid ();
+                            twofa_grid.margin_top = 12;
+                            twofa_grid.margin_bottom = 12;
+                            twofa_grid.margin_start = 12;
+                            twofa_grid.margin_end = 12;
+                            twofa_grid.row_spacing = 12;
+                            twofa_grid.column_spacing = 12;
+                            twofa_grid.orientation = Gtk.Orientation.VERTICAL;
+                            twofa_grid.hexpand = true;
+                            twofa_grid.vexpand = true;
+
+                            Gtk.Label code_label = new Gtk.Label (_("Enter verification code from your authenticator app"));
+                            code_label.xalign = 0;
+                            code_label.wrap = true;
+
+                            Gtk.Entry code_entry = new Gtk.Entry ();
+                            code_entry.placeholder_text = "000000";
+                            code_entry.max_width_chars = 6;
+
+                            twofa_grid.attach (code_label, 1, 1, 2, 1);
+                            twofa_grid.attach (code_entry, 1, 2, 2, 1);
+
+                            var twofa_dialog = new Gtk.Dialog.with_buttons (
+                                            _("Two-Factor Authentication Required"),
+                                            ThiefApp.get_instance (),
+                                            Gtk.DialogFlags.MODAL,
+                                            _("_Verify"),
+                                            Gtk.ResponseType.ACCEPT,
+                                            _("_Cancel"),
+                                            Gtk.ResponseType.REJECT,
+                                            null);
+
+                            twofa_dialog.get_content_area ().append (twofa_grid);
+
+                            bool twofa_verified = false;
+                            var twofa_loop = new GLib.MainLoop ();
+                            twofa_dialog.response.connect ((twofa_response_id) => {
+                                if (twofa_response_id == Gtk.ResponseType.ACCEPT) {
+                                    debug ("Attempting 2FA verification");
+                                    if (temp_client.verify_session (code_entry.text)) {
+                                        twofa_verified = true;
+                                        debug ("2FA verification successful");
+                                    } else {
+                                        warning ("2FA verification failed");
+                                    }
+                                }
+                                twofa_dialog.destroy ();
+                                twofa_loop.quit ();
+                            });
+
+                            twofa_dialog.close_request.connect (() => {
+                                twofa_loop.quit ();
+                                return false;
+                            });
+
+                            twofa_dialog.present ();
+                            twofa_loop.run ();
+
+                            if (twofa_verified) {
+                                // 2FA verification successful, extract session cookie
+                                string? session_cookie = temp_client.get_session_cookie ();
+                                data = new ConnectionData ();
+                                data.connection_type = CONNECTION_TYPE;
+                                data.user = username_entry.text;
+                                // Store cookie with "cookie:" prefix to distinguish from password
+                                data.auth = session_cookie != null ? "cookie:" + session_cookie : password_entry.text;
+                                data.endpoint = endpoint_entry.text;
+                            } else {
+                                warning ("2FA verification failed");
+                            }
+                        } else {
+                            // Authentication successful, extract session cookie
+                            string? session_cookie = temp_client.get_session_cookie ();
+                            data = new ConnectionData ();
+                            data.connection_type = CONNECTION_TYPE;
+                            data.user = username_entry.text;
+                            // Store cookie with "cookie:" prefix to distinguish from password
+                            data.auth = session_cookie != null ? "cookie:" + session_cookie : password_entry.text;
+                            data.endpoint = endpoint_entry.text;
+                        }
+                    } else {
+                        warning ("Failed to authenticate with Ghost");
+                    }
                 }
                 dialog.destroy ();
                 loop.quit ();
