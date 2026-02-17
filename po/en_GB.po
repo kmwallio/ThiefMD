@@ -839,7 +839,7 @@ msgstr ""
 
 #: src/Widgets/Preferences.vala:77
 msgid "Current Connections"
-msgstr "Current Conenctions"
+msgstr "Current Connections"
 
 #: src/Widgets/Preferences.vala:78
 msgid "Click on a connection to remove."
