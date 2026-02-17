@@ -7,5 +7,5 @@ Exec=com.github.kmwallio.thiefmd %U
 Icon=com.github.kmwallio.thiefmd
 Terminal=false
 Type=Application
-Keywords=markdown;text;editor;
+Keywords=markdown;text;editor;novel;writing;fountain;blog;book;ghost;wordpress;screenplay;screenwriting;medium;forem;
 MimeType=text/x-markdown;text/markdown;text/fountain;text/spmd;

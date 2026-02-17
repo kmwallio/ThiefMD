@@ -46,17 +46,13 @@ namespace ThiefMD.Connections {
             if (conf_alias.chug ().chomp () == "") {
                 string q_domain = "";
                 string pub_id = "";
-                if (connection.get_user_information (username, out pub_id, out q_domain)) {
-                    conf_alias = "%s/%s".printf(q_domain, username);
-                } else {
-                    conf_alias = "%s@hashnode".printf(username);
-                }
+                conf_alias = "%s@hashnode".printf(username);
             }
 
             try {
                 connection.authenticate (username, password);
                 export_name = conf_alias;
-                exporter = new HashnodeExporter (connection);
+                exporter = new HashnodeExporter (connection, username);
             } catch (Error e) {
                 warning ("Could not establish connection: %s", e.message);
             }
@@ -71,14 +67,17 @@ namespace ThiefMD.Connections {
 
         public static ConnectionData? create_connection (Gtk.Window? parent) {
             Gtk.Grid grid = new Gtk.Grid ();
-            grid.margin = 12;
+            grid.margin_top = 12;
+            grid.margin_bottom = 12;
+            grid.margin_start = 12;
+            grid.margin_end = 12;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
             grid.orientation = Gtk.Orientation.VERTICAL;
             grid.hexpand = true;
             grid.vexpand = true;
 
-            Gtk.Label username_label = new Gtk.Label (_("Username or Publication ID"));
+            Gtk.Label username_label = new Gtk.Label (_("Username"));
             username_label.xalign = 0;
             Gtk.Entry username_entry = new Gtk.Entry ();
 
@@ -88,34 +87,10 @@ namespace ThiefMD.Connections {
             Gtk.Entry password_entry = new Gtk.Entry ();
             password_entry.set_visibility (false);
 
-            Gtk.Label endpoint_label = new Gtk.Label (_("Display Name"));
-            endpoint_label.xalign = 0;
-            Gtk.Entry endpoint_entry = new Gtk.Entry ();
-            endpoint_entry.placeholder_text = "username.hashnode.com";
-
-            username_entry.editing_done.connect (() => {
-                if (endpoint_entry.text.chug ().chomp () == "") {
-                    Hashnode.Client client = new Hashnode.Client();
-                    if (username_entry.text.chug ().chomp () == "") {
-                        string domain = "";
-                        string pub_id = "";
-                        if (client.get_user_information (username_entry.text, out pub_id, out domain)) {
-                            endpoint_entry.placeholder_text = "%s/%s".printf(domain, username_entry.text);
-                        } else {
-                            endpoint_entry.placeholder_text = "%s@hashnode".printf(username_entry.text);
-                        }
-                    }
-                }
-            });
-
             grid.attach (username_label, 1, 1, 1, 1);
             grid.attach (username_entry, 2, 1, 2, 1);
             grid.attach (password_label, 1, 2, 1, 1);
             grid.attach (password_entry, 2, 2, 2, 1);
-            grid.attach (endpoint_label, 1, 3, 1, 1);
-            grid.attach (endpoint_entry, 2, 3, 2, 1);
-
-            grid.show_all ();
 
             var dialog = new Gtk.Dialog.with_buttons (
                             _("New Hashnode Connection"),
@@ -127,10 +102,11 @@ namespace ThiefMD.Connections {
                             Gtk.ResponseType.REJECT,
                             null);
 
-            dialog.get_content_area ().add (grid);
+            dialog.get_content_area ().append (grid);
 
             ConnectionData data = null;
 
+            var loop = new GLib.MainLoop ();
             dialog.response.connect ((response_id) => {
                 if (response_id == Gtk.ResponseType.ACCEPT) {
                     debug ("Data from callback");
@@ -138,18 +114,18 @@ namespace ThiefMD.Connections {
                     data.connection_type = CONNECTION_TYPE;
                     data.user = username_entry.text;
                     data.auth = password_entry.text;
-                    data.endpoint = endpoint_entry.text;
+                    data.endpoint = "";
                 }
                 dialog.destroy ();
+                loop.quit ();
             });
-            if (dialog.run () == Gtk.ResponseType.ACCEPT) {
-                debug ("Data from block");
-                data = new ConnectionData ();
-                data.connection_type = CONNECTION_TYPE;
-                data.user = username_entry.text;
-                data.auth = password_entry.text;
-                data.endpoint = endpoint_entry.text;
-            }
+            dialog.close_request.connect (() => {
+                loop.quit ();
+                return false;
+            });
+
+            dialog.present ();
+            loop.run ();
 
             return data;
         }
@@ -160,11 +136,21 @@ namespace ThiefMD.Connections {
         public override string export_css { get; protected set; }
         private PublisherPreviewWindow publisher_instance;
         public Hashnode.Client connection;
+        private GLib.List<Hashnode.PublicationResponse> publications;
+        private Gtk.ComboBoxText publication_selector;
+        private Gtk.ComboBoxText publish_state;
+        private string username;
 
-        public HashnodeExporter (Hashnode.Client connected) {
+        public HashnodeExporter (Hashnode.Client connected, string user) {
             export_name = "hashnode";
             export_css = "preview";
             connection = connected;
+            username = user;
+
+            publish_state = new Gtk.ComboBoxText ();
+            publish_state.append_text ("Draft");
+            publish_state.append_text ("Published");
+            publish_state.set_active (0);
         }
 
         public override string update_markdown (string markdown) {
@@ -173,22 +159,42 @@ namespace ThiefMD.Connections {
 
         public override void attach (PublisherPreviewWindow ppw) {
             publisher_instance = ppw;
+            publications = new GLib.List<Hashnode.PublicationResponse> ();
+            if (connection.get_user_publications (ref publications)) {
+                if (publications.length () > 0) {
+                    publication_selector = new Gtk.ComboBoxText ();
+                    publication_selector.hexpand = true;
+
+                    foreach (var p in publications) {
+                        publication_selector.append_text (p.title != null && p.title != "" ? p.title : p.domain);
+                    }
+
+                    publication_selector.set_active (0);
+                    publisher_instance.headerbar.pack_end (publication_selector);
+                }
+            }
+            publisher_instance.headerbar.pack_end (publish_state);
             return;
         }
 
         public override void detach () {
+            if (publications.length () > 0) {
+                publication_selector.set_active (0);
+                publisher_instance.headerbar.remove (publication_selector);
+                publication_selector = null;
+            }
+            publisher_instance.headerbar.remove (publish_state);
             publisher_instance = null;
             return;
         }
 
         public override bool export () {
-            bool non_collected_post = true;
             bool published = false;
-            string temp;
             string title = "";
             string date;
             string url = "";
             string id = "";
+            string draft_id = "";
             string body = FileManager.get_yamlless_markdown (
                 publisher_instance.get_export_markdown (),
                 0,
@@ -198,11 +204,13 @@ namespace ThiefMD.Connections {
                 false, // Override instead of use settings as theme will display
                 false);
 
-            warning ("Hashnode exporting");
+            debug ("Hashnode exporting");
 
             Gee.Map<string, string> images_to_upload = Pandoc.file_image_map (publisher_instance.get_export_markdown ());
             Gee.HashMap<string, string> replacements = new Gee.HashMap<string, string> ();
 
+            // Initialize publication_id early so it's available for draft link
+            string publication_id = "";
             bool good_to_go = true;
             if (images_to_upload.keys.size > 0) {
                 foreach (var images in images_to_upload) {
@@ -236,22 +244,58 @@ namespace ThiefMD.Connections {
                     featured_image = "";
                 }
 
+                // Get selected publication
+                Hashnode.PublicationResponse selected_publication = null;
+                if (publications.length () > 0) {
+                    int option = publication_selector.get_active ();
+                    if (option >= 0 && option < publications.length ()) {
+                        selected_publication = publications.nth_data (option);
+                        publication_id = selected_publication.id;
+                    }
+                }
+
+                // If no publication is selected, fall back to default publication
+                if (publication_id == "") {
+                    publication_id = connection.get_publication_id (username);
+                }
+
+                // Check if we're publishing as draft or immediately
+                int published_state = publish_state.get_active ();
+                bool is_draft = (published_state == 0);
+
                 Gee.List<string> hashnodeSayings = new Gee.LinkedList<string> ();
                 hashnodeSayings.add(_("Hashing words and nodes together."));
                 hashnodeSayings.add(_("Don't forget to share on reddit."));
                 hashnodeSayings.add(_("This looks like something worth sharing"));
 
-                Thinking worker = new Thinking (_("Beaming to the Internet"), () => {
-                    if (connection.publish_post (
-                        out url,
-                        out id,
-                        body,
-                        title,
-                        featured_image))
-                    {
-                        published = true;
-                    }
-                }, hashnodeSayings, publisher_instance);
+                Thinking worker = new Thinking (
+                    is_draft ? _("Creating Draft") : _("Beaming to the Internet"), 
+                    () => {
+                        if (is_draft) {
+                            // Create as draft
+                            if (connection.create_draft (
+                                out draft_id,
+                                publication_id,
+                                body,
+                                title,
+                                featured_image))
+                            {
+                                published = true;
+                            }
+                        } else {
+                            // Publish directly to the publication
+                            if (connection.publish_publication_post (
+                                out url,
+                                out id,
+                                publication_id,
+                                body,
+                                title,
+                                featured_image))
+                            {
+                                published = true;
+                            }
+                        }
+                    }, hashnodeSayings, publisher_instance);
                 worker.run ();
             } else {
                 Gtk.Label label = new Gtk.Label (
@@ -266,19 +310,41 @@ namespace ThiefMD.Connections {
             }
 
             if (published) {
-                Gtk.Label label = new Gtk.Label (
-                    "<b>Post URL:</b> <a href='%s'>%s</a>".printf (
-                        url,
-                        url));
+                int published_state = publish_state.get_active ();
+                bool is_draft = (published_state == 0);
 
-                label.xalign = 0;
-                label.use_markup = true;
-                PublishedStatusWindow status = new PublishedStatusWindow (
-                    publisher_instance,
-                    (title != "") ? title + _(" Published") : _("Post Published"),
-                    label);
+                if (is_draft) {
+                    // Show draft created message with link to drafts dashboard
+                    string drafts_url = "https://hashnode.com/%s/dashboard/posts?view=drafts".printf (publication_id);
+                    Gtk.Label label = new Gtk.Label (
+                        _("Draft created successfully!") + "\n\n" +
+                        "<b>Draft ID:</b> " + draft_id + "\n\n" +
+                        "<a href=\"" + drafts_url + "\">" + _("View Drafts") + "</a>");
 
-                status.run ();
+                    label.xalign = 0;
+                    label.use_markup = true;
+                    PublishedStatusWindow status = new PublishedStatusWindow (
+                        publisher_instance,
+                        (title != "") ? title + _(" Draft Created") : _("Draft Created"),
+                        label);
+
+                    status.run ();
+                } else {
+                    // Show published message
+                    Gtk.Label label = new Gtk.Label (
+                        "<b>Post URL:</b> <a href='%s'>%s</a>".printf (
+                            url,
+                            url));
+
+                    label.xalign = 0;
+                    label.use_markup = true;
+                    PublishedStatusWindow status = new PublishedStatusWindow (
+                        publisher_instance,
+                        (title != "") ? title + _(" Published") : _("Post Published"),
+                        label);
+
+                    status.run ();
+                }
             }
 
             return published;

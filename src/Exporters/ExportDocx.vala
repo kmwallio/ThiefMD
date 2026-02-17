@@ -56,7 +56,7 @@ namespace ThiefMD.Exporters {
             docx_filter.add_mime_type ("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
             docx_filter.add_pattern ("*.docx");
 
-            File new_novel = Dialogs.get_target_save_file_with_extension (
+            File? new_novel = Dialogs.get_target_save_file_with_extension (
                 _("Export DocX"),
                 docx_filter,
                 "docx");

@@ -23,14 +23,13 @@ using Gtk;
 using Gdk;
 
 namespace ThiefMD.Widgets {
-public class About : Dialog {
+public class About : Gtk.Window {
         private Gtk.Stack stack;
         private Gtk.HeaderBar bar;
 
         public About () {
             set_transient_for (ThiefApp.get_instance ());
             resizable = false;
-            deletable = true;
             modal = true;
             build_ui ();
         }
@@ -38,7 +37,6 @@ public class About : Dialog {
         private void build_ui () {
             add_headerbar ();
             title = "";
-            window_position = WindowPosition.CENTER;
 
             stack = new Stack ();
             stack.add_titled (build_about_ui (), _("About ThiefMD"), _("About"));
@@ -50,24 +48,26 @@ public class About : Dialog {
 
             Box box = new Box (Orientation.VERTICAL, 0);
 
-            bar.set_custom_title (switcher);
-            box.add (stack);
-            this.get_content_area().add (box);
+            bar.set_title_widget (switcher);
+            box.append (stack);
+            set_child (box);
 
             set_default_size (450, 450);
 
-            add_button (_("Close"), Gtk.ResponseType.CLOSE);
-            response.connect (() =>
-            {
+            close_request.connect (() => {
                 destroy ();
+                return true;
             });
 
-            show_all ();
+            present ();
         }
 
         private Gtk.Grid build_about_ui () {
             Grid grid = new Grid ();
-            grid.margin = 12;
+            grid.margin_top = 12;
+            grid.margin_bottom = 12;
+            grid.margin_start = 12;
+            grid.margin_end = 12;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
             grid.orientation = Orientation.VERTICAL;
@@ -105,29 +105,25 @@ public class About : Dialog {
             grid.attach (lic_label, 1, 7);
             grid.attach (lic_label2, 1, 8);
 
-            try {
-                IconTheme icon_theme = IconTheme.get_default();
-                var thief_icon = icon_theme.load_icon("com.github.kmwallio.thiefmd", 128, IconLookupFlags.FORCE_SVG);
-                var icon = new Gtk.Image.from_pixbuf (thief_icon);
-                grid.attach (icon, 1, 1);
-            } catch (Error e) {
-                warning ("Could not load logo: %s", e.message);
-            }
-
-            grid.show_all ();
+            var icon = new Gtk.Image.from_icon_name ("com.github.kmwallio.thiefmd");
+            icon.set_pixel_size (128);
+            grid.attach (icon, 1, 1);
 
             return grid;
         }
 
         private Gtk.Grid build_credits_ui () {
             Grid grid = new Grid ();
-            grid.margin = 12;
+            grid.margin_top = 12;
+            grid.margin_bottom = 12;
+            grid.margin_start = 12;
+            grid.margin_end = 12;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
             grid.orientation = Orientation.VERTICAL;
             grid.hexpand = true;
 
-            Gtk.ScrolledWindow scrl = new Gtk.ScrolledWindow (null, null);
+            Gtk.ScrolledWindow scrl = new Gtk.ScrolledWindow ();
             Gtk.Grid scrl_grid = new Grid ();
             int i = 1;
 
@@ -142,7 +138,7 @@ public class About : Dialog {
             });
             scrl.hexpand = true;
             scrl.vexpand = true;
-            scrl.add (scrl_grid);
+            scrl.set_child (scrl_grid);
 
             grid.attach (scrl, 0, 0);
 
@@ -151,10 +147,14 @@ public class About : Dialog {
 
         public void add_headerbar () {
             bar = new Gtk.HeaderBar ();
-            bar.set_show_close_button (true);
-            bar.set_title ("");
+            bar.set_show_title_buttons (true);
+            bar.set_title_widget (new Gtk.Label (""));
 
-            this.set_titlebar(bar);
+            this.set_titlebar (bar);
+        }
+
+        public void run () {
+            present ();
         }
     }
 }

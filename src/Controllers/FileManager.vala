@@ -366,40 +366,183 @@ namespace ThiefMD.Controllers.FileManager {
         return file_contents;
     }
 
+    public int get_word_count_from_string (string text) {
+        int word_count = 0;
+        bool in_yaml = false;
+        bool in_code_block = false;
+        bool in_html_tag = false;
+        StringBuilder current_word = new StringBuilder ();
+        
+        string[] lines = text.split ("\n");
+        
+        foreach (string line in lines) {
+            // Skip YAML frontmatter
+            if (line == "---" || line == "+++") {
+                if (in_yaml) {
+                    in_yaml = false;
+                    continue;
+                } else if (word_count == 0) {
+                    in_yaml = true;
+                    continue;
+                }
+            }
+            
+            if (in_yaml) {
+                continue;
+            }
+            
+            // Skip code blocks
+            if (line.has_prefix ("```") || line.has_prefix ("~~~")) {
+                in_code_block = !in_code_block;
+                continue;
+            }
+            
+            if (in_code_block) {
+                continue;
+            }
+            
+            // Process line character by character for word counting (respect UTF-8 boundaries)
+            int index = 0;
+            unichar c = 0;
+            while (line.get_next_char (ref index, out c)) {
+                
+                // Skip HTML tags (simple detection)
+                if (c == '<') {
+                    in_html_tag = true;
+                    continue;
+                } else if (c == '>') {
+                    in_html_tag = false;
+                    continue;
+                }
+                
+                if (in_html_tag) {
+                    continue;
+                }
+                
+                // Skip markdown formatting characters
+                if (c == '*' || c == '#' || c == '_' || c == '`' || c == '>' || 
+                    c == '|' || c == '=' || c == '+' || c == '[' || c == ']' ||
+                    c == '(' || c == ')') {
+                    continue;
+                }
+                
+                // Word boundary detection
+                if (c.isspace () || c.ispunct ()) {
+                    if (current_word.len > 0) {
+                        word_count++;
+                        current_word.erase ();
+                    }
+                } else if (c.isalnum ()) {
+                    current_word.append_unichar (c);
+                }
+            }
+            
+            // Handle word at end of line
+            if (current_word.len > 0) {
+                word_count++;
+                current_word.erase ();
+            }
+        }
+        
+        return word_count;
+    }
+
     public int get_word_count (string file_path) {
-        var settings = AppSettings.get_default ();
-        string title, date;
-        string markdown = get_yamlless_markdown (get_file_contents (file_path), 0, out title, out date, true, settings.export_include_yaml_title, false);
-
-        // This is for an approximate word count, not trying to be secure or anything...
+        DataInputStream? input = null;
         try {
-            Regex style = new Regex ("<style\\b[^<]*(?:(?!<\\/style>)<[^<]*)*<\\/style>", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex script = new Regex ("<script\\b[^<]*(?:(?!<\\/script>)<[^<]*)*<\\/script>", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex random_tags = new Regex ("<\\/?(div|p|script|img|td|tr|table|small|u|b|strong|em|sup|sub|span)[^>]*>", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex words = new Regex ("\\s+\\n*", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex num_bullets = new Regex ("^\\s*[0-9]+\\.\\s+");
+            var file = File.new_for_path (file_path);
+            if (!file.query_exists ()) {
+                return 0;
+            }
 
-            markdown = num_bullets.replace (markdown, markdown.length, 0, " ");
-            markdown = style.replace (markdown, markdown.length, 0, " ");
-            markdown = script.replace (markdown, markdown.length, 0, " ");
-            markdown = random_tags.replace (markdown, markdown.length, 0, " ");
-            // Markdown special characters?
-            markdown = markdown.replace ("*", "")
-                                .replace ("#", "")
-                                .replace (">", "")
-                                .replace ("|", "")
-                                .replace ("-", "")
-                                .replace ("_", "")
-                                .replace ("`", "")
-                                .replace ("=", "")
-                                .replace ("+", "");
-
-            markdown = words.replace (markdown, markdown.length, 0, " ");
-            markdown = markdown.chomp ().chug ();
-
-            return words.split (markdown, RegexMatchFlags.NOTEMPTY | RegexMatchFlags.NOTEMPTY_ATSTART | RegexMatchFlags.NEWLINE_ANY).length;
+            input = new DataInputStream (file.read ());
+            int word_count = 0;
+            string? line;
+            bool in_yaml = false;
+            bool in_code_block = false;
+            bool in_html_tag = false;
+            StringBuilder current_word = new StringBuilder ();
+            
+            while ((line = input.read_line (null)) != null) {
+                // Skip YAML frontmatter
+                if (line == "---" || line == "+++") {
+                    if (in_yaml) {
+                        in_yaml = false;
+                        continue;
+                    } else if (word_count == 0) {
+                        in_yaml = true;
+                        continue;
+                    }
+                }
+                
+                if (in_yaml) {
+                    continue;
+                }
+                
+                // Skip code blocks
+                if (line.has_prefix ("```") || line.has_prefix ("~~~")) {
+                    in_code_block = !in_code_block;
+                    continue;
+                }
+                
+                if (in_code_block) {
+                    continue;
+                }
+                
+                // Process line character by character for word counting (respect UTF-8 boundaries)
+                int index = 0;
+                unichar c = 0;
+                while (line.get_next_char (ref index, out c)) {
+                    
+                    // Skip HTML tags (simple detection)
+                    if (c == '<') {
+                        in_html_tag = true;
+                        continue;
+                    } else if (c == '>') {
+                        in_html_tag = false;
+                        continue;
+                    }
+                    
+                    if (in_html_tag) {
+                        continue;
+                    }
+                    
+                    // Skip markdown formatting characters
+                    if (c == '*' || c == '#' || c == '_' || c == '`' || c == '>' || 
+                        c == '|' || c == '=' || c == '+' || c == '[' || c == ']' ||
+                        c == '(' || c == ')') {
+                        continue;
+                    }
+                    
+                    // Word boundary detection
+                    if (c.isspace () || c.ispunct ()) {
+                        if (current_word.len > 0) {
+                            word_count++;
+                            current_word.erase ();
+                        }
+                    } else if (c.isalnum ()) {
+                        current_word.append_unichar (c);
+                    }
+                }
+                
+                // Handle word at end of line
+                if (current_word.len > 0) {
+                    word_count++;
+                    current_word.erase ();
+                }
+            }
+            
+            return word_count;
         } catch (Error e) {
-            warning ("Could not get accurate count: %s", e.message);
+            warning ("Could not get word count for %s: %s", file_path, e.message);
+        } finally {
+            if (input != null) {
+                try {
+                    input.close ();
+                } catch (Error e) {
+                    warning ("Could not close word count stream: %s", e.message);
+                }
+            }
         }
 
         return 0;
@@ -626,6 +769,9 @@ namespace ThiefMD.Controllers.FileManager {
         return markout.str;
     }
 
+    // Static regex to avoid recompilation on every call
+    private static Regex? yaml_headers_regex = null;
+    
     public string get_file_lines_yaml (
         string file_path,
         int lines,
@@ -637,62 +783,115 @@ namespace ThiefMD.Controllers.FileManager {
         var markdown = new StringBuilder ();
         string temp_title = "";
         string temp_date = "";
+        DataInputStream? input = null;
 
         try {
+            // Compile regex once
+            if (yaml_headers_regex == null) {
+                yaml_headers_regex = new Regex ("^\\s*(.+?)\\s*[=:]\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            }
+
             var file = File.new_for_path (file_path);
-            Regex headers = new Regex ("^\\s*(.+?)\\s*[=:]\\s+(.+)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            MatchInfo matches;
+            if (!file.query_exists ()) {
+                warning ("File does not exist: %s", file_path);
+                title = temp_title;
+                date = temp_date;
+                return "";
+            }
 
-            if (file.query_exists ()) {
-                string filename = file.get_path ();
-                debug ("Reading %s", filename);
+            debug ("Reading %s", file.get_path ());
+            input = new DataInputStream (file.read ());
+            int lines_read = 0;
+            string? line;
+            bool in_yaml = false;
+            bool first_line = true;
 
-                var input = new DataInputStream (file.read ());
-                int lines_read = 0;
-                string line;
-                bool in_yaml = false;
+            while ((line = input.read_line (null)) != null) {
+                // Early termination if we have enough lines
+                if (lines > 0 && lines_read >= lines) {
+                    break;
+                }
 
-                while (((line = input.read_line (null)) != null) && (lines_read < lines || lines <= 0)) {
-                    if ((!non_empty_lines_only) || (line.chomp() != "")) {
-                        if (line == "---" || line == "+++") {
-                            if (in_yaml) {
-                                in_yaml = false;
-                                continue;
-                            } else if (lines_read == 0) {
-                                in_yaml = true;
-                            }
-                        }
-                        if (!in_yaml) {
-                            if (temp_title == "" && line.has_prefix ("#") && line.index_of (" ") != -1) {
-                                temp_title = line.substring (line.index_of (" ")).chug ().chomp ();
-                            }
-                            markdown.append (((lines_read == 0) ? "" :"\n") + line.chomp());
-                            lines_read++;
-                        } else {
-                            if (headers.match (line, RegexMatchFlags.NOTEMPTY, out matches)) {
-                                if (matches.fetch (1).ascii_down().chug ().chomp () == "title") {
-                                    temp_title = matches.fetch (2).replace ("\"", "").chomp ().chug ();
-                                    markdown.append (((lines_read == 0) ? "" :"\n") + "# " + temp_title);
-                                    lines_read++;
-                                } else if (matches.fetch (1).ascii_down().chug ().chomp ().has_prefix ("date")) {
-                                    temp_date = matches.fetch (2).replace ("\"", "").chomp ().chug ();
-                                    markdown.append (((lines_read == 0) ? "" :"\n") + temp_date);
-                                    lines_read++;
-                                }
-                            }
-                        }
+                string trimmed = line.chomp ();
+                
+                // Skip empty lines if requested
+                if (non_empty_lines_only && trimmed == "") {
+                    continue;
+                }
+
+                // Handle YAML frontmatter delimiters
+                if (trimmed == "---" || trimmed == "+++") {
+                    if (in_yaml) {
+                        in_yaml = false;
+                        continue;
+                    } else if (lines_read == 0) {
+                        in_yaml = true;
+                        continue;
                     }
                 }
 
-                if (lines_read == 1) {
-                    markdown.append ("\n");
+                if (!in_yaml) {
+                    // Regular markdown content
+                    if (temp_title == "" && line.has_prefix ("#")) {
+                        int space_idx = line.index_of (" ");
+                        if (space_idx != -1) {
+                            temp_title = line.substring (space_idx).chug ().chomp ();
+                        }
+                    }
+                    
+                    if (!first_line) {
+                        markdown.append_c ('\n');
+                    }
+                    markdown.append (trimmed);
+                    lines_read++;
+                    first_line = false;
+                } else {
+                    // Parse YAML frontmatter
+                    MatchInfo matches;
+                    if (yaml_headers_regex.match (trimmed, RegexMatchFlags.NOTEMPTY, out matches)) {
+                        string key = matches.fetch (1).chug ().chomp ().ascii_down ();
+                        string value = matches.fetch (2).chug ().chomp ();
+                        
+                        // Remove quotes
+                        if (value.has_prefix ("\"") && value.has_suffix ("\"") && value.length >= 2) {
+                            value = value.substring (1, value.length - 2);
+                        }
+                        
+                        if (key == "title") {
+                            temp_title = value;
+                            if (!first_line) {
+                                markdown.append_c ('\n');
+                            }
+                            markdown.append ("# ").append (temp_title);
+                            lines_read++;
+                            first_line = false;
+                        } else if (key.has_prefix ("date")) {
+                            temp_date = value;
+                            if (!first_line) {
+                                markdown.append_c ('\n');
+                            }
+                            markdown.append (temp_date);
+                            lines_read++;
+                            first_line = false;
+                        }
+                    }
                 }
-
-            } else {
-                warning ("File does not exist\n");
             }
+
+            if (lines_read == 1) {
+                markdown.append_c ('\n');
+            }
+
         } catch (Error e) {
-            warning ("Error: %s", e.message);
+            warning ("Error reading %s: %s", file_path, e.message);
+        } finally {
+            if (input != null) {
+                try {
+                    input.close ();
+                } catch (Error e) {
+                    warning ("Could not close file lines stream: %s", e.message);
+                }
+            }
         }
 
         title = temp_title;
@@ -738,6 +937,7 @@ namespace ThiefMD.Controllers.FileManager {
     public string get_file_lines (string file_path, int lines, bool non_empty = true) {
         var lock = new FileLock ();
         string file_contents = "";
+        DataInputStream? input = null;
 
         if (lines <= 0) {
             return get_file_contents(file_path);
@@ -750,7 +950,7 @@ namespace ThiefMD.Controllers.FileManager {
                 string filename = file.get_path ();
                 debug ("Reading %s\n", filename);
 
-                var input = new DataInputStream (file.read ());
+                input = new DataInputStream (file.read ());
                 int lines_read = 0;
                 string line;
 
@@ -770,6 +970,14 @@ namespace ThiefMD.Controllers.FileManager {
             }
         } catch (Error e) {
             warning ("Error: %s", e.message);
+        } finally {
+            if (input != null) {
+                try {
+                    input.close ();
+                } catch (Error e) {
+                    warning ("Could not close file lines internal stream: %s", e.message);
+                }
+            }
         }
 
         return file_contents;

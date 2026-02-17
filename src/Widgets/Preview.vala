@@ -39,7 +39,6 @@ namespace ThiefMD.Widgets {
             vexpand = true;
             hexpand = true;
             var settingsweb = get_settings();
-            settingsweb.enable_plugins = false;
             settingsweb.enable_page_cache = false;
             settingsweb.enable_developer_extras = false;
             settingsweb.javascript_can_open_windows_automatically = false;
@@ -53,14 +52,6 @@ namespace ThiefMD.Widgets {
             }
 
             return instance;
-        }
-
-        protected override bool context_menu (
-            ContextMenu context_menu,
-            Gdk.Event event,
-            HitTestResult hit_test_result
-        ) {
-            return true;
         }
 
         private string set_stylesheet (bool render_fountain = false) {
@@ -198,7 +189,7 @@ namespace ThiefMD.Widgets {
         private void connect_signals () {
             create.connect ((navigation_action) => {
                 launch_browser (navigation_action.get_request().get_uri ());
-                return (Gtk.Widget) null;
+                return (WebKit.WebView?) null;
             });
 
             decide_policy.connect ((decision, type) => {

@@ -17,220 +17,154 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using GLib;
+
 namespace ThiefMD.Controllers.Dialogs {
-    public File get_target_save_file_with_extension (
+    private Gtk.FileDialog build_dialog (string title) {
+        var dialog = new Gtk.FileDialog ();
+        dialog.set_title (title);
+        dialog.set_modal (true);
+        return dialog;
+    }
+
+    private void apply_filter (Gtk.FileDialog dialog, Gtk.FileFilter filter) {
+            var filters = new GLib.ListStore (typeof (Gtk.FileFilter));
+        filters.append (filter);
+        dialog.set_filters (filters);
+        dialog.set_default_filter (filter);
+    }
+
+    private File? run_open_dialog (Gtk.FileDialog dialog) {
+        File? file = null;
+        var loop = new GLib.MainLoop ();
+        dialog.open.begin (ThiefApp.get_instance (), null, (obj, res) => {
+            try {
+                file = dialog.open.end (res);
+            } catch (Error e) {
+                warning ("Open dialog failed: %s", e.message);
+            }
+            loop.quit ();
+        });
+        loop.run ();
+        return file;
+    }
+
+    private File? run_save_dialog (Gtk.FileDialog dialog) {
+        File? file = null;
+        var loop = new GLib.MainLoop ();
+        dialog.save.begin (ThiefApp.get_instance (), null, (obj, res) => {
+            try {
+                file = dialog.save.end (res);
+            } catch (Error e) {
+                warning ("Save dialog failed: %s", e.message);
+            }
+            loop.quit ();
+        });
+        loop.run ();
+        return file;
+    }
+
+    private File? run_folder_dialog (Gtk.FileDialog dialog) {
+        File? file = null;
+        var loop = new GLib.MainLoop ();
+        dialog.select_folder.begin (ThiefApp.get_instance (), null, (obj, res) => {
+            try {
+                file = dialog.select_folder.end (res);
+            } catch (Error e) {
+                warning ("Folder dialog failed: %s", e.message);
+            }
+            loop.quit ();
+        });
+        loop.run ();
+        return file;
+    }
+
+    public File? get_target_save_file_with_extension (
         string title,
         Gtk.FileFilter filter,
         string ext)
     {
-        string accept = _("_Save");
-        string cancel = _("_Cancel");
-        Gtk.FileChooserAction action = Gtk.FileChooserAction.SAVE;
-
-        var chooser = new Gtk.FileChooserNative (title, null, action, accept, cancel);
-        chooser.action = action;
-        chooser.set_do_overwrite_confirmation (true);
-
-        if (filter != null) {
-            chooser.add_filter (filter);
-        }
-
+        var dialog = build_dialog (title);
         if (ext != "") {
-            chooser.set_current_name ("my-great-work." + ext);
+            dialog.set_initial_name ("my-great-work." + ext);
         }
-
-        File file = null;
-        if (chooser.run () == Gtk.ResponseType.ACCEPT) {
-            file = chooser.get_file ();
+        if (filter != null) {
+            apply_filter (dialog, filter);
         }
-
-        chooser.destroy ();
-        return file;
-    }
-
-    public Gtk.FileChooserNative create_file_chooser (string title,
-            Gtk.FileChooserAction action, string ext = "") {
-
-        string accept = "";
-        string cancel = _("_Cancel");
-        if (action == Gtk.FileChooserAction.OPEN) {
-            accept = _("_Open");
-        } else if (action == Gtk.FileChooserAction.SAVE) {
-            accept = _("_Save");
-        } else if (action == Gtk.FileChooserAction.SELECT_FOLDER) {
-            accept = _("_Add to Library");
-        }
-
-        var chooser = new Gtk.FileChooserNative (title, null, action, accept, cancel);
-        chooser.action = action;
-
-        if (action == Gtk.FileChooserAction.SAVE) {
-            chooser.set_do_overwrite_confirmation (true);
-            var pdf = new Gtk.FileFilter ();
-            pdf.set_filter_name (_("PDF file"));
-            pdf.add_mime_type ("application/pdf");
-            pdf.add_pattern ("*.pdf");
-            chooser.add_filter (pdf);
-
-            var epub_filter = new Gtk.FileFilter ();
-            epub_filter.set_filter_name (_("ePUB file"));
-            epub_filter.add_mime_type ("application/epub+zip");
-            epub_filter.add_pattern ("*.epub");
-            chooser.add_filter (epub_filter);
-
-            var docx_filter = new Gtk.FileFilter ();
-            docx_filter.set_filter_name (_("docx file"));
-            docx_filter.add_mime_type ("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-            docx_filter.add_pattern ("*.docx");
-            chooser.add_filter (docx_filter);
-
-            var markdown_filter = new Gtk.FileFilter ();
-            markdown_filter.set_filter_name (_("Markdown files"));
-            markdown_filter.add_mime_type ("text/markdown");
-            markdown_filter.add_pattern ("*.md");
-            markdown_filter.add_pattern ("*.markdown");
-            chooser.add_filter (markdown_filter);
-
-            var html_filter = new Gtk.FileFilter ();
-            html_filter.set_filter_name (_("HTML files"));
-            html_filter.add_mime_type ("text/html");
-            html_filter.add_pattern ("*.html");
-            html_filter.add_pattern ("*.htm");
-            chooser.add_filter (html_filter);
-
-            var mhtml_filter = new Gtk.FileFilter ();
-            mhtml_filter.set_filter_name (_("MHTML files"));
-            mhtml_filter.add_mime_type ("application/x-mimearchive");
-            mhtml_filter.add_pattern ("*.mhtml");
-            mhtml_filter.add_pattern ("*.mht");
-            chooser.add_filter (mhtml_filter);
-
-            var tex_filter = new Gtk.FileFilter ();
-            tex_filter.set_filter_name (_("LaTeX file"));
-            tex_filter.add_mime_type ("application/x-tex");
-            tex_filter.add_pattern ("*.tex");
-            chooser.add_filter (tex_filter);
-
-            if (ext == "epub") {
-                chooser.set_current_name ("my-great-novel.epub");
-                chooser.set_filter (epub_filter);
-            } else if (ext == "pdf") {
-                chooser.set_current_name ("my-great-work.pdf");
-                chooser.set_filter (pdf);
-            }
-
-            chooser.selection_changed.connect (() => {
-                string current_file = chooser.get_current_name ();
-                string filter_name = chooser.filter.get_filter_name ().down ();
-                string filter_ext = "md";
-                if (filter_name.contains ("markdown")) {
-                    filter_ext = "md";
-                } else if (filter_name.contains ("epub")) {
-                    filter_ext = "epub";
-                } else if (filter_name.contains ("pdf")) {
-                    filter_ext = "pdf";
-                } else if (filter_name.contains ("doc")) {
-                    filter_ext = "docx";
-                } else if (filter_name.contains ("mhtml")) {
-                    filter_ext = "mhtml";
-                } else if (filter_name.contains ("html")) {
-                    filter_ext = "html";
-                } else if (filter_name.contains ("latex")) {
-                    filter_ext = "tex";
-                }
-
-                if (current_file.last_index_of (".") != -1) {
-                    current_file = current_file.substring (0, current_file.last_index_of (".") + 1) + filter_ext;
-                } else {
-                    current_file += filter_ext;
-                }
-                chooser.set_current_name (current_file);
-            });
-
-        } else if (action != Gtk.FileChooserAction.SELECT_FOLDER) {
-            if (ext == "md" || ext == "*.md") {
-                var filter1 = new Gtk.FileFilter ();
-                filter1.set_filter_name (_("Markdown files"));
-                filter1.add_pattern ("*.md");
-                filter1.add_pattern ("*.markdown");
-                chooser.add_filter (filter1);
-            } else if (ext != "") {
-                if (ext.index_of (";") > 0) {
-                    string[] extensions = ext.split (";");
-                    var filter1 = new Gtk.FileFilter ();
-                    filter1.set_filter_name (_("Supported files"));
-                    foreach (unowned string extension in extensions) {
-                        if (extension != "") {
-                            filter1.add_pattern (extension);
-                        }
-                    }
-                    chooser.add_filter (filter1);
-                } else {
-                    var filter1 = new Gtk.FileFilter ();
-                    filter1.set_filter_name (_("%s files").printf (ext));
-                    filter1.add_pattern (ext);
-                    chooser.add_filter (filter1);
-                }
-            }
-
-            var filter = new Gtk.FileFilter ();
-            filter.set_filter_name (_("All files"));
-            filter.add_pattern ("*");
-            chooser.add_filter (filter);
-        }
-
-        return chooser;
+        return run_save_dialog (dialog);
     }
 
     public string select_folder_dialog () {
-        var chooser = create_file_chooser (_("Add to Library"), Gtk.FileChooserAction.SELECT_FOLDER);
-        string path = "";
-        if (chooser.run () == Gtk.ResponseType.ACCEPT) {
-            path = chooser.get_file ().get_path ();
+        var dialog = build_dialog (_("Add to Library"));
+        dialog.set_modal (true);
+        var file = run_folder_dialog (dialog);
+        return (file != null) ? file.get_path () : "";
+    }
+
+    public File? display_open_dialog (string ext = "") {
+        var dialog = build_dialog (_("Open file"));
+        if (ext != "") {
+            var filter = new Gtk.FileFilter ();
+            filter.set_filter_name (_("Supported files"));
+            foreach (unowned string pattern in ext.split (";")) {
+                if (pattern != "") {
+                    filter.add_pattern (pattern);
+                }
+            }
+            apply_filter (dialog, filter);
         }
-        chooser.destroy ();
-        return path;
+        return run_open_dialog (dialog);
     }
 
-    public File display_open_dialog (string ext = "") {
-        var chooser = create_file_chooser (_("Open file"),
-                Gtk.FileChooserAction.OPEN, ext);
-        File file = null;
+    public File? display_save_dialog (bool epub_ext = true) {
+        var dialog = build_dialog (_("Save file"));
 
-        if (chooser.run () == Gtk.ResponseType.ACCEPT)
-            file = chooser.get_file ();
+        var pdf = new Gtk.FileFilter ();
+        pdf.set_filter_name (_("PDF file"));
+        pdf.add_mime_type ("application/pdf");
+        pdf.add_pattern ("*.pdf");
 
-        chooser.destroy ();
-        return file;
+        var epub_filter = new Gtk.FileFilter ();
+        epub_filter.set_filter_name (_("ePUB file"));
+        epub_filter.add_mime_type ("application/epub+zip");
+        epub_filter.add_pattern ("*.epub");
+
+            var filters = new GLib.ListStore (typeof (Gtk.FileFilter));
+        filters.append (pdf);
+        filters.append (epub_filter);
+        dialog.set_filters (filters);
+        dialog.set_default_filter (epub_ext ? epub_filter : pdf);
+        dialog.set_initial_name (epub_ext ? "my-great-novel.epub" : "my-great-work.pdf");
+
+        return run_save_dialog (dialog);
     }
 
-    public File display_save_dialog (bool epub_ext = true) {
-        var chooser = create_file_chooser (_("Save file"),
-                Gtk.FileChooserAction.SAVE, epub_ext ? "epub" : "pdf");
-        File file = null;
-
-        if (chooser.run () == Gtk.ResponseType.ACCEPT)
-            file = chooser.get_file ();
-
-        chooser.destroy ();
-        return file;
-    }
-
-    public class Dialog : Gtk.MessageDialog {
+    public class Dialog : Adw.MessageDialog {
         public Dialog.display_save_confirm (Gtk.Window parent) {
-            set_markup ("<b>" +
-                    _("There are unsaved changes to the file. Do you want to save?") + "</b>" +
-                    "\n\n" + _("If you don't save, changes will be lost forever."));
-            use_markup = true;
-            type_hint = Gdk.WindowTypeHint.DIALOG;
-            set_transient_for (parent);
+            Object (transient_for: parent, modal: true);
+            set_heading (_("There are unsaved changes to the file. Do you want to save?"));
+            set_body (_("If you don't save, changes will be lost forever."));
 
-            var button = new Gtk.Button.with_label (_("Close without saving"));
-            button.show ();
-            add_action_widget (button, Gtk.ResponseType.NO);
-            add_button ("_Cancel", Gtk.ResponseType.CANCEL);
-            add_button ("_Save", Gtk.ResponseType.YES);
-            message_type = Gtk.MessageType.WARNING;
+            add_response ("close-without-saving", _("Close without saving"));
+            add_response ("cancel", _("_Cancel"));
+            add_response ("save", _("_Save"));
+
+            set_response_appearance ("save", Adw.ResponseAppearance.SUGGESTED);
+            set_default_response ("save");
+            set_close_response ("cancel");
+        }
+
+        public Dialog.display_move_confirm (Gtk.Window parent, string filename, string dest_folder) {
+            Object (transient_for: parent, modal: true);
+            set_heading (_("Move file to another folder?"));
+            set_body (_("Moving \"%s\" to \"%s\"").printf (filename, dest_folder));
+
+            add_response ("cancel", _("_Cancel"));
+            add_response ("move", _("_Move"));
+
+            set_response_appearance ("move", Adw.ResponseAppearance.SUGGESTED);
+            set_default_response ("move");
+            set_close_response ("cancel");
         }
     }
 }

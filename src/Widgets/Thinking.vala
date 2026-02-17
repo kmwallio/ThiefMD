@@ -28,6 +28,7 @@ namespace ThiefMD.Widgets {
         private ThinkingCallback work = null;
         private Mutex running;
         private string message;
+        private MainLoop? loop = null;
 
         public Thinking (string set_title, owned ThinkingCallback callback, Gee.List<string>? messages = null, Gtk.Window? parent = null) {
             set_transient_for ((parent == null) ? ThiefApp.get_instance () : parent);
@@ -46,49 +47,59 @@ namespace ThiefMD.Widgets {
         }
 
         private void build_ui () {
-            window_position = Gtk.WindowPosition.CENTER;
-            this.get_content_area().add (build_thinking_ui ());
-            show_all ();
-            Timeout.add (500, run_and_done);
+            set_child (build_thinking_ui ());
+        }
+
+        public void run () {
+            present ();
+            loop = new MainLoop (null, false);
+            Timeout.add (25, run_and_done);
+            loop.run ();
+            loop = null;
         }
 
         private bool run_and_done () {
             if (work == null) {
-                return true;
-            } else {
-                if (running.trylock ()) {
-                    debug ("Doing work.");
-                    work ();
-                    running.unlock ();
-                    this.destroy ();
+                if (loop != null) {
+                    loop.quit ();
                 }
+                destroy ();
                 return false;
             }
+
+            if (running.trylock ()) {
+                debug ("Doing work.");
+                work ();
+                running.unlock ();
+                destroy ();
+                if (loop != null) {
+                    loop.quit ();
+                }
+            }
+
+            return false;
         }
 
         private Gtk.Grid build_thinking_ui () {
             Gtk.Grid grid = new Gtk.Grid ();
-            grid.margin = 12;
+            grid.margin_top = 12;
+            grid.margin_bottom = 12;
+            grid.margin_start = 12;
+            grid.margin_end = 12;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
             grid.orientation = Gtk.Orientation.VERTICAL;
             grid.hexpand = true;
             grid.vexpand = true;
 
-            try {
-                Gtk.IconTheme icon_theme = Gtk.IconTheme.get_default();
-                var thief_icon = icon_theme.load_icon("com.github.kmwallio.thiefmd", 128, Gtk.IconLookupFlags.FORCE_SVG);
-                var icon = new Gtk.Image.from_pixbuf (thief_icon);
-                grid.attach (icon, 1, 1);
-            } catch (Error e) {
-                warning ("Could not load logo: %s", e.message);
-            }
+            var icon = new Gtk.Image.from_icon_name ("com.github.kmwallio.thiefmd");
+            icon.set_pixel_size (128);
+            grid.attach (icon, 1, 1);
 
             var stealing_label = new Gtk.Label ((message != "") ? "<b>" + message + "</b>" : _("<b>Stealing file contents...</b>"));
             stealing_label.use_markup = true;
             stealing_label.hexpand = true;
             grid.attach (stealing_label, 1, 2);
-            grid.show_all ();
 
             return grid;
         }

@@ -89,7 +89,7 @@ namespace ThiefMD.Exporters {
             pdf.add_mime_type ("application/pdf");
             pdf.add_pattern ("*.pdf");
 
-            File new_novel = Dialogs.get_target_save_file_with_extension (
+            File? new_novel = Dialogs.get_target_save_file_with_extension (
                 _("Export PDF"),
                 pdf,
                 "pdf");
@@ -97,6 +97,8 @@ namespace ThiefMD.Exporters {
             if (new_novel == null) {
                 return true;
             }
+
+            bool success = false;
 
             string? weasyprint_loc = Environment.find_program_in_path ("weasyprint");
             if (weasyprint_loc == null || weasyprint_loc == "")
@@ -111,70 +113,62 @@ namespace ThiefMD.Exporters {
             if ((pagedjs_loc != null && pagedjs_loc != "" && !publisher_instance.preview.html.contains ("<img")) ||
                 (weasyprint_loc != null && weasyprint_loc != "" && !publisher_instance.render_fountain))
             {
-                // string resolved_mkd = Pandoc.resolve_paths (publisher_instance.get_export_markdown ());
-                // string temp_file = FileManager.save_temp_file (resolved_mkd);
                 string temp_html_file = FileManager.save_temp_file (publisher_instance.preview.html, "html");
-                // string css_file_path = "";
-                bool res = false;
                 if (temp_html_file != "") {
                     try {
-                        if (res && new_novel.query_exists ()) {
-                            new_novel.delete ();
+                        string[] command;
+                        if (pagedjs_loc == null ||
+                            pagedjs_loc == "" ||
+                            publisher_instance.preview.html.contains ("<img"))
+                        {
+                            command = {
+                                weasyprint_loc,
+                                temp_html_file,
+                                new_novel.get_path ()
+                            };
+                            debug ("Using weasyprint");
+                        } else {
+                            command = {
+                                "pagedjs-cli",
+                                temp_html_file,
+                                "-o",
+                                new_novel.get_path ()
+                            };
+                            debug ("Using pagedjs");
                         }
 
-                        // Phase 2 weasyprint
-                        {
-                            string[] command;
-                            if (pagedjs_loc == null ||
-                                pagedjs_loc == "" ||
-                                publisher_instance.preview.html.contains ("<img"))
-                            {
-                                command = {
-                                    weasyprint_loc,
-                                    temp_html_file,
-                                    new_novel.get_path ()
-                                };
-                                debug ("Using weasyprint");
-                            } else {
-                                command = {
-                                    "pagedjs-cli",
-                                    temp_html_file,
-                                    "-o",
-                                    new_novel.get_path ()
-                                };
-                                debug ("Using pagedjs");
+                        bool res = false;
+                        Gee.List<string> pdfSayings = new Gee.LinkedList<string> ();
+                        pdfSayings.add(_("Simply Shakespearean."));
+                        pdfSayings.add(_("Hmm... that's interesting..."));
+                        pdfSayings.add(_("Your writing is insightful."));
+
+                        Thinking worker = new Thinking (_("Working PDF Magic"), () => {
+                            try {
+                                Subprocess converter = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
+                                res = converter.wait ();
+                                converter.force_exit ();
+                            } catch (Error e) {
+                                warning ("Error converting PDF, %s", e.message);
+                                res = false;
                             }
+                        },
+                        pdfSayings,
+                        publisher_instance);
+                        worker.run ();
 
-                            Gee.List<string> pdfSayings = new Gee.LinkedList<string> ();
-                            pdfSayings.add(_("Simply Shakespearean."));
-                            pdfSayings.add(_("Hmm... that's interesting..."));
-                            pdfSayings.add(_("Your writing is insightful."));
+                        success = res && new_novel.query_exists ();
 
-                            Thinking worker = new Thinking (_("Working PDF Magic"), () => {
-                                // Run PDF conversion
-                                try {
-                                    Subprocess weasyprint = new Subprocess.newv (command, SubprocessFlags.STDERR_MERGE);
-                                    res = weasyprint.wait ();
-                                    weasyprint.force_exit ();
-                                } catch (Error e) {
-                                    warning ("Error converting PDF, %s", e.message);
-                                }
-
-                                // Clean up intermediate files
-                                try {
-                                    File temp_html = File.new_for_path (temp_html_file);
-                                    temp_html.delete ();
-                                } catch (Error e) {
-                                    warning ("Could not delete cache file %s, %s", temp_html_file, e.message);
-                                }
-                                return;
-                            },
-                            pdfSayings,
-                            publisher_instance);
-                            worker.run ();
+                        // Clean up intermediate files
+                        try {
+                            File temp_html = File.new_for_path (temp_html_file);
+                            temp_html.delete ();
+                        } catch (Error e) {
+                            warning ("Could not delete cache file %s, %s", temp_html_file, e.message);
                         }
                     } catch (Error e) {
                         warning ("Could not generate pdf: %s", e.message);
+                        success = false;
                     }
                 }
             } else {
@@ -183,7 +177,7 @@ namespace ThiefMD.Exporters {
                     _("Working PDF Magic"),
                     new Gtk.Label (_("Making sure your hard work looks purrfect...")));
 
-                debug ("Using webkit2gtk2pdf");
+                debug ("Using webkitgtk6 for PDF export");
                 var print_operation = new WebKit.PrintOperation (publisher_instance.preview);
                 var print_settings = new Gtk.PrintSettings ();
                 print_settings.set_printer ("Print to File");
@@ -197,21 +191,25 @@ namespace ThiefMD.Exporters {
                 page_setup.set_bottom_margin (settings.export_top_bottom_margins, Gtk.Unit.INCH);
                 print_operation.set_print_settings (print_settings);
                 print_operation.set_page_setup (page_setup);
+                bool printed_success = false;
+                var loop = new MainLoop (null, false);
                 print_operation.finished.connect (() => {
+                    printed_success = true;
                     status.destroy ();
+                    loop.quit ();
                 });
                 print_operation.failed.connect (() => {
+                    printed_success = false;
                     status.destroy ();
+                    loop.quit ();
                 });
                 print_operation.print ();
                 status.run ();
+                loop.run ();
+                success = printed_success && new_novel.query_exists ();
             }
 
-            if (new_novel.query_exists ()) {
-                return true;
-            } else {
-                return false;
-            }
+            return success;
         }
     }
 }

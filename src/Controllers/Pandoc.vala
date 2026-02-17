@@ -105,11 +105,22 @@ namespace ThiefMD.Controllers.Pandoc {
             var output_stream = pandoc.get_stdout_pipe ();
             res = pandoc.wait ();
             if (output_stream != null) {
-                var input = new DataInputStream (output_stream);
-                string line = "";
-                while ((line = input.read_line (null)) != null) {
-                    if (line.down ().contains ("--citeproc")) {
-                        found = true;
+                DataInputStream? input = null;
+                try {
+                    input = new DataInputStream (output_stream);
+                    string line = "";
+                    while ((line = input.read_line (null)) != null) {
+                        if (line.down ().contains ("--citeproc")) {
+                            found = true;
+                        }
+                    }
+                } finally {
+                    if (input != null) {
+                        try {
+                            input.close ();
+                        } catch (Error e) {
+                            warning ("Could not close pandoc check stream: %s", e.message);
+                        }
                     }
                 }
             }

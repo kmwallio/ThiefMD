@@ -36,7 +36,7 @@ namespace ThiefMD.Widgets {
 
         private void build_ui () {
             var notes_grid = build_notes_grid ();
-            add (notes_grid);
+            append (notes_grid);
         }
 
         public static int get_notes_width () {
@@ -48,12 +48,14 @@ namespace ThiefMD.Widgets {
         private Gtk.Widget build_notes_grid () {
             var settings = AppSettings.get_default ();
 
-            Gtk.ScrolledWindow s_win = new Gtk.ScrolledWindow (null, null);
+            Gtk.ScrolledWindow s_win = new Gtk.ScrolledWindow ();
             Gtk.Grid notes_grid = new Gtk.Grid ();
-            notes_grid.margin = 12;
+            notes_grid.margin_top = 12;
+            notes_grid.margin_bottom = 12;
+            notes_grid.margin_start = 12;
+            notes_grid.margin_end = 12;
             notes_grid.row_spacing = 12;
             notes_grid.column_spacing = 12;
-            notes_grid.orientation = Gtk.Orientation.VERTICAL;
 
             var file_notes_label = new Gtk.Label ("<b>" + _("Sheet Notes") + "</b>");
             file_notes_label.xalign = 0;
@@ -84,7 +86,7 @@ namespace ThiefMD.Widgets {
 
             settings.sheet_changed.connect (load_notes);
             load_notes ();
-            s_win.add (notes_grid);
+            s_win.set_child (notes_grid);
             s_win.width_request = settings.view_library_width + settings.view_sheets_width;
             s_win.vexpand = true;
 

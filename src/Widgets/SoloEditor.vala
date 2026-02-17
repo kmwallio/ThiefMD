@@ -22,12 +22,13 @@ using ThiefMD.Widgets;
 using ThiefMD.Controllers;
 
 namespace ThiefMD {
-    public class SoloEditor : Hdy.Window {
+    public class SoloEditor : Gtk.ApplicationWindow {
         public Editor editor;
         private Gtk.Box vbox;
         private Preview preview;
         private Gtk.ScrolledWindow scroller;
-        private Hdy.HeaderBar headerbar;
+        private Adw.HeaderBar headerbar;
+        private Adw.WindowTitle title_widget;
         private File file;
         private TimedMutex preview_mutex;
         public Gtk.Paned preview_display;
@@ -35,32 +36,31 @@ namespace ThiefMD {
         public SoloEditor (File fp) {
             file = fp;
             editor = new Editor (file.get_path ());
+            preview_mutex = new TimedMutex (250);
             new KeyBindings (this, false);
             build_ui ();
         }
 
         private void build_ui () {
             var settings = AppSettings.get_default ();
-            headerbar = new Hdy.HeaderBar ();
+            headerbar = new Adw.HeaderBar ();
 
             vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            scroller = new Gtk.ScrolledWindow (null, null);
-            scroller.set_policy (Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.AUTOMATIC);
+            scroller = new Gtk.ScrolledWindow ();
+            scroller.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
 
             string title = "";
             if (!settings.brandless) {
                 title = "ThiefMD: ";
             }
             title += file.get_basename ();
-            headerbar.set_title (title);
-            if (settings.show_filename) {
-                headerbar.set_subtitle (file.get_parent ().get_path ());
-            }
-            var header_context = headerbar.get_style_context ();
-            header_context.add_class (Gtk.STYLE_CLASS_FLAT);
-            header_context.add_class ("thief-toolbar");
-            header_context.add_class("thiefmd-toolbar");
-            headerbar.show_close_button = true;
+            title_widget = new Adw.WindowTitle (title, settings.show_filename ? file.get_parent ().get_path () : "");
+            headerbar.set_title_widget (title_widget);
+            headerbar.add_css_class ("flat");
+            headerbar.add_css_class ("thief-toolbar");
+            headerbar.add_css_class("thiefmd-toolbar");
+            headerbar.set_show_start_title_buttons (true);
+            headerbar.set_show_end_title_buttons (true);
 
             populate_header ();
 
@@ -69,18 +69,31 @@ namespace ThiefMD {
             scroller.hexpand = true;
             editor.vexpand = true;
             editor.hexpand = true;
-            vbox.add (headerbar);
-            scroller.add (editor);
-            vbox.add (scroller);
-            vbox.show_all ();
-            add (vbox);
+            vbox.append (headerbar);
+            scroller.set_child (editor);
+            vbox.append (scroller);
+            set_child (vbox);
             set_default_size (settings.window_width, settings.window_height);
 
             editor.buffer.changed.connect (update_preview);
 
-            delete_event.connect (this.on_delete_event);
-            size_allocate.connect (() => {
+            close_request.connect (this.on_delete_event);
+        }
+
+        private uint solo_resize_timeout_id = 0;
+        
+        public override void size_allocate (int width, int height, int baseline) {
+            base.size_allocate (width, height, baseline);
+            
+            // Debounce resize events
+            if (solo_resize_timeout_id != 0) {
+                Source.remove (solo_resize_timeout_id);
+            }
+            
+            solo_resize_timeout_id = Timeout.add (50, () => {
+                solo_resize_timeout_id = 0;
                 editor.dynamic_margins ();
+                return false;
             });
         }
 
@@ -88,13 +101,13 @@ namespace ThiefMD {
             var menu_button = new Gtk.MenuButton ();
             menu_button.has_tooltip = true;
             menu_button.tooltip_text = (_("Settings"));
-            menu_button.set_image (new Gtk.Image.from_icon_name ("open-menu-symbolic", Gtk.IconSize.BUTTON));
+            menu_button.set_icon_name ("open-menu-symbolic");
             menu_button.popover = new QuickPreferences (this);
             headerbar.pack_end (menu_button);
         }
 
         private void update_preview () {
-            if (preview != null && preview_mutex.can_do_action ()) {
+            if (preview != null && preview_mutex != null && preview_mutex.can_do_action ()) {
                 editor.update_preview ();
                 preview.update_html_view (true, editor.preview_markdown, has_fountain ());
             }
@@ -106,39 +119,38 @@ namespace ThiefMD {
         }
 
         public void toggle_preview () {
-            int w = 0, h = 0;
-            this.get_size (out w, out h);
-            if (preview_display.get_child1 () == null) {
+            int w = get_allocated_width ();
+            int h = get_allocated_height ();
+            if (preview_display.get_start_child () == null) {
                 // Remove default display
                 vbox.remove (scroller);
 
                 // Populate the preview display
-                preview_display.add1 (scroller);
+                preview_display.set_start_child (scroller);
                 preview = new Preview ();
                 preview.base_path = file.get_parent ().get_path ();
                 preview_mutex = new TimedMutex ();
                 preview.update_html_view (true, editor.get_buffer_text (), has_fountain ());
-                preview_display.add2 (preview);
+                preview_display.set_end_child (preview);
 
-                vbox.add (preview_display);
-                preview_display.show_all ();
+                vbox.append (preview_display);
+                preview_display.show ();
                 preview_display.set_position (w / 2);
-                vbox.show_all ();
-                preview.show_all ();
+                preview.show ();
                 update_preview ();
             } else {
                 vbox.remove (preview_display);
-                preview_display.remove (scroller);
-                preview_display.remove (preview);
+                preview_display.set_start_child (null);
+                preview_display.set_end_child (null);
                 preview = null;
-                vbox.add (scroller);
-                vbox.show_all ();
+                vbox.append (scroller);
             }
         }
 
         public void get_editor_size (out int w, out int h) {
-            get_size (out w, out h);
-            if (preview_display.get_child1 () != null) {
+            w = get_allocated_width ();
+            h = get_allocated_height ();
+            if (preview_display.get_start_child () != null) {
                 w = preview_display.get_position ();
             }
         }
@@ -153,7 +165,7 @@ namespace ThiefMD {
         public bool on_delete_event () {
             editor.save ();
             ThiefApplication.close_window (this);
-            return false;
+            return true;
         }
 
         public bool has_fountain () {

@@ -20,104 +20,235 @@
 using ThiefMD;
 using ThiefMD.Widgets;
 using ThiefMD.Controllers;
+using GtkSource;
 
 namespace ThiefMD.Enrichments {
-    public class BibTexCompletionProvider : Gtk.SourceCompletionProvider, Object {
+    /**
+     * Citation proposal class for GtkSourceView 5 completion.
+     * 
+     * Represents a single citation from a BibTeX file that can be
+     * inserted into the document.
+     */
+    public class CitationProposal : Object, GtkSource.CompletionProposal {
+        public string citation { get; set; }
+        public string title { get; set; }
+        public string typed_prefix { get; set; }
+
+        public CitationProposal (string citation, string title, string typed_prefix = "") {
+            this.citation = citation;
+            this.title = title;
+            this.typed_prefix = typed_prefix;
+        }
+
+        public virtual string? get_typed_text () {
+            return typed_prefix;
+        }
+    }
+
+    /**
+     * BibTeX completion provider for GtkSourceView 5.
+     * 
+     * Provides auto-completion for BibTeX citations when typing '@' followed
+     * by citation keys. The provider searches for a .bib file in the current
+     * document's directory and offers matching citations.
+     * 
+     * Usage example:
+     * {{{
+     *   var completion = source_view.get_completion();
+     *   var bibtex_provider = new BibTexCompletionProvider();
+     *   completion.add_provider(bibtex_provider);
+     * }}}
+     * 
+     * Compatible with GTK4 and GtkSourceView 5.
+     */
+    public class BibTexCompletionProvider : Object, GtkSource.CompletionProvider {
+        private GLib.ListStore? current_proposals = null;
+        private string last_bib_file = "";
+        private BibTex.Parser? bib_parser = null;
+
         public BibTexCompletionProvider () {
         }
 
-        public override string get_name () {
+        public virtual string? get_title () {
             return _("Citations");
         }
 
-        public override bool match (Gtk.SourceCompletionContext context) {
-            Gtk.TextIter? start = null, sanity = null;
-            if (context.get_iter (out start) && context.get_iter (out sanity)) {
-                if (start.backward_char ()) {
-                    if (start.get_char () == '@') {
-                        if (!start.backward_char ()) {
-                            return true;
-                        }
-                        return start.get_char ().isspace () || !start.get_char ().isalnum ();
-                    }
-                    unichar check = start.get_char ();
-                    for (int i = 0; i < 10; i++) {
-                        if (check == ' ' || check == '@' || check == '\n' || check == '\t') {
-                            break;
-                        }
-                        if (!start.backward_char ()) {
-                            break;
-                        }
-                        check = start.get_char ();
-                    }
-
-                    if (start.get_char () == '@') {
-                        if (!start.backward_char ()) {
-                            return true;
-                        }
-                        return start.get_char ().isspace () || !start.get_char ().isalnum ();
-                    }
-                }
-            }
-
-            return false;
+        public virtual int get_priority (GtkSource.CompletionContext context) {
+            return 100;
         }
 
-        public override void populate (Gtk.SourceCompletionContext context) {
-            List<Gtk.SourceCompletionItem> completions = new List<Gtk.SourceCompletionItem> ();
-            Gtk.TextIter? start = null, end = null;
-            if (context.get_iter (out start) && context.get_iter (out end)) {
-                string prefix = "";
-                for (int i = 0; i < 10 && start.backward_char (); i++) {
-                    unichar check = start.get_char ();
-                    if (check == ' ' || check == '@' || check == '\n' || check == '\t') {
+        public virtual bool is_trigger (Gtk.TextIter iter, unichar ch) {
+            // Trigger on '@' character
+            if (ch == '@') {
+                return true;
+            }
+            // Also trigger on alphanumeric characters after '@'
+            if (ch.isalnum () || ch == '_' || ch == '-') {
+                Gtk.TextIter check = iter;
+                // Look back to see if there's an '@' character
+                for (int i = 0; i < 20 && check.backward_char (); i++) {
+                    unichar c = check.get_char ();
+                    if (c == '@') {
+                        return true;
+                    }
+                    if (c.isspace () || c == '\n' || c == '\r') {
                         break;
                     }
                 }
-                start.forward_char ();
-                if (start.get_offset () < end.get_offset ()) {
-                    prefix = start.get_text (end);
-                }
-
-                var settings = AppSettings.get_default ();
-                string bib_file = find_bibtex_for_sheet (settings.last_file);
-                if (bib_file != "") {
-                    BibTex.Parser bib_parser = new BibTex.Parser (bib_file);
-                    bib_parser.parse_file ();
-                    var cite_labels = bib_parser.get_labels ();
-                    if (!cite_labels.is_empty) {
-                        foreach (var citation in cite_labels) {
-                            if (citation.down ().has_prefix (prefix.down ()) && citation.down () != prefix.down ()) {
-                                var com_item = new Gtk.SourceCompletionItem ();
-                                string title = bib_parser.get_title (citation);
-                                if (title.length > Constants.CITATION_TITLE_MAX_LEN) {
-                                    title = title.substring (0, Constants.CITATION_TITLE_MAX_LEN - 3) + "...";
-                                }
-                                com_item.text = citation;
-                                com_item.label = citation + ": " + title;
-                                com_item.info = bib_parser.get_title (citation);
-                                com_item.markup = "<b>" + citation + "</b>: <i>" + title + "</i>";
-                                completions.append (com_item);
-                            }
-                        }
-                    }
-                }
             }
-            context.add_proposals (this, completions, true);
+            return false;
         }
 
-        public override bool activate_proposal (Gtk.SourceCompletionProposal proposal, Gtk.TextIter iter) {
-            return false;
+        private string get_prefix_at_iter (Gtk.TextIter iter) {
+            Gtk.TextIter start = iter;
+            // Move backwards to find the start of the word after '@'
+            for (int i = 0; i < 100 && start.backward_char (); i++) {
+                unichar c = start.get_char ();
+                if (c == '@') {
+                    start.forward_char (); // Move past '@'
+                    break;
+                }
+                if (c.isspace () || c == '\n' || c == '\r') {
+                    return "";
+                }
+            }
+            
+            if (start.get_offset () < iter.get_offset ()) {
+                return start.get_text (iter);
+            }
+            return "";
+        }
+
+        public async virtual GLib.ListModel populate_async (GtkSource.CompletionContext context, GLib.Cancellable? cancellable) throws GLib.Error {
+            var proposals = new GLib.ListStore (typeof (CitationProposal));
+            
+            Gtk.TextIter begin, end;
+            if (!context.get_bounds (out begin, out end)) {
+                return proposals;
+            }
+            
+            // Use the end iterator as the current position
+            Gtk.TextIter iter = end;
+
+            string prefix = get_prefix_at_iter (iter);
+            
+            var settings = AppSettings.get_default ();
+            string bib_file = find_bibtex_for_sheet (settings.last_file);
+            
+            if (bib_file == "") {
+                return proposals;
+            }
+
+            // Parse BibTeX file if needed
+            if (bib_file != last_bib_file || bib_parser == null) {
+                bib_parser = new BibTex.Parser (bib_file);
+                bib_parser.parse_file ();
+                last_bib_file = bib_file;
+            }
+
+            var cite_labels = bib_parser.get_labels ();
+            if (cite_labels.is_empty) {
+                return proposals;
+            }
+
+            // Add matching citations
+            foreach (var citation in cite_labels) {
+                if (prefix == "" || citation.down ().has_prefix (prefix.down ())) {
+                    string full_title = bib_parser.get_title (citation);
+                    string display_title = full_title;
+                    if (full_title.length > Constants.CITATION_TITLE_MAX_LEN) {
+                        display_title = full_title.substring (0, Constants.CITATION_TITLE_MAX_LEN - 3) + "...";
+                    }
+                    proposals.append (new CitationProposal (citation, display_title, prefix));
+                }
+            }
+
+            current_proposals = proposals;
+            return proposals;
+        }
+
+        public virtual void refilter (GtkSource.CompletionContext context, GLib.ListModel model) {
+            // Refiltering is handled by populate_async in this implementation
+        }
+
+        public virtual void activate (GtkSource.CompletionContext context, GtkSource.CompletionProposal proposal) {
+            var citation_proposal = proposal as CitationProposal;
+            if (citation_proposal == null) {
+                return;
+            }
+
+            Gtk.TextIter begin, end;
+            if (!context.get_bounds (out begin, out end)) {
+                return;
+            }
+            
+            // Use the end iterator as the current position
+            Gtk.TextIter iter = end;
+
+            var buffer = iter.get_buffer ();
+            if (buffer == null) {
+                return;
+            }
+
+            // Find the start of the current word (after '@')
+            Gtk.TextIter start = iter;
+            for (int i = 0; i < 100 && start.backward_char (); i++) {
+                unichar c = start.get_char ();
+                if (c == '@') {
+                    start.forward_char (); // Position after '@'
+                    break;
+                }
+                if (c.isspace () || c == '\n' || c == '\r') {
+                    break;
+                }
+            }
+
+            // Delete the current prefix and insert the citation
+            buffer.begin_user_action ();
+            buffer.delete (ref start, ref iter);
+            buffer.insert (ref start, citation_proposal.citation, citation_proposal.citation.length);
+            buffer.end_user_action ();
+        }
+
+        public virtual void display (GtkSource.CompletionContext context, GtkSource.CompletionProposal proposal, GtkSource.CompletionCell cell) {
+            var citation_proposal = proposal as CitationProposal;
+            if (citation_proposal == null) {
+                return;
+            }
+
+            var column = cell.get_column ();
+            switch (column) {
+                case GtkSource.CompletionColumn.TYPED_TEXT:
+                    cell.set_text (citation_proposal.citation);
+                    break;
+                case GtkSource.CompletionColumn.COMMENT:
+                    cell.set_text (citation_proposal.title);
+                    break;
+                case GtkSource.CompletionColumn.DETAILS:
+                    // Could show additional details here
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
     public class MarkdownEnrichment : Object {
-        private BibTexCompletionProvider citation_suggester = null;
-        private Gtk.SourceCompletionWords source_completion;
-        private unowned Gtk.SourceView view;
+        private GtkSource.CompletionWords? source_completion;
+        private BibTexCompletionProvider? bibtex_provider;
+        private unowned GtkSource.View view;
         private unowned Gtk.TextBuffer buffer;
         private Mutex checking;
         private bool markup_inserted_around_selection;
+        private Gtk.EventControllerKey? markup_key_controller;
+        private ulong markup_cursor_handler_id = 0;
+        private int markup_start_offset = -1;
+        private int markup_end_offset = -1;
+        private bool markup_is_link = false;
+        private int link_text_start_offset = -1;
+        private int link_text_end_offset = -1;
+        private int link_url_start_offset = -1;
+        private int link_url_end_offset = -1;
         private bool cursor_at_interesting_location = false;
         public bool active_selection = false;
 
@@ -222,68 +353,61 @@ namespace ThiefMD.Enrichments {
             checking_copy = "";
         }
 
-        /*public bool is_linked_clicked (Gdk.EventButton event) {
-            if ((event.state & Gdk.ModifierType.BUTTON1_MASK) != 0 && !buffer.has_selection && (event.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
-                markdown.link_clicked ();
+        public void handle_click (double x, double y, Gdk.ModifierType state) {
+            // Only handle clicks with Ctrl held and no selection
+            if ((state & Gdk.ModifierType.CONTROL_MASK) != 0 && !buffer.has_selection) {
+                warning ("Ctrl+Click detected at coordinates: (%f, %f)", x, y);
+                // Convert click coordinates to text position
+                Gtk.TextIter click_iter;
+                int buffer_x, buffer_y;
+                view.window_to_buffer_coords (Gtk.TextWindowType.WIDGET, (int)x, (int)y, out buffer_x, out buffer_y);
+                view.get_iter_at_location (out click_iter, buffer_x, buffer_y);
+                link_clicked_at_iter (click_iter);
             }
-
-            return false;
         }
 
-        public void link_clicked () {
-            Gtk.TextIter cursor_location;
-            var cursor = buffer.get_insert ();
-            buffer.get_iter_at_mark (out cursor_location, cursor);
+        public void link_clicked_at_iter (Gtk.TextIter cursor_location) {
+            warning ("Checking for link at cursor offset: %d", cursor_location.get_offset ());
             if (cursor_location.has_tag (markdown_link) || cursor_location.has_tag (markdown_url)) {
-                warning ("at url");
-                //
-                // Get into markdown_url
-                //
-                while (!cursor_location.has_tag (markdown_url) && cursor_location.has_tag (markdown_link)) {
-                    if (!cursor_location.forward_char ()) {
-                        return;
-                    }
+                warning ("Link tag found at click location. Attempting to extract URL...");
+                string url = "";
+                Gtk.TextIter line_start = cursor_location;
+                Gtk.TextIter line_end = cursor_location;
+                line_start.set_line_offset (0);
+                line_end.forward_to_line_end ();
+
+                string line_text = buffer.get_text (line_start, line_end, true);
+                MatchInfo match_info;
+                if (is_markdown_url.match_full (line_text, line_text.length, 0,
+                        RegexMatchFlags.BSR_ANYCRLF | RegexMatchFlags.NEWLINE_ANYCRLF, out match_info)) {
+                    do {
+                        int start_full_pos, end_full_pos;
+                        int start_url_pos, end_url_pos;
+                        bool full_found = match_info.fetch_pos (0, out start_full_pos, out end_full_pos);
+                        bool url_found = match_info.fetch_pos (2, out start_url_pos, out end_url_pos);
+                        if (!full_found || !url_found) {
+                            continue;
+                        }
+
+                        int start_full_char = line_text.char_count (start_full_pos);
+                        int end_full_char = line_text.char_count (end_full_pos);
+                        int line_offset = line_start.get_offset ();
+                        int cursor_offset = cursor_location.get_offset ();
+
+                        if (cursor_offset >= line_offset + start_full_char &&
+                            cursor_offset <= line_offset + end_full_char) {
+                            url = line_text.substring (start_url_pos, end_url_pos - start_url_pos);
+                            break;
+                        }
+                    } while (match_info.next ());
                 }
 
-                Gtk.TextIter start, end;
-                buffer.get_iter_at_offset (out start, cursor_location.get_offset ());
-                buffer.get_iter_at_offset (out end, cursor_location.get_offset ());
-                while (start.has_tag (markdown_url)) {
-                    if (!start.backward_char ()) {
-                        return;
-                    }
-                }
-                if (!start.forward_chars (2)) {
+                if (url == "") {
+                    warning ("No URL found for click location");
                     return;
                 }
 
-                //
-                // Markdown could end with URL, so it's fine to not be able to go foward
-                //
-                while (end.has_tag (markdown_url)) {
-                    if (!end.forward_char ()) {
-                        break;
-                    }
-                }
-
-                // If at end of doc check
-                if (!end.backward_char ()) {
-                    return;
-                }
-
-                // We weren't at the end, go back one more
-                if (end.get_char () != ')') {
-                    if (!end.backward_char ()) {
-                        return;
-                    }
-                }
-
-                // Illegal state
-                if (end.get_offset () <= start.get_offset ()) {
-                    return;
-                }
-
-                string url = buffer.get_text (start, end, true);
+                warning ("URL Clicked: %s", url);
                 if (url.has_prefix ("https:") || url.has_prefix ("http:") || url.has_prefix ("mailto:") || url.has_prefix ("ftp:") ||
                     url.has_prefix ("sftp:"))
                 {
@@ -292,11 +416,10 @@ namespace ThiefMD.Enrichments {
                     } catch (Error e) {
                         warning ("No app to handle urls: %s", e.message);
                     }
+                    return;
                 }
-                string possible = try_possible_urls (url);
-                warning ("trying %s", url);
+                string possible = get_possible_markdown_url (url);
                 if (possible != "") {
-                    warning ("Found %s", possible);
                     var thief_instance = ThiefApp.get_instance ();
                     if (thief_instance.library.file_in_library (possible)) {
                         var load_sheet = thief_instance.library.find_sheet_for_path (possible);
@@ -313,14 +436,24 @@ namespace ThiefMD.Enrichments {
                                 warning ("No app to handle urls: %s", e.message);
                             }
                         }
-                    } else {
-                        warning ("File not in library");
                     }
                 }
-            } else {
-                warning ("Not at url");
             }
-        }*/
+            else
+            {
+                // log text around click
+                var next = cursor_location.copy ();
+                next.forward_line ();
+                warning ("No link at click location. Text around click: %s", buffer.get_text (cursor_location, next, true));
+            }
+        }
+
+        public void link_clicked () {
+            Gtk.TextIter cursor_location;
+            var cursor = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_location, cursor);
+            link_clicked_at_iter (cursor_location);
+        }
 
         private void update_link_text (Gtk.TextIter start_region, Gtk.TextIter end_region) {
             var settings = AppSettings.get_default ();
@@ -574,9 +707,9 @@ namespace ThiefMD.Enrichments {
             } else {
                 double r, g, b;
                 UI.get_codeblock_bg_color (out r, out g, out b);
-                code_block.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+                code_block.background_rgba = Gdk.RGBA () { red = (float) r, green = (float) g, blue = (float) b, alpha = 1.0f };
                 code_block.background_set = true;
-                code_block.paragraph_background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+                code_block.paragraph_background_rgba = Gdk.RGBA () { red = (float) r, green = (float) g, blue = (float) b, alpha = 1.0f };
                 code_block.paragraph_background_set = true;
                 code_block.background_full_height = true;
                 code_block.background_full_height_set = true;
@@ -601,8 +734,21 @@ namespace ThiefMD.Enrichments {
             int current_cursor = cursor_iter.get_offset ();
 
             tag_code_blocks ();
-            if (last_cursor == -1) {
+            
+            // For large documents, optimize by processing visible area + buffer
+            if (last_cursor == -1 || buffer.get_char_count () > 10000) {
                 buffer.get_bounds (out start, out end);
+                
+                // For very large files (>10k chars), just process around cursor
+                if (buffer.get_char_count () > 10000 && last_cursor != -1) {
+                    buffer.get_iter_at_mark (out start, cursor);
+                    buffer.get_iter_at_mark (out end, cursor);
+                    
+                    // Get a larger chunk around cursor for large files
+                    for (int i = 0; i < 50 && start.backward_line (); i++) {}
+                    for (int i = 0; i < 50 && end.forward_line (); i++) {}
+                }
+                
                 run_between_start_and_end (start, end);
             } else {
                 //
@@ -635,125 +781,140 @@ namespace ThiefMD.Enrichments {
             checking.unlock ();
         }
 
-        private bool on_keypress (Gdk.EventKey key) {
-            uint keycode = key.hardware_keycode;
-            bool skip_request = false;
+        private void clear_markup_navigation () {
+            markup_inserted_around_selection = false;
+            markup_is_link = false;
+            markup_start_offset = -1;
+            markup_end_offset = -1;
+            link_text_start_offset = -1;
+            link_text_end_offset = -1;
+            link_url_start_offset = -1;
+            link_url_end_offset = -1;
+        }
 
-            if (is_list == null || is_partial_list == null || numerical_list == null) {
+        private bool handle_markup_navigation_key (uint keyval) {
+            if (!markup_inserted_around_selection) {
                 return false;
             }
 
-            // Move outside of selection if we just inserted formatting and get a right -> key from the user
-            if (match_keycode (Gdk.Key.Right, keycode) && markup_inserted_around_selection && buffer.has_selection) {
-                skip_request = true;
+            if (keyval != Gdk.Key.Left && keyval != Gdk.Key.Right) {
+                return false;
             }
 
-            markup_inserted_around_selection = false;
+            Gtk.TextIter cursor_iter;
+            var cursor = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_iter, cursor);
+            int cursor_offset = cursor_iter.get_offset ();
 
-            if (match_keycode (Gdk.Key.Return, keycode) || match_keycode (Gdk.Key.Tab, keycode) || skip_request) {
-                debug ("Got enter or tab key or skip request");
-                var cursor = buffer.get_insert ();
-                Gtk.TextIter start, end;
-                if (!skip_request) {
-                    buffer.get_iter_at_mark (out start, cursor);
-                    buffer.get_iter_at_mark (out end, cursor);
-                } else {
-                    buffer.get_selection_bounds (out start, out end);
-                }
-                unichar end_char = end.get_char ();
+            if (cursor_offset < markup_start_offset || cursor_offset > markup_end_offset) {
+                clear_markup_navigation ();
+                return false;
+            }
 
-                // Tab to next item in link, or outside of current markup
-                if ((skip_request || match_keycode (Gdk.Key.Tab, keycode)) && 
-                    (end_char == '*' ||
-                     end_char == ']' ||
-                     end_char == ')' ||
-                     end_char == '_' ||
-                     end_char == '~'))
-                {
-                    if (end_char == ']') {
-                        while (end_char == ']' || end_char == '(') {
-                            end.forward_char ();
-                            end_char = end.get_char ();
-                        }
-                    } else {
-                        while (end_char == '~' || end_char == '*' || end_char == '_' || end_char == ')') {
-                            end.forward_char ();
-                            end_char = end.get_char ();
-                        }
-                    }
-                    buffer.place_cursor (end);
+            if (markup_is_link && keyval == Gdk.Key.Right) {
+                if (cursor_offset >= link_text_start_offset && cursor_offset <= link_text_end_offset) {
+                    Gtk.TextIter target;
+                    buffer.get_iter_at_offset (out target, link_url_start_offset);
+                    buffer.place_cursor (target);
                     return true;
-
-                // List movements
-                } else if (!start.starts_line ()) {
-                    while (!start.starts_line ()) {
-                        start.backward_char ();
-                    }
-                    string line_text = buffer.get_text (start, end, true);
-                    debug ("Checking '%s'", line_text);
-                    MatchInfo match_info;
-                    try {
-                        if (is_list.match_full (line_text, line_text.length, 0, 0, out match_info)) {
-                            debug ("Is a list");
-                            if (match_info == null) {
-                                return false;
-                            }
-
-                            string list_item = match_info.fetch (1);
-                            if (match_keycode (Gdk.Key.Return, keycode)) {
-                                view.insert_at_cursor ("\n");
-                                if (numerical_list.match_full (list_item, list_item.length, 0, 0, out match_info)) {
-                                    string spaces = match_info.fetch (1);
-                                    string close_char = match_info.fetch (3);
-                                    int number = int.parse (match_info.fetch (2)) + 1;
-                                    view.insert_at_cursor (spaces);
-                                    view.insert_at_cursor (number.to_string ());
-                                    view.insert_at_cursor (close_char);
-                                } else {
-                                    view.insert_at_cursor (list_item);
-                                }
-                            } else {
-                                if ((key.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
-                                    int diff = end.get_offset () - start.get_offset ();
-                                    buffer.place_cursor (start);
-                                    view.insert_at_cursor ("    ");
-                                    buffer.get_iter_at_mark (out start, cursor);
-                                    start.forward_chars (diff);
-                                    buffer.place_cursor (start);
-                                } else {
-                                    return false;
-                                }
-                            }
-                            return true;
-                        } else if (is_partial_list.match_full (line_text, line_text.length, 0, 0, out match_info)) {
-                            if (match_keycode (Gdk.Key.Return, keycode)) {
-                                Gtk.TextIter doc_start, doc_end;
-                                buffer.get_bounds (out doc_start, out doc_end);
-                                while (!end.starts_line () && end.in_range(doc_start, doc_end)) {
-                                    end.forward_char ();
-                                }
-                                buffer.@delete (ref start, ref end);
-                            } else {
-                                if ((key.state & Gdk.ModifierType.SHIFT_MASK) == 0) {
-                                    int diff = end.get_offset () - start.get_offset ();
-                                    buffer.place_cursor (start);
-                                    view.insert_at_cursor ("    ");
-                                    buffer.get_iter_at_mark (out start, cursor);
-                                    start.forward_chars (diff);
-                                    buffer.place_cursor (start);
-                                    return true;
-                                } else {
-                                    return false;
-                                }
-                            }
-                        }
-                    } catch (Error e) {
-                        warning ("Error parsing key presses: %s", e.message);
-                    }
                 }
             }
 
-            return false;
+            Gtk.TextIter target;
+            if (keyval == Gdk.Key.Left) {
+                buffer.get_iter_at_offset (out target, markup_start_offset);
+            } else {
+                buffer.get_iter_at_offset (out target, markup_end_offset);
+            }
+            buffer.place_cursor (target);
+            clear_markup_navigation ();
+            return true;
+        }
+
+        private void handle_markup_cursor_position () {
+            if (!markup_inserted_around_selection) {
+                return;
+            }
+
+            Gtk.TextIter cursor_iter;
+            var cursor = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_iter, cursor);
+            int cursor_offset = cursor_iter.get_offset ();
+            if (cursor_offset < markup_start_offset || cursor_offset > markup_end_offset) {
+                clear_markup_navigation ();
+            }
+        }
+
+        private void set_generic_markup_range (int start_offset, int end_offset) {
+            markup_start_offset = start_offset;
+            markup_end_offset = end_offset;
+            markup_is_link = false;
+            markup_inserted_around_selection = true;
+        }
+
+        private void record_link_markup_at_cursor (Gtk.TextIter cursor_iter) {
+            Gtk.TextIter scan = cursor_iter;
+            bool found_open = false;
+            for (int i = 0; i < 256 && scan.backward_char (); i++) {
+                unichar c = scan.get_char ();
+                if (c == '\n' || c == '\r') {
+                    break;
+                }
+                if (c == '[') {
+                    found_open = true;
+                    break;
+                }
+            }
+            if (!found_open || scan.get_char () != '[') {
+                return;
+            }
+
+            int link_open = scan.get_offset ();
+            Gtk.TextIter close = scan;
+            if (!close.forward_char ()) {
+                return;
+            }
+            while (close.get_char () != ']' && close.forward_char ()) {
+                if (close.get_char () == '\n' || close.get_char () == '\r') {
+                    return;
+                }
+            }
+            if (close.get_char () != ']') {
+                return;
+            }
+            int link_close = close.get_offset ();
+
+            Gtk.TextIter paren_open = close;
+            if (!paren_open.forward_char ()) {
+                return;
+            }
+            if (paren_open.get_char () != '(') {
+                return;
+            }
+            int url_open = paren_open.get_offset ();
+
+            Gtk.TextIter paren_close = paren_open;
+            if (!paren_close.forward_char ()) {
+                return;
+            }
+            while (paren_close.get_char () != ')' && paren_close.forward_char ()) {
+                if (paren_close.get_char () == '\n' || paren_close.get_char () == '\r') {
+                    return;
+                }
+            }
+            if (paren_close.get_char () != ')') {
+                return;
+            }
+            int url_close = paren_close.get_offset ();
+
+            markup_start_offset = link_open;
+            markup_end_offset = url_close + 1;
+            link_text_start_offset = link_open + 1;
+            link_text_end_offset = link_close;
+            link_url_start_offset = url_open + 1;
+            link_url_end_offset = url_close;
+            markup_is_link = true;
+            markup_inserted_around_selection = true;
         }
 
         private void insert_markup_around_cursor (string markup) {
@@ -764,6 +925,8 @@ namespace ThiefMD.Enrichments {
                 if (buffer.cursor_position - markup.length > 0) {
                     buffer.place_cursor (iter);
                 }
+                int cursor_pos = buffer.cursor_position;
+                set_generic_markup_range (cursor_pos - markup.length, cursor_pos + markup.length);
             } else {
                 Gtk.TextIter iter_start, iter_end;
                 if (buffer.get_selection_bounds (out iter_start, out iter_end)) {
@@ -773,7 +936,7 @@ namespace ThiefMD.Enrichments {
                         buffer.get_selection_bounds (out iter_start, out iter_end);
                         iter_end.backward_chars (markup.length);
                         buffer.select_range (iter_start, iter_end);
-                        markup_inserted_around_selection = true;
+                        set_generic_markup_range (iter_start.get_offset () - markup.length, iter_end.get_offset () + markup.length);
                     }
                 }
             }
@@ -805,6 +968,7 @@ namespace ThiefMD.Enrichments {
                                 buffer.get_selection_bounds (out iter_start, out iter_end);
                                 iter_end.backward_chars (1);
                                 buffer.place_cursor (iter_end);
+                                record_link_markup_at_cursor (iter_end);
                             }
                         } else {
                             buffer.insert (ref iter_start, "[](", -1);
@@ -813,6 +977,7 @@ namespace ThiefMD.Enrichments {
                                 buffer.get_selection_bounds (out iter_start, out iter_end);
                                 iter_start.backward_chars (2);
                                 buffer.place_cursor (iter_start);
+                                record_link_markup_at_cursor (iter_start);
                             }
                         }
                     } catch (Error e) {
@@ -826,11 +991,14 @@ namespace ThiefMD.Enrichments {
                 buffer.get_iter_at_mark (out start, cursor);
                 start.backward_chars (3);
                 buffer.place_cursor (start);
+                record_link_markup_at_cursor (start);
             }
         }
 
         private void cursor_update_heading_margins () {
             var settings = AppSettings.get_default ();
+
+            debug ("settings.experimental: %s", settings.experimental ? "true" : "false");
 
             if (settings.experimental) {
                 var cursor = buffer.get_insert ();
@@ -861,7 +1029,7 @@ namespace ThiefMD.Enrichments {
             }
         }
 
-        public bool attach (Gtk.SourceView textview) {
+        public bool attach (GtkSource.View textview) {
             if (textview == null) {
                 return false;
             }
@@ -877,7 +1045,6 @@ namespace ThiefMD.Enrichments {
             var settings = AppSettings.get_default ();
 
             view.destroy.connect (detach);
-            view.key_press_event.connect (on_keypress);
 
             heading_text = new Gtk.TextTag[6];
             for (int h = 0; h < 6; h++) {
@@ -898,6 +1065,16 @@ namespace ThiefMD.Enrichments {
 
             last_cursor = -1;
 
+            // Attach BibTeX completion provider if experimental mode and bibtex file exists
+            update_bibtex_provider ();
+
+            markup_key_controller = new Gtk.EventControllerKey ();
+            markup_key_controller.key_pressed.connect ((keyval, _keycode, _state) => {
+                return handle_markup_navigation_key (keyval);
+            });
+            view.add_controller (markup_key_controller);
+            markup_cursor_handler_id = buffer.notify["cursor-position"].connect (handle_markup_cursor_position);
+
             return true;
         }
 
@@ -914,12 +1091,15 @@ namespace ThiefMD.Enrichments {
                 markdown_url.invisible_set = false;
             }
 
+            // Update BibTeX provider based on experimental mode
+            update_bibtex_provider ();
+
             double r, g, b;
             if (!settings.focus_mode) {
                 UI.get_codeblock_bg_color (out r, out g, out b);
-                code_block.background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+                code_block.background_rgba = Gdk.RGBA () { red = (float) r, green = (float) g, blue = (float) b, alpha = 1.0f };
                 code_block.background_set = true;
-                code_block.paragraph_background_rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 1.0 };
+                code_block.paragraph_background_rgba = Gdk.RGBA () { red = (float) r, green = (float) g, blue = (float) b, alpha = 1.0f };
                 code_block.paragraph_background_set = true;
                 code_block.background_full_height = true;
                 code_block.background_full_height_set = true;
@@ -930,29 +1110,33 @@ namespace ThiefMD.Enrichments {
                 code_block.background_full_height_set = false;
             }
 
-            if (settings.experimental && citation_suggester == null) {
-                try {
-                    citation_suggester = new BibTexCompletionProvider ();
-                    var completion = view.get_completion ();
-                    completion.add_provider (citation_suggester);
-                    source_completion = new Gtk.SourceCompletionWords ("Citation Suggestor", null);
-                    source_completion.register (buffer);
-                } catch (Error e) {
-                    warning ("Could not add suggestions: %s", e.message);
-                }
-            } else if (!settings.experimental && citation_suggester != null) {
-                try {
-                    var completion = view.get_completion ();
-                    completion.remove_provider (citation_suggester);
-                    source_completion.unregister (buffer);
-                    source_completion = null;
-                    citation_suggester = null;
-                } catch (Error e) {
-                    warning ("Could not remove suggestions: %s", e.message);
-                }
+            recalculate_margins ();
+        }
+
+        private void update_bibtex_provider () {
+            if (view == null) {
+                return;
             }
 
-            recalculate_margins ();
+            var settings = AppSettings.get_default ();
+            string bib_file = find_bibtex_for_sheet (settings.last_file);
+            var completion = view.get_completion ();
+
+            if (completion == null) {
+                return;
+            }
+
+            // Remove existing provider if present
+            if (bibtex_provider != null) {
+                completion.remove_provider (bibtex_provider);
+                bibtex_provider = null;
+            }
+
+            // Add provider if experimental mode is enabled and bibtex file exists
+            if (settings.experimental && bib_file != "") {
+                bibtex_provider = new BibTexCompletionProvider ();
+                completion.add_provider (bibtex_provider);
+            }
         }
 
         private int get_string_px_width (string str) {
@@ -981,6 +1165,8 @@ namespace ThiefMD.Enrichments {
             hashtag_w = f_w;
             space_w = f_w;
             avg_w = f_w;
+
+            debug ("Recalculate margins");
 
             if (view.get_realized ()) {
                 var font_desc = Pango.FontDescription.from_string (settings.font_family);
@@ -1015,6 +1201,12 @@ namespace ThiefMD.Enrichments {
                     heading_text[3].left_margin = m;
                     heading_text[4].left_margin = m;
                     heading_text[5].left_margin = m;
+                    heading_text[0].left_margin_set = true;
+                    heading_text[1].left_margin_set = true;
+                    heading_text[2].left_margin_set = true;
+                    heading_text[3].left_margin_set = true;
+                    heading_text[4].left_margin_set = true;
+                    heading_text[5].left_margin_set = true;
                     heading_text[0].indent_set = false;
                     heading_text[1].indent_set = false;
                     heading_text[2].indent_set = false;
@@ -1028,6 +1220,12 @@ namespace ThiefMD.Enrichments {
                     heading_text[3].left_margin = m - ((hashtag_w * 4) + space_w);
                     heading_text[4].left_margin = m - ((hashtag_w * 5) + space_w);
                     heading_text[5].left_margin = m - ((hashtag_w * 6) + space_w);
+                    heading_text[0].left_margin_set = true;
+                    heading_text[1].left_margin_set = true;
+                    heading_text[2].left_margin_set = true;
+                    heading_text[3].left_margin_set = true;
+                    heading_text[4].left_margin_set = true;
+                    heading_text[5].left_margin_set = true;
                     heading_text[0].indent = -((hashtag_w * 1) + space_w);
                     heading_text[1].indent = -((hashtag_w * 2) + space_w);
                     heading_text[2].indent = -((hashtag_w * 3) + space_w);
@@ -1040,12 +1238,28 @@ namespace ThiefMD.Enrichments {
                     heading_text[3].indent_set = true;
                     heading_text[4].indent_set = true;
                     heading_text[5].indent_set = true;
+                    heading_text[0].accumulative_margin = false;
+                    heading_text[1].accumulative_margin = false;
+                    heading_text[2].accumulative_margin = false;
+                    heading_text[3].accumulative_margin = false;
+                    heading_text[4].accumulative_margin = false;
+                    heading_text[5].accumulative_margin = false;
                 }
             }
         }
 
         public void detach () {
             var settings = AppSettings.get_default ();
+            
+            // Remove BibTeX completion provider if present
+            if (bibtex_provider != null && view != null) {
+                var completion = view.get_completion ();
+                if (completion != null) {
+                    completion.remove_provider (bibtex_provider);
+                }
+                bibtex_provider = null;
+            }
+
             Gtk.TextIter start, end;
             buffer.get_bounds (out start, out end);
 
@@ -1066,15 +1280,17 @@ namespace ThiefMD.Enrichments {
             cursor_at_interesting_location = false;
             active_selection = false;
 
-            if (citation_suggester != null) {
-                source_completion.unregister (buffer);
-                source_completion = null;
-                citation_suggester = null;
-            }
-
-            view.key_press_event.disconnect (on_keypress);
             settings.changed.disconnect (settings_updated);
             buffer.notify["cursor-position"].disconnect (cursor_update_heading_margins);
+            if (markup_cursor_handler_id != 0) {
+                SignalHandler.disconnect (buffer, markup_cursor_handler_id);
+                markup_cursor_handler_id = 0;
+            }
+            if (markup_key_controller != null) {
+                view.remove_controller (markup_key_controller);
+                markup_key_controller = null;
+            }
+            clear_markup_navigation ();
             view = null;
             buffer = null;
             last_cursor = -1;

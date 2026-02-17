@@ -56,7 +56,7 @@ namespace ThiefMD.Exporters {
             epub_filter.add_mime_type ("application/epub+zip");
             epub_filter.add_pattern ("*.epub");
 
-            File new_novel = Dialogs.get_target_save_file_with_extension (
+            File? new_novel = Dialogs.get_target_save_file_with_extension (
                 _("Export ePUB"),
                 epub_filter,
                 "epub");

@@ -189,17 +189,8 @@ namespace ThiefMD {
     }
 
     public bool match_keycode (uint keyval, uint code) {
-        Gdk.KeymapKey [] keys;
-        Gdk.Keymap keymap = Gdk.Keymap.get_for_display (Gdk.Display.get_default ());
-        if (keymap.get_entries_for_keyval (keyval, out keys)) {
-            foreach (var key in keys) {
-                if (code == key.keycode) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        // GTK4: compare the translated keyval directly; callers now pass keyval
+        return keyval == code;
     }
 
     public string get_some_words (string buffer) {
@@ -241,55 +232,40 @@ namespace ThiefMD {
         return found;
     }
 
+    /* @TODO: change to gtk4
     public Gtk.MenuItem set_icon_option (string name, string icon, Sheets project) {
         var box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
-        var image = new Gtk.Image.from_pixbuf (get_pixbuf_for_value (icon));
+        var image = new Gtk.Image.from_gicon (get_icon_for_value (icon));
         var label = new Gtk.Label (name);
         var set_icon = new Gtk.MenuItem ();
-        box.add (image);
-        box.add (label);
-        set_icon.add (box);
-        box.show_all ();
+        box.append (image);
+        box.append (label);
+        set_icon.set_child (box);
+        box.show ();
         return set_icon;
     }
+    */
 
-    public Gdk.Pixbuf? get_pixbuf_for_value (string value) {
-        Gdk.Pixbuf? ret_val = null;
+    public GLib.Icon? get_icon_for_value (string value) {
         try {
             if (value != "") {
                 File icon_file = File.new_for_path (value);
                 if (icon_file.query_exists ()) {
-                    ret_val = new Gdk.Pixbuf.from_file (value);
-                } else {
-                    if (value.has_prefix ("/")) {
-                        ret_val = new Gdk.Pixbuf.from_resource (value);
-                    } else {
-                        ret_val =  Gtk.IconTheme.get_default ().load_icon (value, Gtk.IconSize.MENU, 0);
-                    }
+                    return new GLib.FileIcon (icon_file);
+                } else if (!value.has_prefix ("/")) {
+                    return new GLib.ThemedIcon (value);
                 }
             }
 
-            if (ret_val == null) {
-                return new Gdk.Pixbuf.from_resource ("/com/github/kmwallio/thiefmd/icons/empty.svg");
-            } else if (ret_val.get_height () != 16) {
-                double percent = (16) / ((double) ret_val.get_height ());
-                int new_w = (int)(percent * ret_val.get_width ());
-                return ret_val.scale_simple (new_w, 16, Gdk.InterpType.NEAREST);
-            }
+            return new GLib.ThemedIcon ("folder");
         } catch (Error e) {
             warning ("Could not set default icon: %s", e.message);
-            try {
-                return Gtk.IconTheme.get_default ().load_icon ("folder", Gtk.IconSize.MENU, 0);
-            } catch (Error e) {
-                warning ("Could not set backup folder icon: %s", e.message);
-            }
+            return new GLib.ThemedIcon ("folder");
         }
-
-        return ret_val;
     }
 
-    public Gdk.Pixbuf? get_pixbuf_for_folder (string folder) {
-        Gdk.Pixbuf? ret_val = null;
+    public GLib.Icon? get_icon_for_folder (string folder) {
+        GLib.Icon? ret_val = null;
         File metadata_file = File.new_for_path (Path.build_filename (folder, ".thiefsheets"));
         ThiefSheets metadata = new ThiefSheets ();
         if (metadata_file.query_exists ()) {
@@ -299,7 +275,7 @@ namespace ThiefMD {
                 warning ("Could not load metafile: %s", e.message);
             }
         }
-        ret_val = get_pixbuf_for_value (metadata.icon);
+        ret_val = get_icon_for_value (metadata.icon);
         return ret_val;
     }
 

@@ -4,6 +4,8 @@ public class ThiefTests {
         new ImageExtractionTests ();
         new MarkdownTests ();
         new FileManagerTests ();
+        new HelpersTests ();
+        new PandocTests ();
         return Test.run ();
     }
 }

@@ -37,10 +37,12 @@ namespace ThiefMD.Widgets {
         private void build_ui () {
             var settings = AppSettings.get_default ();
             headerbar = new Gtk.HeaderBar ();
-            headerbar.set_title (get_base_library_path (monitor_path).replace (Path.DIR_SEPARATOR_S, " " + Path.DIR_SEPARATOR_S + " "));
-            var header_context = headerbar.get_style_context ();
-            header_context.add_class (Gtk.STYLE_CLASS_FLAT);
-            header_context.add_class ("thiefmd-toolbar");
+            var title_label = new Gtk.Label (get_base_library_path (monitor_path).replace (Path.DIR_SEPARATOR_S, " " + Path.DIR_SEPARATOR_S + " "));
+            title_label.set_ellipsize (Pango.EllipsizeMode.END);
+            title_label.halign = Gtk.Align.START;
+            headerbar.set_title_widget (title_label);
+            headerbar.add_css_class ("flat");
+            headerbar.add_css_class ("thiefmd-toolbar");
 
             word_label = new Gtk.Label ("");
             word_label.xalign = 0;
@@ -52,7 +54,10 @@ namespace ThiefMD.Widgets {
 
             var grid = new Gtk.Grid ();
             grid.orientation = Gtk.Orientation.VERTICAL;
-            grid.margin = 12;
+            grid.margin_top = 12;
+            grid.margin_bottom = 12;
+            grid.margin_start = 12;
+            grid.margin_end = 12;
             grid.row_spacing = 12;
             grid.column_spacing = 12;
             grid.vexpand = true;
@@ -77,27 +82,24 @@ namespace ThiefMD.Widgets {
             grid.attach (export_button, 0, 3, 1, 1);
             grid.attach (close_button, 1, 3, 1, 1);
 
-            grid.show_all ();
-
             refresh = new Gtk.Button ();
             refresh.tooltip_text = _("Refresh Statistics");
-            refresh.set_image (new Gtk.Image.from_icon_name ("view-refresh-symbolic", Gtk.IconSize.BUTTON));
+            var refresh_image = new Gtk.Image.from_icon_name ("view-refresh-symbolic");
+            refresh_image.pixel_size = 16;
+            refresh.set_child (refresh_image);
 
             refresh.activate.connect (update_wordcount);
-            headerbar.set_show_close_button (true);
+            headerbar.set_show_title_buttons (true);
             headerbar.pack_start (refresh);
             set_titlebar (headerbar);
             transient_for = ThiefApp.get_instance ();
             destroy_with_parent = true;
-            add (grid);
+            set_child (grid);
 
-            int w, h;
-            ThiefApp.get_instance ().get_size (out w, out h);
-
-            show_all ();
+            present ();
 
             settings.writing_changed.connect (update_wordcount);
-            delete_event.connect (() => {
+            close_request.connect (() => {
                 settings.writing_changed.disconnect (update_wordcount);
                 return false;
             });
