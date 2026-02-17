@@ -829,9 +829,8 @@ msgid "Import"
 msgstr ""
 
 #: src/Widgets/Notes.vala:60
-#, fuzzy
 msgid "Sheet Notes"
-msgstr "Sheet Name"
+msgstr "Sheet Notes"
 
 #: src/Widgets/Notes.vala:68
 msgid "Project Notes"
