@@ -101,7 +101,7 @@ namespace ThiefMD.Widgets {
             export_button.tooltip_text = _("Open Export Window");
             export_button.clicked.connect (() => {
                 if (_instance is ThiefApp) {
-                    PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown (), is_fountain (settings.last_file));
+                    PublisherPreviewWindow ppw = new PublisherPreviewWindow (SheetManager.get_markdown ().replace(ThiefProperties.THIEF_MARK_CONST, ""), is_fountain (settings.last_file));
                     ppw.show ();
                 } else if (_instance is SoloEditor) {
                     var editor = (SoloEditor)_instance;
