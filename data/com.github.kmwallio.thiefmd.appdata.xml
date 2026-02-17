@@ -68,6 +68,8 @@
         <ul>
           <li>Updated to GTK4.</li>
           <li>Updated to GtkSourceView5.</li>
+          <li>Support for Ghost 2FA and Cookie Authentication.</li>
+          <li>Updated to latest Hashnode API.</li>
           <li>From libhandy to libadwaita.</li>
           <li>Large file handling improvements.</li>
           <li>We've done our best to upgrade to the latest and greatest while maintaining functionality.</li>

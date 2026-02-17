@@ -224,6 +224,9 @@ namespace ThiefMD.Connections {
                 }
             }
 
+            int published_state = publish_state.get_active ();
+            bool immediately_publish = (published_state == 1);
+
             if (good_to_go) {
                 Gee.Map<string, string> metadata = FileManager.get_yaml_kvp (publisher_instance.get_export_markdown ());
                 string featured_image = "";
@@ -252,9 +255,6 @@ namespace ThiefMD.Connections {
                     series = metadata.get ("series").chomp ().chug ();
                 }
 
-                int published_state = publish_state.get_active ();
-                bool immediately_publish = (published_state == 1);
-
                 if (connection.publish_post (
                     out url,
                     out id,
@@ -279,6 +279,7 @@ namespace ThiefMD.Connections {
             }
 
             if (published) {
+                url = (!immediately_publish) ? url + "/edit": url;
                 Gtk.Label label = new Gtk.Label (
                     "<b>Post URL:</b> <a href='%s'>%s</a>".printf (
                         url,
