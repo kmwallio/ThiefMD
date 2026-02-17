@@ -358,7 +358,7 @@ msgstr "Toevoegen aan verzameling"
 
 #: src/Controllers/Dialogs.vala:105
 msgid "Open file"
-msgstr "Bestand openen "
+msgstr "Bestand openen"
 
 #: src/Controllers/Dialogs.vala:108
 msgid "Supported files"
