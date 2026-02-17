@@ -44,22 +44,97 @@ namespace ThiefMD.Connections {
             conf_alias = username;
 
             if (connection.authenticate ()) {
-                string label = endpoint.down ();
-                if (label.has_prefix ("https://")) {
-                    label = endpoint.substring (8);
-                } else if (endpoint.has_prefix ("http://")) {
-                    label = endpoint.substring (7);
+                // Check if 2FA is required
+                if (connection.requires_2fa) {
+                    if (prompt_for_2fa ()) {
+                        setup_connection (endpoint, username);
+                    } else {
+                        warning ("2FA verification failed");
+                    }
+                } else {
+                    setup_connection (endpoint, username);
                 }
-                if (!label.has_suffix ("/")) {
-                    label += "/";
-                }
-                label = label.substring (0, 1).up () + label.substring (1).down ();
-                export_name = label + username.substring (0, username.index_of ("@"));
-                exporter = new GhostExporter (connection);
-                authenticated = true;
             } else {
                 warning ("Could not establish connection");
             }
+        }
+
+        private void setup_connection (string endpoint, string username) {
+            string label = endpoint.down ();
+            if (label.has_prefix ("https://")) {
+                label = endpoint.substring (8);
+            } else if (endpoint.has_prefix ("http://")) {
+                label = endpoint.substring (7);
+            }
+            if (!label.has_suffix ("/")) {
+                label += "/";
+            }
+            label = label.substring (0, 1).up () + label.substring (1).down ();
+            export_name = label + username.substring (0, username.index_of ("@"));
+            exporter = new GhostExporter (connection);
+            authenticated = true;
+        }
+
+        private bool prompt_for_2fa () {
+            bool verified = false;
+            Gtk.Grid grid = new Gtk.Grid ();
+            grid.margin_top = 12;
+            grid.margin_bottom = 12;
+            grid.margin_start = 12;
+            grid.margin_end = 12;
+            grid.row_spacing = 12;
+            grid.column_spacing = 12;
+            grid.orientation = Gtk.Orientation.VERTICAL;
+            grid.hexpand = true;
+            grid.vexpand = true;
+
+            Gtk.Label code_label = new Gtk.Label (_("Enter verification code from your authenticator app"));
+            code_label.xalign = 0;
+            code_label.wrap = true;
+
+            Gtk.Entry code_entry = new Gtk.Entry ();
+            code_entry.placeholder_text = "000000";
+            code_entry.max_width_chars = 6;
+
+            grid.attach (code_label, 1, 1, 2, 1);
+            grid.attach (code_entry, 1, 2, 2, 1);
+
+            var dialog = new Gtk.Dialog.with_buttons (
+                            _("Two-Factor Authentication Required"),
+                            ThiefApp.get_instance (),
+                            Gtk.DialogFlags.MODAL,
+                            _("_Verify"),
+                            Gtk.ResponseType.ACCEPT,
+                            _("_Cancel"),
+                            Gtk.ResponseType.REJECT,
+                            null);
+
+            dialog.get_content_area ().append (grid);
+
+            var loop = new GLib.MainLoop ();
+            dialog.response.connect ((response_id) => {
+                if (response_id == Gtk.ResponseType.ACCEPT) {
+                    debug ("Attempting 2FA verification");
+                    if (connection.verify_session (code_entry.text)) {
+                        verified = true;
+                        debug ("2FA verification successful");
+                    } else {
+                        warning ("2FA verification failed");
+                    }
+                }
+                dialog.destroy ();
+                loop.quit ();
+            });
+
+            dialog.close_request.connect (() => {
+                loop.quit ();
+                return false;
+            });
+
+            dialog.present ();
+            loop.run ();
+
+            return verified;
         }
 
         public override bool connection_valid () {
