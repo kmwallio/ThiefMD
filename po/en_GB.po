@@ -373,11 +373,11 @@ msgstr "Close without saving"
 #: src/Connections/GhostConnection.vala:237
 #: src/Connections/WordpressConnection.vala:115
 msgid "_Cancel"
-msgstr "Cancel"
+msgstr "_Cancel"
 
 #: src/Controllers/Dialogs.vala:150
 msgid "_Save"
-msgstr "Save"
+msgstr "_Save"
 
 #: src/Controllers/Dialogs.vala:159
 msgid "Move file to another folder?"
@@ -391,7 +391,7 @@ msgstr ""
 #: src/Controllers/Dialogs.vala:163
 #, fuzzy
 msgid "_Move"
-msgstr "Move"
+msgstr "_Move"
 
 #: src/Controllers/SheetManager.vala:161 src/Widgets/StatisticsBar.vala:98
 msgid "No file opened"
@@ -427,7 +427,7 @@ msgstr ""
 #: src/Connections/GhostConnection.vala:185
 #: src/Connections/WordpressConnection.vala:113
 msgid "_Add Account"
-msgstr "Add Account"
+msgstr "_Add Account"
 
 #: src/Connections/WriteFreelyConnection.vala:235
 msgid "Taking your words, and letting them go... to the internet!"
@@ -472,7 +472,7 @@ msgstr ""
 #: src/Connections/GhostConnection.vala:106
 #: src/Connections/GhostConnection.vala:235
 msgid "_Verify"
-msgstr ""
+msgstr "_Verify"
 
 #: src/Connections/GhostConnection.vala:160
 msgid "E-mail"
@@ -890,11 +890,11 @@ msgstr ""
 
 #: src/Widgets/Preferences.vala:336
 msgid "_Remove"
-msgstr "Remove"
+msgstr "_Remove"
 
 #: src/Widgets/Preferences.vala:338
 msgid "_Keep"
-msgstr "Keep"
+msgstr "_Keep"
 
 #: src/Widgets/Preferences.vala:361
 msgid "Display"
