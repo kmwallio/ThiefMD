@@ -782,7 +782,7 @@ msgstr "Writing Statistics"
 
 #: src/Widgets/Library.vala:1036
 msgid "Search "
-msgstr "Search"
+msgstr "Search "
 
 #: src/Widgets/Library.vala:1040
 msgid "Open in File Manager"
