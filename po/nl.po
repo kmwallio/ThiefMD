@@ -109,14 +109,12 @@ msgid "Finnish Translation Contributors"
 msgstr "Finse vertaalmedewerkers"
 
 #: src/Constants/ThiefProperties.vala:94
-#, fuzzy
 msgid "Polish Translation Contributors"
-msgstr "Zweedse vertaalmedewerkers"
+msgstr "Poolse vertaalmedewerkers"
 
 #: src/Constants/ThiefProperties.vala:95
-#, fuzzy
 msgid "Turkish Translation Contributors"
-msgstr "Zweedse vertaalmedewerkers"
+msgstr "Turkse vertaalmedewerkers"
 
 #: src/Constants/ThiefProperties.vala:96
 msgid "Original Code"
