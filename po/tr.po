@@ -1,164 +1,553 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: ThiefMD\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-16 19:20-0800\n"
+"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: POEditor.com\n"
-"Project-Id-Version: ThiefMD\n"
-"Language: tr\n"
 
-#: src/ThiefApp.vala:309
+#: src/ThiefApp.vala:198
+msgid "Library"
+msgstr "Kitaplık"
+
+#: src/ThiefApp.vala:206
+msgid "Add Folder to Library"
+msgstr "Kitaplığa Klasör Ekle"
+
+#: src/ThiefApp.vala:441
 msgid "HTML"
 msgstr "HTML"
 
-#: src/ThiefApp.vala:310
+#: src/ThiefApp.vala:442
 msgid "PDF"
 msgstr "PDF"
 
-#: src/ThiefApp.vala:311
+#: src/ThiefApp.vala:443
 msgid "MHTML"
 msgstr "MHTML"
 
-#: src/ThiefApp.vala:312
+#: src/ThiefApp.vala:444
 msgid "Markdown"
 msgstr "Markdown"
 
-#: src/ThiefApp.vala:313
+#: src/ThiefApp.vala:445
 msgid "LaTeX"
 msgstr "LaTeX"
 
-#: src/ThiefApp.vala:314
+#: src/ThiefApp.vala:446
 msgid "DocX"
 msgstr "DocX"
 
-#. Supported import file extensions
+#: src/ThiefApp.vala:447
+msgid "Fountain"
+msgstr "Fountain"
+
+#. Visual Settings
+#. Arbitrary strings
+#: src/Constants/AppSettings.vala:104
+#, c-format
+msgid ""
+"# Click on a sheet to get started\n"
+"\n"
+"First time here?  Drag a folder into the library, or click on the Folder "
+"icon to select a folder to add.\n"
+"\n"
+"## Thief Tip:\n"
+"\n"
+"%s"
+msgstr ""
+"# Başlamak için bir sayfaya tıklayın\n"
+"\n"
+"Burada yeni misiniz? Bir klasörü kitaplığa sürükleyin veya bir klasör "
+"eklemek için Klasör simgesine tıklayın.\n"
+"\n"
+"## Thief İpucu:\n"
+"\n"
+"%s"
+
+#: src/Constants/ThiefProperties.vala:25
+msgid "The Markdown editor worth stealing"
+msgstr "Çalmaya değer Markdown düzenleyici"
+
+#: src/Constants/ThiefProperties.vala:87
+msgid "Contributors who help make ThiefMD awesome"
+msgstr "ThiefMD uygulamasının muhteşem olmasına katkı verenler"
+
+#: src/Constants/ThiefProperties.vala:88
+msgid "Czech Translation Contributors"
+msgstr "Çekçe Çeviriye Katkıda Bulunanlar"
+
+#: src/Constants/ThiefProperties.vala:89
+msgid "French Translation Contributors"
+msgstr "Fransızca Çeviriye Katkıda Bulunanlar"
+
+#: src/Constants/ThiefProperties.vala:90
+msgid "Slovak Translation Contributors"
+msgstr "Slovakça Çeviriye Katkıda Bulunanlar"
+
+#: src/Constants/ThiefProperties.vala:91
+msgid "Swedish Translation Contributors"
+msgstr "İsveççe Çeviriye Katkıda Bulunanlar"
+
+#: src/Constants/ThiefProperties.vala:92
+msgid "German Translation Contributors"
+msgstr "Almanca Çeviriye Katkıda Bulunanlar"
+
+#: src/Constants/ThiefProperties.vala:93
+msgid "Finnish Translation Contributors"
+msgstr "Fince Çeviriye Katkıda Bulunanlar"
+
+#: src/Constants/ThiefProperties.vala:94
+#, fuzzy
+msgid "Polish Translation Contributors"
+msgstr "İsveççe Çeviriye Katkıda Bulunanlar"
+
+#: src/Constants/ThiefProperties.vala:95
+#, fuzzy
+msgid "Turkish Translation Contributors"
+msgstr "İsveççe Çeviriye Katkıda Bulunanlar"
+
+#: src/Constants/ThiefProperties.vala:96
+msgid "Original Code"
+msgstr "Özgün Kod"
+
+#: src/Constants/ThiefProperties.vala:96
+msgid "Based on <a href='https://github.com/lainsce/quilter'>Quilter</a>"
+msgstr "<a href='https://github.com/lainsce/quilter'>Quilter</a> temellidir"
+
+#: src/Constants/ThiefProperties.vala:96 src/Constants/ThiefProperties.vala:97
+#: src/Constants/ThiefProperties.vala:98 src/Constants/ThiefProperties.vala:99
+#: src/Constants/ThiefProperties.vala:100
+#: src/Constants/ThiefProperties.vala:101
+#: src/Constants/ThiefProperties.vala:102
+#: src/Constants/ThiefProperties.vala:103
+#: src/Constants/ThiefProperties.vala:104
+#: src/Constants/ThiefProperties.vala:105
+#: src/Constants/ThiefProperties.vala:106
+#: src/Constants/ThiefProperties.vala:107
+#: src/Constants/ThiefProperties.vala:108
+#: src/Constants/ThiefProperties.vala:109
+#: src/Constants/ThiefProperties.vala:110
+#: src/Constants/ThiefProperties.vala:111
+msgid "Copyright"
+msgstr "Telif Hakkı"
+
+#: src/Constants/ThiefProperties.vala:96
+msgid "GNU General Public License v3.0"
+msgstr "GNU General Public License v3.0"
+
+#: src/Constants/ThiefProperties.vala:97
+msgid "Stolen Victory Font"
+msgstr "Stolen Victory Yazı Tipi"
+
+#: src/Constants/ThiefProperties.vala:97 src/Constants/ThiefProperties.vala:99
+#: src/Constants/ThiefProperties.vala:100
+#: src/Constants/ThiefProperties.vala:101
+msgid "SIL OPEN FONT LICENSE Version 1.1"
+msgstr "SIL OPEN FONT LICENSE Version 1.1"
+
+#: src/Constants/ThiefProperties.vala:98 src/Constants/ThiefProperties.vala:103
+#: src/Constants/ThiefProperties.vala:106
+#: src/Constants/ThiefProperties.vala:107
+msgid "MIT License"
+msgstr "MIT License"
+
+#: src/Constants/ThiefProperties.vala:100
+#: src/Constants/ThiefProperties.vala:101 src/Widgets/ThemeSelector.vala:50
+msgid "Font"
+msgstr "Yazı tipi"
+
+#: src/Constants/ThiefProperties.vala:102
+msgid "Preview CSS"
+msgstr "CSS Önizle"
+
+#: src/Constants/ThiefProperties.vala:102
+msgid "Mash up of Splendor and Modest"
+msgstr "İhtişam ve Tevazu Karması"
+
+#: src/Constants/ThiefProperties.vala:102
+#: src/Constants/ThiefProperties.vala:111
+msgid "The MIT License (MIT)"
+msgstr "MIT Lisansı (MIT)"
+
+#: src/Constants/ThiefProperties.vala:103
+msgid "Fountain Preview and Export"
+msgstr "Fountain Önizle ve Dışa Aktar"
+
+#: src/Constants/ThiefProperties.vala:104
+msgid "Markdown Parsing"
+msgstr "Markdown Ayrıştırma"
+
+#: src/Constants/ThiefProperties.vala:104
+msgid "BSD-style License"
+msgstr "BSD-tarzı Lisans"
+
+#: src/Constants/ThiefProperties.vala:105
+msgid "Syntax Highlighting"
+msgstr "Söz Dizimi Vurgulaması"
+
+#: src/Constants/ThiefProperties.vala:105
+#: src/Constants/ThiefProperties.vala:109
+msgid "BSD-3-Clause License"
+msgstr "BSD-3-Clause License"
+
+#: src/Constants/ThiefProperties.vala:106
+msgid "Math Rendering"
+msgstr "Matematik İşleme"
+
+#: src/Constants/ThiefProperties.vala:106
+msgid "Khan Academy and other contributors."
+msgstr "Khan Academy ve diğer katkıda bulunanlar"
+
+#: src/Constants/ThiefProperties.vala:107
+msgid "XML Parsing"
+msgstr "XML Ayrıştırma"
+
+#: src/Constants/ThiefProperties.vala:108
+msgid "Pandoc Export"
+msgstr "Pandoc Dışa Aktar"
+
+#: src/Constants/ThiefProperties.vala:108
+msgid "John MacFarlane and others"
+msgstr "John MacFarlane ve diğerleri"
+
+#: src/Constants/ThiefProperties.vala:108
+msgid "GNU General Public License v2.0"
+msgstr "GNU Genel Kamu Lisansı, Sürüm 2"
+
+#: src/Constants/ThiefProperties.vala:109
+msgid "PDF Export"
+msgstr "PDF Dışa Aktar"
+
+#: src/Constants/ThiefProperties.vala:109
+msgid "Simon Sapin and contributors"
+msgstr "Simon Sapin ve katkıda bulunanlar"
+
+#: src/Constants/ThiefProperties.vala:110
+msgid "Grammar Check"
+msgstr "Dil Bilgisi Denetimi"
+
+#: src/Constants/ThiefProperties.vala:110
+msgid "the AbiSource Community"
+msgstr "AbiSource Topluluğu"
+
+#: src/Constants/ThiefProperties.vala:110
+msgid "GNU Lesser General Public License v2.1"
+msgstr "Kısıtlı GNU Genel Kamu Lisansı, sürüm 2.1"
+
+#: src/Constants/ThiefProperties.vala:111
+msgid "libwritegood-vala based on"
+msgstr "libwritegood-vala temelli"
+
+#: src/Constants/ThiefProperties.vala:111
+msgid "write-good: Naive linter for English prose"
+msgstr "write-good: İngilizce düz yazı için saf ayıklayıcı"
+
+#. Needs to be kept in sync with PAPER_SIZES_GTK_NAME
+#: src/Constants/ThiefProperties.vala:115
+msgid "A3 (11.7 x 16.5 inches)"
+msgstr "A3 (11.7 x 16.5 inç)"
+
+#: src/Constants/ThiefProperties.vala:116
+msgid "A4 (8 x 11 inches)"
+msgstr "A4 (8 x 11 inç)"
+
+#: src/Constants/ThiefProperties.vala:117
+msgid "A5 (5.8 x 8.3 inches)"
+msgstr "A5 (5.8 x 8.3 inç)"
+
+#: src/Constants/ThiefProperties.vala:118
+msgid "B5 (6.93 x 9.84 inches)"
+msgstr "B5 (6.93 x 9.84 inç)"
+
+#: src/Constants/ThiefProperties.vala:119
+msgid "Executive (7 x 10 inches)"
+msgstr "Yönetici (7 x 10 inç)"
+
+#: src/Constants/ThiefProperties.vala:120
+msgid "Legal (8.5 x 14 inches)"
+msgstr "Yasal (8.5 x 14 inç)"
+
+#: src/Constants/ThiefProperties.vala:121
+msgid "Letter (8.5 x 11 inches)"
+msgstr "Mektup (8.5 x 11 inç)"
+
+#: src/Constants/ThiefProperties.vala:124
+msgid "Don't like what you see? Hit `Ctrl+,` to access the preferences."
+msgstr ""
+"Gördüklerini beğenmediniz mi? Tercihlere erişmek için `Ctrl+,` tuşlarına "
+"basın."
+
+#: src/Constants/ThiefProperties.vala:125
+msgid ""
+"No built in dark mode? Dark themes are available at https://"
+"themes.thiefmd.com. Add more in the Preferences (`Ctrl+,`)."
+msgstr ""
+"Yerleşik karanlık kip yok mu? Karanlık temalar https://themes.thiefmd.com "
+"adresinde mevcuttur. Tercihlerden daha fazlasını ekleyin (`Ctrl+,`)."
+
+#: src/Constants/ThiefProperties.vala:126
+msgid ""
+"Don't like how the preview looks? Hit `Ctrl+,` to access the preferences and "
+"click Export."
+msgstr ""
+"Ön izlemenin görünümünü beğenmediniz mi? Tercihlere erişmek için `Ctrl+,` "
+"tuşlarına basın ve Dışa Aktar'a tıklayın."
+
+#: src/Constants/ThiefProperties.vala:127
+msgid ""
+"Want to import a ePub, HTML, or DocX? Click Import from the New Sheet prompt."
+msgstr ""
+"Bir ePub, HTML veya DocX dosyasını içe aktarmak mı istiyorsunuz? Yeni Sayfa "
+"isteminden İçe Aktar'a tıklayın."
+
+#: src/Constants/ThiefProperties.vala:128
+msgid ""
+"Ready to publish your great work? Right-click on the folder and choose "
+"\"Export Preview\""
+msgstr ""
+"Harika çalışmanızı yayınlamaya hazır mısınız? Klasöre sağ tıklayın ve "
+"\"Önizlemeyi Dışa Aktar\"ı seçin"
+
+#: src/Constants/ThiefProperties.vala:129
+msgid "Want to block out distractions? Full-screen is just an `F11` away."
+msgstr ""
+"Dikkat dağıtıcı şeyleri engellemek mi istiyorsunuz? Tam ekran sadece `F11` "
+"uzaklığında."
+
+#: src/Constants/ThiefProperties.vala:130
+msgid "Quickly switch view modes with `Ctrl+1`, `Ctrl+2`, and `Ctrl+3`."
+msgstr ""
+"`Ctrl+1`, `Ctrl+2`, ve `Ctrl+3` ile görünüm kipleri arasında hızla geçiş "
+"yapın."
+
+#: src/Constants/ThiefProperties.vala:131
+msgid ""
+"Working with a lot of links? Turn on Experimental Mode to make your markdown "
+"more readable `Ctrl+Shift+M`."
+msgstr ""
+"Çok sayıda bağlantıyla mı çalışıyorsunuz? Markdownınızı daha okunabilir hale "
+"getirmek için Deneysel Kipi `Ctrl+Shift+M` kısayoluyla açabilirsiniz."
+
+#: src/Controllers/FileManager.vala:39
+msgid "Stealing file contents..."
+msgstr "Dosya içerikleri çalınıyor..."
+
+#: src/Controllers/FileManager.vala:40
+msgid "This isn't plagiarism, it's a remix!"
+msgstr "Bu intihal değil, bir remix!"
+
+#: src/Controllers/FileManager.vala:41
+msgid "NYT Best Seller, here we come!"
+msgstr "NYT En Çok Satanları, biz geliyoruz!"
+
 #: src/Controllers/FileManager.vala:43
 msgid "Importing File"
 msgstr "Dosya İçe Aktarılıyor"
 
-#: src/Controllers/Dialogs.vala:26 src/Controllers/Dialogs.vala:59
-msgid "_Save"
-msgstr "Kayd_et"
-
-#: src/Controllers/Dialogs.vala:27 src/Controllers/Dialogs.vala:55
-#: src/Connections/WriteFreelyConnection.vala:132
-#: src/Connections/GhostConnection.vala:111
-#: src/Connections/WordpressConnection.vala:114
-msgid "_Cancel"
-msgstr "İ_ptal"
-
-#: src/Controllers/Dialogs.vala:57
-msgid "_Open"
-msgstr "_Aç"
-
-#: src/Controllers/Dialogs.vala:61
-msgid "_Add to Library"
-msgstr "Kitaplığa _Ekle"
-
-#: src/Controllers/Dialogs.vala:70 src/Exporters/ExportPdf.vala:88
-msgid "PDF file"
-msgstr "PDF dosyası"
-
-#: src/Controllers/Dialogs.vala:76 src/Exporters/ExportEpub.vala:55
-msgid "ePUB file"
-msgstr "EPUB dosyası"
-
-#: src/Controllers/Dialogs.vala:82 src/Exporters/ExportDocx.vala:55
-msgid "docx file"
-msgstr "docx dosyası"
-
-#: src/Controllers/Dialogs.vala:88 src/Controllers/Dialogs.vala:153
-#: src/Exporters/ExportMarkdown.vala:55
-msgid "Markdown files"
-msgstr "Markdown dosyaları"
-
-#: src/Controllers/Dialogs.vala:95 src/Exporters/ExportHtml.vala:56
-msgid "HTML files"
-msgstr "HTML dosyaları"
-
-#: src/Controllers/Dialogs.vala:102 src/Exporters/ExportMhtml.vala:56
-msgid "MHTML files"
-msgstr "MHTML dosyaları"
-
-#: src/Controllers/Dialogs.vala:109 src/Exporters/ExportLatex.vala:55
-msgid "LaTeX file"
-msgstr "LaTeX dosyası"
-
-#: src/Controllers/Dialogs.vala:177
-msgid "All files"
-msgstr "Tüm dosyalar"
-
-#: src/Controllers/Dialogs.vala:186
+#: src/Controllers/Dialogs.vala:98
 msgid "Add to Library"
 msgstr "Kitaplığa Ekle"
 
-#: src/Controllers/Dialogs.vala:196
+#: src/Controllers/Dialogs.vala:105
 msgid "Open file"
 msgstr "Dosya aç"
 
-#: src/Controllers/Dialogs.vala:208
+#: src/Controllers/Dialogs.vala:108
+msgid "Supported files"
+msgstr "Desteklenen dosyalar"
+
+#: src/Controllers/Dialogs.vala:120
 msgid "Save file"
 msgstr "Dosyayı kaydet"
 
-#: src/Controllers/Dialogs.vala:222
+#: src/Controllers/Dialogs.vala:123 src/Exporters/ExportPdf.vala:88
+msgid "PDF file"
+msgstr "PDF dosyası"
+
+#: src/Controllers/Dialogs.vala:128 src/Exporters/ExportEpub.vala:55
+msgid "ePUB file"
+msgstr "EPUB dosyası"
+
+#: src/Controllers/Dialogs.vala:145
 msgid "There are unsaved changes to the file. Do you want to save?"
 msgstr "Dosyada kaydedilmemiş değişiklikler var. Kaydetmek istiyor musunuz?"
 
-#: src/Controllers/Dialogs.vala:223
+#: src/Controllers/Dialogs.vala:146
 msgid "If you don't save, changes will be lost forever."
 msgstr "Eğer kaydetmezseniz, yaptığınız değişiklikler yitecek."
 
-#: src/Controllers/Dialogs.vala:228
+#: src/Controllers/Dialogs.vala:148
 msgid "Close without saving"
 msgstr "Kaydetmeden kapat"
 
-#: src/Controllers/SheetManager.vala:156 src/Widgets/StatisticsBar.vala:93
+#: src/Controllers/Dialogs.vala:149 src/Controllers/Dialogs.vala:162
+#: src/Connections/WriteFreelyConnection.vala:133
+#: src/Connections/GhostConnection.vala:108
+#: src/Connections/GhostConnection.vala:187
+#: src/Connections/GhostConnection.vala:237
+#: src/Connections/WordpressConnection.vala:115
+msgid "_Cancel"
+msgstr "İ_ptal"
+
+#: src/Controllers/Dialogs.vala:150
+msgid "_Save"
+msgstr "Kayd_et"
+
+#: src/Controllers/Dialogs.vala:159
+msgid "Move file to another folder?"
+msgstr ""
+
+#: src/Controllers/Dialogs.vala:160
+#, c-format
+msgid "Moving \"%s\" to \"%s\""
+msgstr ""
+
+#: src/Controllers/Dialogs.vala:163
+#, fuzzy
+msgid "_Move"
+msgstr "Taşı"
+
+#: src/Controllers/SheetManager.vala:161 src/Widgets/StatisticsBar.vala:98
 msgid "No file opened"
 msgstr "Dosya açılmadı"
 
-#: src/Connections/WriteFreelyConnection.vala:103
-#: src/Connections/WordpressConnection.vala:85
+#: src/Connections/ConnectionBase.vala:86
+#: src/Widgets/PublisherPreviewWindow.vala:192
+#: src/Widgets/ProjectStatistics.vala:76 src/Widgets/QuickPreferences.vala:75
+msgid "Close"
+msgstr "Kapat"
+
+#: src/Connections/WriteFreelyConnection.vala:106
+#: src/Connections/WordpressConnection.vala:88
 msgid "Username"
 msgstr "Kullanıcı adı"
 
-#: src/Connections/WriteFreelyConnection.vala:107
-#: src/Connections/GhostConnection.vala:86
+#: src/Connections/WriteFreelyConnection.vala:110
+#: src/Connections/GhostConnection.vala:164
 msgid "Password"
 msgstr "Parola"
 
-#: src/Connections/WriteFreelyConnection.vala:112
-#: src/Connections/GhostConnection.vala:91
-#: src/Connections/WordpressConnection.vala:94
+#: src/Connections/WriteFreelyConnection.vala:115
+#: src/Connections/GhostConnection.vala:169
+#: src/Connections/WordpressConnection.vala:97
 msgid "Endpoint"
 msgstr "Uç noktası"
 
-#: src/Connections/WriteFreelyConnection.vala:130
-#: src/Connections/GhostConnection.vala:109
-#: src/Connections/WordpressConnection.vala:112
+#: src/Connections/WriteFreelyConnection.vala:128
+msgid "New WriteFreely Connection"
+msgstr "Yeni WriteFreely Bağlantısı"
+
+#: src/Connections/WriteFreelyConnection.vala:131
+#: src/Connections/GhostConnection.vala:185
+#: src/Connections/WordpressConnection.vala:113
 msgid "_Add Account"
 msgstr "Hesap _Ekle"
 
-#: src/Connections/WriteFreelyConnection.vala:318
-#: src/Connections/GhostConnection.vala:288
-#: src/Connections/WordpressConnection.vala:297
+#: src/Connections/WriteFreelyConnection.vala:235
+msgid "Taking your words, and letting them go... to the internet!"
+msgstr "Sözlerinizi alınıyor ve internete gönderiliyor!"
+
+#: src/Connections/WriteFreelyConnection.vala:236
+msgid "Mhm... I see and I ship."
+msgstr "Hımm... Görüyorum ve gönderiyorum."
+
+#: src/Connections/WriteFreelyConnection.vala:237
+msgid "Is this a selfie, and you're happy to see me?"
+msgstr "Bu bir selfie mi ve beni gördüğüne sevindin mi?"
+
+#: src/Connections/WriteFreelyConnection.vala:240
+#: src/Connections/GhostConnection.vala:362
+#: src/Connections/WordpressConnection.vala:219
+msgid "Uploading images"
+msgstr "Resimler karşıya yükleniyor"
+
+#: src/Connections/WriteFreelyConnection.vala:320
+#: src/Connections/GhostConnection.vala:453
+#: src/Connections/WordpressConnection.vala:299
 msgid " Published"
 msgstr "Yayımlandı"
 
-#: src/Connections/WriteFreelyConnection.vala:318
-#: src/Connections/GhostConnection.vala:288
-#: src/Connections/WordpressConnection.vala:297
+#: src/Connections/WriteFreelyConnection.vala:320
+#: src/Connections/GhostConnection.vala:453
+#: src/Connections/WordpressConnection.vala:299
 msgid "Post Published"
 msgstr "Gönderi Yayımlandı"
 
-#: src/Connections/GhostConnection.vala:82
+#: src/Connections/GhostConnection.vala:91
+#: src/Connections/GhostConnection.vala:220
+msgid "Enter verification code from your authenticator app"
+msgstr ""
+
+#: src/Connections/GhostConnection.vala:103
+#: src/Connections/GhostConnection.vala:232
+msgid "Two-Factor Authentication Required"
+msgstr ""
+
+#: src/Connections/GhostConnection.vala:106
+#: src/Connections/GhostConnection.vala:235
+msgid "_Verify"
+msgstr ""
+
+#: src/Connections/GhostConnection.vala:160
 msgid "E-mail"
 msgstr "E-posta"
 
-#: src/Connections/WriteFreelyConnection.vala:238
-#: src/Connections/GhostConnection.vala:197
-#: src/Connections/WordpressConnection.vala:217
-msgid "Uploading images"
-msgstr "Resimler karşıya yükleniyor"
+#: src/Connections/GhostConnection.vala:182
+msgid "New ghost Connection"
+msgstr "Yeni Ghost Bağlantısı"
+
+#: src/Connections/GhostConnection.vala:357
+msgid "Your words are like Casper... Friendly!"
+msgstr "Sözlerin Casper gibi... Dostça!"
+
+#: src/Connections/GhostConnection.vala:358
+msgid "I see your words, and I'm taking them to the internet!"
+msgstr "Sözlerini görüyorum ve onları internete taşıyorum!"
+
+#: src/Connections/GhostConnection.vala:359
+msgid "Booooooooooo! (That's Ghost speak for Great Work!)"
+msgstr "Öcüüüüüüü! (Bu Ghost, Great Work adına konuşuyor!)"
+
+#: src/Connections/WordpressConnection.vala:92
+msgid "Application Password"
+msgstr ""
+
+#: src/Connections/WordpressConnection.vala:110
+msgid "New Wordpress Connection"
+msgstr "Yeni Wordpress Bağlantısı"
+
+#: src/Connections/WordpressConnection.vala:194
+msgid "Taking it to the internet!"
+msgstr "İnternete taşıyor!"
+
+#: src/Connections/WordpressConnection.vala:195
+msgid "Don't forget to share on reddit."
+msgstr "Redditʼte paylaşmayı unutmayın."
+
+#: src/Connections/WordpressConnection.vala:196
+msgid "Pressing words together..."
+msgstr "Kelimeler birbirine basılıyor..."
+
+#: src/Enrichments/Fountain.vala:53
+msgid "Characters"
+msgstr "Karakterler"
+
+#: src/Enrichments/Fountain.vala:246
+#, fuzzy
+msgid "Fountain character"
+msgstr "Fountain dosyaları"
+
+#: src/Enrichments/Markdown.vala:73
+msgid "Citations"
+msgstr "Alıntılar"
+
+#: src/Exporters/ExportDocx.vala:55
+msgid "docx file"
+msgstr "docx dosyası"
 
 #: src/Exporters/ExportDocx.vala:60
 msgid "Export DocX"
@@ -168,17 +557,41 @@ msgstr "DocX Dışa Aktar"
 msgid "Export ePUB"
 msgstr "ePUB Dışa Aktar"
 
+#: src/Exporters/ExportHtml.vala:56
+msgid "HTML files"
+msgstr "HTML dosyaları"
+
 #: src/Exporters/ExportHtml.vala:62
 msgid "Export HTML"
 msgstr "HTML Dışa Aktar"
+
+#: src/Exporters/ExportLatex.vala:55
+msgid "LaTeX file"
+msgstr "LaTeX dosyası"
 
 #: src/Exporters/ExportLatex.vala:60
 msgid "Export LaTeX"
 msgstr "LaTeX Dışa Aktar"
 
+#: src/Exporters/ExportMarkdown.vala:55
+msgid "Markdown files"
+msgstr "Markdown dosyaları"
+
 #: src/Exporters/ExportMarkdown.vala:61
 msgid "Export Markdown"
 msgstr "Markdown Dışa Aktar"
+
+#: src/Exporters/ExportFountain.vala:57
+msgid "Fountain files"
+msgstr "Fountain dosyaları"
+
+#: src/Exporters/ExportFountain.vala:63
+msgid "Export Fountain"
+msgstr "Fountain Dışa Aktar"
+
+#: src/Exporters/ExportMhtml.vala:56
+msgid "MHTML files"
+msgstr "MHTML dosyaları"
 
 #: src/Exporters/ExportMhtml.vala:62
 msgid "Export MHTML"
@@ -188,156 +601,233 @@ msgstr "MHTML Dışa Aktar"
 msgid "Export PDF"
 msgstr "PDF Dışa Aktar"
 
-#: src/Exporters/ExportPdf.vala:153 src/Exporters/ExportPdf.vala:183
+#: src/Exporters/ExportPdf.vala:142
+msgid "Simply Shakespearean."
+msgstr "Shakespeare Gibi."
+
+#: src/Exporters/ExportPdf.vala:143
+msgid "Hmm... that's interesting..."
+msgstr "Hmm... Bu ilginç..."
+
+#: src/Exporters/ExportPdf.vala:144
+msgid "Your writing is insightful."
+msgstr "Yazınız ilham verici."
+
+#: src/Exporters/ExportPdf.vala:146 src/Exporters/ExportPdf.vala:177
 msgid "Working PDF Magic"
 msgstr "PDF Magic Çalışıyor"
 
-#: src/Exporters/ExportPdf.vala:184
+#: src/Exporters/ExportPdf.vala:178
 msgid "Making sure your hard work looks purrfect..."
 msgstr "Sıkı çalışmanızın mükemmel göründüğünden emin olunuyor..."
 
-#: src/Exporters/ExportPdf.vala:107
-msgid "Print to File"
-msgstr ""
-
-#: src/Widgets/About.vala:44 src/Widgets/QuickPreferences.vala:146
-#: src/Widgets/QuickPreferences.vala:237 src/Widgets/QuickPreferences.vala:326
+#: src/Widgets/About.vala:42 src/Widgets/QuickPreferences.vala:136
 msgid "About ThiefMD"
 msgstr "ThiefMD Hakkında"
 
-#: src/Widgets/About.vala:44 src/Widgets/QuickPreferences.vala:144
-#: src/Widgets/QuickPreferences.vala:235 src/Widgets/QuickPreferences.vala:324
+#: src/Widgets/About.vala:42 src/Widgets/QuickPreferences.vala:134
 msgid "About"
 msgstr "Hakkında"
 
-#: src/Widgets/About.vala:45
+#: src/Widgets/About.vala:43
 msgid "Credits"
 msgstr "Geliştirenler"
 
-#: src/Connections/ConnectionBase.vala:85 src/Widgets/About.vala:59
-#: src/Widgets/PublisherPreviewWindow.vala:295
-#: src/Widgets/ProjectStatistics.vala:71
-msgid "Close"
-msgstr "Kapat"
+#. website = ThiefProperties.URL;
+#: src/Widgets/About.vala:94
+msgid "Feedback"
+msgstr "Geri Bildirim"
 
-#: src/Widgets/Sheets.vala:179
-msgid "New Sheet"
-msgstr "Yeni Sayfa"
+#. license_type = ThiefProperties.LICENSE_TYPE;
+#: src/Widgets/About.vala:99
+msgid "This program comes with absolutely no warranty."
+msgstr "Bu program kesinlikle hiçbir garanti vermiyor."
 
-#: src/Widgets/HeaderBar.vala:78
+#: src/Widgets/About.vala:100
+msgid ""
+"See the <a href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU General "
+"Public License, version 3 or later</a> for details."
+msgstr ""
+"Ayrıntılı bilgi için <a href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU "
+"Genel Kamu Lisansı, sürüm 3 ya da sonrası</a> sayfasına bakınız."
+
+#: src/Widgets/HeaderBar.vala:82
 msgid "Change View"
 msgstr "Görünümü Değişitir"
 
-#: src/ThiefApp.vala:186
-msgid "Add Folder to Library"
-msgstr "Kitaplığa Klasör Ekle"
-
-#: src/Widgets/HeaderBar.vala:92
+#: src/Widgets/HeaderBar.vala:96
 msgid "Settings"
 msgstr "Ayarlar"
 
-#: src/Widgets/Sheet.vala:215
-msgid "Sort by"
-msgstr "Şuna göre sırala"
+#: src/Widgets/HeaderBar.vala:109
+msgid "Show Notes"
+msgstr "Notları Göster"
 
-#: src/Widgets/Sheet.vala:218
+#: src/Widgets/Sheets.vala:183
+msgid "New Sheet"
+msgstr "Yeni Sayfa"
+
+#: src/Widgets/Sheets.vala:283
+msgid "Select an item from the Library to open or create a new Sheet."
+msgstr ""
+
+#: src/Widgets/Sheet.vala:369
 msgid "Sort by Filename Ascending"
 msgstr "Dosya Adına Göre Artan"
 
-#: src/Widgets/Sheet.vala:224
+#: src/Widgets/Sheet.vala:370
 msgid "Sort by Filename Descending"
 msgstr "Dosya Adına Göre Azalan"
 
-#: src/Widgets/Sheet.vala:231
+#: src/Widgets/Sheet.vala:374
 msgid "Sort by Title Ascending"
 msgstr "Başlığa Göre Artan"
 
-#: src/Widgets/Sheet.vala:237
+#: src/Widgets/Sheet.vala:375
 msgid "Sort by Title Descending"
 msgstr "Başlığa Göre Azalan"
 
-#: src/Widgets/Sheet.vala:244
+#: src/Widgets/Sheet.vala:379
 msgid "Sort by Date Ascending"
 msgstr "Tarihe Göre Artan"
 
-#: src/Widgets/Sheet.vala:250
+#: src/Widgets/Sheet.vala:380
 msgid "Sort by Date Descending"
 msgstr "Tarihe Göre Azalan"
 
-#: src/Widgets/Sheet.vala:273 src/Widgets/QuickPreferences.vala:95
-#: src/Widgets/QuickPreferences.vala:195 src/Widgets/QuickPreferences.vala:279
+#: src/Widgets/Sheet.vala:383
+msgid "Sort by"
+msgstr "Şuna göre sırala"
+
+#: src/Widgets/Sheet.vala:388 src/Widgets/PreviewWindow.vala:48
+#: src/Widgets/PreviewWindow.vala:79 src/Widgets/QuickPreferences.vala:85
 msgid "Preview"
 msgstr "Ön izleme"
 
-#: src/Widgets/Sheet.vala:281 src/Widgets/Preferences.vala:482
-#: src/Widgets/PublisherPreviewWindow.vala:155
-#: src/Widgets/ProjectStatistics.vala:64
-msgid "Export"
-msgstr "Dışa Aktar"
+#: src/Widgets/Sheet.vala:389
+#, fuzzy
+msgid "Publisher Preview"
+msgstr "Yayımlama Önizlemesi"
 
-#. Gtk.MenuItem menu_rename = new Gtk.MenuItem.with_label (_("Rename File"));
-#. menu_rename.activate.connect (() => {
-#. });
-#. menu.add (menu_rename);
-#: src/Widgets/Sheet.vala:305
+#: src/Widgets/Sheet.vala:390
+msgid "Copy File Path"
+msgstr "Dosya Yolunu Kopyala"
+
+#: src/Widgets/Sheet.vala:394
 msgid "Danger Zone"
 msgstr "Tehlikeli Bölge"
 
-#: src/Widgets/Sheet.vala:311
+#: src/Widgets/Sheet.vala:397
 msgid "Move to Trash"
 msgstr "Çöpe Taşı"
 
-#: src/Widgets/Editor.vala:236
-msgid "_Load from disk"
-msgstr "Diskten _yükle"
-
-#: src/Widgets/Editor.vala:238
-msgid "_Keep what's in editor"
-msgstr "_Düzenleyicidekileri koru"
-
-#: src/Widgets/Editor.vala:1278
+#: src/Widgets/Editor.vala:201
 msgid "Insert Datetime"
 msgstr "Tarih ve Saat Ekle"
 
-#: src/Widgets/Editor.vala:1296
+#: src/Widgets/Editor.vala:219
 msgid "Insert YAML Frontmatter"
 msgstr "YAML Frontmatter Ekle"
 
-#: src/Widgets/Library.vala:539
+#: src/Widgets/Library.vala:964 src/Widgets/Preferences.vala:377
+msgid "None"
+msgstr "Yok"
+
+#: src/Widgets/Library.vala:964
+msgid "Folder"
+msgstr "Klasör"
+
+#: src/Widgets/Library.vala:964
+msgid "Reader"
+msgstr "Seslendiren"
+
+#: src/Widgets/Library.vala:964
+msgid "Love"
+msgstr "Aşk"
+
+#: src/Widgets/Library.vala:964
+msgid "Game"
+msgstr "Oyun"
+
+#: src/Widgets/Library.vala:964
+msgid "Art"
+msgstr "Art"
+
+#: src/Widgets/Library.vala:965
+msgid "Nature"
+msgstr "Doğa"
+
+#: src/Widgets/Library.vala:965
+msgid "Food"
+msgstr "Yiyecek"
+
+#: src/Widgets/Library.vala:965
+msgid "Help"
+msgstr "Yardım"
+
+#: src/Widgets/Library.vala:965
+msgid "Cool"
+msgstr "Havalı"
+
+#: src/Widgets/Library.vala:965
+msgid "Angel"
+msgstr "Melek"
+
+#: src/Widgets/Library.vala:965
+msgid "Monkey"
+msgstr "Maymun"
+
+#: src/Widgets/Library.vala:966 src/Widgets/Preferences.vala:144
+msgid "WordPress"
+msgstr "WordPress"
+
+#: src/Widgets/Library.vala:966
+msgid "Ghost"
+msgstr "Ghost"
+
+#: src/Widgets/Library.vala:966
+msgid "Write Freely"
+msgstr "Write Freely"
+
+#: src/Widgets/Library.vala:966
+msgid "Trash"
+msgstr "Çöp"
+
+#: src/Widgets/Library.vala:1031
 msgid "Export Preview"
 msgstr "Dışa Aktarma Önizlemesi"
 
-#: src/Widgets/Library.vala:549
+#: src/Widgets/Library.vala:1032
 msgid "Writing Statistics"
 msgstr "Yazım İstatistikleri"
 
-#: src/Widgets/Library.vala:562
+#: src/Widgets/Library.vala:1036
 msgid "Search "
 msgstr "Ara"
 
-#: src/Widgets/Library.vala:586
+#: src/Widgets/Library.vala:1040
+msgid "Open in File Manager"
+msgstr "Dosya Yöneticisiyle Aç"
+
+#: src/Widgets/Library.vala:1041
 msgid "Create Sub-Folder"
 msgstr "Alt Klasör Oluştur"
 
-#: src/Widgets/Library.vala:603
+#: src/Widgets/Library.vala:1043
 msgid "Hide from Library"
 msgstr "Kitaplıktan gizle"
 
-#: src/Widgets/Library.vala:627
+#: src/Widgets/Library.vala:1045
 msgid "Show Hidden Items"
 msgstr "Gizli Ogeleri Göster"
 
-#: src/Widgets/Library.vala:697
+#: src/Widgets/Library.vala:1049
+msgid "Set Project Icon"
+msgstr "Proje Simgesi Ayarla"
+
+#: src/Widgets/Library.vala:1054
 msgid "Remove from Library"
 msgstr "Kitaplıktan kaldır"
-
-#: src/Widgets/Library.vala:934
-msgid "Copy"
-msgstr "Kopyala"
-
-#: src/Widgets/Library.vala:936
-msgid "Move"
-msgstr "Taşı"
 
 #: src/Widgets/NewFolder.vala:31
 msgid "Folder name"
@@ -355,182 +845,328 @@ msgstr "Dosya adı"
 msgid "Create"
 msgstr "Oluştur"
 
-#: src/Widgets/Preferences.vala:50
+#: src/Widgets/NewSheet.vala:41
+msgid "Import"
+msgstr "İçe Aktar"
+
+#: src/Widgets/Notes.vala:60
+#, fuzzy
+msgid "Sheet Notes"
+msgstr "Notları Göster"
+
+#: src/Widgets/Notes.vala:68
+#, fuzzy
+msgid "Project Notes"
+msgstr "Proje Simgesi Ayarla"
+
+#: src/Widgets/Preferences.vala:77
 msgid "Current Connections"
 msgstr "Geçerli Bağlantı"
 
-#: src/Widgets/Preferences.vala:51
+#: src/Widgets/Preferences.vala:78
 msgid "Click on a connection to remove."
 msgstr "Kaldırmak için bir bağlantıya tıklayın."
 
-#: src/Widgets/Preferences.vala:54
+#: src/Widgets/Preferences.vala:81
 msgid "Add Connection"
 msgstr "Bağlantı Ekle"
 
-#: src/Widgets/Preferences.vala:55
+#: src/Widgets/Preferences.vala:82
 msgid "Choose your blogging software."
 msgstr "Blog yazılımınızı seçin."
 
-#: src/Widgets/Preferences.vala:57
-msgid "  WriteFreely"
-msgstr "  WriteFreely"
+#: src/Widgets/Preferences.vala:84
+#, fuzzy
+msgid "WriteFreely"
+msgstr "Write Freely"
 
-#: src/Widgets/Preferences.vala:91
-msgid "  ghost"
+#: src/Widgets/Preferences.vala:106 src/Widgets/Preferences.vala:136
+#: src/Widgets/Preferences.vala:166 src/Widgets/Preferences.vala:196
+#: src/Widgets/Preferences.vala:226 src/Widgets/Preferences.vala:267
+msgid "Connection Error"
+msgstr "Bağlantı Hatası"
+
+#: src/Widgets/Preferences.vala:114
+#, fuzzy
+msgid "ghost"
 msgstr "  ghost"
 
-#: src/Widgets/Preferences.vala:343
+#: src/Widgets/Preferences.vala:174
+#, fuzzy
+msgid "Medium"
+msgstr "  Medium"
+
+#: src/Widgets/Preferences.vala:204
+#, fuzzy
+msgid "Forem"
+msgstr "  Forem"
+
+#: src/Widgets/Preferences.vala:234
+#, fuzzy
+msgid "Hashnode"
+msgstr "  Hashnode"
+
+#: src/Widgets/Preferences.vala:282
+msgid "Connections"
+msgstr "Bağlantılar"
+
+#: src/Widgets/Preferences.vala:333
+msgid "Remove "
+msgstr "Kaldır"
+
+#: src/Widgets/Preferences.vala:336
 msgid "_Remove"
 msgstr "_Kaldır"
 
-#: src/Widgets/Preferences.vala:345
+#: src/Widgets/Preferences.vala:338
 msgid "_Keep"
 msgstr "_Koru"
 
-#: src/Widgets/Preferences.vala:384
+#: src/Widgets/Preferences.vala:361
+msgid "Display"
+msgstr "Görünüm"
+
+#: src/Widgets/Preferences.vala:365
+msgid "Display Options"
+msgstr "Görüntü Seçenekleri"
+
+#: src/Widgets/Preferences.vala:366
+msgid "Make ThiefMD feel like home."
+msgstr "ThiefMDʼyi eviniz gibi hissettirin."
+
+#: src/Widgets/Preferences.vala:372
 msgid "Focus"
 msgstr "Odaklama"
 
-#: src/Widgets/Library.vala:642 src/Widgets/Preferences.vala:389
-msgid "None"
-msgstr "Yok"
-
-#: src/Widgets/Preferences.vala:390
+#: src/Widgets/Preferences.vala:378
 msgid "Paragraph"
 msgstr "Paragraf"
 
-#: src/Widgets/Preferences.vala:391
+#: src/Widgets/Preferences.vala:379
 msgid "Sentence"
 msgstr "Tümce"
 
-#: src/Widgets/Preferences.vala:392
+#: src/Widgets/Preferences.vala:380
 msgid "Word"
 msgstr "Sözcük"
 
-#: src/Widgets/Preferences.vala:440
+#: src/Widgets/Preferences.vala:419
+msgid "Number of Lines to Preview in Sheets View"
+msgstr "Sayfa Görünümünde Önizlenecek Satır Sayısı"
+
+#: src/Widgets/Preferences.vala:428
 msgid "Add New Theme"
 msgstr "Yeni Tema Ekle"
 
-#: src/Widgets/Preferences.vala:496
+#: src/Widgets/Preferences.vala:468 src/Widgets/PublisherPreviewWindow.vala:155
+#: src/Widgets/ProjectStatistics.vala:69
+msgid "Export"
+msgstr "Dışa Aktar"
+
+#: src/Widgets/Preferences.vala:473
+msgid "Compiling Options"
+msgstr "Derleme Seçenekleri"
+
+#: src/Widgets/Preferences.vala:474
+msgid "Adjust how Markdown files are compiled together."
+msgstr "Markdown dosyalarının birlikte nasıl derlendiğini ayarlayın."
+
+#: src/Widgets/Preferences.vala:482
 msgid "First Markdown File includes Author Metadata"
 msgstr "İlk Markdown Dosyası, Yazar Üst Verilerini içerir"
 
-#: src/Widgets/Preferences.vala:498
-msgid "First Markdown file includes <a href='https://pandoc.org/MANUAL.html#epub-metadata'>Author metadata</a>"
-msgstr "İlk Mark Dosyası <a href='https://pandoc.org/MANUAL.html#epub-metadata'>Yazar üst verilerini</a> içerir"
+#: src/Widgets/Preferences.vala:484
+msgid ""
+"First Markdown file includes <a href='https://pandoc.org/MANUAL.html#epub-"
+"metadata'>Author metadata</a>"
+msgstr ""
+"İlk Mark Dosyası <a href='https://pandoc.org/MANUAL.html#epub-"
+"metadata'>Yazar üst verilerini</a> içerir"
 
-#: src/Widgets/Preferences.vala:514
+#: src/Widgets/Preferences.vala:500
 msgid "Resolve full paths to resources"
 msgstr "Kaynaklara giden tüm yolları çözümle"
 
-#: src/Widgets/Preferences.vala:516
+#: src/Widgets/Preferences.vala:502
 msgid "Resolve full paths to resources on export"
 msgstr "Dışa aktarırken kaynaklara giden tüm yolları çözümle"
 
-#: src/Widgets/Preferences.vala:531
+#: src/Widgets/Preferences.vala:517
 msgid "Include YAML title as Heading"
 msgstr "YAML başlığını Başlık olarak içer"
 
-#: src/Widgets/Preferences.vala:533
+#: src/Widgets/Preferences.vala:519
 msgid "Include YAML title as H1 Heading"
 msgstr "YAML başlıklarını H1 Başlık olarak içer"
 
-#: src/Widgets/Preferences.vala:552
+#: src/Widgets/Preferences.vala:529
+msgid "Page Setup"
+msgstr "Sayfa Ayarları"
+
+#: src/Widgets/Preferences.vala:530
+msgid "Configure PDF export options."
+msgstr "PDF dışa aktarma seçeneklerini  yapılandır."
+
+#: src/Widgets/Preferences.vala:538
 msgid "Page Break between Folders"
 msgstr "Klasörler arasında Sayfa Sonu"
 
-#: src/Widgets/Preferences.vala:554
+#: src/Widgets/Preferences.vala:540
 msgid "Insert a Page Break after each folder"
 msgstr "Her klasörden sonra Sayfa Sonu ekle"
 
-#: src/Widgets/Preferences.vala:569
+#: src/Widgets/Preferences.vala:555
 msgid "Page Break between Sheets"
 msgstr "Sayfalar arasında Sayfa Sonu"
 
-#: src/Widgets/Preferences.vala:571
+#: src/Widgets/Preferences.vala:557
 msgid "Insert a Page Break after each sheet"
 msgstr "Her sayfadan sonra Sayfa Sonu ekle"
 
-#: src/Widgets/Preferences.vala:611
+#: src/Widgets/Preferences.vala:597
 msgid "Side margins in PDF in inches"
 msgstr "PDF yan kenar boşlukları (inç olarak)"
 
-#: src/Widgets/Preferences.vala:631
+#: src/Widgets/Preferences.vala:617
 msgid "Top & Bottom margins in PDF in inches"
 msgstr "PDF üst kenar boşlukları (inç olarak)"
 
-#: src/Widgets/Preferences.vala:657
+#: src/Widgets/Preferences.vala:627
+msgid "PDF CSS"
+msgstr "PDF CSS"
+
+#: src/Widgets/Preferences.vala:628
+msgid "Choose CSS Style for PDF Export."
+msgstr "PDF Dışa Aktarma için CSS Biçemi seç."
+
+#: src/Widgets/Preferences.vala:636
+msgid "ePub & HTML CSS"
+msgstr "ePub ve HTML CSS"
+
+#: src/Widgets/Preferences.vala:637
+msgid "Choose CSS Style to use for ePub and HTML Export."
+msgstr "ePub ve HTML Dışa Aktarma için kullanılacak CSS Biçemini seç."
+
+#: src/Widgets/Preferences.vala:643
 msgid "Add Export Style"
 msgstr "Dışa Aktarma Biçemi Ekle"
 
-#: src/Widgets/Preferences.vala:693
+#: src/Widgets/Preferences.vala:666
+msgid "Editor"
+msgstr "Düzenleyici"
+
+#: src/Widgets/Preferences.vala:670
+msgid "Editor Settings"
+msgstr "Düzenleyici Ayarları"
+
+#: src/Widgets/Preferences.vala:671
+msgid "Modify the ThiefMD environment."
+msgstr "ThiefMD ortamını düzenle."
+
+#: src/Widgets/Preferences.vala:679
 msgid "Enable spellcheck"
 msgstr "Yazım denetimini etkinleştir"
 
-#: src/Widgets/Preferences.vala:695
+#: src/Widgets/Preferences.vala:681
 msgid "Check document spelling"
 msgstr "Belgede yazım denetimi yap"
 
-#: src/Widgets/Preferences.vala:709
+#: src/Widgets/Preferences.vala:695
 msgid "Enable Write-Good"
 msgstr "Write-Good etkinleştir"
 
-#: src/Widgets/Preferences.vala:713
+#: src/Widgets/Preferences.vala:699
 msgid "Enable Write-Good: recommendations for sentence structure"
 msgstr "Write-Good etkinleştir: (İngilizce) cümle yapısı için öneriler"
 
-#: src/Widgets/Preferences.vala:728
+#: src/Widgets/Preferences.vala:714
 msgid "Toggle typewriter scrolling"
 msgstr "Daktilo kaydırmayı aç/kapat"
 
-#: src/Widgets/Preferences.vala:729
+#: src/Widgets/Preferences.vala:715
 msgid "Enable typewriter focus mode"
 msgstr "Daktilo odak kipini etkinleştir"
 
-#: src/Widgets/Preferences.vala:749
+#: src/Widgets/Preferences.vala:735
 msgid "Toggle writing statistics"
 msgstr "Yazım istatistiklerini aç/kapat"
 
-#: src/Widgets/Preferences.vala:750
+#: src/Widgets/Preferences.vala:736
 msgid "Show writing statistics"
 msgstr "Yazım istatistiklerini göster"
 
-#: src/Widgets/Preferences.vala:790
+#: src/Widgets/Preferences.vala:751
+msgid "Disable application tips"
+msgstr "Uygulama ipuçlarını devre dışı bırak"
+
+#: src/Widgets/Preferences.vala:752
+msgid "Start with new empty sheet on launch"
+msgstr "Başlangıçta yeni boş sayfa ile başla"
+
+#: src/Widgets/Preferences.vala:765
+msgid "ThiefMD Settings"
+msgstr "ThiefMD Ayarları"
+
+#: src/Widgets/Preferences.vala:766
+msgid "Modify the ThiefMD appearance."
+msgstr "ThiefMD görünümünü değiştir."
+
+#: src/Widgets/Preferences.vala:776
 msgid "Toggle interface theming"
 msgstr "Arayüz temasını değiştir"
 
-#: src/Widgets/Preferences.vala:791
+#: src/Widgets/Preferences.vala:777
 msgid "Apply theme to interface"
 msgstr "Arayüze tema uygula"
 
-#: src/Widgets/Preferences.vala:810
+#: src/Widgets/Preferences.vala:796
 msgid "Toggle auto-hide headerbar"
 msgstr "Başlık çubuğunu aç/kapat"
 
-#: src/Widgets/Preferences.vala:812
+#: src/Widgets/Preferences.vala:798
 msgid "Automatically hide headerbar"
 msgstr "Başlık çubuğunu kendiliğinden gizle"
 
-#: src/Widgets/Preferences.vala:826
+#: src/Widgets/Preferences.vala:812
 msgid "Hide title"
 msgstr "Başlığı gizle"
 
-#: src/Widgets/Preferences.vala:828
+#: src/Widgets/Preferences.vala:814
 msgid "Remove ThiefMD branding"
 msgstr "ThiefMD markasını kaldır"
 
-#: src/Widgets/Preferences.vala:842
+#: src/Widgets/Preferences.vala:828
 msgid "Toggle library order"
 msgstr "Kitaplık sırasını değiştir"
 
-#: src/Widgets/Preferences.vala:844
+#: src/Widgets/Preferences.vala:830
 msgid "Keep library order"
 msgstr "Kitaplık sırasını koru"
 
+#: src/Widgets/Preferences.vala:844
+msgid "Toggle always show sheet filenames"
+msgstr ""
+
+#: src/Widgets/Preferences.vala:846
+msgid "Always show sheet filenames"
+msgstr ""
+
+#: src/Widgets/Preferences.vala:860
+msgid "Toggle experimental features"
+msgstr "Deneysel özellikleri aç/kapat"
+
+#: src/Widgets/Preferences.vala:862
+msgid "Enable experimental features"
+msgstr "Deneysel özellikleri etkinleştir"
+
+#: src/Widgets/PreviewWindow.vala:46 src/Widgets/PreviewWindow.vala:77
+#, fuzzy
+msgid "Preview: "
+msgstr "Ön izleme"
+
 #: src/Widgets/PublisherPreviewWindow.vala:67
-#: src/Widgets/PublisherPreviewWindow.vala:209
-#: src/Widgets/QuickPreferences.vala:109 src/Widgets/QuickPreferences.vala:204
-#: src/Widgets/QuickPreferences.vala:293
+#: src/Widgets/PublisherPreviewWindow.vala:208
+#: src/Widgets/QuickPreferences.vala:99
 msgid "Publishing Preview"
 msgstr "Yayımlama Önizlemesi"
 
@@ -538,49 +1174,52 @@ msgstr "Yayımlama Önizlemesi"
 msgid "Export Item"
 msgstr "Ogeyi Dışa aktar"
 
-#: src/Widgets/PublisherPreviewWindow.vala:194
+#: src/Widgets/PublisherPreviewWindow.vala:191
 msgid "File not Exported"
 msgstr "Dosya Dışa Aktarıldı"
 
-#: src/Widgets/PublisherPreviewWindow.vala:195
+#: src/Widgets/PublisherPreviewWindow.vala:191
 msgid "ThiefMD could not export the file, please try again."
 msgstr "ThiefMD dosyayı dışa aktaramadı, lütfen tekrar deneyin."
 
-#: src/Widgets/ProjectStatistics.vala:83
+#: src/Widgets/ProjectStatistics.vala:86
 msgid "Refresh Statistics"
 msgstr "İstatistikleri Tazele"
 
-#: src/Widgets/ProjectStatistics.vala:125
+#: src/Widgets/ProjectStatistics.vala:127
 msgid "words"
 msgstr "sözcükler"
 
-#: src/Widgets/ProjectStatistics.vala:126
-msgid "<b>Reading Time:</b>\n"
+#: src/Widgets/ProjectStatistics.vala:128
+#, c-format
+msgid ""
+"<b>Reading Time:</b>\n"
 "%d %s\n"
 "%d %s\n"
 "%d %s"
-msgstr "<b>Okuma Süresi:</b>\n"
+msgstr ""
+"<b>Okuma Süresi:</b>\n"
 "%d %s\n"
 "%d %s\n"
 "%d %s"
 
-#: src/Widgets/ProjectStatistics.vala:127
+#: src/Widgets/ProjectStatistics.vala:129
 msgid "Hour"
 msgstr "Saat"
 
-#: src/Widgets/ProjectStatistics.vala:127
+#: src/Widgets/ProjectStatistics.vala:129
 msgid "Hours"
 msgstr "Saat"
 
-#: src/Widgets/ProjectStatistics.vala:128
+#: src/Widgets/ProjectStatistics.vala:130
 msgid "Minute"
 msgstr "Dakika"
 
-#: src/Widgets/ProjectStatistics.vala:128
+#: src/Widgets/ProjectStatistics.vala:130
 msgid "Minutes"
 msgstr "Dakika"
 
-#: src/Widgets/ProjectStatistics.vala:129
+#: src/Widgets/ProjectStatistics.vala:131
 msgid "Seconds"
 msgstr "Saniye"
 
@@ -588,712 +1227,163 @@ msgstr "Saniye"
 msgid "Typewriter Scrolling"
 msgstr "Daktilo Kaydırma"
 
-#: src/Widgets/QuickPreferences.vala:44
+#: src/Widgets/QuickPreferences.vala:42
 msgid "Toggle Typewriter Scrolling"
 msgstr "Daktilo Kaydırmayı Aç/Kapat"
 
-#: src/Widgets/QuickPreferences.vala:51
+#: src/Widgets/QuickPreferences.vala:49
 msgid "Check Spelling"
 msgstr "Yazımı Denetle"
 
-#: src/Widgets/QuickPreferences.vala:54
+#: src/Widgets/QuickPreferences.vala:50
 msgid "Toggle Spellcheck"
 msgstr "Yazım Denetimini Aç/Kapat"
 
-#: src/Widgets/QuickPreferences.vala:61
+#: src/Widgets/QuickPreferences.vala:57
 msgid "Write Good"
 msgstr "Write Good"
 
-#: src/Widgets/QuickPreferences.vala:64
+#: src/Widgets/QuickPreferences.vala:58
 msgid "Toggle Write Good"
 msgstr "Write Good Aç/Kapat"
 
-#: src/Widgets/QuickPreferences.vala:97 src/Widgets/QuickPreferences.vala:197
-#: src/Widgets/QuickPreferences.vala:281
-msgid "Launch Preview"
-msgstr "Önizlemeyi Başlat"
-
-#: src/Widgets/QuickPreferences.vala:135 src/Widgets/QuickPreferences.vala:226
-#: src/Widgets/QuickPreferences.vala:315
-msgid "Preferences"
-msgstr "Tercihler"
-
-#: src/Widgets/QuickPreferences.vala:137 src/Widgets/QuickPreferences.vala:228
-#: src/Widgets/QuickPreferences.vala:317
-msgid "Edit Preferences"
-msgstr "Tercihleri Düzenle"
-
-#: src/Constants/ThiefProperties.vala:98 src/Constants/ThiefProperties.vala:99
-#: src/Widgets/ThemeSelector.vala:50
-msgid "Font"
-msgstr "Yazı tipi"
-
-#: src/Widgets/ThemeSelector.vala:142
-msgid "Font Selector"
-msgstr "Yazı Tipi Seçici"
-
-#: src/Widgets/ThemeSelector.vala:320
-msgid "Download <a href='https://themes.thiefmd.com/themes/'>more themes</a>.\n"
-"<small>Stored in <a href='file://"
-msgstr ""
-
-#: src/Widgets/SearchBar.vala:110
-msgid "(%d occurences)"
-msgstr "(%d oluşum)"
-
-#: src/Widgets/StatisticsBar.vala:100
-msgid "%d %s %d %s and %d %s reading time."
-msgstr "%d %s %d %s ve %d %s okuma süresi."
-
-#: src/Widgets/StatisticsBar.vala:101
-msgid "hour"
-msgstr "saat"
-
-#: src/Widgets/StatisticsBar.vala:101
-msgid "hours"
-msgstr "saat"
-
-#: src/Widgets/StatisticsBar.vala:102
-msgid "minute"
-msgstr "dakika"
-
-#: src/Widgets/StatisticsBar.vala:102
-msgid "minutes"
-msgstr "dakika"
-
-#: src/Widgets/StatisticsBar.vala:103
-msgid "seconds"
-msgstr "saniye"
-
-#: src/Widgets/StatisticsBar.vala:106
-msgid "%s : %d words."
-msgstr "%s : %d sözcük"
-
-#: src/Widgets/SearchWindow.vala:419
-msgid "Library Search"
-msgstr "Kitaplıkta Ara"
-
-#: src/Widgets/SearchWindow.vala:422
-msgid " Search"
-msgstr ""
-
-#: src/Widgets/SearchWindow.vala:445
-msgid "Monitor for Library changes"
-msgstr "Kitaplık değişimlerini izle"
-
-#: src/Widgets/Thinking.vala:87
-msgid "<b>Stealing file contents...</b>"
-msgstr "<b>Dosya içerikleri çalınıyor...</b>"
-
-#: src/Widgets/MarkdownCheatSheet.vala:52
-msgid "Heading"
-msgstr "Başlık"
-
-#. Font settings
-#. Arbitrary strings
-#: src/Constants/AppSettings.vala:104
-msgid "# Click on a sheet to get started\n"
-"\n"
-"First time here?  Drag a folder into the library, or click on the Folder icon to select a folder to add.\n"
-"\n"
-"## Thief Tip:\n"
-"\n"
-"%s"
-msgstr "# Başlamak için bir sayfaya tıklayın\n"
-"\n"
-"Burada yeni misiniz? Bir klasörü kitaplığa sürükleyin veya bir klasör eklemek için Klasör simgesine tıklayın.\n"
-"\n"
-"## Thief İpucu:\n"
-"\n"
-"%s"
-
-#. insert_column_with_attributes (-1, _("Library"), new CellRendererText (), "text", 0, null);
-#: src/ThiefApp.vala:182
-msgid "Library"
-msgstr "Kitaplık"
-
-#: src/Widgets/Preferences.vala:680
-msgid "Editor"
-msgstr "Düzenleyici"
-
-#: src/Widgets/SearchWindow.vala:421
-msgid "Search"
-msgstr "Ara"
-
-#: src/Widgets/QuickPreferences.vala:111 src/Widgets/QuickPreferences.vala:206
-#: src/Widgets/QuickPreferences.vala:295
-msgid "Open Export Window"
-msgstr "Dışa Aktarma Penceresini Aç"
-
-#: src/Widgets/QuickPreferences.vala:123 src/Widgets/QuickPreferences.vala:218
-#: src/Widgets/QuickPreferences.vala:307
-msgid "Search Library"
-msgstr "Kitaplıkta Ara"
-
-#: src/Widgets/QuickPreferences.vala:125 src/Widgets/QuickPreferences.vala:220
-#: src/Widgets/QuickPreferences.vala:309
-msgid "Open Search Window"
-msgstr "Arama Penceresini Aç"
-
-#: src/Widgets/ThemeSelector.vala:55
-msgid "Spacing"
-msgstr "Boşluk"
-
-#: src/Widgets/Preferences.vala:858
-msgid "Toggle experimental features"
-msgstr "Deneysel özellikleri aç/kapat"
-
-#: src/Widgets/Preferences.vala:860
-msgid "Enable experimental features"
-msgstr "Deneysel özellikleri etkinleştir"
-
-#: src/Controllers/Dialogs.vala:161
-msgid "Supported files"
-msgstr "Desteklenen dosyalar"
-
-#: src/Controllers/Dialogs.vala:170
-msgid "%s files"
-msgstr "%s dosyaları"
-
-#: src/Widgets/Library.vala:574
-msgid "Open in File Manager"
-msgstr "Dosya Yöneticisiyle Aç"
-
-#: src/Widgets/NewSheet.vala:41
-msgid "Import"
-msgstr "İçe Aktar"
-
-#: src/Widgets/Preferences.vala:125
-msgid "  WordPress"
-msgstr "  WordPress"
-
-#: src/Constants/ThiefProperties.vala:25
-msgid "The Markdown editor worth stealing"
-msgstr "Çalmaya değer Markdown düzenleyici"
-
-#: src/Constants/ThiefProperties.vala:87
-msgid "Contributors who help make ThiefMD awesome"
-msgstr "ThiefMD uygulamasının muhteşem olmasına katkı verenler"
-
-#: src/Constants/ThiefProperties.vala:89
-msgid "French Translation Contributors"
-msgstr "Fransızca Çeviriye Katkıda Bulunanlar"
-
-#: src/Constants/ThiefProperties.vala:90
-msgid "Slovak Translation Contributors"
-msgstr "Slovakça Çeviriye Katkıda Bulunanlar"
-
-#: src/Constants/ThiefProperties.vala:91
-msgid "Swedish Translation Contributors"
-msgstr "İsveççe Çeviriye Katkıda Bulunanlar"
-
-#: src/Constants/ThiefProperties.vala:94
-msgid "Original Code"
-msgstr "Özgün Kod"
-
-#: src/Constants/ThiefProperties.vala:94
-msgid "Based on <a href='https://github.com/lainsce/quilter'>Quilter</a>"
-msgstr "<a href='https://github.com/lainsce/quilter'>Quilter</a> temellidir"
-
-#: src/Constants/ThiefProperties.vala:94 src/Constants/ThiefProperties.vala:95
-#: src/Constants/ThiefProperties.vala:96 src/Constants/ThiefProperties.vala:97
-#: src/Constants/ThiefProperties.vala:98 src/Constants/ThiefProperties.vala:99
-#: src/Constants/ThiefProperties.vala:100
-#: src/Constants/ThiefProperties.vala:101
-#: src/Constants/ThiefProperties.vala:102
-#: src/Constants/ThiefProperties.vala:103
-#: src/Constants/ThiefProperties.vala:104
-#: src/Constants/ThiefProperties.vala:105
-#: src/Constants/ThiefProperties.vala:106
-#: src/Constants/ThiefProperties.vala:107
-#: src/Constants/ThiefProperties.vala:108
-#: src/Constants/ThiefProperties.vala:109
-msgid "Copyright"
-msgstr "Telif Hakkı"
-
-#: src/Constants/ThiefProperties.vala:94
-msgid "GNU General Public License v3.0"
-msgstr "GNU General Public License v3.0"
-
-#: src/Constants/ThiefProperties.vala:95 src/Constants/ThiefProperties.vala:97
-#: src/Constants/ThiefProperties.vala:98 src/Constants/ThiefProperties.vala:99
-msgid "SIL OPEN FONT LICENSE Version 1.1"
-msgstr "SIL OPEN FONT LICENSE Version 1.1"
-
-#: src/Constants/ThiefProperties.vala:100
-msgid "Preview CSS"
-msgstr "CSS Önizle"
-
-#: src/Constants/ThiefProperties.vala:100
-msgid "Mash up of Splendor and Modest"
-msgstr "İhtişam ve Tevazu Karması"
-
-#: src/Constants/ThiefProperties.vala:100
-#: src/Constants/ThiefProperties.vala:109
-msgid "The MIT License (MIT)"
-msgstr "MIT Lisansı (MIT)"
-
-#: src/Constants/ThiefProperties.vala:102
-msgid "Markdown Parsing"
-msgstr "Markdown Ayrıştırma"
-
-#: src/Constants/ThiefProperties.vala:102
-msgid "BSD-style License"
-msgstr "BSD-tarzı Lisans"
-
-#: src/Constants/ThiefProperties.vala:103
-msgid "Syntax Highlighting"
-msgstr "Söz Dizimi Vurgulaması"
-
-#: src/Constants/ThiefProperties.vala:103
-#: src/Constants/ThiefProperties.vala:107
-msgid "BSD-3-Clause License"
-msgstr "BSD-3-Clause License"
-
-#: src/Constants/ThiefProperties.vala:104
-msgid "Math Rendering"
-msgstr "Matematik İşleme"
-
-#: src/Constants/ThiefProperties.vala:104
-msgid "Khan Academy and other contributors."
-msgstr "Khan Academy ve diğer katkıda bulunanlar"
-
-#: src/Constants/ThiefProperties.vala:96 src/Constants/ThiefProperties.vala:101
-#: src/Constants/ThiefProperties.vala:104
-#: src/Constants/ThiefProperties.vala:105
-msgid "MIT License"
-msgstr "MIT License"
-
-#: src/Constants/ThiefProperties.vala:105
-msgid "XML Parsing"
-msgstr "XML Ayrıştırma"
-
-#: src/Constants/ThiefProperties.vala:106
-msgid "Pandoc Export"
-msgstr "Pandoc Dışa Aktar"
-
-#: src/Constants/ThiefProperties.vala:106
-msgid "John MacFarlane and others"
-msgstr "John MacFarlane ve diğerleri"
-
-#: src/Constants/ThiefProperties.vala:106
-msgid "GNU General Public License v2.0"
-msgstr "GNU Genel Kamu Lisansı, Sürüm 2"
-
-#: src/Constants/ThiefProperties.vala:109
-msgid "libwritegood-vala based on"
-msgstr "libwritegood-vala temelli"
-
-#: src/Constants/ThiefProperties.vala:109
-msgid "write-good: Naive linter for English prose"
-msgstr "write-good: İngilizce düz yazı için saf ayıklayıcı"
-
-#. Needs to be kept in sync with PAPER_SIZES_GTK_NAME
-#: src/Constants/ThiefProperties.vala:113
-msgid "A3 (11.7 x 16.5 inches)"
-msgstr "A3 (11.7 x 16.5 inç)"
-
-#: src/Constants/ThiefProperties.vala:114
-msgid "A4 (8 x 11 inches)"
-msgstr "A4 (8 x 11 inç)"
-
-#: src/Constants/ThiefProperties.vala:115
-msgid "A5 (5.8 x 8.3 inches)"
-msgstr "A5 (5.8 x 8.3 inç)"
-
-#: src/Constants/ThiefProperties.vala:116
-msgid "B5 (6.93 x 9.84 inches)"
-msgstr "B5 (6.93 x 9.84 inç)"
-
-#: src/Constants/ThiefProperties.vala:117
-msgid "Executive (7 x 10 inches)"
-msgstr "Yönetici (7 x 10 inç)"
-
-#: src/Constants/ThiefProperties.vala:118
-msgid "Legal (8.5 x 14 inches)"
-msgstr "Yasal (8.5 x 14 inç)"
-
-#: src/Constants/ThiefProperties.vala:119
-msgid "Letter (8.5 x 11 inches)"
-msgstr "Mektup (8.5 x 11 inç)"
-
-#: src/Constants/ThiefProperties.vala:122
-msgid "Don't like what you see? Hit `Ctrl+,` to access the preferences."
-msgstr "Gördüklerini beğenmediniz mi? Tercihlere erişmek için `Ctrl+,` tuşlarına basın."
-
-#: src/Constants/ThiefProperties.vala:123
-msgid "No built in dark mode? Dark themes are available at https://themes.thiefmd.com. Add more in the Preferences (`Ctrl+,`)."
-msgstr "Yerleşik karanlık kip yok mu? Karanlık temalar https://themes.thiefmd.com adresinde mevcuttur. Tercihlerden daha fazlasını ekleyin (`Ctrl+,`)."
-
-#: src/Constants/ThiefProperties.vala:124
-msgid "Don't like how the preview looks? Hit `Ctrl+,` to access the preferences and click Export."
-msgstr "Ön izlemenin görünümünü beğenmediniz mi? Tercihlere erişmek için `Ctrl+,` tuşlarına basın ve Dışa Aktar'a tıklayın."
-
-#: src/Constants/ThiefProperties.vala:125
-msgid "Want to import a ePub, HTML, or DocX? Click Import from the New Sheet prompt."
-msgstr "Bir ePub, HTML veya DocX dosyasını içe aktarmak mı istiyorsunuz? Yeni Sayfa isteminden İçe Aktar'a tıklayın."
-
-#: src/Constants/ThiefProperties.vala:126
-msgid "Ready to publish your great work? Right-click on the folder and choose \"Export Preview\""
-msgstr "Harika çalışmanızı yayınlamaya hazır mısınız? Klasöre sağ tıklayın ve \"Önizlemeyi Dışa Aktar\"ı seçin"
-
-#: src/Constants/ThiefProperties.vala:127
-msgid "Want to block out distractions? Full-screen is just an `F11` away."
-msgstr "Dikkat dağıtıcı şeyleri engellemek mi istiyorsunuz? Tam ekran sadece `F11` uzaklığında."
-
-#: src/Constants/ThiefProperties.vala:128
-msgid "Quickly switch view modes with `Ctrl+1`, `Ctrl+2`, and `Ctrl+3`."
-msgstr "`Ctrl+1`, `Ctrl+2`, ve `Ctrl+3` ile görünüm kipleri arasında hızla geçiş yapın."
-
-#: src/Constants/ThiefProperties.vala:129
-msgid "Working with a lot of links? Turn on Experimental Mode to make your markdown more readable `Ctrl+Shift+M`."
-msgstr "Çok sayıda bağlantıyla mı çalışıyorsunuz? Markdownınızı daha okunabilir hale getirmek için Deneysel Kipi `Ctrl+Shift+M` kısayoluyla açabilirsiniz."
-
-#: src/Connections/WriteFreelyConnection.vala:127
-msgid "New WriteFreely Connection"
-msgstr "Yeni WriteFreely Bağlantısı"
-
-#: src/Connections/GhostConnection.vala:106
-msgid "New ghost Connection"
-msgstr "Yeni Ghost Bağlantısı"
-
-#: src/Connections/WordpressConnection.vala:109
-msgid "New Wordpress Connection"
-msgstr "Yeni Wordpress Bağlantısı"
-
-#. website = ThiefProperties.URL;
-#: src/Widgets/About.vala:94
-msgid "Feedback"
-msgstr "Geri Bildirim"
-
-#. license_type = ThiefProperties.LICENSE_TYPE;
-#: src/Widgets/About.vala:99
-msgid "This program comes with absolutely no warranty."
-msgstr "Bu program kesinlikle hiçbir garanti vermiyor."
-
-#: src/Widgets/About.vala:100
-msgid "See the <a href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU General Public License, version 3 or later</a> for details."
-msgstr "Ayrıntılı bilgi için <a href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU Genel Kamu Lisansı, sürüm 3 ya da sonrası</a> sayfasına bakınız."
-
-#: src/Widgets/Preferences.vala:279
-msgid "Connections"
-msgstr "Bağlantılar"
-
-#: src/Widgets/Preferences.vala:340
-msgid "Remove "
-msgstr "Kaldır"
-
-#: src/Widgets/Preferences.vala:373
-msgid "Display"
-msgstr "Görünüm"
-
-#: src/Widgets/Preferences.vala:377
-msgid "Display Options"
-msgstr "Görüntü Seçenekleri"
-
-#: src/Widgets/Preferences.vala:378
-msgid "Make ThiefMD feel like home."
-msgstr "ThiefMDʼyi eviniz gibi hissettirin."
-
-#: src/Widgets/Preferences.vala:487
-msgid "Compiling Options"
-msgstr "Derleme Seçenekleri"
-
-#: src/Widgets/Preferences.vala:488
-msgid "Adjust how Markdown files are compiled together."
-msgstr "Markdown dosyalarının birlikte nasıl derlendiğini ayarlayın."
-
-#: src/Widgets/Preferences.vala:543
-msgid "Page Setup"
-msgstr "Sayfa Ayarları"
-
-#: src/Widgets/Preferences.vala:544
-msgid "Configure PDF export options."
-msgstr "PDF dışa aktarma seçeneklerini  yapılandır."
-
-#: src/Widgets/Preferences.vala:641
-msgid "PDF CSS"
-msgstr "PDF CSS"
-
-#: src/Widgets/Preferences.vala:642
-msgid "Choose CSS Style for PDF Export."
-msgstr "PDF Dışa Aktarma için CSS Biçemi seç."
-
-#: src/Widgets/Preferences.vala:650
-msgid "ePub & HTML CSS"
-msgstr "ePub ve HTML CSS"
-
-#: src/Widgets/Preferences.vala:651
-msgid "Choose CSS Style to use for ePub and HTML Export."
-msgstr "ePub ve HTML Dışa Aktarma için kullanılacak CSS Biçemini seç."
-
-#: src/Widgets/Preferences.vala:684
-msgid "Editor Settings"
-msgstr "Düzenleyici Ayarları"
-
-#: src/Widgets/Preferences.vala:685
-msgid "Modify the ThiefMD environment."
-msgstr "ThiefMD ortamını düzenle."
-
-#: src/Widgets/Preferences.vala:779
-msgid "ThiefMD Settings"
-msgstr "ThiefMD Ayarları"
-
-#: src/Widgets/Preferences.vala:780
-msgid "Modify the ThiefMD appearance."
-msgstr "ThiefMD görünümünü değiştir."
-
-#: src/Widgets/ThemeSelector.vala:326
-msgid "Download"
-msgstr "İndir: "
-
-#: src/Widgets/ThemeSelector.vala:326
-msgid "more themes"
-msgstr "daha fazla tema"
-
-#: src/Widgets/ThemeSelector.vala:326
-msgid "Stored in"
-msgstr "Saklanma konumu: "
-
-#: src/ThiefApp.vala:315
-msgid "Fountain"
-msgstr "Fountain"
-
-#: src/Constants/ThiefProperties.vala:101
-msgid "Fountain Preview and Export"
-msgstr "Fountain Önizle ve Dışa Aktar"
-
-#: src/Exporters/ExportFountain.vala:57
-msgid "Fountain files"
-msgstr "Fountain dosyaları"
-
-#: src/Exporters/ExportFountain.vala:63
-msgid "Export Fountain"
-msgstr "Fountain Dışa Aktar"
-
-#: src/Widgets/HeaderBar.vala:107
-msgid "Show Notes"
-msgstr "Notları Göster"
-
-#: src/Widgets/Sheet.vala:289
-msgid "Copy File Path"
-msgstr "Dosya Yolunu Kopyala"
-
-#: src/Widgets/Editor.vala:1394
-msgid "Insert Citation"
-msgstr "Alıntı Ekle"
-
-#: src/Widgets/Library.vala:639
-msgid "Set Project Icon"
-msgstr "Proje Simgesi Ayarla"
-
-#: src/Widgets/Library.vala:645
-msgid "Folder"
-msgstr "Klasör"
-
-#: src/Widgets/Library.vala:648
-msgid "Reader"
-msgstr "Seslendiren"
-
-#: src/Widgets/Library.vala:651
-msgid "Love"
-msgstr "Aşk"
-
-#: src/Widgets/Library.vala:654
-msgid "Game"
-msgstr "Oyun"
-
-#: src/Widgets/Library.vala:657
-msgid "Art"
-msgstr "Art"
-
-#: src/Widgets/Library.vala:660
-msgid "Nature"
-msgstr "Doğa"
-
-#: src/Widgets/Library.vala:663
-msgid "Food"
-msgstr "Yiyecek"
-
-#: src/Widgets/Library.vala:666
-msgid "Help"
-msgstr "Yardım"
-
-#: src/Widgets/Library.vala:669
-msgid "Cool"
-msgstr "Havalı"
-
-#: src/Widgets/Library.vala:672
-msgid "Angel"
-msgstr "Melek"
-
-#: src/Widgets/Library.vala:675
-msgid "Monkey"
-msgstr "Maymun"
-
-#: src/Widgets/Library.vala:678
-msgid "WordPress"
-msgstr "WordPress"
-
-#: src/Widgets/Library.vala:681
-msgid "Ghost"
-msgstr "Ghost"
-
-#: src/Widgets/Library.vala:684
-msgid "Write Freely"
-msgstr "Write Freely"
-
-#: src/Widgets/Library.vala:687
-msgid "Trash"
-msgstr "Çöp"
-
-#: src/Widgets/Preferences.vala:431
-msgid "Number of Lines to Preview in Sheets View"
-msgstr "Sayfa Görünümünde Önizlenecek Satır Sayısı"
-
-#: src/Widgets/Preferences.vala:765
-msgid "Disable application tips"
-msgstr "Uygulama ipuçlarını devre dışı bırak"
-
-#: src/Widgets/Preferences.vala:766
-msgid "Start with new empty sheet on launch"
-msgstr "Başlangıçta yeni boş sayfa ile başla"
-
-#: src/Enrichments/Fountain.vala:32
-msgid "Characters"
-msgstr "Karakterler"
-
-#: src/Enrichments/Markdown.vala:30
-msgid "Citations"
-msgstr "Alıntılar"
-
-#: src/Constants/ThiefProperties.vala:95
-msgid "Stolen Victory Font"
-msgstr "Stolen Victory Yazı Tipi"
-
-#: src/Constants/ThiefProperties.vala:108
-msgid "Grammar Check"
-msgstr "Dil Bilgisi Denetimi"
-
-#: src/Constants/ThiefProperties.vala:108
-msgid "the AbiSource Community"
-msgstr "AbiSource Topluluğu"
-
-#: src/Constants/ThiefProperties.vala:108
-msgid "GNU Lesser General Public License v2.1"
-msgstr "Kısıtlı GNU Genel Kamu Lisansı, sürüm 2.1"
-
-#: src/Widgets/QuickPreferences.vala:71
+#: src/Widgets/QuickPreferences.vala:65
 msgid "Check Grammar"
 msgstr "Dil Bilgisi Denetimi"
 
-#: src/Widgets/QuickPreferences.vala:74
+#: src/Widgets/QuickPreferences.vala:66
 msgid "Toggle Grammar Checking"
 msgstr "Dil Bilgisi Denetimini Aç/Kapat"
 
-#: src/Widgets/QuickPreferences.vala:87
+#: src/Widgets/QuickPreferences.vala:74
 msgid "Grammar check is not available for your language"
 msgstr "Dil bilgisi denetimi dilinizde kullanılamıyor"
 
-#: src/Constants/ThiefProperties.vala:88
-msgid "Czech Translation Contributors"
-msgstr "Çekçe Çeviriye Katkıda Bulunanlar"
+#: src/Widgets/QuickPreferences.vala:87
+msgid "Launch Preview"
+msgstr "Önizlemeyi Başlat"
 
-#: src/Constants/ThiefProperties.vala:107
-msgid "PDF Export"
-msgstr "PDF Dışa Aktar"
+#: src/Widgets/QuickPreferences.vala:101
+msgid "Open Export Window"
+msgstr "Dışa Aktarma Penceresini Aç"
 
-#: src/Constants/ThiefProperties.vala:107
-msgid "Simon Sapin and contributors"
-msgstr "Simon Sapin ve katkıda bulunanlar"
+#: src/Widgets/QuickPreferences.vala:113
+msgid "Search Library"
+msgstr "Kitaplıkta Ara"
 
-#: src/Controllers/FileManager.vala:39
-msgid "Stealing file contents..."
-msgstr "Dosya içerikleri çalınıyor..."
+#: src/Widgets/QuickPreferences.vala:115
+msgid "Open Search Window"
+msgstr "Arama Penceresini Aç"
 
-#: src/Controllers/FileManager.vala:40
-msgid "This isn't plagiarism, it's a remix!"
-msgstr "Bu intihal değil, bir remix!"
+#: src/Widgets/QuickPreferences.vala:125
+msgid "Preferences"
+msgstr "Tercihler"
 
-#: src/Controllers/FileManager.vala:41
-msgid "NYT Best Seller, here we come!"
-msgstr "NYT En Çok Satanları, biz geliyoruz!"
+#: src/Widgets/QuickPreferences.vala:127
+msgid "Edit Preferences"
+msgstr "Tercihleri Düzenle"
 
-#: src/Connections/WriteFreelyConnection.vala:233
-msgid "Taking your words, and letting them go... to the internet!"
-msgstr "Sözlerinizi alınıyor ve internete gönderiliyor!"
+#: src/Widgets/ThemeSelector.vala:58
+msgid "Spacing"
+msgstr "Boşluk"
 
-#: src/Connections/WriteFreelyConnection.vala:234
-msgid "Mhm... I see and I ship."
-msgstr "Hımm... Görüyorum ve gönderiyorum."
+#: src/Widgets/ThemeSelector.vala:145
+msgid "Font Selector"
+msgstr "Yazı Tipi Seçici"
 
-#: src/Connections/WriteFreelyConnection.vala:235
-msgid "Is this a selfie, and you're happy to see me?"
-msgstr "Bu bir selfie mi ve beni gördüğüne sevindin mi?"
+#: src/Widgets/ThemeSelector.vala:336
+msgid "Download"
+msgstr "İndir: "
 
-#: src/Connections/GhostConnection.vala:192
-msgid "Your words are like Casper... Friendly!"
-msgstr "Sözlerin Casper gibi... Dostça!"
+#: src/Widgets/ThemeSelector.vala:336
+msgid "more themes"
+msgstr "daha fazla tema"
 
-#: src/Connections/GhostConnection.vala:193
-msgid "I see your words, and I'm taking them to the internet!"
-msgstr "Sözlerini görüyorum ve onları internete taşıyorum!"
+#: src/Widgets/ThemeSelector.vala:336
+msgid "Stored in"
+msgstr "Saklanma konumu: "
 
-#: src/Connections/GhostConnection.vala:194
-msgid "Booooooooooo! (That's Ghost speak for Great Work!)"
-msgstr "Öcüüüüüüü! (Bu Ghost, Great Work adına konuşuyor!)"
+#: src/Widgets/SearchBar.vala:120
+#, c-format
+msgid "(%d occurences)"
+msgstr "(%d oluşum)"
 
-#: src/Connections/WordpressConnection.vala:192
-msgid "Taking it to the internet!"
-msgstr "İnternete taşıyor!"
+#: src/Widgets/StatisticsBar.vala:105
+#, c-format
+msgid "%d %s %d %s and %d %s reading time."
+msgstr "%d %s %d %s ve %d %s okuma süresi."
 
-#: src/Connections/WordpressConnection.vala:193
-msgid "Don't forget to share on reddit."
-msgstr "Redditʼte paylaşmayı unutmayın."
+#: src/Widgets/StatisticsBar.vala:106
+msgid "hour"
+msgstr "saat"
 
-#: src/Connections/WordpressConnection.vala:194
-msgid "Pressing words together..."
-msgstr "Kelimeler birbirine basılıyor..."
+#: src/Widgets/StatisticsBar.vala:106
+msgid "hours"
+msgstr "saat"
 
-#: src/Exporters/ExportPdf.vala:149
-msgid "Simply Shakespearean."
-msgstr "Shakespeare Gibi."
+#: src/Widgets/StatisticsBar.vala:107
+msgid "minute"
+msgstr "dakika"
 
-#: src/Exporters/ExportPdf.vala:150
-msgid "Hmm... that's interesting..."
-msgstr "Hmm... Bu ilginç..."
+#: src/Widgets/StatisticsBar.vala:107
+msgid "minutes"
+msgstr "dakika"
 
-#: src/Exporters/ExportPdf.vala:151
-msgid "Your writing is insightful."
-msgstr "Yazınız ilham verici."
+#: src/Widgets/StatisticsBar.vala:108
+msgid "seconds"
+msgstr "saniye"
 
-#: src/Widgets/Preferences.vala:83 src/Widgets/Preferences.vala:117
-#: src/Widgets/Preferences.vala:151 src/Widgets/Preferences.vala:185
-#: src/Widgets/Preferences.vala:219 src/Widgets/Preferences.vala:264
-msgid "Connection Error"
-msgstr "Bağlantı Hatası"
+#: src/Widgets/StatisticsBar.vala:111
+#, c-format
+msgid "%s : %d words."
+msgstr "%s : %d sözcük"
 
-#: src/Widgets/Preferences.vala:159
-msgid "  Medium"
-msgstr "  Medium"
+#: src/Widgets/SearchWindow.vala:415
+msgid "Library Search"
+msgstr "Kitaplıkta Ara"
 
-#: src/Widgets/Preferences.vala:193
-msgid "  Forem"
-msgstr "  Forem"
+#: src/Widgets/SearchWindow.vala:417
+msgid "Search"
+msgstr "Ara"
 
-#: src/Widgets/Preferences.vala:227
-msgid "  Hashnode"
-msgstr "  Hashnode"
+#: src/Widgets/SearchWindow.vala:441
+msgid "Monitor for Library changes"
+msgstr "Kitaplık değişimlerini izle"
 
-#: src/Constants/ThiefProperties.vala:92
-msgid "German Translation Contributors"
-msgstr "Almanca Çeviriye Katkıda Bulunanlar"
+#: src/Widgets/Thinking.vala:99
+msgid "<b>Stealing file contents...</b>"
+msgstr "<b>Dosya içerikleri çalınıyor...</b>"
 
-#: src/Constants/ThiefProperties.vala:93
-msgid "Finnish Translation Contributors"
-msgstr "Fince Çeviriye Katkıda Bulunanlar"
+#: src/Widgets/MarkdownCheatSheet.vala:58
+msgid "Heading"
+msgstr "Başlık"
 
-#: src/Connections/WordpressConnection.vala:89
-msgid "Application Password"
-msgstr ""
+#~ msgid "_Open"
+#~ msgstr "_Aç"
 
+#~ msgid "_Add to Library"
+#~ msgstr "Kitaplığa _Ekle"
+
+#~ msgid "All files"
+#~ msgstr "Tüm dosyalar"
+
+#~ msgid "_Load from disk"
+#~ msgstr "Diskten _yükle"
+
+#~ msgid "_Keep what's in editor"
+#~ msgstr "_Düzenleyicidekileri koru"
+
+#~ msgid "Copy"
+#~ msgstr "Kopyala"
+
+#~ msgid "  WriteFreely"
+#~ msgstr "  WriteFreely"
+
+#~ msgid "%s files"
+#~ msgstr "%s dosyaları"
+
+#~ msgid "  WordPress"
+#~ msgstr "  WordPress"
+
+#~ msgid "Insert Citation"
+#~ msgstr "Alıntı Ekle"
