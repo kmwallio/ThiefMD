@@ -403,7 +403,7 @@ msgstr ""
 #: src/Controllers/Dialogs.vala:163
 #, fuzzy
 msgid "_Move"
-msgstr "Flytta"
+msgstr "_Flytta"
 
 #: src/Controllers/SheetManager.vala:161 src/Widgets/StatisticsBar.vala:98
 msgid "No file opened"

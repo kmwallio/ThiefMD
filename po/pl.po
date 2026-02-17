@@ -38,22 +38,22 @@ msgstr "Importowanie pliku"
 
 #: src/Controllers/Dialogs.vala:26 src/Controllers/Dialogs.vala:59
 msgid "_Save"
-msgstr "Zapisz"
+msgstr "_Zapisz"
 
 #: src/Controllers/Dialogs.vala:27 src/Controllers/Dialogs.vala:55
 #: src/Connections/WriteFreelyConnection.vala:132
 #: src/Connections/GhostConnection.vala:111
 #: src/Connections/WordpressConnection.vala:114
 msgid "_Cancel"
-msgstr "Anuluj"
+msgstr "_Anuluj"
 
 #: src/Controllers/Dialogs.vala:57
 msgid "_Open"
-msgstr "Otwórz"
+msgstr "_Otwórz"
 
 #: src/Controllers/Dialogs.vala:61
 msgid "_Add to Library"
-msgstr "Dodaj do biblioteki"
+msgstr "_Dodaj do biblioteki"
 
 #: src/Controllers/Dialogs.vala:70 src/Exporters/ExportPdf.vala:88
 msgid "PDF file"
@@ -136,7 +136,7 @@ msgstr "Endpoint"
 #: src/Connections/GhostConnection.vala:109
 #: src/Connections/WordpressConnection.vala:112
 msgid "_Add Account"
-msgstr "Dodaj konto"
+msgstr "_Dodaj konto"
 
 #: src/Connections/WriteFreelyConnection.vala:318
 #: src/Connections/GhostConnection.vala:288
@@ -381,11 +381,11 @@ msgstr "  ghost"
 
 #: src/Widgets/Preferences.vala:343
 msgid "_Remove"
-msgstr "Usuń"
+msgstr "_Usuń"
 
 #: src/Widgets/Preferences.vala:345
 msgid "_Keep"
-msgstr "Zachowaj"
+msgstr "_Zachowaj"
 
 #: src/Widgets/Preferences.vala:384
 msgid "Focus"
