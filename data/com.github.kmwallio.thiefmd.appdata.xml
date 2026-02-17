@@ -62,6 +62,15 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.1" date="2026-02-16" urgency="low">
+      <description>
+        <p>From experimental to normal, and some new experiments.</p>
+        <ul>
+          <li>.</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.3.1</url>
+    </release>
     <release version="0.3.0" date="2026-02-16" urgency="low">
       <description>
         <p>Everything's different but still the same.</p>
@@ -80,8 +89,8 @@
     <release version="0.2.7" date="2023-06-03" urgency="low">
       <description>
         <p>Like your files to fly solo? Open files from your file manager. Even abandon our library concept if you want to.</p>
-        <p>We also have a new out of box experience and some <i>hopefully</i> UI improvements.</p>
-        <p><b>Breaking Change</b> We've updated the Wordpress API. You now have to use Application Passwords.</p>
+        <p>We also have a new out of box experience and some hopefully UI improvements.</p>
+        <p>Breaking Change We've updated the Wordpress API. You now have to use Application Passwords.</p>
         <ul>
           <li>Add support for single file opening</li>
           <li>Fix some null references</li>
