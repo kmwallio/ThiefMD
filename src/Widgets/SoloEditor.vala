@@ -69,7 +69,7 @@ namespace ThiefMD {
             scroller.hexpand = true;
             editor.vexpand = true;
             editor.hexpand = true;
-            vbox.append (headerbar);
+            set_titlebar (headerbar);
             scroller.set_child (editor);
             vbox.append (scroller);
             set_child (vbox);
