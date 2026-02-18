@@ -16,9 +16,7 @@ Manage your <span class="pun">**\*\*mark\*\***</span> without any <span class="n
 [^no-file-sync]: ThiefMD has no sync support built in.
 [^no-git]: ThiefMD has no built in Git support.
 
-<div style="float:left; min-width: 150px; max-width: 25%; margin-right: 10px"><a href="https://flathub.org/apps/details/com.github.kmwallio.thiefmd"><img src="/images/flathub-badge-en.png" /></a></div>
-
-<div style="float:left; min-width: 150px; max-width: 25%"><a href="/download"><img src="/images/thiefmd-badge-en.png" /></a></div>
+<div style="float: left;"><a href="https://flathub.org/apps/details/com.github.kmwallio.thiefmd"><img src="/images/flathub-badge-en.png" /></a></div>
 
 <div class="clear"></div>
 
@@ -59,7 +57,6 @@ Spell checking and weasel word detection are also built in.
 
 <div class="center-images">
 <a href="https://flathub.org/apps/details/com.github.kmwallio.thiefmd"><img src="/images/flathub-badge-en.png" /></a>
-<a href="/download"><img src="/images/thiefmd-badge-en.png" /></a>
 </div>
 
 <div class="clear"></div>

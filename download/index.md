@@ -13,16 +13,6 @@ flatpak install flathub com.github.kmwallio.thiefmd
 
 The flatpak bundles all of the latest features of ThiefMD. RPM and DEB features vary based on version of the OS.
 
-## Debian Based Distro Installation
-
-```bash
-sudo add-apt-repository ppa:thiefmd/thiefmd
-sudo apt-get update
-sudo apt-get install com.github.kmwallio.thiefmd
-```
-
-The ThiefMD PPA requires Ubuntu 20.10+. [Flatpak](#flatpak) provides libhandy and should be ran on 20.04 and below.
-
 ## Arch User Repository
 
 [ThiefMD is in the Arch User Repository](https://aur.archlinux.org/packages/thiefmd) thanks to [Mark Wagie](https://github.com/yochananmarqos). You can follow [these instructions](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_and_upgrading_packages), use [yay](https://github.com/Jguer/yay), or use your favorite AUR helper.
@@ -30,12 +20,6 @@ The ThiefMD PPA requires Ubuntu 20.10+. [Flatpak](#flatpak) provides libhandy an
 ```bash
 yay -S thiefmd
 ```
-
-## RPM?
-
-[Download the latest release](https://github.com/kmwallio/ThiefMD/releases) from GitHub.
-
-RPM is built on [Fedora 33](https://getfedora.org).
 
 ## Build from Source
 
