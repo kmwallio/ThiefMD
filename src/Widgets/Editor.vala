@@ -125,6 +125,7 @@ namespace ThiefMD.Widgets {
 
             // Initialize optional enrichments to avoid null derefs when toggled
             writegood = new WriteGood.Checker ();
+            writegood.show_tooltip = true;
             grammar = new GrammarChecker ();
 
             var click_controller = new Gtk.GestureClick ();
