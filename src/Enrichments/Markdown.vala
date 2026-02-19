@@ -594,16 +594,8 @@ namespace ThiefMD.Enrichments {
         }
 
         private bool show_image_tooltip_for_path (string img_path, Gtk.Tooltip tooltip) {
-            int max_w = 240;
-            int max_h = 200;
-            int editor_w = view.get_allocated_width ();
-            int editor_h = view.get_allocated_height ();
-            if (editor_w > 0) {
-                max_w = int.max (120, (int) (editor_w * 0.35));
-            }
-            if (editor_h > 0) {
-                max_h = int.max (90, (int) (editor_h * 0.35));
-            }
+            int max_w, max_h;
+            get_preview_max_size (out max_w, out max_h);
 
             Gdk.Texture? texture = load_preview_texture (img_path, max_w, max_h);
             if (texture == null) {
@@ -620,7 +612,20 @@ namespace ThiefMD.Enrichments {
             return true;
         }
 
-        private string resolve_tooltip_image_path (string img_url) {
+        private void get_preview_max_size (out int max_w, out int max_h) {
+            max_w = 240;
+            max_h = 200;
+            int editor_w = view.get_allocated_width ();
+            int editor_h = view.get_allocated_height ();
+            if (editor_w > 0) {
+                max_w = int.max (120, (int) (editor_w * 0.35));
+            }
+            if (editor_h > 0) {
+                max_h = int.max (90, (int) (editor_h * 0.35));
+            }
+        }
+
+        private string resolve_image_path (string img_url) {
             string img_path = Pandoc.find_file (img_url);
             if (img_path == img_url && img_url.has_prefix ("/") && img_url.length > 1) {
                 // Hugo/Jekyll style: `/images/foo.png` should resolve from project root.
@@ -668,7 +673,7 @@ namespace ThiefMD.Enrichments {
                             return false;
                         }
 
-                        string frontmatter_path = resolve_tooltip_image_path (frontmatter_url);
+                        string frontmatter_path = resolve_image_path (frontmatter_url);
                         if (frontmatter_path == frontmatter_url &&
                             !GLib.FileUtils.test (frontmatter_path, GLib.FileTest.EXISTS))
                         {
@@ -702,7 +707,7 @@ namespace ThiefMD.Enrichments {
                     }
 
                     string img_url = match_info.fetch (url_group);
-                    string img_path = resolve_tooltip_image_path (img_url);
+                    string img_path = resolve_image_path (img_url);
                     if (img_path == img_url && !GLib.FileUtils.test (img_path, GLib.FileTest.EXISTS)) {
                         continue;
                     }
@@ -1686,7 +1691,7 @@ namespace ThiefMD.Enrichments {
                 try {
                     if (is_image.match (line_text, 0, out mi)) {
                         string img_url = mi.fetch (2);
-                        string img_path = Pandoc.find_file (img_url);
+                        string img_path = resolve_image_path (img_url);
                         // find_file returns url unchanged when nothing found
                         if (img_path != img_url || GLib.FileUtils.test (img_path, GLib.FileTest.EXISTS)) {
                             pending_inserts.add (new PendingImageInsert (line_num, img_url, img_path));
@@ -1704,16 +1709,8 @@ namespace ThiefMD.Enrichments {
                 string img_url = info.img_url;
                 string img_path = info.img_path;
 
-                int max_inline_w = 240;
-                int max_inline_h = 200;
-                int editor_w = view.get_allocated_width ();
-                int editor_h = view.get_allocated_height ();
-                if (editor_w > 0) {
-                    max_inline_w = int.max (120, (int) (editor_w * 0.35));
-                }
-                if (editor_h > 0) {
-                    max_inline_h = int.max (90, (int) (editor_h * 0.35));
-                }
+                int max_inline_w, max_inline_h;
+                get_preview_max_size (out max_inline_w, out max_inline_h);
 
                 Gdk.Texture? texture = load_preview_texture (img_path, max_inline_w, max_inline_h);
                 if (texture == null) {
