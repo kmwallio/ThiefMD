@@ -652,7 +652,8 @@ namespace ThiefMD.Enrichments {
             Gtk.TextIter line_end = hover_iter;
             line_start.set_line_offset (0);
             line_end.forward_to_line_end ();
-            string line_text = buffer.get_text (line_start, line_end, false);
+            // Include invisible text so collapsed markdown image URLs are still matchable.
+            string line_text = buffer.get_text (line_start, line_end, true);
             int line_offset = line_start.get_offset ();
             int hover_offset = hover_iter.get_offset ();
 
