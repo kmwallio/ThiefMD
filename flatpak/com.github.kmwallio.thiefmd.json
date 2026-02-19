@@ -64,14 +64,14 @@
                 "*.a"
             ],
             "build-commands": [
-                "./configure.sh --prefix=/app --enable-all-features --github-checkbox --with-fenced-code --shared",
+                "./configure.sh --prefix=/app --enable-all-features --github-checkbox=input --with-fenced-code --shared",
                 "sed -e 's|/sbin/ldconfig|/sbin/ldconfig -n|' -i librarian.sh",
                 "make install"
             ],
             "sources": [{
                 "type": "archive",
-                "url": "https://www.pell.portland.or.us/~orc/Code/discount/discount-2.2.7e.tar.bz2",
-                "sha256": "82249a3d50a09aac29245990bf9c6139c0ae48707b7dab1268daf851f9db963b"
+                "url": "https://www.pell.portland.or.us/~orc/Code/discount/discount-3.0.1.2.tar.bz2",
+                "sha256": "ec670ca34fba6dd99cf30170b98f57fbd84ed51528cc3ae732b5ec298e738d9d"
             }]
         },
         {
@@ -175,6 +175,9 @@
                 "*.a"
             ],
             "buildsystem": "meson",
+            "config-opts": [
+                "-Drequire_libmarkdown3=true"
+            ],
             "sources": [{
                 "type": "dir",
                 "path": ".."
