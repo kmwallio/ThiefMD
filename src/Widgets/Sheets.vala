@@ -622,10 +622,15 @@ namespace ThiefMD.Widgets {
             save_metadata_file (true);
         }
 
-        public void update_sheet_indicators () {
+        public void update_sheet_indicators (string active_file = "") {
             foreach (var s in metadata.sheet_order) {
                 Sheet show = _sheets.get (s);
-                show.redraw ();
+                bool should_be_active = (active_file != "" && show.file_path () == active_file);
+                if (show.active_sheet != should_be_active) {
+                    show.active_sheet = should_be_active;
+                } else {
+                    show.redraw ();
+                }
             }
         }
 

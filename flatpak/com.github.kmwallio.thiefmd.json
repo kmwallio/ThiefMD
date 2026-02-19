@@ -28,18 +28,7 @@
         "*.la",
         "*grammar.a"
     ],
-    "modules": [{
-            "name": "gtksourceview",
-            "buildsystem": "meson",
-            "cleanup": [
-                "*.a"
-            ],
-            "sources": [{
-                "type": "archive",
-                "url": "https://download.gnome.org/sources/gtksourceview/5.14/gtksourceview-5.14.2.tar.xz",
-                "sha256": "1a6d387a68075f8aefd4e752cf487177c4a6823b14ff8a434986858aeaef6264"
-            }]
-        },
+    "modules": [
         "shared-modules/intltool/intltool-0.51.json",
         {
             "name": "libspelling",
@@ -124,27 +113,6 @@
                     "type" : "archive",
                     "url" : "https://github.com/opencog/link-grammar/archive/refs/tags/link-grammar-5.13.0.tar.gz",
                     "sha256" : "a545b7efb7aceab2d8ad301466f199778a3da712928999ed8d66deb32ca3184f"
-                }
-            ]
-        },
-        {
-            "name" : "libadwaita",
-            "buildsystem" : "meson",
-            "cleanup": [
-                "*.a"
-            ],
-            "config-opts" : [
-                "-Dexamples=false",
-                "-Dprofiling=false",
-                "-Dintrospection=enabled",
-                "-Dtests=false",
-                "-Dvapi=true"
-            ],
-            "sources" : [
-                {
-                    "type": "archive",
-                    "url": "https://download.gnome.org/sources/libadwaita/1.6/libadwaita-1.6.2.tar.xz",
-                    "sha256": "7542f8354e6808dd4e9a31551bbdfc0170735e4af4d1b3e69186500ccb9c01eb"
                 }
             ]
         },
