@@ -5,6 +5,7 @@ public class PandocTests {
     public PandocTests () {
         test_find_file ();
         test_needs_bibtex ();
+        test_generate_discount_html ();
     }
 
     private void test_find_file () {
@@ -38,6 +39,31 @@ public class PandocTests {
             // Text without YAML front matter
             string plain_text = "No YAML here\nJust plain text";
             assert (!Pandoc.needs_bibtex (plain_text));
+        });
+    }
+
+    private void test_generate_discount_html () {
+        Test.add_func ("/thiefmd/pandoc_generate_discount_html", () => {
+            string markdown = "# Hello Writer\n\nA paragraph with **bold** and a [link](https://example.com).\n\n- one\n- two\n";
+
+            string html_once = "";
+            bool first_result = Pandoc.generate_discount_html (markdown, out html_once);
+            assert (first_result);
+            assert (html_once != "");
+            assert (html_once.contains ("<h1"));
+            assert (html_once.contains ("<strong>bold</strong>"));
+            assert (html_once.contains ("<ul>"));
+
+            string html_twice = "";
+            bool second_result = Pandoc.generate_discount_html (markdown, out html_twice);
+            assert (second_result);
+            assert (html_twice != "");
+            assert (html_once == html_twice);
+
+            string empty_html = "not-empty-before-call";
+            bool empty_result = Pandoc.generate_discount_html ("", out empty_html);
+            assert (!empty_result);
+            assert (empty_html == "");
         });
     }
 }
