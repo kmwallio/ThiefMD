@@ -466,9 +466,12 @@ namespace ThiefMD.Enrichments {
             switch (key.down ()) {
                 case "coverimage":
                 case "cover_image":
+                case "cover-image":
                 case "cover":
                 case "featured_image":
                 case "feature_image":
+                case "featured-image":
+                case "feature-image":
                 case "image":
                 case "thumbnail":
                 case "thumb":
@@ -573,15 +576,15 @@ namespace ThiefMD.Enrichments {
         }
 
         private void get_preview_max_size (out int max_w, out int max_h) {
-            max_w = 240;
-            max_h = 200;
+            max_w = 640;
+            max_h = 480;
             int editor_w = view.get_allocated_width ();
             int editor_h = view.get_allocated_height ();
             if (editor_w > 0) {
-                max_w = int.max (120, (int) (editor_w * 0.35));
+                max_w = int.max (640, (int) (editor_w * 0.65));
             }
             if (editor_h > 0) {
-                max_h = int.max (90, (int) (editor_h * 0.35));
+                max_h = int.max (480, (int) (editor_h * 0.65));
             }
         }
 
