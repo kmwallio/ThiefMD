@@ -44,6 +44,17 @@ namespace Markdown
     public char markdown_version[256];
 
     [Compact]
+    [CCode (cname = "mkd_flag_t", free_function = "mkd_free_flags")]
+    public class FlagBlob {
+    }
+
+    [CCode (cname = "mkd_flags")]
+    public FlagBlob create_flags ();
+
+    [CCode (cname = "mkd_set_flag_bitmap")]
+    public void set_flag_bitmap (FlagBlob flags, long value);
+
+    [Compact]
     [CCode (cname = "MMIOT", cprefix = "mkd_", free_function = "mkd_cleanup")]
     public class Document
     {
@@ -55,13 +66,13 @@ namespace Markdown
         [CCode (cname = "gfm_in")]
         public Document.from_gfm_in (GLib.FileStream file, DocumentFlags flags);
         [CCode (cname = "gfm_string")]
-        public Document.from_gfm_string (uint8[] doc, DocumentFlags flags);
+        public Document.from_gfm_string (uint8[] doc, FlagBlob? flags);
         [CCode (cname = "mkd_document")]
         public int get_document (out unowned string result);
 
         public void basename (string @base);
 
-        public bool compile (DocumentFlags flags);
+        public bool compile (FlagBlob? flags);
         public void cleanup ();
 
         public int dump (GLib.FileStream file, DocumentFlags flags, string title);

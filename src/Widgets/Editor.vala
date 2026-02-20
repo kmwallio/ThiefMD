@@ -125,6 +125,7 @@ namespace ThiefMD.Widgets {
 
             // Initialize optional enrichments to avoid null derefs when toggled
             writegood = new WriteGood.Checker ();
+            writegood.show_tooltip = true;
             grammar = new GrammarChecker ();
 
             var click_controller = new Gtk.GestureClick ();
@@ -732,7 +733,10 @@ namespace ThiefMD.Widgets {
         public string get_buffer_text () {
             Gtk.TextIter start, end;
             buffer.get_bounds (out start, out end);
-            return buffer.get_text (start, end, true);
+            // Strip U+FFFC (object replacement char) — that's what GTK uses to
+            // represent child anchors and embedded objects in the text.
+            // We don't want those sneaking into saved markdown files!
+            return buffer.get_text (start, end, true).replace ("\xef\xbf\xbc", "");
         }
 
         public int get_buffer_word_count () {
@@ -1371,6 +1375,10 @@ namespace ThiefMD.Widgets {
 
                     string filename = file.get_path ();
                     GLib.FileUtils.get_contents (filename, out text);
+
+                    // Tear down current enrichments before replacing buffer text.
+                    // This avoids callbacks touching text regions during file open.
+                    detach_enrichments ();
                     
                     // For large files, defer markdown processing
                     bool defer_enrichments = file_size > 100000; // 100KB threshold
@@ -1405,8 +1413,7 @@ namespace ThiefMD.Widgets {
             return check.has_suffix (".md") || check.has_suffix (".markdown");
         }
 
-        private void setup_enrichments_for_file (string filename, string text) {
-            // Detach any previous enrichments before switching file types
+        private void detach_enrichments () {
             if (fountain != null) {
                 fountain.detach ();
                 fountain = null;
@@ -1415,6 +1422,11 @@ namespace ThiefMD.Widgets {
                 markdown.detach ();
                 markdown = null;
             }
+        }
+
+        private void setup_enrichments_for_file (string filename, string text) {
+            // Detach any previous enrichments before switching file types
+            detach_enrichments ();
 
             if (is_fountain (filename)) {
                 // Normalize Windows newlines for fountain parsing
@@ -1427,7 +1439,13 @@ namespace ThiefMD.Widgets {
             } else if (is_markdown_file (filename)) {
                 markdown = new MarkdownEnrichment ();
                 if (markdown.attach (this)) {
-                    markdown.recheck_all ();
+                    // Run first pass on idle so file-open text replacement settles.
+                    GLib.Idle.add (() => {
+                        if (markdown != null) {
+                            markdown.recheck_all ();
+                        }
+                        return false;
+                    });
                 }
             }
         }

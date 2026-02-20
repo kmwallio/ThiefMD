@@ -232,20 +232,61 @@ namespace ThiefMD.Widgets {
                 event_type == FileMonitorEvent.MOVED_IN || event_type == FileMonitorEvent.MOVED_OUT ||
                 event_type == FileMonitorEvent.DELETED || event_type == FileMonitorEvent.RENAMED)
             {
-                if (FileUtils.test (file.get_path (), FileTest.IS_DIR) || (other_file != null && FileUtils.test (other_file.get_path (), FileTest.IS_DIR))) {
-                    ThiefApp.get_instance ().library.refresh_dir (this);
+                bool refresh_library = false;
+                string? changed_path = file.get_path ();
+                string? changed_other_path = other_file != null ? other_file.get_path () : null;
+
+                if (changed_path != null && FileUtils.test (changed_path, FileTest.IS_DIR)) {
+                    refresh_library = true;
+                }
+
+                if (!refresh_library && changed_other_path != null && FileUtils.test (changed_other_path, FileTest.IS_DIR)) {
+                    refresh_library = true;
+                }
+
+                if (!refresh_library &&
+                    (event_type == FileMonitorEvent.DELETED ||
+                     event_type == FileMonitorEvent.MOVED_OUT ||
+                     event_type == FileMonitorEvent.RENAMED ||
+                     event_type == FileMonitorEvent.MOVED))
+                {
+                    string? changed_name = file.get_basename ();
+                    string? changed_other_name = other_file != null ? other_file.get_basename () : null;
+
+                    if ((changed_name != null && metadata.folder_order.contains (changed_name)) ||
+                        (changed_other_name != null && metadata.folder_order.contains (changed_other_name)))
+                    {
+                        refresh_library = true;
+                    }
+                }
+
+                debug ("Folder event=%d path=%s other=%s refresh_library=%s",
+                    (int) event_type,
+                    changed_path ?? "(null)",
+                    changed_other_path ?? "(null)",
+                    refresh_library.to_string ());
+
+                if (refresh_library) {
+                    Idle.add (() => {
+                        ThiefApp.get_instance ().library.refresh_dir (this);
+                        return false;
+                    });
                 }
 
                 File my_dir = File.new_for_path (_sheets_dir);
                 if (my_dir.query_exists ()) {
-                    refresh ();
+                    Idle.add (() => {
+                        refresh ();
+                        return false;
+                    });
                 } else {
                     _monitor.changed.disconnect (folder_changed);
-                    ThiefApp.get_instance ().library.remove_item (_sheets_dir);
+                    Idle.add (() => {
+                        ThiefApp.get_instance ().library.remove_item (_sheets_dir);
+                        return false;
+                    });
                 }
             }
-
-            // @TODO: Folder unmount support
         }
 
         public void add_hidden_item (string directory_path) {
@@ -622,10 +663,15 @@ namespace ThiefMD.Widgets {
             save_metadata_file (true);
         }
 
-        public void update_sheet_indicators () {
+        public void update_sheet_indicators (string active_file = "") {
             foreach (var s in metadata.sheet_order) {
                 Sheet show = _sheets.get (s);
-                show.redraw ();
+                bool should_be_active = (active_file != "" && show.file_path () == active_file);
+                if (show.active_sheet != should_be_active) {
+                    show.active_sheet = should_be_active;
+                } else {
+                    show.redraw ();
+                }
             }
         }
 

@@ -287,15 +287,27 @@ namespace ThiefMD.Controllers.SheetManager {
 
     public void set_sheets (Sheets? sheets) {
         _current_sheets = sheets;
-        if (_current_sheets != null) {
-            _current_sheets.update_sheet_indicators ();
-        }
+        sync_all_sheet_indicators ();
         UI.set_sheets (sheets);
     }
 
     public void redraw_sheets () {
-        if (_current_sheets != null) {
-            _current_sheets.update_sheet_indicators ();
+        sync_all_sheet_indicators ();
+    }
+
+    private static void sync_all_sheet_indicators () {
+        string active_path = "";
+        if (_currentSheet != null) {
+            active_path = _currentSheet.sheet.file_path ();
+        }
+
+        var app = ThiefApp.get_instance ();
+        if (app != null && app.library != null) {
+            foreach (var sheets in app.library.get_all_sheets ()) {
+                sheets.update_sheet_indicators (active_path);
+            }
+        } else if (_current_sheets != null) {
+            _current_sheets.update_sheet_indicators (active_path);
         }
     }
 
@@ -362,6 +374,12 @@ namespace ThiefMD.Controllers.SheetManager {
 
         debug ("Opening sheet: %s", sheet.file_path ());
 
+        if (_currentSheet != null && !Sheet.areEqual (sheet, _currentSheet.sheet)) {
+            _currentSheet.sheet.active_sheet = false;
+            _currentSheet.sheet.redraw ();
+            _currentSheet.editor.am_active = false;
+        }
+
         drain_and_save_active ();
 
         bool success = false;
@@ -385,6 +403,7 @@ namespace ThiefMD.Controllers.SheetManager {
 
         if (success) {
             _currentSheet.sheet.active_sheet = true;
+            _currentSheet.sheet.redraw ();
             _currentSheet.editor.am_active = true;
             _active_editors.add (_currentSheet);
             settings.last_file = sheet.file_path ();
@@ -399,6 +418,7 @@ namespace ThiefMD.Controllers.SheetManager {
         debug ("Tried to load %s (%s)\n", sheet.file_path (), (success) ? "success" : "failed");
 
         update_view ();
+        sync_all_sheet_indicators ();
 
         if (ThiefApp.get_instance ().search_bar.search_enabled ()) {
             Timeout.add (250, () => {
@@ -489,8 +509,8 @@ namespace ThiefMD.Controllers.SheetManager {
 
         foreach (var editor in _active_editors) {
             editor.editor.save ();
-            editor.sheet.redraw ();
             editor.sheet.active_sheet = false;
+            editor.sheet.redraw ();
             editor.editor.am_active = false;
             _view_container.remove (editor.editor);
         }
@@ -572,6 +592,7 @@ namespace ThiefMD.Controllers.SheetManager {
             clear_view ();
         }
 
+        sync_all_sheet_indicators ();
         settings.sheet_changed (); // Clear notes
         return false;
     }

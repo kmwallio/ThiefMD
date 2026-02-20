@@ -25,6 +25,9 @@ using ThiefMD;
 using ThiefMD.Widgets;
 
 namespace ThiefMD.Controllers.Pandoc {
+    [CCode (cname = "thief_markdown_to_html")]
+    private extern void markdown_to_html (string raw_mk, long flags, out string? html);
+
     public class PandocThinking : GLib.Object {
         private int wait_time;
         private Cancellable cancellable;
@@ -651,23 +654,16 @@ namespace ThiefMD.Controllers.Pandoc {
     }
 
     public bool generate_discount_html (string raw_mk, out string processed_mk) {
-        processed_mk = raw_mk;
-        var mkd = new Markdown.Document.from_gfm_string (processed_mk.data,
-            Markdown.DocumentFlags.TOC + 
-            Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.EXTRA_FOOTNOTE + 
-            Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.DLEXTRA + 
-            Markdown.DocumentFlags.FENCEDCODE + Markdown.DocumentFlags.GITHUBTAGS + 
-            Markdown.DocumentFlags.LATEX + Markdown.DocumentFlags.URLENCODEDANCHOR + 
-            Markdown.DocumentFlags.NOSTYLE + Markdown.DocumentFlags.EXPLICITLIST);
-
-        mkd.compile (
-            Markdown.DocumentFlags.TOC + Markdown.DocumentFlags.AUTOLINK + 
-            Markdown.DocumentFlags.EXTRA_FOOTNOTE + 
-            Markdown.DocumentFlags.AUTOLINK + Markdown.DocumentFlags.DLEXTRA +
-            Markdown.DocumentFlags.FENCEDCODE + Markdown.DocumentFlags.GITHUBTAGS +
-            Markdown.DocumentFlags.LATEX + Markdown.DocumentFlags.URLENCODEDANCHOR +
-            Markdown.DocumentFlags.EXPLICITLIST + Markdown.DocumentFlags.NOSTYLE);
-        mkd.get_document (out processed_mk);
+        long markdown_bitmap = (long) Markdown.DocumentFlags.TOC |
+            (long) Markdown.DocumentFlags.AUTOLINK | (long) Markdown.DocumentFlags.EXTRA_FOOTNOTE |
+            (long) Markdown.DocumentFlags.DLEXTRA | (long) Markdown.DocumentFlags.FENCEDCODE |
+            (long) Markdown.DocumentFlags.GITHUBTAGS | (long) Markdown.DocumentFlags.LATEX |
+            (long) Markdown.DocumentFlags.URLENCODEDANCHOR | (long) Markdown.DocumentFlags.NOSTYLE |
+            (long) Markdown.DocumentFlags.EXPLICITLIST;
+        markdown_to_html (raw_mk, markdown_bitmap, out processed_mk);
+        if (processed_mk == null) {
+            processed_mk = "";
+        }
 
         return (processed_mk.chomp () != "");
     }

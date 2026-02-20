@@ -28,18 +28,7 @@
         "*.la",
         "*grammar.a"
     ],
-    "modules": [{
-            "name": "gtksourceview",
-            "buildsystem": "meson",
-            "cleanup": [
-                "*.a"
-            ],
-            "sources": [{
-                "type": "archive",
-                "url": "https://download.gnome.org/sources/gtksourceview/5.14/gtksourceview-5.14.2.tar.xz",
-                "sha256": "1a6d387a68075f8aefd4e752cf487177c4a6823b14ff8a434986858aeaef6264"
-            }]
-        },
+    "modules": [
         "shared-modules/intltool/intltool-0.51.json",
         {
             "name": "libspelling",
@@ -64,14 +53,14 @@
                 "*.a"
             ],
             "build-commands": [
-                "./configure.sh --prefix=/app --enable-all-features --github-checkbox --with-fenced-code --shared",
+                "./configure.sh --prefix=/app --enable-all-features --github-checkbox=input --with-fenced-code --shared",
                 "sed -e 's|/sbin/ldconfig|/sbin/ldconfig -n|' -i librarian.sh",
                 "make install"
             ],
             "sources": [{
                 "type": "archive",
-                "url": "https://www.pell.portland.or.us/~orc/Code/discount/discount-2.2.7e.tar.bz2",
-                "sha256": "82249a3d50a09aac29245990bf9c6139c0ae48707b7dab1268daf851f9db963b"
+                "url": "https://www.pell.portland.or.us/~orc/Code/discount/discount-3.0.1.2.tar.bz2",
+                "sha256": "ec670ca34fba6dd99cf30170b98f57fbd84ed51528cc3ae732b5ec298e738d9d"
             }]
         },
         {
@@ -128,27 +117,6 @@
             ]
         },
         {
-            "name" : "libadwaita",
-            "buildsystem" : "meson",
-            "cleanup": [
-                "*.a"
-            ],
-            "config-opts" : [
-                "-Dexamples=false",
-                "-Dprofiling=false",
-                "-Dintrospection=enabled",
-                "-Dtests=false",
-                "-Dvapi=true"
-            ],
-            "sources" : [
-                {
-                    "type": "archive",
-                    "url": "https://download.gnome.org/sources/libadwaita/1.6/libadwaita-1.6.2.tar.xz",
-                    "sha256": "7542f8354e6808dd4e9a31551bbdfc0170735e4af4d1b3e69186500ccb9c01eb"
-                }
-            ]
-        },
-        {
             "name": "python-setuptools_scm",
             "buildsystem": "simple",
             "build-commands": [
@@ -175,6 +143,9 @@
                 "*.a"
             ],
             "buildsystem": "meson",
+            "config-opts": [
+                "-Drequire_libmarkdown3=true"
+            ],
             "sources": [{
                 "type": "dir",
                 "path": ".."

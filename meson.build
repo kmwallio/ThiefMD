@@ -1,6 +1,6 @@
 # Name our project
 project('com.github.kmwallio.thiefmd', ['vala', 'c'],
-    version: '0.3.0'
+    version: '0.3.1'
 )
 
 # Application ID
@@ -53,10 +53,19 @@ c_args = [
 cc = meson.get_compiler('c')
 
 # Find libMarkdown
-libmarkdown = dependency('libmarkdown', version: '>= 2.2.1', required: false)
+require_libmarkdown3 = get_option('require_libmarkdown3')
+libmarkdown = dependency('libmarkdown', version: '>= 3.0.0', required: require_libmarkdown3)
+libmarkdown3 = false
 if libmarkdown.found() == false
-    cc = meson.get_compiler('c')
-    libmarkdown = cc.find_library('libmarkdown', required: true)
+    libmarkdown = dependency('libmarkdown', version: '>= 2.2.1', required: true)
+endif
+if libmarkdown.version().version_compare('>= 3.0.0')
+    libmarkdown3 = true
+endif
+if libmarkdown3
+    add_global_arguments('-DTHIEF_LIBMARKDOWN3=1', language: 'c')
+else
+    add_global_arguments('-DTHIEF_LIBMARKDOWN3=0', language: 'c')
 endif
 
 # Find linkgrammar
@@ -91,6 +100,7 @@ executable(
     'src/Controllers/UI.vala',
     'src/Controllers/UserData.vala',
     'src/Controllers/Pandoc.vala',
+    'src/Controllers/MarkdownCompat.c',
     'src/Controllers/Exporters.vala',
     'src/Controllers/ConnectionManager.vala',
     'src/Connections/ConnectionBase.vala',

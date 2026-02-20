@@ -99,7 +99,7 @@ namespace ThiefMD.Widgets {
             grid.attach (lic_label, 1, 7);
             grid.attach (lic_label2, 1, 8);
 
-            var icon = new Gtk.Image.from_icon_name ("com.github.kmwallio.thiefmd");
+            var icon = new Gtk.Image.from_resource ("/com/github/kmwallio/thiefmd/icons/thiefmd.svg");
             icon.set_pixel_size (128);
             grid.attach (icon, 1, 1);
 

@@ -1,14 +1,5 @@
 if get_option('build_tests')
 
-cc = meson.get_compiler('c')
-
-# Find libMarkdown
-libmarkdown = dependency('libmarkdown', version: '>= 2.2.1', required: false)
-if libmarkdown.found() == false
-    cc = meson.get_compiler('c')
-    libmarkdown = cc.find_library('libmarkdown', required: true)
-endif
-
 # Find linkgrammar
 linkgrammar = dependency('liblink-grammar', version: '>= 5.8.0', required: false)
 if linkgrammar.found() == false
@@ -29,6 +20,7 @@ testing = executable('tests',
     'HelpersTests.vala',
     'PandocTests.vala',
     'TestSettings.vala',
+    meson.source_root() + '/src/Controllers/MarkdownCompat.c',
     meson.source_root() + '/src/Controllers/Pandoc.vala',
     meson.source_root() + '/src/Controllers/FileManager.vala',
     meson.source_root() + '/src/Controllers/UserData.vala',

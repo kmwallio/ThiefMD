@@ -12,7 +12,7 @@ Requires: pandoc
 BuildRequires: meson
 BuildRequires: vala
 BuildRequires: gcc
-BuildRequires: pkgconfig(libmarkdown)
+BuildRequires: pkgconfig(libmarkdown) >= 2.2.1
 BuildRequires: pkgconfig(libxml-2.0)
 BuildRequires: pkgconfig(gio-2.0)
 BuildRequires: pkgconfig(gee-0.8)
