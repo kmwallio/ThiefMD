@@ -1,2 +1,3 @@
 option('profile', type: 'combo', choices: [ 'default', 'development' ], value: 'default', description: 'Dev build or production')
 option('build_tests', type: 'boolean', value: false, description: 'build tests')
+option('require_libmarkdown3', type: 'boolean', value: false, description: 'require libmarkdown >= 3.0.0')

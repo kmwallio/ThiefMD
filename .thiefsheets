@@ -4,7 +4,8 @@
     "CONTRIBUTING.md",
     "DEB-Packaging.md",
     "RPM-Packaging.md",
-    "flatpak-packaging.md"
+    "flatpak-packaging.md",
+    "TEST_COVERAGE.md"
   ],
   "hidden-folders" : [
     "subprojects",
@@ -17,13 +18,15 @@
     "meson",
     "po",
     "tests",
-    "builddir"
+    "builddir",
+    "_build"
   ],
   "folder-order" : [
     "docs",
     "po",
     "tests",
-    "builddir"
+    "builddir",
+    "_build"
   ],
   "notes" : "",
   "icon" : ""
