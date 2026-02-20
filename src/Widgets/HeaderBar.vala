@@ -107,7 +107,7 @@ namespace ThiefMD.Widgets {
             sidebar_button = new Gtk.Button ();
             sidebar_button.has_tooltip = true;
             sidebar_button.tooltip_text = (_("Show Notes"));
-            sidebar_button.set_icon_name ("sidebar-hide-symbolic");
+            sidebar_button.set_icon_name ("sidebar-show-right-symbolic");
             sidebar_button.clicked.connect (() => {
                 if (!ThiefApp.get_instance ().notes.child_revealed) {
                     ThiefApp.get_instance ().notes_widget.show ();
