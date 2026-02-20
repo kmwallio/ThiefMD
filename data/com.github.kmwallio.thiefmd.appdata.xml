@@ -67,7 +67,6 @@
         <p>From experimental to normal, and some new experiments.</p>
         <ul>
           <li>Image previews - Hover over an image tag, and we'll show what it looks like.</li>
-          <li>libmarkdown3 (Discount 3) - More markdown, better support. We're living in the future today.</li>
           <li>About Dialog Fixes - Thanks sevonj!</li>
           <li>Bug fixes.</li>
         </ul>
