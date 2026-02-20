@@ -233,35 +233,6 @@ namespace ThiefMD.Enrichments {
         }
     }
 
-    /**
-     * Holds a child anchor inserted into the buffer to show an image preview,
-     * along with the URL it was loaded from.
-     */
-    private class ImagePreviewEntry : Object {
-        public Gtk.TextChildAnchor anchor;
-        public Gtk.Picture picture;
-        public int line_num;
-        public string url;
-
-        public ImagePreviewEntry (Gtk.TextChildAnchor a, Gtk.Picture p, int line, string u) {
-            anchor = a;
-            picture = p;
-            line_num = line;
-            url = u;
-        }
-    }
-
-    /** Pending image insert: target line number, raw URL, resolved file path. */
-    private class PendingImageInsert : Object {
-        public int line_num;
-        public string img_url;
-        public string img_path;
-
-        public PendingImageInsert (int l, string u, string p) {
-            line_num = l; img_url = u; img_path = p;
-        }
-    }
-
     public class MarkdownEnrichment : Object {
         private GtkSource.CompletionWords? source_completion;
         private BibTexCompletionProvider? bibtex_provider;
@@ -303,16 +274,6 @@ namespace ThiefMD.Enrichments {
         private string checking_copy;
         private TimedMutex limit_updates;
 
-        // Image preview state (experimental mode only)
-        private Gee.ArrayList<ImagePreviewEntry> image_previews;
-        private bool updating_images = false;
-        private bool image_update_pending = false;
-        private uint image_update_idle_id = 0;
-        private bool image_preview_ready = false;
-        private bool initializing_attach = false;
-        private bool image_preview_edit_gate = false;
-        private ulong image_preview_edit_handler_id = 0;
-
         private int last_cursor;
         private int copy_offset;
         private int hashtag_w;
@@ -335,7 +296,7 @@ namespace ThiefMD.Enrichments {
             try {
                 is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss|file)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.CASELESS, 0);
                 is_markdown_url = new Regex ("(?<text_group>\\[(?>[^\\[\\]]+|(?&text_group))+\\])(?:\\((?<url>\\S+?)(?:[ ]\"(?<title>(?:[^\"]|(?<=\\\\)\")*?)\")?\\))", RegexCompileFlags.CASELESS, 0);
-                // Matches image tags: ![alt text](url) — used for inline preview
+                // Matches image tags: ![alt text](url) — used for hover tooltip preview
                 is_image = new Regex ("!\\[([^\\]]*)\\]\\(([^)]+)\\)", RegexCompileFlags.CASELESS, 0);
                 // Matches HTML image tags like: <img src="path/to/image.png" ...>
                 is_html_image = new Regex ("<img\\b[^>]*\\bsrc\\s*=\\s*[\\\"']([^\\\"']+)[\\\"'][^>]*>", RegexCompileFlags.CASELESS, 0);
@@ -352,7 +313,6 @@ namespace ThiefMD.Enrichments {
             markup_inserted_around_selection = false;
             active_selection = false;
             last_cursor = -1;
-            image_previews = new Gee.ArrayList<ImagePreviewEntry> ();
         }
 
         private void tag_code_blocks () {
@@ -1045,8 +1005,6 @@ namespace ThiefMD.Enrichments {
 
             last_cursor = current_cursor;
             checking.unlock ();
-
-            // Inline image previews are disabled; images are shown via hover tooltip.
         }
 
         private void clear_markup_navigation () {
@@ -1302,21 +1260,6 @@ namespace ThiefMD.Enrichments {
                 return false;
             }
 
-            if (image_update_idle_id != 0) {
-                GLib.Source.remove (image_update_idle_id);
-                image_update_idle_id = 0;
-            }
-            if (image_preview_edit_handler_id != 0 && buffer != null) {
-                SignalHandler.disconnect (buffer, image_preview_edit_handler_id);
-                image_preview_edit_handler_id = 0;
-            }
-            image_update_pending = false;
-            updating_images = false;
-            image_preview_ready = false;
-            initializing_attach = true;
-            image_preview_edit_gate = false;
-            image_previews.clear ();
-
             view = textview;
             buffer = textview.get_buffer ();
 
@@ -1326,17 +1269,6 @@ namespace ThiefMD.Enrichments {
             }
 
             var settings = AppSettings.get_default ();
-
-            image_preview_edit_handler_id = buffer.changed.connect (() => {
-                if (!image_preview_edit_gate) {
-                    image_preview_edit_gate = true;
-                    recheck_all ();
-                }
-                if (image_preview_edit_handler_id != 0 && buffer != null) {
-                    SignalHandler.disconnect (buffer, image_preview_edit_handler_id);
-                    image_preview_edit_handler_id = 0;
-                }
-            });
 
             view.destroy.connect (detach);
 
@@ -1355,7 +1287,6 @@ namespace ThiefMD.Enrichments {
             active_selection = false;
 
             settings_updated ();
-            initializing_attach = false;
             settings.changed.connect (settings_updated);
 
             last_cursor = -1;
@@ -1382,17 +1313,10 @@ namespace ThiefMD.Enrichments {
                 buffer.notify["cursor-position"].connect (cursor_update_heading_margins);
                 markdown_url.invisible = true;
                 markdown_url.invisible_set = true;
-                if (!image_preview_ready && !initializing_attach) {
-                    image_preview_ready = true;
-                    recheck_all ();
-                }
             } else {
                 buffer.notify["cursor-position"].disconnect (cursor_update_heading_margins);
                 markdown_url.invisible = false;
                 markdown_url.invisible_set = false;
-                // Toss any image previews — they're an experimental-only treat
-                remove_all_image_previews ();
-                image_preview_ready = false;
             }
 
             // Update BibTeX provider based on experimental mode
@@ -1552,30 +1476,7 @@ namespace ThiefMD.Enrichments {
             }
         }
 
-        /**
-         * Resolve an image URL to an absolute local file path.
-         * Relative paths are resolved against the directory of the current file.
-         * Returns an empty string if the URL looks remote or can't be resolved.
-         */
-        /**
-         * Remove every image preview widget from the buffer and clear the tracking list.
-         * Deletes bottom-to-top so earlier deletions don't shift later iters.
-         * Must be called from the main thread (it modifies the buffer).
-         */
-        private void remove_all_image_previews () {
-            if (image_previews == null) {
-                return;
-            }
-
-            foreach (var entry in image_previews) {
-                if (entry.picture != null) {
-                    entry.picture.unparent ();
-                }
-            }
-
-            image_previews.clear ();
-        }
-
+        /** Load an image from disk, scale it to fit max_w/max_h, and return a texture. Returns null if the image cannot be loaded. */
         private Gdk.Texture? load_preview_texture (string img_path, int max_w, int max_h) {
             try {
                 var pixbuf = new Gdk.Pixbuf.from_file_at_scale (img_path, max_w, max_h, true);
@@ -1586,186 +1487,8 @@ namespace ThiefMD.Enrichments {
             }
         }
 
-        /**
-         * Scan the buffer for image tags and sync preview widgets.
-         * Scheduled via GLib.Idle so it never runs inside recheck_all().
-         * Only active in experimental mode.
-         *
-         * Key design: all buffer inserts are done bottom-to-top (highest line
-         * number first) so that each insertion doesn't shift the line numbers
-         * of subsequent insert points. This avoids the cjhtextregion assertion
-         * crash caused by stale buffer offsets.
-         */
-        private bool update_image_previews () {
-            image_update_idle_id = 0;
-            image_update_pending = false;
-
-            var settings = AppSettings.get_default ();
-            if (!settings.experimental || !image_preview_ready || buffer == null || view == null) {
-                return GLib.Source.REMOVE;
-            }
-
-            // Don't let buffer edits below trigger another update loop
-            updating_images = true;
-            debug ("Image preview sync start: lines=%d chars=%d tracked=%d",
-                buffer.get_line_count (), buffer.get_char_count (), image_previews.size);
-
-            // Figure out where the cursor lives so we can skip that line
-            var cursor_mark = buffer.get_insert ();
-            Gtk.TextIter cursor_iter;
-            buffer.get_iter_at_mark (out cursor_iter, cursor_mark);
-            int cursor_line = cursor_iter.get_line ();
-
-            // --- Step 1: Drop stale preview entries without mutating buffer text ---
-            var still_good = new Gee.ArrayList<ImagePreviewEntry> ();
-
-            foreach (var entry in image_previews) {
-                if (entry.anchor.get_deleted ()) {
-                    if (entry.picture != null) {
-                        entry.picture.unparent ();
-                    }
-                    continue;
-                }
-
-                if (entry.line_num < 0 || entry.line_num >= buffer.get_line_count ()) {
-                    if (entry.picture != null) {
-                        entry.picture.unparent ();
-                    }
-                    continue;
-                }
-
-                Gtk.TextIter line_start, line_end;
-                buffer.get_iter_at_line (out line_start, entry.line_num);
-                line_end = line_start;
-                line_end.forward_to_line_end ();
-                string line_text = buffer.get_text (line_start, line_end, false);
-
-                bool still_valid = false;
-                try {
-                    MatchInfo mi;
-                    if (is_image.match (line_text, 0, out mi)) {
-                        still_valid = (mi.fetch (2) == entry.url) && (entry.line_num != cursor_line);
-                    }
-                } catch (Error e) {}
-
-                if (still_valid) {
-                    still_good.add (entry);
-                } else {
-                    if (entry.picture != null) {
-                        entry.picture.unparent ();
-                    }
-                }
-            }
-
-            image_previews = still_good;
-
-            // --- Step 2: Scan line-by-line for image tags that need previews ---
-            var previewed_lines = new Gee.HashSet<int> ();
-            foreach (var entry in image_previews) {
-                if (!entry.anchor.get_deleted ()) {
-                    previewed_lines.add (entry.line_num);
-                }
-            }
-
-            // Collect (line_number, url, resolved_path) for lines that need a new preview
-            var pending_inserts = new Gee.ArrayList<PendingImageInsert> ();
-
-            Gtk.TextIter line_iter;
-            buffer.get_start_iter (out line_iter);
-            do {
-                int line_num = line_iter.get_line ();
-
-                if (line_num == cursor_line || previewed_lines.contains (line_num)) {
-                    continue;
-                }
-
-                if (line_iter.has_tag (code_block)) {
-                    continue;
-                }
-
-                Gtk.TextIter line_end = line_iter;
-                line_end.forward_to_line_end ();
-                string line_text = buffer.get_text (line_iter, line_end, false);
-
-                MatchInfo mi;
-                try {
-                    if (is_image.match (line_text, 0, out mi)) {
-                        string img_url = mi.fetch (2);
-                        string img_path = resolve_image_path (img_url);
-                        // find_file returns url unchanged when nothing found
-                        if (img_path != img_url || GLib.FileUtils.test (img_path, GLib.FileTest.EXISTS)) {
-                            pending_inserts.add (new PendingImageInsert (line_num, img_url, img_path));
-                        }
-                    }
-                } catch (Error e) {}
-            } while (line_iter.forward_line ());
-
-            // --- Step 3: Insert anchors bottom-to-top ---
-            // Sort by descending line number so earlier inserts don't shift later positions.
-            pending_inserts.sort ((a, b) => b.line_num - a.line_num);
-
-            foreach (var info in pending_inserts) {
-                int line_num = info.line_num;
-                string img_url = info.img_url;
-                string img_path = info.img_path;
-
-                int max_inline_w, max_inline_h;
-                get_preview_max_size (out max_inline_w, out max_inline_h);
-
-                Gdk.Texture? texture = load_preview_texture (img_path, max_inline_w, max_inline_h);
-                if (texture == null) {
-                    continue;
-                }
-
-                // Get a fresh iter at the end of the target line — always valid
-                // because we're going bottom-to-top and haven't touched this line yet.
-                Gtk.TextIter insert_pos;
-                buffer.get_iter_at_line (out insert_pos, line_num);
-                insert_pos.forward_to_line_end ();
-
-                var anchor = buffer.create_child_anchor (insert_pos);
-                var picture = new Gtk.Picture.for_paintable (texture);
-                picture.content_fit = Gtk.ContentFit.SCALE_DOWN;
-                picture.width_request = max_inline_w;
-                picture.height_request = max_inline_h;
-                picture.can_shrink = true;
-                view.add_child_at_anchor (picture, anchor);
-
-                image_previews.add (new ImagePreviewEntry (anchor, picture, line_num, img_url));
-                previewed_lines.add (line_num);
-            }
-
-            debug ("Image preview sync end: inserted=%d tracked=%d",
-                pending_inserts.size, image_previews.size);
-            updating_images = false;
-            return GLib.Source.REMOVE;
-        }
-
         public void detach () {
             var settings = AppSettings.get_default ();
-
-            // Cancel any idle that might try to touch buffer/view after we null them
-            if (image_update_idle_id != 0) {
-                GLib.Source.remove (image_update_idle_id);
-                image_update_idle_id = 0;
-            }
-            // The buffer is being abandoned — no need to surgically delete anchor
-            // chars; just drop our references so nothing tries to use them.
-            foreach (var entry in image_previews) {
-                if (entry.picture != null) {
-                    entry.picture.unparent ();
-                }
-            }
-            image_previews.clear ();
-            if (image_preview_edit_handler_id != 0 && buffer != null) {
-                SignalHandler.disconnect (buffer, image_preview_edit_handler_id);
-                image_preview_edit_handler_id = 0;
-            }
-            image_update_pending = false;
-            updating_images = false;
-            image_preview_ready = false;
-            initializing_attach = false;
-            image_preview_edit_gate = false;
 
             // Remove BibTeX completion provider if present
             if (bibtex_provider != null && view != null) {
