@@ -22,12 +22,20 @@ using ThiefMD.Widgets;
 
 namespace ThiefMD.Controllers.FileManager {
     public static bool disable_save = false;
+    // AE_IFREG from libarchive: regular file mode for archive entries
+    private const uint ARCHIVE_IFREG = 0100000;
 
     public void import_file (string file_path, Sheets parent) {
         File import_f = File.new_for_path (file_path);
         string ext = file_path.substring (file_path.last_index_of (".") + 1).down ();
         string match_ext = ext;
         warning ("Importing (%s): %s", ext, import_f.get_path ());
+
+        // TextPack has its own import logic
+        if (ext == "textpack") {
+            import_textpack (file_path, parent);
+            return;
+        }
 
         if (match_ext.length >= 3) {
             match_ext = "*." + match_ext + ";";
@@ -1011,6 +1019,246 @@ namespace ThiefMD.Controllers.FileManager {
         }
 
         return file_created;
+    }
+
+    // Import a TextPack (.textpack) archive into a library folder.
+    // TextBundle spec: https://textbundle.org/spec/
+    public void import_textpack (string textpack_path, Sheets parent) {
+        File textpack_file = File.new_for_path (textpack_path);
+        if (!textpack_file.query_exists ()) {
+            return;
+        }
+
+        Gee.List<string> importSayings = new Gee.LinkedList<string> ();
+        importSayings.add (_("Unpacking your stories..."));
+        importSayings.add (_("Liberating your words!"));
+        importSayings.add (_("TextPack, meet ThiefMD!"));
+
+        Thinking worker = new Thinking (_("Importing TextPack"), () => {
+            // Use the textpack file name (without extension) as the output file name
+            string bundle_name = textpack_file.get_basename ();
+            bundle_name = bundle_name.substring (0, bundle_name.last_index_of ("."));
+
+            try {
+                var archive = new Archive.Read ();
+                throw_on_failure (archive.support_filter_all ());
+                throw_on_failure (archive.support_format_all ());
+                throw_on_failure (archive.open_filename (textpack_file.get_path (), 10240));
+
+                string imported_text_path = "";
+
+                unowned Archive.Entry entry;
+                while (archive.next_header (out entry) == Archive.Result.OK) {
+                    string entry_path = entry.pathname ();
+
+                    // Strip a leading bundle folder prefix (e.g. "mybundle/text.md" -> "text.md"),
+                    // but keep the "assets/" prefix intact since that's part of the spec
+                    if (entry_path.contains ("/")) {
+                        string first_comp = entry_path.substring (0, entry_path.index_of ("/"));
+                        string rest = entry_path.substring (entry_path.index_of ("/") + 1);
+                        if (first_comp != "assets" && rest != "") {
+                            entry_path = rest;
+                        }
+                    }
+
+                    // Check for the main text file
+                    bool is_text = (entry_path == "text.md" ||
+                        entry_path == "text.markdown" ||
+                        entry_path == "text.fountain" ||
+                        entry_path == "text.fou");
+
+                    // Assets go in the same folder as the markdown file
+                    bool is_asset = entry_path.has_prefix ("assets/") &&
+                        !entry_path.has_suffix ("/");
+
+                    if (is_text || is_asset) {
+                        uint8[] buffer = null;
+                        Array<uint8> bin_buffer = new Array<uint8> ();
+                        Posix.off_t offset;
+                        while (archive.read_data_block (out buffer, out offset) == Archive.Result.OK) {
+                            if (buffer == null) {
+                                break;
+                            }
+                            bin_buffer.append_vals (buffer, buffer.length);
+                        }
+
+                        if (bin_buffer.length != 0) {
+                            string dest_path;
+                            if (is_text) {
+                                string ext = entry_path.substring (entry_path.last_index_of ("."));
+                                dest_path = Path.build_filename (parent.get_sheets_path (), bundle_name + ext);
+                                imported_text_path = dest_path;
+                            } else {
+                                // Assets go right next to the markdown file, no subfolder
+                                string asset_name = Path.get_basename (entry_path);
+                                dest_path = Path.build_filename (parent.get_sheets_path (), asset_name);
+                            }
+
+                            File dest_file = File.new_for_path (dest_path);
+                            try {
+                                save_file (dest_file, bin_buffer.data);
+                            } catch (Error e) {
+                                warning ("Could not save extracted file: %s", e.message);
+                            }
+                        }
+                    } else {
+                        archive.read_data_skip ();
+                    }
+                }
+
+                // Rewrite "assets/" image paths to flat paths since assets live next to the .md.
+                // TextBundle-compliant tools only use "assets/" as a path prefix (not in prose),
+                // so a direct replace is safe here.
+                if (imported_text_path != "") {
+                    string markdown = get_file_contents (imported_text_path);
+                    string fixed = markdown.replace ("assets/", "");
+                    if (fixed != markdown) {
+                        File md_file = File.new_for_path (imported_text_path);
+                        try {
+                            save_file (md_file, fixed.data);
+                        } catch (Error e) {
+                            warning ("Could not update image paths: %s", e.message);
+                        }
+                    }
+                }
+            } catch (Error e) {
+                warning ("Could not import textpack: %s", e.message);
+            }
+        }, importSayings, ThiefApp.get_instance ());
+
+        worker.run ();
+        parent.refresh ();
+        ThiefApp.get_instance ().library.refresh_dir (parent);
+    }
+
+    // Export a folder's markdown files as a TextPack (.textpack) archive.
+    // TextBundle spec: https://textbundle.org/spec/
+    public bool export_textpack (string folder_path, string textpack_path) {
+        try {
+            // Gather all markdown files from the folder, in order
+            var md_files = new Gee.LinkedList<string> ();
+            collect_exportable_files (folder_path, md_files);
+
+            // Combine all markdown into a single string
+            var combined = new StringBuilder ();
+            foreach (string file_path in md_files) {
+                string content = get_file_contents (file_path);
+                combined.append (content);
+                combined.append ("\n\n");
+            }
+            string markdown_content = combined.str;
+
+            // Find all local image files referenced by the markdown
+            Gee.Map<string, string> images = Pandoc.file_image_map (markdown_content, folder_path);
+
+            // Rewrite image references to use assets/ prefix inside the bundle
+            string textbundle_markdown = markdown_content;
+            foreach (var img_entry in images.entries) {
+                string asset_name = "assets/" + Path.get_basename (img_entry.value);
+                textbundle_markdown = textbundle_markdown.replace (img_entry.key, asset_name);
+            }
+
+            // Build the info.json for the TextBundle
+            string info_json = """{"version":2,"type":"net.daringfireball.markdown","transient":false,"creatorURL":"https://thiefmd.com","creatorIdentifier":"com.github.kmwallio.thiefmd"}""";
+
+            // Create the ZIP archive
+            var writer = new Archive.Write ();
+            if (writer.set_format_zip () != Archive.Result.OK) {
+                warning ("Could not set zip format for textpack");
+                return false;
+            }
+            if (writer.open_filename (textpack_path) != Archive.Result.OK) {
+                warning ("Could not open textpack for writing: %s", textpack_path);
+                return false;
+            }
+
+            // Add info.json
+            textpack_add_string (writer, "info.json", info_json);
+
+            // Add text.md with the combined content
+            textpack_add_string (writer, "text.md", textbundle_markdown);
+
+            // Add asset files to the assets/ folder
+            foreach (var img_entry in images.entries) {
+                string abs_path = img_entry.value;
+                string asset_name = "assets/" + Path.get_basename (abs_path);
+                textpack_add_file (writer, asset_name, abs_path);
+            }
+
+            writer.close ();
+            return true;
+        } catch (Error e) {
+            warning ("Could not create textpack: %s", e.message);
+            return false;
+        }
+    }
+
+    // Recursively collect exportable markdown/fountain files from a folder, in order.
+    private void collect_exportable_files (string folder_path, Gee.LinkedList<string> files) {
+        try {
+            Dir dir = Dir.open (folder_path, 0);
+            string? name = null;
+            var file_list = new Gee.LinkedList<string> ();
+            var dir_list = new Gee.LinkedList<string> ();
+
+            while ((name = dir.read_name ()) != null) {
+                if (name.has_prefix (".")) {
+                    continue;
+                }
+                string full_path = Path.build_filename (folder_path, name);
+                if (FileUtils.test (full_path, FileTest.IS_DIR)) {
+                    dir_list.add (full_path);
+                } else if (exportable_file (name)) {
+                    file_list.add (full_path);
+                }
+            }
+
+            file_list.sort ((a, b) => a.collate (b));
+            foreach (string f in file_list) {
+                files.add (f);
+            }
+
+            dir_list.sort ((a, b) => a.collate (b));
+            foreach (string d in dir_list) {
+                collect_exportable_files (d, files);
+            }
+        } catch (Error e) {
+            warning ("Could not scan folder for export: %s", e.message);
+        }
+    }
+
+    // Write a string as a file entry inside a ZIP archive.
+    private void textpack_add_string (Archive.Write writer, string name, string data) {
+        var entry = new Archive.Entry ();
+        entry.set_pathname (name);
+        entry.set_size (data.length);
+        entry.set_filetype (ARCHIVE_IFREG);
+        entry.set_perm (0644);
+        writer.write_header (entry);
+        // data.data includes a null byte at the end; only write data.length bytes
+        writer.write_data (data.data, data.length);
+    }
+
+    // Write a file from disk as an entry inside a ZIP archive.
+    private void textpack_add_file (Archive.Write writer, string archive_name, string file_path) {
+        try {
+            File f = File.new_for_path (file_path);
+            if (!f.query_exists ()) {
+                return;
+            }
+            uint8[] data;
+            f.load_contents (null, out data, null);
+
+            var entry = new Archive.Entry ();
+            entry.set_pathname (archive_name);
+            entry.set_size (data.length);
+            entry.set_filetype (ARCHIVE_IFREG);
+            entry.set_perm (0644);
+            writer.write_header (entry);
+            writer.write_data (data, data.length);
+        } catch (Error e) {
+            warning ("Could not add asset to textpack: %s", e.message);
+        }
     }
 
     public class FileLock : Object {

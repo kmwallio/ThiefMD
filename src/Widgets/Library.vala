@@ -1029,6 +1029,7 @@ namespace ThiefMD.Widgets {
 
             var export_section = new GLib.Menu ();
             export_section.append (_("Export Preview"), "library.export_preview");
+            export_section.append (_("Export as TextPack"), "library.export_textpack");
             export_section.append (_("Writing Statistics"), "library.writing_stats");
             root.append_section (null, export_section);
 
@@ -1039,6 +1040,7 @@ namespace ThiefMD.Widgets {
             var folder_section = new GLib.Menu ();
             folder_section.append (_("Open in File Manager"), "library.open_folder");
             folder_section.append (_("Create Sub-Folder"), "library.create_folder");
+            folder_section.append (_("Import TextPack"), "library.import_textpack");
             if (!settings.is_in_library (selection.path)) {
                 folder_section.append (_("Hide from Library"), "library.hide");
             }
@@ -1081,6 +1083,30 @@ namespace ThiefMD.Widgets {
                 ppw.show ();
             });
             _context_actions.add_action (export_preview);
+
+            var export_textpack_action = new GLib.SimpleAction ("export_textpack", null);
+            export_textpack_action.activate.connect ((parameter) => {
+                LibNode? selection = current_selection ();
+                if (selection == null) {
+                    return;
+                }
+
+                var textpack_filter = new Gtk.FileFilter ();
+                textpack_filter.set_filter_name (_("TextPack files"));
+                textpack_filter.add_pattern ("*.textpack");
+
+                File? save_target = Dialogs.get_target_save_file_with_extension (
+                    _("Export as TextPack"),
+                    textpack_filter,
+                    "textpack");
+
+                if (save_target == null) {
+                    return;
+                }
+
+                FileManager.export_textpack (selection.path, save_target.get_path ());
+            });
+            _context_actions.add_action (export_textpack_action);
 
             var writing_stats = new GLib.SimpleAction ("writing_stats", null);
             writing_stats.activate.connect ((parameter) => {
@@ -1127,6 +1153,22 @@ namespace ThiefMD.Widgets {
                 show_new_folder_popover ();
             });
             _context_actions.add_action (create_folder);
+
+            var import_textpack_action = new GLib.SimpleAction ("import_textpack", null);
+            import_textpack_action.activate.connect ((parameter) => {
+                LibNode? selection = current_selection ();
+                if (selection == null) {
+                    return;
+                }
+
+                File? textpack_file = Dialogs.display_open_dialog ("*.textpack");
+                if (textpack_file == null || !textpack_file.query_exists ()) {
+                    return;
+                }
+
+                FileManager.import_textpack (textpack_file.get_path (), selection.sheets);
+            });
+            _context_actions.add_action (import_textpack_action);
 
             var hide_folder = new GLib.SimpleAction ("hide", null);
             hide_folder.activate.connect ((parameter) => {
