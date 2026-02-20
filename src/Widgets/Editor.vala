@@ -734,7 +734,7 @@ namespace ThiefMD.Widgets {
             Gtk.TextIter start, end;
             buffer.get_bounds (out start, out end);
             // Strip U+FFFC (object replacement char) — that's what GTK uses to
-            // represent child anchors (like image preview widgets) in the text.
+            // represent child anchors and embedded objects in the text.
             // We don't want those sneaking into saved markdown files!
             return buffer.get_text (start, end, true).replace ("\xef\xbf\xbc", "");
         }
