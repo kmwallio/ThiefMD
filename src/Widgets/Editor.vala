@@ -1665,7 +1665,7 @@ namespace ThiefMD.Widgets {
                 }
                 
                 // Set margins to 20% of the visible viewport height
-                int margin = (int)(page_size * 0.20);
+                int margin = (int)(page_size * 0.40);
                 bottom_margin = margin;
                 top_margin = margin;
                 debug ("typewriter_scrolling: Set margins to %d based on page_size %.0f", margin, page_size);
