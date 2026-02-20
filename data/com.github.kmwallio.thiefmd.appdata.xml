@@ -66,7 +66,10 @@
       <description>
         <p>From experimental to normal, and some new experiments.</p>
         <ul>
-          <li>.</li>
+          <li>Image previews - Hover over an image tag, and we'll show what it looks like.</li>
+          <li>libmarkdown3 (Discount 3) - More markdown, better support. We're living in the future today.</li>
+          <li>About Dialog Fixes - Thanks sevonj!</li>
+          <li>Bug fixes.</li>
         </ul>
       </description>
       <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.3.1</url>

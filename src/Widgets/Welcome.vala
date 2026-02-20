@@ -117,7 +117,8 @@ namespace ThiefMD {
             h_box.append (v_box);
 
             close_request.connect (() => {
-                return ThiefApplication.close_window (this);
+                ThiefApplication.close_window (this);
+                return false;
             });
             set_titlebar (bar);
             set_child (h_box);

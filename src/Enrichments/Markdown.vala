@@ -242,6 +242,7 @@ namespace ThiefMD.Enrichments {
         private bool markup_inserted_around_selection;
         private Gtk.EventControllerKey? markup_key_controller;
         private ulong markup_cursor_handler_id = 0;
+        private ulong image_tooltip_handler_id = 0;
         private int markup_start_offset = -1;
         private int markup_end_offset = -1;
         private bool markup_is_link = false;
@@ -265,6 +266,8 @@ namespace ThiefMD.Enrichments {
         private Regex numerical_list;
         private Regex is_url;
         private Regex is_markdown_url;
+        private Regex is_image;
+        private Regex is_html_image;
         private Regex is_heading;
         private Regex is_codeblock;
 
@@ -293,6 +296,10 @@ namespace ThiefMD.Enrichments {
             try {
                 is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss|file)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.CASELESS, 0);
                 is_markdown_url = new Regex ("(?<text_group>\\[(?>[^\\[\\]]+|(?&text_group))+\\])(?:\\((?<url>\\S+?)(?:[ ]\"(?<title>(?:[^\"]|(?<=\\\\)\")*?)\")?\\))", RegexCompileFlags.CASELESS, 0);
+                // Matches image tags: ![alt text](url) or ![alt](url "title") — used for hover tooltip preview
+                is_image = new Regex ("!\\[([^\\]]*)\\]\\(([^\\s)]+)(?:\\s[^)]*)?\\)", RegexCompileFlags.CASELESS, 0);
+                // Matches HTML image tags like: <img src="path/to/image.png" ...>
+                is_html_image = new Regex ("<img\\b[^>]*\\bsrc\\s*=\\s*[\\\"']([^\\\"']+)[\\\"'][^>]*>", RegexCompileFlags.CASELESS, 0);
             } catch (Error e) {
                 warning ("Could not initialize URL regexes: %s", e.message);
             }
@@ -453,6 +460,228 @@ namespace ThiefMD.Enrichments {
             var cursor = buffer.get_insert ();
             buffer.get_iter_at_mark (out cursor_location, cursor);
             link_clicked_at_iter (cursor_location);
+        }
+
+        private bool is_common_frontmatter_image_key (string key) {
+            switch (key.down ()) {
+                case "coverimage":
+                case "cover_image":
+                case "cover-image":
+                case "cover":
+                case "featured_image":
+                case "feature_image":
+                case "featured-image":
+                case "feature-image":
+                case "image":
+                case "thumbnail":
+                case "thumb":
+                case "banner":
+                case "teaser":
+                case "hero":
+                case "poster":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private bool is_iter_in_yaml_frontmatter (Gtk.TextIter iter) {
+            if (buffer == null || iter.get_line () <= 0) {
+                return false;
+            }
+
+            Gtk.TextIter first_start, first_end;
+            buffer.get_iter_at_line (out first_start, 0);
+            first_end = first_start;
+            first_end.forward_to_line_end ();
+            if (buffer.get_text (first_start, first_end, false).strip () != "---") {
+                return false;
+            }
+
+            Gtk.TextIter line_iter;
+            buffer.get_iter_at_line (out line_iter, 1);
+            for (int line_num = 1; line_num <= iter.get_line (); line_num++) {
+                Gtk.TextIter line_end = line_iter;
+                line_end.forward_to_line_end ();
+                string line_text = buffer.get_text (line_iter, line_end, false).strip ();
+                if (line_text == "---" || line_text == "...") {
+                    return false;
+                }
+                if (!line_iter.forward_line ()) {
+                    break;
+                }
+            }
+
+            return true;
+        }
+
+        private string get_frontmatter_image_url (string line_text, Gtk.TextIter hover_iter) {
+            if (!is_iter_in_yaml_frontmatter (hover_iter)) {
+                return "";
+            }
+
+            string stripped = line_text.strip ();
+            if (stripped == "" || stripped.has_prefix ("#")) {
+                return "";
+            }
+
+            int colon_index = stripped.index_of (":");
+            if (colon_index <= 0 || colon_index + 1 >= stripped.length) {
+                return "";
+            }
+
+            string key = stripped.substring (0, colon_index).strip ().down ();
+            if (!is_common_frontmatter_image_key (key)) {
+                return "";
+            }
+
+            string value = stripped.substring (colon_index + 1).strip ();
+            int comment_index = value.index_of (" #");
+            if (comment_index > 0) {
+                value = value.substring (0, comment_index).strip ();
+            }
+
+            if ((value.has_prefix ("\"") && value.has_suffix ("\"")) ||
+                (value.has_prefix ("'") && value.has_suffix ("'")))
+            {
+                if (value.length >= 2) {
+                    value = value.substring (1, value.length - 2);
+                }
+            }
+
+            if (value == "") {
+                return "";
+            }
+
+            return value;
+        }
+
+        private bool show_image_tooltip_for_path (string img_path, Gtk.Tooltip tooltip) {
+            int max_w, max_h;
+            get_preview_max_size (out max_w, out max_h);
+
+            Gdk.Texture? texture = load_preview_texture (img_path, max_w, max_h);
+            if (texture == null) {
+                return false;
+            }
+
+            var picture = new Gtk.Picture.for_paintable (texture);
+            picture.content_fit = Gtk.ContentFit.SCALE_DOWN;
+            picture.can_shrink = true;
+            picture.width_request = texture.get_width ();
+            picture.height_request = texture.get_height ();
+
+            tooltip.set_custom (picture);
+            return true;
+        }
+
+        private void get_preview_max_size (out int max_w, out int max_h) {
+            max_w = 640;
+            max_h = 480;
+            int editor_w = view.get_allocated_width ();
+            int editor_h = view.get_allocated_height ();
+            if (editor_w > 0) {
+                max_w = int.max (640, (int) (editor_w * 0.65));
+            }
+            if (editor_h > 0) {
+                max_h = int.max (480, (int) (editor_h * 0.65));
+            }
+        }
+
+        private string resolve_image_path (string img_url) {
+            string img_path = Pandoc.find_file (img_url);
+            if (img_path == img_url && img_url.has_prefix ("/") && img_url.length > 1) {
+                // Hugo/Jekyll style: `/images/foo.png` should resolve from project root.
+                img_path = Pandoc.find_file (img_url.substring (1));
+            }
+
+            return img_path;
+        }
+
+        private bool handle_image_tooltip (int x, int y, bool keyboard_tooltip, Gtk.Tooltip tooltip) {
+            var settings = AppSettings.get_default ();
+            if (!settings.experimental || view == null || buffer == null) {
+                return false;
+            }
+
+            Gtk.TextIter hover_iter;
+            if (keyboard_tooltip) {
+                var cursor = buffer.get_insert ();
+                buffer.get_iter_at_mark (out hover_iter, cursor);
+            } else {
+                int buffer_x, buffer_y;
+                view.window_to_buffer_coords (Gtk.TextWindowType.WIDGET, x, y, out buffer_x, out buffer_y);
+                if (!view.get_iter_at_location (out hover_iter, buffer_x, buffer_y)) {
+                    return false;
+                }
+            }
+
+            Gtk.TextIter line_start = hover_iter;
+            Gtk.TextIter line_end = hover_iter;
+            line_start.set_line_offset (0);
+            line_end.forward_to_line_end ();
+            // Include invisible text so collapsed markdown image URLs are still matchable.
+            string line_text = buffer.get_text (line_start, line_end, true);
+            int line_offset = line_start.get_offset ();
+            int hover_offset = hover_iter.get_offset ();
+
+            MatchInfo match_info;
+            try {
+                int url_group = 2; // Markdown image URL capture group
+                if (!is_image.match (line_text, 0, out match_info)) {
+                    // Fall back to HTML <img ... src="..."> support
+                    if (!is_html_image.match (line_text, 0, out match_info)) {
+                        string frontmatter_url = get_frontmatter_image_url (line_text, hover_iter);
+                        if (frontmatter_url == "") {
+                            return false;
+                        }
+
+                        string frontmatter_path = resolve_image_path (frontmatter_url);
+                        if (frontmatter_path == frontmatter_url &&
+                            !GLib.FileUtils.test (frontmatter_path, GLib.FileTest.EXISTS))
+                        {
+                            return false;
+                        }
+
+                        return show_image_tooltip_for_path (frontmatter_path, tooltip);
+                    }
+                    url_group = 1; // HTML src capture group
+                }
+
+                do {
+                    int start_pos, end_pos;
+                    if (!match_info.fetch_pos (0, out start_pos, out end_pos)) {
+                        continue;
+                    }
+
+                    int start_char = line_text.char_count (start_pos);
+                    int end_char = line_text.char_count (end_pos);
+                    bool hover_in_match = !(hover_offset < (line_offset + start_char) || hover_offset > (line_offset + end_char));
+                    if (!hover_in_match && url_group == 2 && hover_iter.has_tag (markdown_link)) {
+                        int alt_start_pos, alt_end_pos;
+                        if (match_info.fetch_pos (1, out alt_start_pos, out alt_end_pos)) {
+                            int alt_start_char = line_text.char_count (alt_start_pos);
+                            int alt_end_char = line_text.char_count (alt_end_pos);
+                            hover_in_match = !(hover_offset < (line_offset + alt_start_char) || hover_offset > (line_offset + alt_end_char));
+                        }
+                    }
+                    if (!hover_in_match) {
+                        continue;
+                    }
+
+                    string img_url = match_info.fetch (url_group);
+                    string img_path = resolve_image_path (img_url);
+                    if (img_path == img_url && !GLib.FileUtils.test (img_path, GLib.FileTest.EXISTS)) {
+                        continue;
+                    }
+
+                    return show_image_tooltip_for_path (img_path, tooltip);
+                } while (match_info.next ());
+            } catch (Error e) {
+                return false;
+            }
+
+            return false;
         }
 
         private void update_link_text (Gtk.TextIter start_region, Gtk.TextIter end_region) {
@@ -1074,6 +1303,8 @@ namespace ThiefMD.Enrichments {
             });
             view.add_controller (markup_key_controller);
             markup_cursor_handler_id = buffer.notify["cursor-position"].connect (handle_markup_cursor_position);
+            view.set_has_tooltip (true);
+            image_tooltip_handler_id = view.query_tooltip.connect (handle_image_tooltip);
 
             return true;
         }
@@ -1248,9 +1479,55 @@ namespace ThiefMD.Enrichments {
             }
         }
 
+        /** Load an image from disk, scale it to fit max_w/max_h, and return a texture. Returns null if the image cannot be loaded. */
+        private Gdk.Texture? load_preview_texture (string img_path, int max_w, int max_h) {
+            try {
+                var pixbuf = new Gdk.Pixbuf.from_file_at_scale (img_path, max_w, max_h, true);
+                return Gdk.Texture.for_pixbuf (pixbuf);
+            } catch (Error e) {
+                // Some animated GIFs fail with from_file_at_scale, so load and scale manually.
+                try {
+                    var pixbuf = new Gdk.Pixbuf.from_file (img_path);
+                    int src_w = pixbuf.get_width ();
+                    int src_h = pixbuf.get_height ();
+
+                    if (src_w <= 0 || src_h <= 0) {
+                        debug ("Image preview: invalid image size for '%s'", img_path);
+                        return null;
+                    }
+
+                    double scale_w = (double) max_w / (double) src_w;
+                    double scale_h = (double) max_h / (double) src_h;
+                    double scale = scale_w < scale_h ? scale_w : scale_h;
+                    if (scale > 1.0) {
+                        scale = 1.0;
+                    }
+
+                    int target_w = (int) Math.round ((double) src_w * scale);
+                    int target_h = (int) Math.round ((double) src_h * scale);
+                    if (target_w <= 0) {
+                        target_w = 1;
+                    }
+                    if (target_h <= 0) {
+                        target_h = 1;
+                    }
+
+                    var scaled = pixbuf.scale_simple (target_w, target_h, Gdk.InterpType.BILINEAR);
+                    if (scaled == null) {
+                        return Gdk.Texture.for_pixbuf (pixbuf);
+                    }
+
+                    return Gdk.Texture.for_pixbuf (scaled);
+                } catch (Error fallback_error) {
+                    debug ("Image preview: could not load '%s': %s (fallback: %s)", img_path, e.message, fallback_error.message);
+                    return null;
+                }
+            }
+        }
+
         public void detach () {
             var settings = AppSettings.get_default ();
-            
+
             // Remove BibTeX completion provider if present
             if (bibtex_provider != null && view != null) {
                 var completion = view.get_completion ();
@@ -1289,6 +1566,10 @@ namespace ThiefMD.Enrichments {
             if (markup_key_controller != null) {
                 view.remove_controller (markup_key_controller);
                 markup_key_controller = null;
+            }
+            if (image_tooltip_handler_id != 0) {
+                SignalHandler.disconnect (view, image_tooltip_handler_id);
+                image_tooltip_handler_id = 0;
             }
             clear_markup_navigation ();
             view = null;
