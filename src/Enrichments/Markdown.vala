@@ -296,8 +296,8 @@ namespace ThiefMD.Enrichments {
             try {
                 is_url = new Regex ("^(http|ftp|ssh|mailto|tor|torrent|vscode|atom|rss|file)?s?(:\\/\\/)?(www\\.)?([a-zA-Z0-9\\.\\-]+)\\.([a-z]+)([^\\s]+)$", RegexCompileFlags.CASELESS, 0);
                 is_markdown_url = new Regex ("(?<text_group>\\[(?>[^\\[\\]]+|(?&text_group))+\\])(?:\\((?<url>\\S+?)(?:[ ]\"(?<title>(?:[^\"]|(?<=\\\\)\")*?)\")?\\))", RegexCompileFlags.CASELESS, 0);
-                // Matches image tags: ![alt text](url) — used for hover tooltip preview
-                is_image = new Regex ("!\\[([^\\]]*)\\]\\(([^)]+)\\)", RegexCompileFlags.CASELESS, 0);
+                // Matches image tags: ![alt text](url) or ![alt](url "title") — used for hover tooltip preview
+                is_image = new Regex ("!\\[([^\\]]*)\\]\\(([^\\s)]+)(?:\\s[^)]*)?\\)", RegexCompileFlags.CASELESS, 0);
                 // Matches HTML image tags like: <img src="path/to/image.png" ...>
                 is_html_image = new Regex ("<img\\b[^>]*\\bsrc\\s*=\\s*[\\\"']([^\\\"']+)[\\\"'][^>]*>", RegexCompileFlags.CASELESS, 0);
             } catch (Error e) {
