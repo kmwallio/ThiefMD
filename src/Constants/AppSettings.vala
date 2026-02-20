@@ -64,7 +64,7 @@ namespace ThiefMD {
 
         // Typewriter Position
         public const int TYPEWRITER_UPDATE_TIME = 500;
-        public const double TYPEWRITER_POSITION = 0.20;
+        public const double TYPEWRITER_POSITION = 0.2;
 
         // Number of lines to preview
         public const int SHEET_PREVIEW_LINES = 3;

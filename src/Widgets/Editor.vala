@@ -1664,11 +1664,12 @@ namespace ThiefMD.Widgets {
                     parent = parent.get_parent ();
                 }
                 
-                // Set margins to 20% of the visible viewport height
-                int margin = (int)(page_size * 0.40);
-                bottom_margin = margin;
-                top_margin = margin;
-                debug ("typewriter_scrolling: Set margins to %d based on page_size %.0f", margin, page_size);
+                // Keep enough room above/below the document so the cursor can sit at TYPEWRITER_POSITION
+                double typewriter_position = Constants.TYPEWRITER_POSITION.clamp (0.0, 1.0);
+                top_margin = (int)(page_size * typewriter_position);
+                bottom_margin = (int)(page_size * (1.0 - typewriter_position));
+                debug ("typewriter_scrolling: Set top=%d bottom=%d based on page_size %.0f and position %.2f",
+                       top_margin, bottom_margin, page_size, typewriter_position);
             } else {
                 bottom_margin = Constants.BOTTOM_MARGIN;
                 top_margin = Constants.TOP_MARGIN;
