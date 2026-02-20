@@ -1482,8 +1482,43 @@ namespace ThiefMD.Enrichments {
                 var pixbuf = new Gdk.Pixbuf.from_file_at_scale (img_path, max_w, max_h, true);
                 return Gdk.Texture.for_pixbuf (pixbuf);
             } catch (Error e) {
-                debug ("Image preview: could not load '%s': %s", img_path, e.message);
-                return null;
+                // Some animated GIFs fail with from_file_at_scale, so load and scale manually.
+                try {
+                    var pixbuf = new Gdk.Pixbuf.from_file (img_path);
+                    int src_w = pixbuf.get_width ();
+                    int src_h = pixbuf.get_height ();
+
+                    if (src_w <= 0 || src_h <= 0) {
+                        debug ("Image preview: invalid image size for '%s'", img_path);
+                        return null;
+                    }
+
+                    double scale_w = (double) max_w / (double) src_w;
+                    double scale_h = (double) max_h / (double) src_h;
+                    double scale = scale_w < scale_h ? scale_w : scale_h;
+                    if (scale > 1.0) {
+                        scale = 1.0;
+                    }
+
+                    int target_w = (int) Math.round ((double) src_w * scale);
+                    int target_h = (int) Math.round ((double) src_h * scale);
+                    if (target_w <= 0) {
+                        target_w = 1;
+                    }
+                    if (target_h <= 0) {
+                        target_h = 1;
+                    }
+
+                    var scaled = pixbuf.scale_simple (target_w, target_h, Gdk.InterpType.BILINEAR);
+                    if (scaled == null) {
+                        return Gdk.Texture.for_pixbuf (pixbuf);
+                    }
+
+                    return Gdk.Texture.for_pixbuf (scaled);
+                } catch (Error fallback_error) {
+                    debug ("Image preview: could not load '%s': %s (fallback: %s)", img_path, e.message, fallback_error.message);
+                    return null;
+                }
             }
         }
 
