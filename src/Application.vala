@@ -43,12 +43,26 @@ namespace ThiefMD {
             }
 
             if (projects.length > 0) {
+                dismiss_welcome_windows ();
                 ThiefApp.show_main_instance ();
             } else {
                 ThiefApp.hide_main_instance ();
                 var welcome_win = new WelcomeWindow ();
                 important_windows.append (welcome_win);
                 welcome_win.present ();
+            }
+        }
+
+        private static void dismiss_welcome_windows () {
+            var welcome_windows = new List<Gtk.Window> ();
+            foreach (var win in important_windows) {
+                if (win is WelcomeWindow) {
+                    welcome_windows.append (win);
+                }
+            }
+
+            foreach (var win in welcome_windows) {
+                win.close ();
             }
         }
 
@@ -82,16 +96,35 @@ namespace ThiefMD {
         }
 
         public override void open (File[] files, string hint) {
+            var settings = AppSettings.get_default ();
+
             // Start library hidden
             if (main_window == null) {
                 main_window = new ThiefApp (this);
                 ThiefApp.hide_main_instance ();
             }
 
+            bool library_updated = false;
+
             foreach (var file in files) {
                 if (file.query_exists ()) {
-                    open_file (file);
+                    if (file.query_file_type (FileQueryInfoFlags.NONE, null) == FileType.DIRECTORY) {
+                        string? directory_path = file.get_path ();
+                        if (directory_path != null && settings.add_to_library (directory_path)) {
+                            library_updated = true;
+                        }
+                    } else {
+                        dismiss_welcome_windows ();
+                        open_file (file);
+                    }
                 }
+            }
+
+            if (library_updated) {
+                ThiefApp instance = ThiefApp.get_instance ();
+                instance.refresh_library ();
+                dismiss_welcome_windows ();
+                ThiefApp.show_main_instance ();
             }
         }
 
