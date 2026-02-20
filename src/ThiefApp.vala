@@ -450,7 +450,6 @@ namespace ThiefMD {
             connections = new Gee.ConcurrentList<Connections.ConnectionBase> ();
 
             // Restore preview view
-            UI.show_view ();
             UI.set_sheets (start_sheet);
             library.expand_all ();
             library.set_active ();
@@ -488,6 +487,7 @@ namespace ThiefMD {
 
             // Go go go!
             ready = true;
+            UI.show_view ();
             show ();
         }
     }

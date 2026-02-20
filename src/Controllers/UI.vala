@@ -651,7 +651,7 @@ namespace ThiefMD.Controllers.UI {
             instance.set_library_split_position_silent (0);
         instance.library_pane.set_visible_child (instance.library_split);
         instance.library_pane.show ();
-            instance.set_main_position_silent (settings.view_sheets_width);
+        instance.set_main_position_silent (settings.view_sheets_width);
     }
 
     // Show all three panels
@@ -668,13 +668,13 @@ namespace ThiefMD.Controllers.UI {
             instance.library_pane.set_visible_child (instance.library_split);
         }
         instance.library_pane.show ();
-            instance.set_main_position_silent (settings.view_library_width + settings.view_sheets_width);
+        instance.set_main_position_silent (settings.view_library_width + settings.view_sheets_width);
     }
 
     // Show just the Editor
     public void hide_sheets () {
         ThiefApp instance = ThiefApp.get_instance ();
         instance.library_pane.hide ();
-            instance.set_main_position_silent (0);
+        instance.set_main_position_silent (0);
     }
 }
