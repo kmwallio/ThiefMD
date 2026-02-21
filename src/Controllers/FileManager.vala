@@ -35,8 +35,8 @@ namespace ThiefMD.Controllers.FileManager {
         string match_ext = ext;
         warning ("Importing (%s): %s", ext, import_f.get_path ());
 
-        // TextPack has its own import logic
-        if (ext == "textpack") {
+        // TextPack and Highland both use the TextBundle ZIP format
+        if (ext == "textpack" || ext == "highland") {
             import_textpack (file_path, parent);
             return;
         }
