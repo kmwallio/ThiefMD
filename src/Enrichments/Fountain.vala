@@ -624,7 +624,7 @@ namespace ThiefMD.Enrichments {
             string text = buffer.get_text (start, end, true);
 
             try {
-                var regex = new Regex ("(?<=\\n)([ \\t]*?[^<>a-z\\s\\/\\n][^<>a-z:!\\?\\n]*[^<>a-z\\(!\\?:,\\n\\.][ \\t]?|\\([^\\n]+\\))\\n{1}(?!\\n)(.+?)\\n{1}", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF, 0);
+                var regex = new Regex ("(?<=\\n)([ \\t]*?[^<>\\p{Ll}\\s\\/\\n][^<>\\p{Ll}:!\\?\\n]*[^<>\\p{Ll}\\(!\\?:,\\n\\.][ \\t]?|\\([^\\n]+\\))\\n{1}(?!\\n)(.+?)\\n{1}", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF, 0);
                 MatchInfo match_info;
                 if (regex.match_full (text, text.length, 0, 0, out match_info)) {
                     var seen = new Gee.HashSet<string> ();
@@ -767,7 +767,7 @@ namespace ThiefMD.Enrichments {
             string text = buffer.get_text (start, end, true);
 
             try {
-                var regex = new Regex ("(?<=\\n)([ \\t]*?[^<>a-z\\s\\/\\n][^<>a-z:!\\?\\n]*[^<>a-z\\(!\\?:,\\n\\.][ \\t]?|\\([^\\n]+\\))\\n{1}(?!\\n)(.+?)\\n{1}", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF, 0);
+                var regex = new Regex ("(?<=\\n)([ \\t]*?[^<>\\p{Ll}\\s\\/\\n][^<>\\p{Ll}:!\\?\\n]*[^<>\\p{Ll}\\(!\\?:,\\n\\.][ \\t]?|\\([^\\n]+\\))\\n{1}(?!\\n)(.+?)\\n{1}", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF, 0);
                 MatchInfo match_info;
                 int logged = 0;
                 if (regex.match_full (text, text.length, 0, 0, out match_info)) {
