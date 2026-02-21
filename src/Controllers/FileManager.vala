@@ -1193,9 +1193,20 @@ namespace ThiefMD.Controllers.FileManager {
     }
 
     // Export a pre-built markdown string as a TextPack (.textpack) archive.
-    // Used when no folder path is available but the markdown content is already combined.
-    public bool export_textpack_from_markdown (string markdown_content, string textpack_path) {
+    // Finds locally referenced images relative to base_path, bundles them in assets/,
+    // and rewrites image paths in the markdown to point to assets/<filename>.
+    public bool export_textpack_from_markdown (string markdown_content, string textpack_path, string base_path = "") {
         try {
+            // Find all local image/asset references in the markdown
+            Gee.Map<string, string> images = Pandoc.file_image_map (markdown_content, base_path);
+
+            // Rewrite image references to use assets/ prefix inside the bundle
+            string bundle_markdown = markdown_content;
+            foreach (var img_entry in images.entries) {
+                string asset_name = "assets/" + Path.get_basename (img_entry.value);
+                bundle_markdown = bundle_markdown.replace (img_entry.key, asset_name);
+            }
+
             var writer = new Archive.Write ();
             if (writer.set_format_zip () != Archive.Result.OK) {
                 warning ("Could not set zip format for textpack");
@@ -1207,7 +1218,13 @@ namespace ThiefMD.Controllers.FileManager {
             }
 
             textpack_add_string (writer, "info.json", TEXTBUNDLE_INFO_JSON);
-            textpack_add_string (writer, "text.md", markdown_content);
+            textpack_add_string (writer, "text.md", bundle_markdown);
+
+            // Add each referenced image into the assets/ folder
+            foreach (var img_entry in images.entries) {
+                string asset_name = "assets/" + Path.get_basename (img_entry.value);
+                textpack_add_file (writer, asset_name, img_entry.value);
+            }
 
             writer.close ();
             return true;

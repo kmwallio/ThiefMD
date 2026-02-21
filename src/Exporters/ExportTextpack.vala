@@ -65,8 +65,9 @@ namespace ThiefMD.Exporters {
             }
 
             string output_path = save_target.get_path ();
-            // Capture markdown now so it's safe to read from the worker thread
+            // Capture these now so they're safe to read from the worker thread
             string original_markdown = publisher_instance.get_original_markdown ();
+            string base_path = publisher_instance.source_path;
             bool success = false;
 
             Gee.List<string> pack_sayings = new Gee.LinkedList<string> ();
@@ -75,7 +76,7 @@ namespace ThiefMD.Exporters {
             pack_sayings.add (_("TextPack, incoming!"));
 
             Thinking worker = new Thinking (_("Exporting TextPack"), () => {
-                success = FileManager.export_textpack_from_markdown (original_markdown, output_path);
+                success = FileManager.export_textpack_from_markdown (original_markdown, output_path, base_path);
             }, pack_sayings, publisher_instance);
 
             worker.run ();
