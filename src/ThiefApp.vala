@@ -445,6 +445,7 @@ namespace ThiefMD {
             exporters.register (_("LaTeX"), new Exporters.ExportLatex ());
             exporters.register (_("DocX"), new Exporters.ExportDocx ());
             exporters.register (_("Fountain"), new Exporters.ExportFountain ());
+            exporters.register (_("FDX"), new Exporters.ExportFdx ());
             exporters.register (_("TextPack"), new Exporters.ExportTextpack ());
 
             // Load connections

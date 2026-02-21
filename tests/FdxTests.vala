@@ -1,0 +1,129 @@
+using ThiefMD;
+using ThiefMD.Controllers;
+
+public class FdxTests {
+    public FdxTests () {
+        test_fdx_to_fountain ();
+        test_fountain_to_fdx ();
+        test_fdx_round_trip ();
+    }
+
+    // Sample FDX document for testing
+    private const string SAMPLE_FDX = """<?xml version="1.0" encoding="UTF-8"?>
+<FinalDraft DocumentType="Script" Template="No" Version="1">
+  <Content>
+    <Paragraph Type="Scene Heading">
+      <Text>INT. COFFEE SHOP - DAY</Text>
+    </Paragraph>
+    <Paragraph Type="Action">
+      <Text>A barista makes coffee.</Text>
+    </Paragraph>
+    <Paragraph Type="Character">
+      <Text>BARISTA</Text>
+    </Paragraph>
+    <Paragraph Type="Dialogue">
+      <Text>What can I get you?</Text>
+    </Paragraph>
+    <Paragraph Type="Character">
+      <Text>CUSTOMER</Text>
+    </Paragraph>
+    <Paragraph Type="Parenthetical">
+      <Text>(nervously)</Text>
+    </Paragraph>
+    <Paragraph Type="Dialogue">
+      <Text>Just a coffee, please.</Text>
+    </Paragraph>
+    <Paragraph Type="Transition">
+      <Text>CUT TO:</Text>
+    </Paragraph>
+  </Content>
+</FinalDraft>""";
+
+    private void test_fdx_to_fountain () {
+        Test.add_func ("/thiefmd/fdx_to_fountain", () => {
+            string result = FileManager.fdx_to_fountain (SAMPLE_FDX);
+
+            // Scene heading should appear in output
+            assert (result.contains ("INT. COFFEE SHOP - DAY"));
+
+            // Action should appear
+            assert (result.contains ("A barista makes coffee."));
+
+            // Character names should appear
+            assert (result.contains ("BARISTA"));
+            assert (result.contains ("CUSTOMER"));
+
+            // Dialogue should appear
+            assert (result.contains ("What can I get you?"));
+            assert (result.contains ("Just a coffee, please."));
+
+            // Parenthetical should appear
+            assert (result.contains ("(nervously)"));
+
+            // Transition should appear with > marker
+            assert (result.contains ("> CUT TO:"));
+        });
+    }
+
+    private void test_fountain_to_fdx () {
+        Test.add_func ("/thiefmd/fountain_to_fdx", () => {
+            // Build a simple fountain screenplay
+            string fountain = """INT. OFFICE - DAY
+
+Someone types at a keyboard.
+
+CODER
+It compiles!
+
+> FADE OUT.
+""";
+
+            string result = FileManager.fountain_to_fdx (fountain);
+
+            // Should produce valid FDX XML
+            assert (result.contains ("<?xml version=\"1.0\""));
+            assert (result.contains ("<FinalDraft"));
+            assert (result.contains ("<Content>"));
+            assert (result.contains ("</Content>"));
+            assert (result.contains ("</FinalDraft>"));
+
+            // Scene heading should be tagged correctly
+            assert (result.contains ("Type=\"Scene Heading\""));
+            assert (result.contains ("INT. OFFICE - DAY"));
+
+            // Action paragraph
+            assert (result.contains ("Type=\"Action\""));
+            assert (result.contains ("Someone types at a keyboard."));
+
+            // Character cue
+            assert (result.contains ("Type=\"Character\""));
+            assert (result.contains ("CODER"));
+
+            // Dialogue
+            assert (result.contains ("Type=\"Dialogue\""));
+            assert (result.contains ("It compiles!"));
+
+            // Transition
+            assert (result.contains ("Type=\"Transition\""));
+            assert (result.contains ("FADE OUT."));
+        });
+    }
+
+    private void test_fdx_round_trip () {
+        Test.add_func ("/thiefmd/fdx_round_trip", () => {
+            // Convert FDX → Fountain → FDX and check the key content survives
+            string fountain = FileManager.fdx_to_fountain (SAMPLE_FDX);
+            assert (fountain != "");
+
+            string fdx = FileManager.fountain_to_fdx (fountain);
+            assert (fdx != "");
+
+            // Key content should survive the round-trip
+            assert (fdx.contains ("INT. COFFEE SHOP - DAY"));
+            assert (fdx.contains ("A barista makes coffee."));
+            assert (fdx.contains ("BARISTA"));
+            assert (fdx.contains ("CUSTOMER"));
+            assert (fdx.contains ("Just a coffee, please."));
+        });
+    }
+}

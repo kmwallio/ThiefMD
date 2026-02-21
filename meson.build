@@ -117,6 +117,7 @@ executable(
     'src/Exporters/ExportLatex.vala',
     'src/Exporters/ExportMarkdown.vala',
     'src/Exporters/ExportFountain.vala',
+    'src/Exporters/ExportFdx.vala',
     'src/Exporters/ExportMhtml.vala',
     'src/Exporters/ExportPdf.vala',
     'src/Exporters/ExportTextpack.vala',
