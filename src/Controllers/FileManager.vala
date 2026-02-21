@@ -1259,8 +1259,8 @@ namespace ThiefMD.Controllers.FileManager {
         entry.set_filetype (ARCHIVE_IFREG);
         entry.set_perm (0644);
         writer.write_header (entry);
-        // data.data includes a null byte at the end; only write data.length bytes
-        writer.write_data (data.data, data.length);
+        // Slice to data.length to skip the trailing null byte that Vala adds to string.data
+        writer.write_data (data.data[0:data.length]);
     }
 
     // Write a file from disk as an entry inside a ZIP archive.
@@ -1279,7 +1279,7 @@ namespace ThiefMD.Controllers.FileManager {
             entry.set_filetype (ARCHIVE_IFREG);
             entry.set_perm (0644);
             writer.write_header (entry);
-            writer.write_data (data, data.length);
+            writer.write_data (data);
         } catch (Error e) {
             warning ("Could not add asset to textpack: %s", e.message);
         }
