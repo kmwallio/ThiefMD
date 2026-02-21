@@ -380,7 +380,7 @@ namespace ThiefMD.Controllers.Pandoc {
             Regex url_search = new Regex ("\\((.+?)\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex src_search = new Regex ("src=['\"](.+?)['\"]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex css_url_search = new Regex ("url\\(['\"]?(.+?)['\"]?\\)", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
-            Regex cover_image_search = new Regex ("(cover-image|coverimage|feature_image|featureimage|featured_image|csl|featuredimage|bibliography):\\s*['\"]?(.+?)['\"]?\\s*$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
+            Regex cover_image_search = new Regex ("(cover|cover-image|coverimage|cover_image|feature_image|featureimage|featured_image|feature-image|featured-image|featuredimage|image|thumbnail|thumb|banner|teaser|hero|poster|csl|bibliography):\\s*['\"]?(.+?)['\"]?\\s*$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
             Regex reference_image_search = new Regex("(\\[[^\\]]+\\]):\\s+(.*?)$", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS, 0);
 
             processed_mk = url_search.replace_eval (
