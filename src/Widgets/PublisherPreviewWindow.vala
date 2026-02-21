@@ -32,6 +32,8 @@ namespace ThiefMD.Widgets {
         private string e_markdown;
         private ExportBase exporter;
         public bool render_fountain;
+        // Folder path of the library item being previewed; used by exporters that need file access.
+        public string source_path { get; set; default = ""; }
 
         public PublisherPreviewWindow (string markdown, bool generate_fountain = false) {
             preview = new Preview ();

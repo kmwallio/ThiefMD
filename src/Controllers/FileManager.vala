@@ -24,6 +24,8 @@ namespace ThiefMD.Controllers.FileManager {
     public static bool disable_save = false;
     // AE_IFREG from libarchive: regular file mode for archive entries
     private const uint ARCHIVE_IFREG = 0100000;
+    // Shared info.json content for TextBundle-compliant archives
+    private const string TEXTBUNDLE_INFO_JSON = """{"version":2,"type":"net.daringfireball.markdown","transient":false,"creatorURL":"https://thiefmd.com","creatorIdentifier":"com.github.kmwallio.thiefmd"}""";
 
     public void import_file (string file_path, Sheets parent) {
         File import_f = File.new_for_path (file_path);
@@ -1158,9 +1160,6 @@ namespace ThiefMD.Controllers.FileManager {
                 textbundle_markdown = textbundle_markdown.replace (img_entry.key, asset_name);
             }
 
-            // Build the info.json for the TextBundle
-            string info_json = """{"version":2,"type":"net.daringfireball.markdown","transient":false,"creatorURL":"https://thiefmd.com","creatorIdentifier":"com.github.kmwallio.thiefmd"}""";
-
             // Create the ZIP archive
             var writer = new Archive.Write ();
             if (writer.set_format_zip () != Archive.Result.OK) {
@@ -1173,7 +1172,7 @@ namespace ThiefMD.Controllers.FileManager {
             }
 
             // Add info.json
-            textpack_add_string (writer, "info.json", info_json);
+            textpack_add_string (writer, "info.json", TEXTBUNDLE_INFO_JSON);
 
             // Add text.md with the combined content
             textpack_add_string (writer, "text.md", textbundle_markdown);
@@ -1189,6 +1188,31 @@ namespace ThiefMD.Controllers.FileManager {
             return true;
         } catch (Error e) {
             warning ("Could not create textpack: %s", e.message);
+            return false;
+        }
+    }
+
+    // Export a pre-built markdown string as a TextPack (.textpack) archive.
+    // Used when no folder path is available but the markdown content is already combined.
+    public bool export_textpack_from_markdown (string markdown_content, string textpack_path) {
+        try {
+            var writer = new Archive.Write ();
+            if (writer.set_format_zip () != Archive.Result.OK) {
+                warning ("Could not set zip format for textpack");
+                return false;
+            }
+            if (writer.open_filename (textpack_path) != Archive.Result.OK) {
+                warning ("Could not open textpack for writing: %s", textpack_path);
+                return false;
+            }
+
+            textpack_add_string (writer, "info.json", TEXTBUNDLE_INFO_JSON);
+            textpack_add_string (writer, "text.md", markdown_content);
+
+            writer.close ();
+            return true;
+        } catch (Error e) {
+            warning ("Could not create textpack from markdown: %s", e.message);
             return false;
         }
     }
