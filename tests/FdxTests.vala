@@ -89,6 +89,34 @@ public class FdxTests {
             // Dialogue should not be upcased
             assert (result.contains ("We're closing soon."));
         });
+
+        Test.add_func ("/thiefmd/fdx_to_fountain_parenthetical_spacing", () => {
+            // Parentheticals must not have blank lines separating them from
+            // surrounding character/dialogue lines.
+            string paren_fdx = """<?xml version="1.0" encoding="UTF-8"?>
+<FinalDraft DocumentType="Script" Template="No" Version="1">
+  <Content>
+    <Paragraph Type="Character">
+      <Text>HERO</Text>
+    </Paragraph>
+    <Paragraph Type="Dialogue">
+      <Text>I can do this.</Text>
+    </Paragraph>
+    <Paragraph Type="Parenthetical">
+      <Text>(quietly)</Text>
+    </Paragraph>
+    <Paragraph Type="Dialogue">
+      <Text>I think.</Text>
+    </Paragraph>
+  </Content>
+</FinalDraft>""";
+            string result = FileManager.fdx_to_fountain (paren_fdx);
+
+            // The entire dialogue block should have no blank lines inside it.
+            // We look for the character followed immediately by the first dialogue,
+            // then paren, then second dialogue — all without intervening blank lines.
+            assert (result.contains ("HERO\nI can do this.\n(quietly)\nI think."));
+        });
     }
 
     private void test_fountain_to_fdx () {

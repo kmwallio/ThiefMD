@@ -1430,8 +1430,10 @@ namespace ThiefMD.Controllers.FileManager {
                         break;
                 }
 
-                // Everything except Character and Parenthetical gets a trailing blank line
-                if (para_type != "Character" && para_type != "Parenthetical") {
+                // Dialogue, Character, and Parenthetical get no trailing blank line;
+                // the blank separating a dialogue block from the next action/heading
+                // comes from the leading blank of the following non-dialogue element.
+                if (para_type != "Character" && para_type != "Parenthetical" && para_type != "Dialogue") {
                     builder.append ("\n");
                 }
 
