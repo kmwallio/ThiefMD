@@ -50,7 +50,10 @@ namespace ThiefMD.Controllers.FileManager {
                 }
                 debug ("Attempt to create: %s", dest_name);
                 string dest_path = Path.build_filename (parent.get_sheets_path (), dest_name);
-                if (can_open_file (import_f.get_basename ())) {
+                if (ext == "bear2bk") {
+                    // Bear2bk is a zip of .textbundle folders, one per note
+                    import_bear2bk (import_f.get_path (), parent.get_sheets_path ());
+                } else if (can_open_file (import_f.get_basename ())) {
                     File copy_to = File.new_for_path (dest_path);
                     try {
                         import_f.copy (copy_to, FileCopyFlags.NONE);
@@ -81,6 +84,100 @@ namespace ThiefMD.Controllers.FileManager {
 
         parent.refresh ();
         ThiefApp.get_instance ().library.refresh_dir (parent);
+    }
+
+    // Imports notes from a Bear2bk backup file into the destination folder.
+    // A .bear2bk is a zip containing one .textbundle per note, each with a text.md inside.
+    public void import_bear2bk (string archive_path, string destination_path) {
+        File arch_file = File.new_for_path (archive_path);
+        if (!arch_file.query_exists ()) {
+            return;
+        }
+
+        try {
+            var archive = new Archive.Read ();
+            throw_on_failure (archive.support_filter_all ());
+            throw_on_failure (archive.support_format_all ());
+            throw_on_failure (archive.open_filename (arch_file.get_path (), 10240));
+
+            unowned Archive.Entry entry;
+            while (archive.next_header (out entry) == Archive.Result.OK) {
+                string pathname = entry.pathname ();
+
+                // Each note lives in a SomeName.textbundle folder.
+                // We want the text.md (or text.markdown) as the note content.
+                if (pathname.contains (".textbundle/text.md") ||
+                    pathname.contains (".textbundle/text.markdown")) {
+                    // Get the note name from the bundle folder name
+                    int bundle_end = pathname.index_of (".textbundle/");
+                    string bundle_path = pathname.substring (0, bundle_end);
+                    int last_sep = bundle_path.last_index_of ("/");
+                    string note_name = (last_sep >= 0) ? bundle_path.substring (last_sep + 1) : bundle_path;
+                    // Skip if the name is empty or tries to escape the destination
+                    if (note_name == "" || note_name.contains ("..") || note_name.contains ("/")) {
+                        archive.read_data_skip ();
+                        continue;
+                    }
+                    string dest_file_name = note_name + ".md";
+
+                    uint8[] buffer = null;
+                    Array<uint8> text_buffer = new Array<uint8> ();
+                    Posix.off_t offset;
+                    while (archive.read_data_block (out buffer, out offset) == Archive.Result.OK) {
+                        if (buffer == null) {
+                            break;
+                        }
+                        text_buffer.append_vals (buffer, buffer.length);
+                    }
+
+                    if (text_buffer.length != 0) {
+                        File dest_file = File.new_for_path (Path.build_filename (destination_path, dest_file_name));
+                        try {
+                            save_file (dest_file, text_buffer.data);
+                        } catch (Error e) {
+                            warning ("Could not save note from bear2bk: %s", e.message);
+                        }
+                    }
+                } else if (pathname.contains (".textbundle/assets/")) {
+                    // Extract assets (images, attachments) alongside the notes
+                    int assets_start = pathname.index_of (".textbundle/assets/") + ".textbundle/assets/".length;
+                    string asset_name = pathname.substring (assets_start);
+                    // Skip directory entries and paths that could escape the destination
+                    if (asset_name == "" || asset_name.has_suffix ("/") ||
+                        asset_name.contains ("..") || asset_name.has_prefix ("/")) {
+                        archive.read_data_skip ();
+                        continue;
+                    }
+
+                    uint8[] buffer = null;
+                    Array<uint8> asset_buffer = new Array<uint8> ();
+                    Posix.off_t offset;
+                    while (archive.read_data_block (out buffer, out offset) == Archive.Result.OK) {
+                        if (buffer == null) {
+                            break;
+                        }
+                        asset_buffer.append_vals (buffer, buffer.length);
+                    }
+
+                    if (asset_buffer.length != 0) {
+                        File dest_file = File.new_for_path (Path.build_filename (destination_path, asset_name));
+                        File dest_parent = dest_file.get_parent ();
+                        try {
+                            if (dest_parent != null && !dest_parent.query_exists ()) {
+                                dest_parent.make_directory_with_parents ();
+                            }
+                            save_file (dest_file, asset_buffer.data);
+                        } catch (Error e) {
+                            warning ("Could not save asset from bear2bk: %s", e.message);
+                        }
+                    }
+                } else {
+                    archive.read_data_skip ();
+                }
+            }
+        } catch (Error e) {
+            warning ("Error importing bear2bk: %s", e.message);
+        }
     }
 
     private string strip_external_formatters (string markdown) {
