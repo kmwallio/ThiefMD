@@ -27,7 +27,7 @@ namespace ThiefMD.Controllers.FileManager {
     // Shared info.json content for TextBundle-compliant archives
     private const string TEXTBUNDLE_INFO_JSON = """{"version":2,"type":"net.daringfireball.markdown","transient":false,"creatorURL":"https://thiefmd.com","creatorIdentifier":"com.github.kmwallio.thiefmd"}""";
     // info.json for fountain screenplay textpacks
-    private const string TEXTBUNDLE_FOUNTAIN_INFO_JSON = """{"version":2,"type":"com.secondgearsoftware.fountain","transient":false,"creatorURL":"https://thiefmd.com","creatorIdentifier":"com.github.kmwallio.thiefmd"}""";
+    private const string TEXTBUNDLE_FOUNTAIN_INFO_JSON = """{"version":2,"type":"io.fountain.screenplay","transient":false,"creatorURL":"https://thiefmd.com","creatorIdentifier":"com.github.kmwallio.thiefmd"}""";
 
     public void import_file (string file_path, Sheets parent) {
         File import_f = File.new_for_path (file_path);
