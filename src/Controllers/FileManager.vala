@@ -1413,6 +1413,14 @@ namespace ThiefMD.Controllers.FileManager {
                 }
 
                 switch (para_type) {
+                    case "Scene Heading":
+                        // Scene headings must be ALL CAPS in Fountain
+                        builder.append (text.up () + "\n");
+                        break;
+                    case "Character":
+                        // Character cues must be ALL CAPS in Fountain
+                        builder.append (text.up () + "\n");
+                        break;
                     case "Transition":
                         // Fountain right-aligns transitions with the > marker
                         builder.append ("> " + text + "\n");

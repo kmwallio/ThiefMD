@@ -63,6 +63,32 @@ public class FdxTests {
             // Transition should appear with > marker
             assert (result.contains ("> CUT TO:"));
         });
+
+        Test.add_func ("/thiefmd/fdx_to_fountain_upcasing", () => {
+            // FDX allows lower case character names and scene headings;
+            // Fountain requires them to be ALL CAPS.
+            string lowercase_fdx = """<?xml version="1.0" encoding="UTF-8"?>
+<FinalDraft DocumentType="Script" Template="No" Version="1">
+  <Content>
+    <Paragraph Type="Scene Heading">
+      <Text>int. cafe - night</Text>
+    </Paragraph>
+    <Paragraph Type="Character">
+      <Text>barista</Text>
+    </Paragraph>
+    <Paragraph Type="Dialogue">
+      <Text>We're closing soon.</Text>
+    </Paragraph>
+  </Content>
+</FinalDraft>""";
+            string result = FileManager.fdx_to_fountain (lowercase_fdx);
+
+            // Scene heading and character name should be uppercased
+            assert (result.contains ("INT. CAFE - NIGHT"));
+            assert (result.contains ("BARISTA"));
+            // Dialogue should not be upcased
+            assert (result.contains ("We're closing soon."));
+        });
     }
 
     private void test_fountain_to_fdx () {
