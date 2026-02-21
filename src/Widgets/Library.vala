@@ -1078,6 +1078,7 @@ namespace ThiefMD.Widgets {
                 }
                 string preview_markdown = build_novel (selection, settings.export_include_metadata_file);
                 PublisherPreviewWindow ppw = new PublisherPreviewWindow (preview_markdown, render_fountain (selection));
+                ppw.source_path = selection.path;
                 ppw.show ();
             });
             _context_actions.add_action (export_preview);
