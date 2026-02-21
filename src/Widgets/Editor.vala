@@ -953,7 +953,14 @@ namespace ThiefMD.Widgets {
 
                         // Place cursor at start of heading
                         buffer.place_cursor (target_iter);
-                        scroll_to_iter (target_iter, 0.0, false, 0.0, 0.0);
+
+                        // Respect typewriter scrolling if enabled
+                        var settings = AppSettings.get_default ();
+                        if (settings.typewriter_scrolling) {
+                            move_typewriter_scolling ();
+                        } else {
+                            scroll_to_iter (target_iter, 0.0, false, 0.0, 0.0);
+                        }
                     }
                 }
             } catch (RegexError e) {
@@ -996,7 +1003,14 @@ namespace ThiefMD.Widgets {
 
                         // Place cursor at start of heading
                         buffer.place_cursor (target_iter);
-                        scroll_to_iter (target_iter, 0.0, false, 0.0, 0.0);
+
+                        // Respect typewriter scrolling if enabled
+                        var settings = AppSettings.get_default ();
+                        if (settings.typewriter_scrolling) {
+                            move_typewriter_scolling ();
+                        } else {
+                            scroll_to_iter (target_iter, 0.0, false, 0.0, 0.0);
+                        }
                     }
                 }
             } catch (RegexError e) {
@@ -1034,7 +1048,14 @@ namespace ThiefMD.Widgets {
 
                         // Place cursor at start of scene heading
                         buffer.place_cursor (target_iter);
-                        scroll_to_iter (target_iter, 0.0, false, 0.0, 0.0);
+
+                        // Respect typewriter scrolling if enabled
+                        var settings = AppSettings.get_default ();
+                        if (settings.typewriter_scrolling) {
+                            move_typewriter_scolling ();
+                        } else {
+                            scroll_to_iter (target_iter, 0.0, false, 0.0, 0.0);
+                        }
                     }
                 }
             } catch (RegexError e) {
@@ -1077,7 +1098,14 @@ namespace ThiefMD.Widgets {
 
                         // Place cursor at start of scene heading
                         buffer.place_cursor (target_iter);
-                        scroll_to_iter (target_iter, 0.0, false, 0.0, 0.0);
+
+                        // Respect typewriter scrolling if enabled
+                        var settings = AppSettings.get_default ();
+                        if (settings.typewriter_scrolling) {
+                            move_typewriter_scolling ();
+                        } else {
+                            scroll_to_iter (target_iter, 0.0, false, 0.0, 0.0);
+                        }
                     }
                 }
             } catch (RegexError e) {
