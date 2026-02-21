@@ -9,7 +9,7 @@
 
         transition: /^((?:FADE (?:TO BLACK|OUT)|CUT TO BLACK)\.|.+ TO\:)|^(?:> *)(.+)/,
 
-        dialogue: /^([A-Z*_]+[0-9A-Z (._\-')]*)(\^?)?(?:\n(?!\n+))([\s\S]+)/,
+        dialogue: /^([A-Z\u00C0-\u00D6\u00D8-\u00DE\u0100-\u017F\u0180-\u024F\u0400-\u04FF*_]+[0-9A-Z\u00C0-\u00D6\u00D8-\u00DE\u0100-\u017F\u0180-\u024F\u0400-\u04FF (._\-')]*)(\^?)?(?:\n(?!\n+))([\s\S]+)/,
         parenthetical: /^(\(.+\))$/,
 
         action: /^(.+)/g,
