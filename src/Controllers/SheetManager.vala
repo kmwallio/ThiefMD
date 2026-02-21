@@ -551,6 +551,20 @@ namespace ThiefMD.Controllers.SheetManager {
         }
     }
 
+    // Navigate to next heading (Markdown) or scene (Fountain)
+    public static void next_marker () {
+        if (_currentSheet != null) {
+            _currentSheet.editor.next_marker ();
+        }
+    }
+
+    // Navigate to previous heading (Markdown) or scene (Fountain)
+    public static void prev_marker () {
+        if (_currentSheet != null) {
+            _currentSheet.editor.prev_marker ();
+        }
+    }
+
     private static void refresh_scheme () {
         var settings = AppSettings.get_default ();
         var scheme_id = settings.get_valid_theme_id ();
