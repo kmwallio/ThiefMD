@@ -90,6 +90,33 @@ public class FdxTests {
             assert (result.contains ("We're closing soon."));
         });
 
+        Test.add_func ("/thiefmd/fdx_to_fountain_forced_scene_heading", () => {
+            // Scene headings without a standard Fountain keyword (INT., EXT., etc.)
+            // must be prefixed with "." so Fountain treats them as forced headings.
+            string nonstandard_fdx = """<?xml version="1.0" encoding="UTF-8"?>
+<FinalDraft DocumentType="Script" Template="No" Version="1">
+  <Content>
+    <Paragraph Type="Scene Heading">
+      <Text>INT. OFFICE - DAY</Text>
+    </Paragraph>
+    <Paragraph Type="Scene Heading">
+      <Text>THE VOID</Text>
+    </Paragraph>
+    <Paragraph Type="Action">
+      <Text>Nothing exists here.</Text>
+    </Paragraph>
+  </Content>
+</FinalDraft>""";
+            string result = FileManager.fdx_to_fountain (nonstandard_fdx);
+
+            // Standard heading: no dot prefix needed
+            assert (result.contains ("INT. OFFICE - DAY"));
+            assert (!result.contains (".INT. OFFICE - DAY"));
+
+            // Non-standard heading: must be prefixed with "."
+            assert (result.contains (".THE VOID"));
+        });
+
         Test.add_func ("/thiefmd/fdx_to_fountain_parenthetical_spacing", () => {
             // Parentheticals must not have blank lines separating them from
             // surrounding character/dialogue lines.

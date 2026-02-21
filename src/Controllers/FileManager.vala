@@ -1414,8 +1414,14 @@ namespace ThiefMD.Controllers.FileManager {
 
                 switch (para_type) {
                     case "Scene Heading":
-                        // Scene headings must be ALL CAPS in Fountain
-                        builder.append (text.up () + "\n");
+                        // Scene headings must be ALL CAPS in Fountain.
+                        // If the heading lacks a standard keyword (INT., EXT., etc.)
+                        // prefix it with "." so Fountain treats it as a forced heading.
+                        string heading = text.up ();
+                        if (!fdx_is_scene_heading (heading)) {
+                            heading = "." + heading;
+                        }
+                        builder.append (heading + "\n");
                         break;
                     case "Character":
                         // Character cues must be ALL CAPS in Fountain
