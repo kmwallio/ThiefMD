@@ -64,7 +64,6 @@ namespace ThiefMD.Exporters {
                 return true;
             }
 
-            string source_path = publisher_instance.source_path;
             string output_path = save_target.get_path ();
             // Capture markdown now so it's safe to read from the worker thread
             string original_markdown = publisher_instance.get_original_markdown ();
@@ -76,13 +75,7 @@ namespace ThiefMD.Exporters {
             pack_sayings.add (_("TextPack, incoming!"));
 
             Thinking worker = new Thinking (_("Exporting TextPack"), () => {
-                if (source_path != "") {
-                    // Export straight from the folder so file order and images are preserved
-                    success = FileManager.export_textpack (source_path, output_path);
-                } else {
-                    // No folder path available, fall back to the combined markdown
-                    success = FileManager.export_textpack_from_markdown (original_markdown, output_path);
-                }
+                success = FileManager.export_textpack_from_markdown (original_markdown, output_path);
             }, pack_sayings, publisher_instance);
 
             worker.run ();
