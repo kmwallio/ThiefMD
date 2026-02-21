@@ -72,7 +72,7 @@ namespace ThiefMD.Exporters {
                     new_script.delete ();
                 }
 
-                string fdx_content = FileManager.fountain_to_fdx (
+                string fdx_content = FountainFdx.fountain_to_fdx (
                     publisher_instance.get_export_markdown ());
 
                 FileManager.save_file (new_script, fdx_content.data);

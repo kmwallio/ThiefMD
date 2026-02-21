@@ -41,7 +41,7 @@ public class FdxTests {
 
     private void test_fdx_to_fountain () {
         Test.add_func ("/thiefmd/fdx_to_fountain", () => {
-            string result = FileManager.fdx_to_fountain (SAMPLE_FDX);
+            string result = FountainFdx.fdx_to_fountain (SAMPLE_FDX);
 
             // Scene heading should appear in output
             assert (result.contains ("INT. COFFEE SHOP - DAY"));
@@ -81,7 +81,7 @@ public class FdxTests {
     </Paragraph>
   </Content>
 </FinalDraft>""";
-            string result = FileManager.fdx_to_fountain (lowercase_fdx);
+            string result = FountainFdx.fdx_to_fountain (lowercase_fdx);
 
             // Scene heading and character name should be uppercased
             assert (result.contains ("INT. CAFE - NIGHT"));
@@ -107,7 +107,7 @@ public class FdxTests {
     </Paragraph>
   </Content>
 </FinalDraft>""";
-            string result = FileManager.fdx_to_fountain (nonstandard_fdx);
+            string result = FountainFdx.fdx_to_fountain (nonstandard_fdx);
 
             // Standard heading: no dot prefix needed
             assert (result.contains ("INT. OFFICE - DAY"));
@@ -137,7 +137,7 @@ public class FdxTests {
     </Paragraph>
   </Content>
 </FinalDraft>""";
-            string result = FileManager.fdx_to_fountain (paren_fdx);
+            string result = FountainFdx.fdx_to_fountain (paren_fdx);
 
             // The entire dialogue block should have no blank lines inside it.
             // We look for the character followed immediately by the first dialogue,
@@ -165,7 +165,7 @@ public class FdxTests {
     </Paragraph>
   </Content>
 </FinalDraft>""";
-            string result = FileManager.fdx_to_fountain (two_scenes_fdx);
+            string result = FountainFdx.fdx_to_fountain (two_scenes_fdx);
 
             // Each block should be separated by exactly one blank line (\n\n total).
             // Two blank lines (\n\n\n) between blocks is the bug we're fixing.
@@ -187,7 +187,7 @@ It compiles!
 > FADE OUT.
 """;
 
-            string result = FileManager.fountain_to_fdx (fountain);
+            string result = FountainFdx.fountain_to_fdx (fountain);
 
             // Should produce valid FDX XML
             assert (result.contains ("<?xml version=\"1.0\""));
@@ -221,10 +221,10 @@ It compiles!
     private void test_fdx_round_trip () {
         Test.add_func ("/thiefmd/fdx_round_trip", () => {
             // Convert FDX → Fountain → FDX and check the key content survives
-            string fountain = FileManager.fdx_to_fountain (SAMPLE_FDX);
+            string fountain = FountainFdx.fdx_to_fountain (SAMPLE_FDX);
             assert (fountain != "");
 
-            string fdx = FileManager.fountain_to_fdx (fountain);
+            string fdx = FountainFdx.fountain_to_fdx (fountain);
             assert (fdx != "");
 
             // Key content should survive the round-trip

@@ -100,6 +100,7 @@ executable(
     'src/Controllers/UI.vala',
     'src/Controllers/UserData.vala',
     'src/Controllers/Pandoc.vala',
+    'src/Controllers/FountainFdx.vala',
     'src/Controllers/MarkdownCompat.c',
     'src/Controllers/Exporters.vala',
     'src/Controllers/ConnectionManager.vala',
