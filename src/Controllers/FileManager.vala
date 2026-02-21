@@ -26,6 +26,8 @@ namespace ThiefMD.Controllers.FileManager {
     private const uint ARCHIVE_IFREG = 0100000;
     // Shared info.json content for TextBundle-compliant archives
     private const string TEXTBUNDLE_INFO_JSON = """{"version":2,"type":"net.daringfireball.markdown","transient":false,"creatorURL":"https://thiefmd.com","creatorIdentifier":"com.github.kmwallio.thiefmd"}""";
+    // info.json for fountain screenplay textpacks
+    private const string TEXTBUNDLE_FOUNTAIN_INFO_JSON = """{"version":2,"type":"com.secondgearsoftware.fountain","transient":false,"creatorURL":"https://thiefmd.com","creatorIdentifier":"com.github.kmwallio.thiefmd"}""";
 
     public void import_file (string file_path, Sheets parent) {
         File import_f = File.new_for_path (file_path);
@@ -1195,7 +1197,8 @@ namespace ThiefMD.Controllers.FileManager {
     // Export a pre-built markdown string as a TextPack (.textpack) archive.
     // Finds locally referenced images relative to base_path, bundles them in assets/,
     // and rewrites image paths in the markdown to point to assets/<filename>.
-    public bool export_textpack_from_markdown (string markdown_content, string textpack_path, string base_path = "") {
+    // Set is_fountain to true when the content is a Fountain screenplay.
+    public bool export_textpack_from_markdown (string markdown_content, string textpack_path, string base_path = "", bool is_fountain = false) {
         try {
             // Find all local image/asset references in the markdown
             Gee.Map<string, string> images = Pandoc.file_image_map (markdown_content, base_path);
@@ -1217,8 +1220,14 @@ namespace ThiefMD.Controllers.FileManager {
                 return false;
             }
 
-            textpack_add_string (writer, "info.json", TEXTBUNDLE_INFO_JSON);
-            textpack_add_string (writer, "text.md", bundle_markdown);
+            // Fountain scripts use a different info.json type and file name
+            if (is_fountain) {
+                textpack_add_string (writer, "info.json", TEXTBUNDLE_FOUNTAIN_INFO_JSON);
+                textpack_add_string (writer, "text.fountain", bundle_markdown);
+            } else {
+                textpack_add_string (writer, "info.json", TEXTBUNDLE_INFO_JSON);
+                textpack_add_string (writer, "text.md", bundle_markdown);
+            }
 
             // Add each referenced image into the assets/ folder
             foreach (var img_entry in images.entries) {

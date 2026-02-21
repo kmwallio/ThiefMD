@@ -36,6 +36,8 @@ namespace ThiefMD.Exporters {
         public ExportTextpack () {
             export_name = _("TextPack");
             export_css = "preview";
+            // TextPack can hold both markdown and fountain screenplays
+            supports_fountain = true;
         }
 
         public override string update_markdown (string markdown) {
@@ -68,6 +70,7 @@ namespace ThiefMD.Exporters {
             // Capture these now so they're safe to read from the worker thread
             string original_markdown = publisher_instance.get_original_markdown ();
             string base_path = publisher_instance.source_path;
+            bool is_fountain = publisher_instance.render_fountain;
             bool success = false;
 
             Gee.List<string> pack_sayings = new Gee.LinkedList<string> ();
@@ -76,7 +79,7 @@ namespace ThiefMD.Exporters {
             pack_sayings.add (_("TextPack, incoming!"));
 
             Thinking worker = new Thinking (_("Exporting TextPack"), () => {
-                success = FileManager.export_textpack_from_markdown (original_markdown, output_path, base_path);
+                success = FileManager.export_textpack_from_markdown (original_markdown, output_path, base_path, is_fountain);
             }, pack_sayings, publisher_instance);
 
             worker.run ();
