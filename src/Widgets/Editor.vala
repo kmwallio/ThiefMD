@@ -923,6 +923,17 @@ namespace ThiefMD.Widgets {
             }
         }
 
+        // GLib regex APIs return byte offsets, but Gtk.TextIter offsets are character offsets.
+        // Convert before cursor jumps so Unicode punctuation does not skew navigation targets.
+        private int utf8_byte_to_char_offset (string text, int byte_offset) {
+            if (byte_offset <= 0) {
+                return 0;
+            }
+
+            string prefix = text[0:byte_offset];
+            return (int) prefix.char_count ();
+        }
+
         // Find and jump to the next Markdown heading
         private void navigate_to_next_heading () {
             Gtk.TextIter cursor_iter;
@@ -947,7 +958,8 @@ namespace ThiefMD.Widgets {
                     int match_start, match_end;
                     if (match_info.fetch_pos (0, out match_start, out match_end)) {
                         // Calculate absolute offset in buffer
-                        int offset = cursor_iter.get_offset () + match_start;
+                        int char_offset = utf8_byte_to_char_offset (remaining_text, match_start);
+                        int offset = cursor_iter.get_offset () + char_offset;
                         Gtk.TextIter target_iter;
                         buffer.get_iter_at_offset (out target_iter, offset);
 
@@ -1000,7 +1012,7 @@ namespace ThiefMD.Widgets {
                     do {
                         int match_start, match_end;
                         if (match_info.fetch_pos (0, out match_start, out match_end)) {
-                            last_match_start = match_start;
+                            last_match_start = utf8_byte_to_char_offset (preceding_text, match_start);
                         }
                     } while (match_info.next ());
 
@@ -1056,7 +1068,8 @@ namespace ThiefMD.Widgets {
                     int match_start, match_end;
                     if (match_info.fetch_pos (0, out match_start, out match_end)) {
                         // Calculate absolute offset in buffer
-                        int offset = cursor_iter.get_offset () + match_start;
+                        int char_offset = utf8_byte_to_char_offset (remaining_text, match_start);
+                        int offset = cursor_iter.get_offset () + char_offset;
                         Gtk.TextIter target_iter;
                         buffer.get_iter_at_offset (out target_iter, offset);
 
@@ -1110,7 +1123,7 @@ namespace ThiefMD.Widgets {
                     do {
                         int match_start, match_end;
                         if (match_info.fetch_pos (0, out match_start, out match_end)) {
-                            last_match_start = match_start;
+                            last_match_start = utf8_byte_to_char_offset (preceding_text, match_start);
                         }
                     } while (match_info.next ());
 
