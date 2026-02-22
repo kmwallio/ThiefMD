@@ -22,13 +22,10 @@ jobs:
         run: sudo apt-get install build-essential meson ninja-build valac cmake libgspell-1-dev libwebkitgtk-6.0-dev libmarkdown2-dev libxml2-dev libarchive-dev libgtk-4-dev libgee-0.8-dev libgtksourceview-5-dev libsecret-1-dev libadwaita-1-dev liblink-grammar-dev libjson-glib-dev libspelling-1-dev
 
       - name: Setup Build
-        run: meson build
-
-      - name: Configure build
-        run: meson configure -Dbuild_tests=true build
+        run: meson setup build --reconfigure -Dbuild_tests=true
 
       - name: Run Build
-        run: ninja -C build
+        run: meson compile -C build
 
       - name: Test
-        run: ./build/tests/tests
+        run: meson test -C build --print-errorlogs
