@@ -47,6 +47,12 @@ namespace ThiefMD.Controllers.FileManager {
             return;
         }
 
+        // FDX (Final Draft) files get converted to Fountain on import
+        if (ext == "fdx") {
+            import_fdx (file_path, parent);
+            return;
+        }
+
         if (match_ext.length >= 3) {
             match_ext = "*." + match_ext + ";";
         }
@@ -1431,6 +1437,41 @@ namespace ThiefMD.Controllers.FileManager {
         } catch (Error e) {
             warning ("Could not add asset to textpack: %s", e.message);
         }
+    }
+
+    // Import an FDX (Final Draft) file, converting it to Fountain format.
+    public void import_fdx (string fdx_path, Sheets parent) {
+        File fdx_file = File.new_for_path (fdx_path);
+        if (!fdx_file.query_exists ()) {
+            return;
+        }
+
+        Gee.List<string> importSayings = new Gee.LinkedList<string> ();
+        importSayings.add (_("Raiding the screenplay vault..."));
+        importSayings.add (_("Converting Final Draft to Fountain!"));
+        importSayings.add (_("Lights, camera, import!"));
+
+        Thinking worker = new Thinking (_("Importing FDX"), () => {
+            string bundle_name = fdx_file.get_basename ();
+            bundle_name = bundle_name.substring (0, bundle_name.last_index_of ("."));
+            string dest_path = Path.build_filename (parent.get_sheets_path (), bundle_name + ".fountain");
+
+            string fdx_content = get_file_contents (fdx_file.get_path ());
+            string fountain_content = FountainFdx.fdx_to_fountain (fdx_content);
+
+            if (fountain_content != "") {
+                File dest_file = File.new_for_path (dest_path);
+                try {
+                    save_file (dest_file, fountain_content.data);
+                } catch (Error e) {
+                    warning ("Could not save converted FDX file: %s", e.message);
+                }
+            }
+        }, importSayings, ThiefApp.get_instance ());
+
+        worker.run ();
+        parent.refresh ();
+        ThiefApp.get_instance ().library.refresh_dir (parent);
     }
 
     public class FileLock : Object {
