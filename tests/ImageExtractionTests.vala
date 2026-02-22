@@ -8,10 +8,6 @@ public class ImageExtractionTests : Object {
         import_images ();
     }
 
-    ~ImageExtractionTests () {
-        tear_down ();
-    }
-
     public static void set_up () {
         string search_path = Path.build_path (Path.DIR_SEPARATOR_S, Environment.get_tmp_dir (), "image-tests");
 

@@ -318,6 +318,28 @@ namespace ThiefMD.Widgets {
                     is_fullscreen = false;
                 }
             });
+
+            // Next Marker (Heading/Scene)
+            add_simple_action ("next-marker", () => {
+                if (window is ThiefApp || window is SoloEditor) {
+                    if (window is ThiefApp) {
+                        SheetManager.next_marker ();
+                    } else {
+                        ((SoloEditor)window).editor.next_marker ();
+                    }
+                }
+            });
+
+            // Previous Marker (Heading/Scene)
+            add_simple_action ("prev-marker", () => {
+                if (window is ThiefApp || window is SoloEditor) {
+                    if (window is ThiefApp) {
+                        SheetManager.prev_marker ();
+                    } else {
+                        ((SoloEditor)window).editor.prev_marker ();
+                    }
+                }
+            });
         }
 
         private void setup_shortcuts () {
@@ -405,9 +427,15 @@ namespace ThiefMD.Widgets {
             
             // F11 - Fullscreen
             add_shortcut ("F11", "keybindings.fullscreen");
-            
+
             // Escape
             add_shortcut ("Escape", "keybindings.escape");
+
+            // Ctrl+[ - Previous Marker (Heading/Scene)
+            add_shortcut ("<Primary>bracketleft", "keybindings.prev-marker");
+
+            // Ctrl+] - Next Marker (Heading/Scene)
+            add_shortcut ("<Primary>bracketright", "keybindings.next-marker");
         }
 
         private void add_simple_action (string name, owned SimpleActionFunc func) {

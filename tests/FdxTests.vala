@@ -2,12 +2,6 @@ using ThiefMD;
 using ThiefMD.Controllers;
 
 public class FdxTests {
-    public FdxTests () {
-        test_fdx_to_fountain ();
-        test_fountain_to_fdx ();
-        test_fdx_round_trip ();
-    }
-
     // Sample FDX document for testing
     private const string SAMPLE_FDX = """<?xml version="1.0" encoding="UTF-8"?>
 <FinalDraft DocumentType="Script" Template="No" Version="1">
@@ -39,7 +33,7 @@ public class FdxTests {
   </Content>
 </FinalDraft>""";
 
-    private void test_fdx_to_fountain () {
+    public FdxTests () {
         Test.add_func ("/thiefmd/fdx_to_fountain", () => {
             string result = FountainFdx.fdx_to_fountain (SAMPLE_FDX);
 
@@ -172,9 +166,7 @@ public class FdxTests {
             assert (!result.contains ("\n\n\n"));
             assert (result.contains ("INT. KITCHEN - DAY\n\nWater boils on the stove.\n\nEXT. GARDEN - CONTINUOUS\n\nBirds chirp."));
         });
-    }
 
-    private void test_fountain_to_fdx () {
         Test.add_func ("/thiefmd/fountain_to_fdx", () => {
             // Build a simple fountain screenplay
             string fountain = """INT. OFFICE - DAY
@@ -216,9 +208,7 @@ It compiles!
             assert (result.contains ("Type=\"Transition\""));
             assert (result.contains ("FADE OUT."));
         });
-    }
 
-    private void test_fdx_round_trip () {
         Test.add_func ("/thiefmd/fdx_round_trip", () => {
             // Convert FDX → Fountain → FDX and check the key content survives
             string fountain = FountainFdx.fdx_to_fountain (SAMPLE_FDX);

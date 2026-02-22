@@ -905,6 +905,246 @@ namespace ThiefMD.Widgets {
             markdown.link ();
         }
 
+        // Navigate to next heading (Markdown) or scene (Fountain)
+        public void next_marker () {
+            if (fountain != null) {
+                navigate_to_next_fountain_scene ();
+            } else if (markdown != null) {
+                navigate_to_next_heading ();
+            }
+        }
+
+        // Navigate to previous heading (Markdown) or scene (Fountain)
+        public void prev_marker () {
+            if (fountain != null) {
+                navigate_to_prev_fountain_scene ();
+            } else if (markdown != null) {
+                navigate_to_prev_heading ();
+            }
+        }
+
+        // Find and jump to the next Markdown heading
+        private void navigate_to_next_heading () {
+            Gtk.TextIter cursor_iter;
+            var cursor_mark = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_iter, cursor_mark);
+
+            // Move to start of next line to begin search
+            if (!cursor_iter.forward_line ()) {
+                return; // Already at end of buffer
+            }
+
+            Gtk.TextIter end;
+            buffer.get_end_iter (out end);
+            string remaining_text = cursor_iter.get_text (end);
+
+            try {
+                // Regex to match Markdown headings: # Heading
+                var heading_regex = new Regex ("^(#+)\\s+(.+)$", RegexCompileFlags.MULTILINE);
+                MatchInfo match_info;
+
+                if (heading_regex.match (remaining_text, 0, out match_info)) {
+                    int match_start, match_end;
+                    if (match_info.fetch_pos (0, out match_start, out match_end)) {
+                        // Calculate absolute offset in buffer
+                        int char_offset = ThiefMD.utf8_byte_to_char_offset (remaining_text, match_start);
+                        int offset = cursor_iter.get_offset () + char_offset;
+                        Gtk.TextIter target_iter;
+                        buffer.get_iter_at_offset (out target_iter, offset);
+
+                        // Move to end of line
+                        if (!target_iter.ends_line ()) {
+                            target_iter.forward_to_line_end ();
+                        }
+
+                        // Place cursor at end of heading line
+                        buffer.place_cursor (target_iter);
+
+                        // Respect typewriter scrolling if enabled
+                        var settings = AppSettings.get_default ();
+                        if (settings.typewriter_scrolling) {
+                            move_typewriter_scolling ();
+                        } else {
+                            ensure_cursor_visible ();
+                        }
+                    }
+                }
+            } catch (RegexError e) {
+                warning ("Regex error in navigate_to_next_heading: %s", e.message);
+            }
+        }
+
+        // Find and jump to the previous Markdown heading
+        private void navigate_to_prev_heading () {
+            Gtk.TextIter cursor_iter;
+            var cursor_mark = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_iter, cursor_mark);
+
+            // Move to start of current line, then back one line to begin search
+            cursor_iter.set_line_offset (0);
+            if (!cursor_iter.backward_line ()) {
+                return; // Already at start of buffer
+            }
+
+            Gtk.TextIter start;
+            buffer.get_start_iter (out start);
+            string preceding_text = start.get_text (cursor_iter);
+
+            try {
+                // Regex to match Markdown headings: # Heading
+                var heading_regex = new Regex ("^(#+)\\s+(.+)$", RegexCompileFlags.MULTILINE);
+                MatchInfo match_info;
+
+                // Find all matches and keep the last one
+                int last_match_start = -1;
+                if (heading_regex.match (preceding_text, 0, out match_info)) {
+                    do {
+                        int match_start, match_end;
+                        if (match_info.fetch_pos (0, out match_start, out match_end)) {
+                            last_match_start = ThiefMD.utf8_byte_to_char_offset (preceding_text, match_start);
+                        }
+                    } while (match_info.next ());
+
+                    if (last_match_start >= 0) {
+                        // Calculate absolute offset in buffer
+                        Gtk.TextIter target_iter;
+                        buffer.get_iter_at_offset (out target_iter, last_match_start);
+
+                        // Move to end of line
+                        if (!target_iter.ends_line ()) {
+                            target_iter.forward_to_line_end ();
+                        }
+
+                        // Place cursor at end of heading line
+                        buffer.place_cursor (target_iter);
+
+                        // Respect typewriter scrolling if enabled
+                        var settings = AppSettings.get_default ();
+                        if (settings.typewriter_scrolling) {
+                            move_typewriter_scolling ();
+                        } else {
+                            ensure_cursor_visible ();
+                        }
+                    }
+                }
+            } catch (RegexError e) {
+                warning ("Regex error in navigate_to_prev_heading: %s", e.message);
+            }
+        }
+
+        // Find and jump to the next Fountain scene heading
+        private void navigate_to_next_fountain_scene () {
+            Gtk.TextIter cursor_iter;
+            var cursor_mark = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_iter, cursor_mark);
+
+            // Move to start of next line to begin search
+            if (!cursor_iter.forward_line ()) {
+                return; // Already at end of buffer
+            }
+
+            Gtk.TextIter end;
+            buffer.get_end_iter (out end);
+            string remaining_text = cursor_iter.get_text (end);
+
+            try {
+                // Regex to match Fountain scene headings:
+                // - Standard prefixes: INT/EXT/EST/I/E followed by period, space, or slash
+                // - Forced headings: a line starting with a single period (not two periods)
+                var scene_regex = new Regex (ThiefMD.get_fountain_scene_heading_pattern (), RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS);
+                MatchInfo match_info;
+
+                if (scene_regex.match (remaining_text, 0, out match_info)) {
+                    int match_start, match_end;
+                    if (match_info.fetch_pos (0, out match_start, out match_end)) {
+                        // Calculate absolute offset in buffer
+                        int char_offset = ThiefMD.utf8_byte_to_char_offset (remaining_text, match_start);
+                        int offset = cursor_iter.get_offset () + char_offset;
+                        Gtk.TextIter target_iter;
+                        buffer.get_iter_at_offset (out target_iter, offset);
+
+                        // Move to end of line
+                        if (!target_iter.ends_line ()) {
+                            target_iter.forward_to_line_end ();
+                        }
+
+                        // Place cursor at end of scene heading line
+                        buffer.place_cursor (target_iter);
+
+                        // Respect typewriter scrolling if enabled
+                        var settings = AppSettings.get_default ();
+                        if (settings.typewriter_scrolling) {
+                            move_typewriter_scolling ();
+                        } else {
+                            ensure_cursor_visible ();
+                        }
+                    }
+                }
+            } catch (RegexError e) {
+                warning ("Regex error in navigate_to_next_fountain_scene: %s", e.message);
+            }
+        }
+
+        // Find and jump to the previous Fountain scene heading
+        private void navigate_to_prev_fountain_scene () {
+            Gtk.TextIter cursor_iter;
+            var cursor_mark = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_iter, cursor_mark);
+
+            // Move to start of current line, then back one line to begin search
+            cursor_iter.set_line_offset (0);
+            if (!cursor_iter.backward_line ()) {
+                return; // Already at start of buffer
+            }
+
+            Gtk.TextIter start;
+            buffer.get_start_iter (out start);
+            string preceding_text = start.get_text (cursor_iter);
+
+            try {
+                // Regex to match Fountain scene headings:
+                // - Standard prefixes: INT/EXT/EST/I/E followed by period, space, or slash
+                // - Forced headings: a line starting with a single period (not two periods)
+                var scene_regex = new Regex (ThiefMD.get_fountain_scene_heading_pattern (), RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS);
+                MatchInfo match_info;
+
+                // Find all matches and keep the last one
+                int last_match_start = -1;
+                if (scene_regex.match (preceding_text, 0, out match_info)) {
+                    do {
+                        int match_start, match_end;
+                        if (match_info.fetch_pos (0, out match_start, out match_end)) {
+                            last_match_start = ThiefMD.utf8_byte_to_char_offset (preceding_text, match_start);
+                        }
+                    } while (match_info.next ());
+
+                    if (last_match_start >= 0) {
+                        // Calculate absolute offset in buffer
+                        Gtk.TextIter target_iter;
+                        buffer.get_iter_at_offset (out target_iter, last_match_start);
+
+                        // Move to end of line
+                        if (!target_iter.ends_line ()) {
+                            target_iter.forward_to_line_end ();
+                        }
+
+                        // Place cursor at end of scene line
+                        buffer.place_cursor (target_iter);
+
+                        // Respect typewriter scrolling if enabled
+                        var settings = AppSettings.get_default ();
+                        if (settings.typewriter_scrolling) {
+                            move_typewriter_scolling ();
+                        } else {
+                            ensure_cursor_visible ();
+                        }
+                    }
+                }
+            } catch (RegexError e) {
+                warning ("Regex error in navigate_to_prev_fountain_scene: %s", e.message);
+            }
+        }
+
         public bool save () {
             bool result = false;
             var settings = AppSettings.get_default ();
