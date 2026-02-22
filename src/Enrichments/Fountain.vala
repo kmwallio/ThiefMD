@@ -258,6 +258,7 @@ namespace ThiefMD.Enrichments {
 
         private Gtk.TextTag tag_character;
         private Gtk.TextTag tag_dialogue;
+        private Gtk.TextTag tag_dialogue_continuation;
         private Gtk.TextTag tag_scene_heading;
         private Gtk.TextTag tag_parenthetical;
 
@@ -280,7 +281,9 @@ namespace ThiefMD.Enrichments {
             try {
                 scene_heading = new Regex ("\\n(ИНТ|НАТ|инт|нат|INT|EXT|EST|I\\/E|int|ext|est|i\\/e)[\\. \\/].*\\S\\s?\\r?\\n", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF | RegexCompileFlags.CASELESS, 0);
                 // character_dialogue = new Regex ("(?<=\\n)([ \\t]*[^<>a-z\\s\\/\\n][^<>a-z:!\\?\\n]*[^<>a-z\\(!\\?:,\\n\\.][ \\t]?|[ \\t]*\\(?[^\\n]\\)?[ \\t]*)\\n{1}(?!\\n)(.*?)\\r?\\n{1}", 0, 0);
-                character_dialogue = new Regex ("(?<=\\n)([ \\t]*?[^<>a-z\\s\\/\\n][^<>a-z:!\\?\\n]*[^<>a-z\\(!\\?:,\\n\\.][ \\t]?|\\([^\\n]+\\))\\n{1}(?!\\n)(.+?)\\n{1}", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF, 0);
+                // Modified to capture multiline dialogue: matches character name followed by dialogue lines (stops at blank line)
+                // Pattern captures one or more non-blank lines after character, stopping before a blank line or EOF
+                character_dialogue = new Regex ("(?<=\\n)([ \\t]*?[^<>a-z\\s\\/\\n][^<>a-z:!\\?\\n]*[^<>a-z\\(!\\?:,\\n\\.][ \\t]?|\\([^\\n]+\\))\\n{1}(?!\\n)((?:[^\\n]+\\n(?!\\n))*[^\\n]+)\\n?", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF, 0);
                 parenthetical_dialogue = new Regex ("(?<=\\n)([ \\t]*?\\([^\\n]+\\))\\n{1}(?!\\n)(.+?)\\n{1}", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF, 0);
             } catch (Error e) {
                 warning ("Could not build regexes: %s", e.message);
@@ -358,6 +361,7 @@ namespace ThiefMD.Enrichments {
             buffer.remove_tag (tag_character, start, end);
             buffer.remove_tag (tag_parenthetical, start, end);
             buffer.remove_tag (tag_dialogue, start, end);
+            buffer.remove_tag (tag_dialogue_continuation, start, end);
             checking_copy = buffer.get_text (start, end, true);
 
             regex_and_tag (scene_heading, tag_scene_heading);
@@ -366,7 +370,7 @@ namespace ThiefMD.Enrichments {
         }
 
         private void tag_characters_and_dialogue () {
-            if (character_dialogue == null || tag_character == null || tag_dialogue == null || parenthetical_dialogue == null) {
+            if (character_dialogue == null || tag_character == null || tag_dialogue == null || tag_dialogue_continuation == null || parenthetical_dialogue == null) {
                 return;
             }
             tag_char_diag_helper (character_dialogue);
@@ -394,6 +398,7 @@ namespace ThiefMD.Enrichments {
                             buffer.get_iter_at_offset (out end, end_pos);
                             buffer.remove_tag (tag_character, start, end);
                             buffer.remove_tag (tag_dialogue, start, end);
+                            buffer.remove_tag (tag_dialogue_continuation, start, end);
                             buffer.remove_tag (tag_parenthetical, start, end);
                         }
 
@@ -420,9 +425,35 @@ namespace ThiefMD.Enrichments {
                         start_pos = copy_offset + checking_copy.char_count (start_pos);
                         end_pos = copy_offset + checking_copy.char_count (end_pos);
                         if (highlight) {
-                            buffer.get_iter_at_offset (out start, start_pos);
-                            buffer.get_iter_at_offset (out end, end_pos);
-                            buffer.apply_tag (tag_dialogue, start, end);
+                            // Split dialogue into lines to handle multiline dialogue
+                            string[] dialogue_lines = dialogue.split ("\n");
+                            int current_offset = start_pos;
+                            bool first_line_tagged = false;
+
+                            for (int i = 0; i < dialogue_lines.length; i++) {
+                                string line = dialogue_lines[i];
+                                if (line.chomp ().chug () == "") {
+                                    // Skip empty lines but account for their length
+                                    current_offset += line.length + 1; // +1 for newline
+                                    continue;
+                                }
+
+                                int line_start = current_offset;
+                                int line_end = current_offset + line.length;
+
+                                buffer.get_iter_at_offset (out start, line_start);
+                                buffer.get_iter_at_offset (out end, line_end);
+
+                                // First non-empty line gets tag_dialogue, subsequent lines get tag_dialogue_continuation
+                                if (!first_line_tagged) {
+                                    buffer.apply_tag (tag_dialogue, start, end);
+                                    first_line_tagged = true;
+                                } else {
+                                    buffer.apply_tag (tag_dialogue_continuation, start, end);
+                                }
+
+                                current_offset = line_end + 1; // +1 for newline
+                            }
                         }
                     } while (match_info.next ());
                 }
@@ -497,6 +528,11 @@ namespace ThiefMD.Enrichments {
             tag_dialogue.accumulative_margin = true;
             tag_dialogue.left_margin_set = true;
             tag_dialogue.right_margin_set = true;
+            // Dialogue continuation (for multiline dialogue)
+            tag_dialogue_continuation = buffer.create_tag ("fou_diag_cont");
+            tag_dialogue_continuation.accumulative_margin = true;
+            tag_dialogue_continuation.left_margin_set = true;
+            tag_dialogue_continuation.right_margin_set = true;
             last_cursor = -1;
 
             calculate_margins ();
@@ -902,6 +938,9 @@ namespace ThiefMD.Enrichments {
                 // Dialogue
                 tag_dialogue.left_margin = (avg_w * 4);
                 tag_dialogue.right_margin = 0;
+                // Dialogue continuation - indented more for visual clarity
+                tag_dialogue_continuation.left_margin = (avg_w * 6);
+                tag_dialogue_continuation.right_margin = 0;
             } else {
                 // Character
                 tag_character.left_margin = (avg_w * 14);
@@ -909,6 +948,9 @@ namespace ThiefMD.Enrichments {
                 // Dialogue
                 tag_dialogue.left_margin = (avg_w * 6);
                 tag_dialogue.right_margin = (avg_w * 6);
+                // Dialogue continuation - indented more for visual clarity
+                tag_dialogue_continuation.left_margin = (avg_w * 8);
+                tag_dialogue_continuation.right_margin = (avg_w * 6);
             }
         }
 
@@ -934,10 +976,12 @@ namespace ThiefMD.Enrichments {
             buffer.remove_tag (tag_character, start, end);
             buffer.remove_tag (tag_parenthetical, start, end);
             buffer.remove_tag (tag_dialogue, start, end);
+            buffer.remove_tag (tag_dialogue_continuation, start, end);
             buffer.tag_table.remove (tag_scene_heading);
             buffer.tag_table.remove (tag_character);
             buffer.tag_table.remove (tag_parenthetical);
             buffer.tag_table.remove (tag_dialogue);
+            buffer.tag_table.remove (tag_dialogue_continuation);
 
             settings.changed.disconnect (settings_changed);
 
@@ -945,6 +989,7 @@ namespace ThiefMD.Enrichments {
             tag_character = null;
             tag_parenthetical = null;
             tag_dialogue = null;
+            tag_dialogue_continuation = null;
 
             view = null;
             buffer = null;
