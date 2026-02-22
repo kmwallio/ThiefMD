@@ -979,6 +979,12 @@ namespace ThiefMD.Widgets {
             var cursor_mark = buffer.get_insert ();
             buffer.get_iter_at_mark (out cursor_iter, cursor_mark);
 
+            // Move to start of current line, then back one line to begin search
+            cursor_iter.set_line_offset (0);
+            if (!cursor_iter.backward_line ()) {
+                return; // Already at start of buffer
+            }
+
             Gtk.TextIter start;
             buffer.get_start_iter (out start);
             string preceding_text = start.get_text (cursor_iter);
@@ -988,16 +994,13 @@ namespace ThiefMD.Widgets {
                 var heading_regex = new Regex ("^(#+)\\s+(.+)$", RegexCompileFlags.MULTILINE);
                 MatchInfo match_info;
 
-                // Find all matches
+                // Find all matches and keep the last one
                 int last_match_start = -1;
                 if (heading_regex.match (preceding_text, 0, out match_info)) {
                     do {
                         int match_start, match_end;
                         if (match_info.fetch_pos (0, out match_start, out match_end)) {
-                            // Only consider matches that end before cursor (with margin)
-                            if (match_end < preceding_text.length - 1) {
-                                last_match_start = match_start;
-                            }
+                            last_match_start = match_start;
                         }
                     } while (match_info.next ());
 
@@ -1084,6 +1087,12 @@ namespace ThiefMD.Widgets {
             var cursor_mark = buffer.get_insert ();
             buffer.get_iter_at_mark (out cursor_iter, cursor_mark);
 
+            // Move to start of current line, then back one line to begin search
+            cursor_iter.set_line_offset (0);
+            if (!cursor_iter.backward_line ()) {
+                return; // Already at start of buffer
+            }
+
             Gtk.TextIter start;
             buffer.get_start_iter (out start);
             string preceding_text = start.get_text (cursor_iter);
@@ -1093,16 +1102,13 @@ namespace ThiefMD.Widgets {
                 var scene_regex = new Regex ("^(ИНТ|НАТ|инт|нат|INT|EXT|EST|I\\/E|int|ext|est|i\\/e)[\\. \\/]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS);
                 MatchInfo match_info;
 
-                // Find all matches
+                // Find all matches and keep the last one
                 int last_match_start = -1;
                 if (scene_regex.match (preceding_text, 0, out match_info)) {
                     do {
                         int match_start, match_end;
                         if (match_info.fetch_pos (0, out match_start, out match_end)) {
-                            // Only consider matches that end before cursor (with margin)
-                            if (match_end < preceding_text.length - 1) {
-                                last_match_start = match_start;
-                            }
+                            last_match_start = match_start;
                         }
                     } while (match_info.next ());
 
