@@ -1047,8 +1047,9 @@ namespace ThiefMD.Widgets {
             string remaining_text = cursor_iter.get_text (end);
 
             try {
-                // Regex to match Fountain scene headings: INT/EXT/EST/I/E. LOCATION - TIME
-                var scene_regex = new Regex ("^(ИНТ|НАТ|инт|нат|INT|EXT|EST|I\\/E|int|ext|est|i\\/e)[\\. \\/]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS);
+                // Regex to match Fountain scene headings: INT/EXT/EST/I/E followed by period, space, or slash
+                // Only matches complete scene heading prefixes, not single letters
+                var scene_regex = new Regex ("^(INT|EXT|EST|INT\\/EXT|I\\/E)[\\.\\s\\/]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS);
                 MatchInfo match_info;
 
                 if (scene_regex.match (remaining_text, 0, out match_info)) {
@@ -1098,8 +1099,9 @@ namespace ThiefMD.Widgets {
             string preceding_text = start.get_text (cursor_iter);
 
             try {
-                // Regex to match Fountain scene headings: INT/EXT/EST/I/E. LOCATION - TIME
-                var scene_regex = new Regex ("^(ИНТ|НАТ|инт|нат|INT|EXT|EST|I\\/E|int|ext|est|i\\/e)[\\. \\/]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS);
+                // Regex to match Fountain scene headings: INT/EXT/EST/I/E followed by period, space, or slash
+                // Only matches complete scene heading prefixes, not single letters
+                var scene_regex = new Regex ("^(INT|EXT|EST|INT\\/EXT|I\\/E)[\\.\\s\\/]", RegexCompileFlags.MULTILINE | RegexCompileFlags.CASELESS);
                 MatchInfo match_info;
 
                 // Find all matches and keep the last one
