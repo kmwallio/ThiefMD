@@ -431,11 +431,11 @@ namespace ThiefMD.Widgets {
             // Escape
             add_shortcut ("Escape", "keybindings.escape");
 
-            // [ - Previous Marker (Heading/Scene)
-            add_shortcut ("bracketleft", "keybindings.prev-marker");
+            // Ctrl+[ - Previous Marker (Heading/Scene)
+            add_shortcut ("<Primary>bracketleft", "keybindings.prev-marker");
 
-            // ] - Next Marker (Heading/Scene)
-            add_shortcut ("bracketright", "keybindings.next-marker");
+            // Ctrl+] - Next Marker (Heading/Scene)
+            add_shortcut ("<Primary>bracketright", "keybindings.next-marker");
         }
 
         private void add_simple_action (string name, owned SimpleActionFunc func) {
