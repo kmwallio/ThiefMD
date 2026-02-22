@@ -233,7 +233,7 @@ namespace ThiefMD.Widgets {
 
             // Walk to the start and end of the tagged run
             var tag_start = iter.copy ();
-            if (!tag_start.begins_tag (url_tag)) {
+            if (!tag_start.starts_tag (url_tag)) {
                 tag_start.backward_to_tag_toggle (url_tag);
             }
             var tag_end = iter.copy ();
