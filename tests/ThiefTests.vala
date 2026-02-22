@@ -7,6 +7,7 @@ public class ThiefTests {
         new FileManagerTests ();
         new HelpersTests ();
         new PandocTests ();
+        new FdxTests ();
         return Test.run ();
     }
 }

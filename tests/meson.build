@@ -16,6 +16,7 @@ test_common_sources = [
     'TestSettings.vala',
     meson.source_root() + '/src/Controllers/MarkdownCompat.c',
     meson.source_root() + '/src/Controllers/Pandoc.vala',
+    meson.source_root() + '/src/Controllers/FountainFdx.vala',
     meson.source_root() + '/src/Controllers/FileManager.vala',
     meson.source_root() + '/src/Controllers/UserData.vala',
     meson.source_root() + '/src/Constants/ThiefProperties.vala',
