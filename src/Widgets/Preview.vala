@@ -397,15 +397,9 @@ namespace ThiefMD.Widgets {
                     """;
                 }
             } else {
-                if (!exporting) {
-                    script += "<script src='";
-                    script += Build.PKGDATADIR + "/scripts/fountain.js";
-                    script += "'></script>";
-                } else {
-                    script = """
-                    <script src="https://cdn.jsdelivr.net/npm/@thombruce/fountain.js@1.4.0/fountain.min.js"></script>
-                    """;
-                }
+                script += "<script src='";
+                script += Build.PKGDATADIR + "/scripts/fountain.js";
+                script += "'></script>";
             }
 
             return script;
