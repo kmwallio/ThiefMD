@@ -50,6 +50,7 @@ testing_all = executable('tests-all',
         'ImageExtractionTests.vala',
         'FileManagerTests.vala',
         'MarkdownTests.vala',
+        'FdxTests.vala',
         'MarkerNavigationTests.vala',
         'HelpersTests.vala',
         'PandocTests.vala',
@@ -119,6 +120,16 @@ testing_pandoc = executable('tests-pandoc',
     install: false
 )
 
+testing_fdx = executable('tests-fdx',
+    [
+        'TestMainFdx.vala',
+        'FdxTests.vala',
+    ] + test_common_sources,
+    dependencies: test_common_dependencies,
+    vala_args: test_common_vala_args,
+    install: false
+)
+
 test('ThiefTests-All', testing_all, is_parallel: false)
 test('ThiefTests-ImageExtraction', testing_image, is_parallel: false)
 test('ThiefTests-Markdown', testing_markdown)
@@ -126,5 +137,6 @@ test('ThiefTests-MarkerNavigation', testing_marker_navigation)
 test('ThiefTests-FileManager', testing_file_manager)
 test('ThiefTests-Helpers', testing_helpers)
 test('ThiefTests-Pandoc', testing_pandoc)
+test('ThiefTests-Fdx', testing_fdx)
 
 endif
