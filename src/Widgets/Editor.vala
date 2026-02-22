@@ -959,7 +959,7 @@ namespace ThiefMD.Widgets {
                         if (settings.typewriter_scrolling) {
                             move_typewriter_scolling ();
                         } else {
-                            scroll_to_iter (target_iter, 0.0, false, 0.0, 0.0);
+                            ensure_cursor_visible ();
                         }
                     }
                 }
@@ -1009,7 +1009,7 @@ namespace ThiefMD.Widgets {
                         if (settings.typewriter_scrolling) {
                             move_typewriter_scolling ();
                         } else {
-                            scroll_to_iter (target_iter, 0.0, false, 0.0, 0.0);
+                            ensure_cursor_visible ();
                         }
                     }
                 }
@@ -1054,7 +1054,7 @@ namespace ThiefMD.Widgets {
                         if (settings.typewriter_scrolling) {
                             move_typewriter_scolling ();
                         } else {
-                            scroll_to_iter (target_iter, 0.0, false, 0.0, 0.0);
+                            ensure_cursor_visible ();
                         }
                     }
                 }
@@ -1104,7 +1104,7 @@ namespace ThiefMD.Widgets {
                         if (settings.typewriter_scrolling) {
                             move_typewriter_scolling ();
                         } else {
-                            scroll_to_iter (target_iter, 0.0, false, 0.0, 0.0);
+                            ensure_cursor_visible ();
                         }
                     }
                 }
