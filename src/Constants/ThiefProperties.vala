@@ -25,7 +25,7 @@ namespace ThiefMD {
         public const string TAGLINE = _("The Markdown editor worth stealing");
         public const string THIEF_MARK_CONST = "THIEFMDa63471e6ec1b4f35b7ca635f3ca39a85";
         public const string THIEF_MARK = "<span id='thiefmark'></span>";
-        public const string SUPPORTED_IMPORT_FILES = "*.docx;*.odt;*.html;*.tex;*.epub;*.textile;*.html;*.fb2;*.dbk;*.xml;*.opml;*.rst;*.md;*.markdown;*.fountain;*.fou;*.spmd;*.textpack;*.highland;*.fdx";
+        public const string SUPPORTED_IMPORT_FILES = "*.docx;*.odt;*.html;*.tex;*.epub;*.textile;*.html;*.fb2;*.dbk;*.xml;*.opml;*.rst;*.md;*.markdown;*.fountain;*.fou;*.spmd;*.textpack;*.highland;*.fdx;*.bear2bk";
         public const string SUPPORTED_OPEN_FILES = "*.md;*.markdown;*.fountain;*.fou;*.spmd";
         public const string VERSION = Build.VERSION;
         public const Gtk.License LICENSE_TYPE = Gtk.License.GPL_3_0;
