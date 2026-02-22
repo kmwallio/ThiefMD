@@ -951,7 +951,12 @@ namespace ThiefMD.Widgets {
                         Gtk.TextIter target_iter;
                         buffer.get_iter_at_offset (out target_iter, offset);
 
-                        // Place cursor at start of heading
+                        // Move to end of line
+                        if (!target_iter.ends_line ()) {
+                            target_iter.forward_to_line_end ();
+                        }
+
+                        // Place cursor at end of heading line
                         buffer.place_cursor (target_iter);
 
                         // Respect typewriter scrolling if enabled
@@ -1001,7 +1006,12 @@ namespace ThiefMD.Widgets {
                         Gtk.TextIter target_iter;
                         buffer.get_iter_at_offset (out target_iter, last_match_start);
 
-                        // Place cursor at start of heading
+                        // Move to end of line
+                        if (!target_iter.ends_line ()) {
+                            target_iter.forward_to_line_end ();
+                        }
+
+                        // Place cursor at end of heading line
                         buffer.place_cursor (target_iter);
 
                         // Respect typewriter scrolling if enabled
@@ -1046,7 +1056,12 @@ namespace ThiefMD.Widgets {
                         Gtk.TextIter target_iter;
                         buffer.get_iter_at_offset (out target_iter, offset);
 
-                        // Place cursor at start of scene heading
+                        // Move to end of line
+                        if (!target_iter.ends_line ()) {
+                            target_iter.forward_to_line_end ();
+                        }
+
+                        // Place cursor at end of scene heading line
                         buffer.place_cursor (target_iter);
 
                         // Respect typewriter scrolling if enabled
@@ -1096,7 +1111,12 @@ namespace ThiefMD.Widgets {
                         Gtk.TextIter target_iter;
                         buffer.get_iter_at_offset (out target_iter, last_match_start);
 
-                        // Place cursor at start of scene heading
+                        // Move to end of line
+                        if (!target_iter.ends_line ()) {
+                            target_iter.forward_to_line_end ();
+                        }
+
+                        // Place cursor at end of scene line
                         buffer.place_cursor (target_iter);
 
                         // Respect typewriter scrolling if enabled
