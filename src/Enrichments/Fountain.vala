@@ -282,8 +282,8 @@ namespace ThiefMD.Enrichments {
                 scene_heading = new Regex ("\\n(ИНТ|НАТ|инт|нат|INT|EXT|EST|I\\/E|int|ext|est|i\\/e)[\\. \\/].*\\S\\s?\\r?\\n", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF | RegexCompileFlags.CASELESS, 0);
                 // character_dialogue = new Regex ("(?<=\\n)([ \\t]*[^<>a-z\\s\\/\\n][^<>a-z:!\\?\\n]*[^<>a-z\\(!\\?:,\\n\\.][ \\t]?|[ \\t]*\\(?[^\\n]\\)?[ \\t]*)\\n{1}(?!\\n)(.*?)\\r?\\n{1}", 0, 0);
                 // Modified to capture multiline dialogue: matches character name followed by dialogue lines (stops at blank line)
-                // Pattern captures one or more non-blank lines after character, stopping before a blank line or EOF
-                character_dialogue = new Regex ("(?<=\\n)([ \\t]*?[^<>a-z\\s\\/\\n][^<>a-z:!\\?\\n]*[^<>a-z\\(!\\?:,\\n\\.][ \\t]?|\\([^\\n]+\\))\\n{1}(?!\\n)((?:[^\\n]+\\n(?!\\n))*[^\\n]+)\\n?", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF, 0);
+                // Matches one or more lines where each line ends with \n that's NOT followed by another \n (no blank lines)
+                character_dialogue = new Regex ("(?<=\\n)([ \\t]*?[^<>a-z\\s\\/\\n][^<>a-z:!\\?\\n]*[^<>a-z\\(!\\?:,\\n\\.][ \\t]?|\\([^\\n]+\\))\\n{1}(?!\\n)((?:[^\\n]+\\n(?!\\n))+)", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF, 0);
                 parenthetical_dialogue = new Regex ("(?<=\\n)([ \\t]*?\\([^\\n]+\\))\\n{1}(?!\\n)(.+?)\\n{1}", RegexCompileFlags.BSR_ANYCRLF | RegexCompileFlags.NEWLINE_ANYCRLF, 0);
             } catch (Error e) {
                 warning ("Could not build regexes: %s", e.message);
@@ -433,9 +433,8 @@ namespace ThiefMD.Enrichments {
                             for (int i = 0; i < dialogue_lines.length; i++) {
                                 string line = dialogue_lines[i];
                                 if (line.chomp ().chug () == "") {
-                                    // Skip empty lines but account for their length
-                                    current_offset += line.length + 1; // +1 for newline
-                                    continue;
+                                    // Empty line indicates end of dialogue block, stop processing
+                                    break;
                                 }
 
                                 int line_start = current_offset;
