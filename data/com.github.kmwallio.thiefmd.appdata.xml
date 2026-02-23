@@ -5,7 +5,7 @@
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>ThiefMD</name>
-  <summary>The markdown editor worth stealing.</summary>
+  <summary>The markdown editor worth stealing</summary>
   <description>
     <p>Keep your Markdown managed. Write epic tales, a novel, that screen play, keep a journal, or finally write that book report.</p>
     <p>ThiefMD is a Markdown Editor providing an easy way to organize, format, and compile your markdown documents. When you're ready to Publish, go to ePub, PDF, Office, Ghost, WordPress, Write-Freely, or more.</p>
@@ -25,10 +25,6 @@
   <content_rating type="oars-1.1">
     <content_attribute id="language-humor">mild</content_attribute>
   </content_rating>
-  <categories>
-    <category>Office</category>
-    <category>Utility</category>
-  </categories>
   <provides>
     <id>com.github.kmwallio.thiefmd.desktop</id>
   </provides>
