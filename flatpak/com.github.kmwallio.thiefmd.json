@@ -15,6 +15,7 @@
     "cleanup": [
         "/cache",
         "/man",
+        "/share/doc",
         "/share/aclocal",
         "/share/devhelp",
         "/lib/systemd",

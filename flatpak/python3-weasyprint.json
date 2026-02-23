@@ -2,8 +2,13 @@
     "name": "python3-weasyprint",
     "buildsystem": "simple",
     "build-commands": [
-        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"pybind11\" --no-build-isolation",
-        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"weasyprint\" --no-build-isolation"
+        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"pybind11\" --no-build-isolation --no-compile",
+        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"weasyprint\" --no-build-isolation --no-compile"
+    ],
+    "cleanup-commands": [
+        "find /app/lib/python3*/site-packages -type d -name __pycache__ -exec rm -rf {} +",
+        "rm -rf /app/lib/python3*/site-packages/pybind11 /app/lib/python3*/site-packages/pybind11-*.dist-info",
+        "rm -f /app/bin/pybind11-config /app/bin/fonttools /app/bin/pyftmerge /app/bin/pyftsubset /app/bin/ttx"
     ],
     "sources": [
         {
