@@ -86,7 +86,7 @@ namespace ThiefMD.Widgets {
                     text-align: center;
                     height: 5px;
                 }
-                
+
                 hr:after {
                     background: #fff;
                     content: '§ Page Break §';
@@ -188,34 +188,63 @@ namespace ThiefMD.Widgets {
 
         private void connect_signals () {
             create.connect ((navigation_action) => {
-                launch_browser (navigation_action.get_request().get_uri ());
+                // Defer to avoid WebKit state issues
+                string uri = navigation_action.get_request().get_uri ();
+                Idle.add (() => {
+                    launch_browser (uri);
+                    return false;
+                });
                 return (WebKit.WebView?) null;
             });
 
             decide_policy.connect ((decision, type) => {
                 switch (type) {
                     case WebKit.PolicyDecisionType.NEW_WINDOW_ACTION:
-                        if (decision is WebKit.ResponsePolicyDecision) {
-                            WebKit.ResponsePolicyDecision response_decision = (decision as WebKit.ResponsePolicyDecision);
-                            if (response_decision != null && 
-                                response_decision.request != null)
-                            {
-                                launch_browser (response_decision.request.get_uri ());
+                        if (decision is WebKit.NavigationPolicyDecision) {
+                            var nav_decision = (WebKit.NavigationPolicyDecision) decision;
+                            var nav_action = nav_decision.get_navigation_action ();
+                            if (nav_action != null && nav_action.get_request () != null) {
+                                string deferred_uri = nav_action.get_request ().get_uri ();
+                                Idle.add (() => {
+                                    launch_browser (deferred_uri);
+                                    return false;
+                                });
                             }
+                            decision.ignore ();
                         }
                     break;
                     case WebKit.PolicyDecisionType.RESPONSE:
                         if (decision is WebKit.ResponsePolicyDecision) {
                             var policy = (WebKit.ResponsePolicyDecision) decision;
-                            launch_browser (policy.request.get_uri ());
-                            return false;
+                            string deferred_uri = policy.request.get_uri ();
+                            Idle.add (() => {
+                                launch_browser (deferred_uri);
+                                return false;
+                            });
+                            decision.ignore ();
+                            return true;
                         }
                     break;
                     case WebKit.PolicyDecisionType.NAVIGATION_ACTION:
+                        // Block all navigations except programmatic loads (load_html)
+                        if (decision is WebKit.NavigationPolicyDecision) {
+                            var nav_decision = (WebKit.NavigationPolicyDecision) decision;
+                            var nav_action = nav_decision.get_navigation_action ();
+                            if (nav_action != null && nav_action.get_request () != null &&
+                                nav_action.get_navigation_type () != WebKit.NavigationType.OTHER) {
+                                string deferred_uri = nav_action.get_request ().get_uri ();
+                                Idle.add (() => {
+                                    launch_browser (deferred_uri);
+                                    return false;
+                                });
+                                decision.ignore ();
+                                return true;
+                            }
+                        }
                     break;
                 }
 
-                return true;
+                return false;
             });
 
             load_changed.connect ((event) => {
@@ -226,8 +255,13 @@ namespace ThiefMD.Widgets {
             });
 
             load_failed.connect ((event, uri, error) => {
-                launch_browser (uri);
-                return false;
+                // Defer so we don't call stop_loading during a failed load
+                string failed_uri = uri;
+                Idle.add (() => {
+                    launch_browser (failed_uri);
+                    return false;
+                });
+                return true;
             });
         }
 
@@ -248,9 +282,15 @@ namespace ThiefMD.Widgets {
             if (possible_markdown != "" && thief_instance.library.file_in_library (possible_markdown)) {
                 var load_sheet = thief_instance.library.find_sheet_for_path (possible_markdown);
                 if (load_sheet != null) {
-                    load_sheet.clicked ();
-                    Timeout.add (250, () => {
-                        UI.update_preview ();
+                    // Defer sheet loading so we don't mutate the widget tree
+                    // while still inside a WebKit callback
+                    var deferred_sheet = load_sheet;
+                    Idle.add (() => {
+                        Timeout.add (250, () => {
+                            deferred_sheet.clicked ();
+                            UI.update_preview ();
+                            return false;
+                        });
                         return false;
                     });
                 }
@@ -261,16 +301,20 @@ namespace ThiefMD.Widgets {
             if (decoded_url.length > 8 && decoded_url.has_prefix ("file://") && thief_instance.library.file_in_library (decoded_url.substring (7))) {
                 var load_sheet = thief_instance.library.find_sheet_for_path (decoded_url.substring (7));
                 if (load_sheet != null) {
-                    load_sheet.clicked ();
-                    Timeout.add (250, () => {
-                        UI.update_preview ();
+                    var deferred_sheet = load_sheet;
+                    Idle.add (() => {
+                        deferred_sheet.clicked ();
+                        Timeout.add (250, () => {
+                            UI.update_preview ();
+                            return false;
+                        });
                         return false;
                     });
                 }
                 stop_loading ();
                 return;
             }
-            
+
             if (!url.contains ("/embed/")) {
                 try {
                     AppInfo.launch_default_for_uri (url, null);
