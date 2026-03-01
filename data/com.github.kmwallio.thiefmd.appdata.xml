@@ -62,6 +62,15 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.2" date="2026-02-22" urgency="low">
+      <description>
+        <p>Quality of life release.</p>
+        <ul>
+          <li>Bug fixes.</li>
+        </ul>
+      </description>
+      <url>https://github.com/kmwallio/ThiefMD/releases/tag/v0.3.2</url>
+    </release>
     <release version="0.3.1" date="2026-02-22" urgency="low">
       <description>
         <p>From experimental to normal, and some new experiments.</p>
