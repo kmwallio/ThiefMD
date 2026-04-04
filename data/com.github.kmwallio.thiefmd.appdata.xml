@@ -62,10 +62,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="0.3.2" date="2026-02-22" urgency="low">
+    <release version="0.3.2" date="2026-04-04" urgency="low">
       <description>
         <p>Quality of life release.</p>
         <ul>
+          <li>Fix font characters showing constant color.</li>
           <li>Bug fixes.</li>
         </ul>
       </description>
