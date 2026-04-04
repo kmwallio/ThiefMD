@@ -1060,6 +1060,228 @@ namespace ThiefMD.Enrichments {
             return true;
         }
 
+        private bool handle_list_enter_key () {
+            Gtk.TextIter cursor_iter;
+            var cursor = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_iter, cursor);
+
+            // Don't interfere inside code blocks
+            if (cursor_iter.has_tag (code_block)) {
+                return false;
+            }
+
+            Gtk.TextIter line_start = cursor_iter;
+            line_start.set_line_offset (0);
+            Gtk.TextIter line_end = cursor_iter;
+            line_end.forward_to_line_end ();
+
+            string line_text = buffer.get_text (line_start, line_end, false);
+            int len = line_text.length;
+            int idx = 0;
+            while (idx < len && (line_text[idx] == ' ' || line_text[idx] == '\t')) idx++;
+
+            if (idx >= len) {
+                // blank line, let default behavior handle it
+                return false;
+            }
+
+            int marker_start = idx;
+            int marker_end = -1;
+            bool is_number = false;
+            int number = 0;
+            int j = idx;
+
+            // Bullet or blockquote markers
+            if (line_text[idx] == '-' || line_text[idx] == '*' || line_text[idx] == '+' || line_text[idx] == '>') {
+                marker_end = idx + 1;
+            } else {
+                // Numeric list detection
+                while (j < len && line_text[j] >= '0' && line_text[j] <= '9') j++;
+                if (j > idx && j < len && (line_text[j] == '.' || line_text[j] == ')')) {
+                    is_number = true;
+                    string numstr = line_text.substring (idx, j - idx);
+                    number = int.parse (numstr);
+                    marker_end = j + 1; // include punctuation
+                }
+            }
+
+            if (marker_end == -1) {
+                return false;
+            }
+
+            // See if there's non-space content after the marker
+            int after = marker_end;
+            while (after < len && (line_text[after] == ' ' || line_text[after] == '\t')) after++;
+            bool only_marker = (after >= len);
+
+            if (only_marker) {
+                // Delete the marker on this line and insert a plain newline so
+                // the list is not continued. We handle this synchronously and
+                // consume the key event (return true) so the editor doesn't
+                // perform its default list continuation.
+                try {
+                    Gtk.TextIter del_start = line_start;
+                    Gtk.TextIter del_end = line_end;
+
+                    buffer.begin_user_action ();
+                    buffer.delete (ref del_start, ref del_end);
+                    buffer.place_cursor (del_start);
+                    view.insert_at_cursor ("\n");
+                    buffer.end_user_action ();
+                } catch (Error e) {
+                    warning ("[list-enter] immediate cleanup error: %s", e.message);
+                    return false;
+                }
+                return true;
+            } else {
+                // Continue the list on the new line
+                string indent = line_text.substring (0, marker_start);
+                string insertion_marker;
+                if (is_number) {
+                    string punct_str = line_text.substring (j, 1);
+                    insertion_marker = (number + 1).to_string () + punct_str + " ";
+                } else {
+                    insertion_marker = line_text.substring (marker_start, 1) + " ";
+                }
+
+                string insertion = "\n" + indent + insertion_marker;
+                buffer.begin_user_action ();
+                view.insert_at_cursor (insertion);
+                buffer.end_user_action ();
+                return true;
+            }
+        }
+
+        private bool parse_list_line (string line_text,
+                                      out int marker_start,
+                                      out int marker_end,
+                                      out bool only_marker,
+                                      out bool is_number,
+                                      out int number,
+                                      out string marker_symbol) {
+            marker_start = 0;
+            marker_end = -1;
+            only_marker = false;
+            is_number = false;
+            number = 0;
+            marker_symbol = "";
+
+            int len = line_text.length;
+            int idx = 0;
+            while (idx < len && (line_text[idx] == ' ' || line_text[idx] == '\t')) idx++;
+            if (idx >= len) {
+                return false;
+            }
+
+            marker_start = idx;
+            int j = idx;
+            if (line_text[idx] == '-' || line_text[idx] == '*' || line_text[idx] == '+' || line_text[idx] == '>') {
+                marker_end = idx + 1;
+                marker_symbol = line_text.substring (idx, 1);
+            } else {
+                while (j < len && line_text[j] >= '0' && line_text[j] <= '9') j++;
+                if (j > idx && j < len && (line_text[j] == '.' || line_text[j] == ')')) {
+                    is_number = true;
+                    number = int.parse (line_text.substring (idx, j - idx));
+                    marker_symbol = line_text.substring (j, 1);
+                    marker_end = j + 1;
+                }
+            }
+
+            if (marker_end == -1) {
+                return false;
+            }
+
+            int after = marker_end;
+            while (after < len && (line_text[after] == ' ' || line_text[after] == '\t')) after++;
+            only_marker = (after >= len);
+            return true;
+        }
+
+        private void handle_list_enter_release_cleanup () {
+            Gtk.TextIter cursor_iter;
+            var cursor = buffer.get_insert ();
+            buffer.get_iter_at_mark (out cursor_iter, cursor);
+
+            if (cursor_iter.has_tag (code_block)) {
+                return;
+            }
+
+            Gtk.TextIter cur_line_start = cursor_iter;
+            cur_line_start.set_line_offset (0);
+            Gtk.TextIter cur_line_end = cur_line_start;
+            cur_line_end.forward_to_line_end ();
+            string cur_line_text = buffer.get_text (cur_line_start, cur_line_end, false);
+
+            Gtk.TextIter prev_line_start = cur_line_start;
+            if (!prev_line_start.backward_line ()) {
+                return;
+            }
+            Gtk.TextIter prev_line_end = prev_line_start;
+            prev_line_end.forward_to_line_end ();
+            string prev_line_text = buffer.get_text (prev_line_start, prev_line_end, false);
+
+            int prev_marker_start, prev_marker_end, cur_marker_start, cur_marker_end;
+            bool prev_only, prev_is_number, cur_only, cur_is_number;
+            int prev_number, cur_number;
+            string prev_marker_symbol, cur_marker_symbol;
+
+            if (!parse_list_line (prev_line_text, out prev_marker_start, out prev_marker_end, out prev_only,
+                                  out prev_is_number, out prev_number, out prev_marker_symbol)) {
+                return;
+            }
+
+            if (!parse_list_line (cur_line_text, out cur_marker_start, out cur_marker_end, out cur_only,
+                                  out cur_is_number, out cur_number, out cur_marker_symbol)) {
+                return;
+            }
+
+            if (!prev_only || !cur_only) {
+                return;
+            }
+
+            if (prev_is_number != cur_is_number) {
+                return;
+            }
+
+            if (cur_is_number) {
+                if (prev_marker_symbol != cur_marker_symbol || cur_number != prev_number + 1) {
+                    return;
+                }
+            } else if (prev_marker_symbol != cur_marker_symbol) {
+                return;
+            }
+
+            int prev_abs_start = prev_line_start.get_offset () + prev_marker_start;
+            int prev_abs_end = prev_line_end.get_offset ();
+            int cur_abs_start = cur_line_start.get_offset () + cur_marker_start;
+            int cur_abs_end = cur_line_end.get_offset ();
+            int prev_deleted_len = prev_abs_end - prev_abs_start;
+
+            Gtk.TextIter del_start;
+            Gtk.TextIter del_end;
+            Gtk.TextIter target;
+
+            buffer.begin_user_action ();
+
+            buffer.get_iter_at_offset (out del_start, cur_abs_start);
+            buffer.get_iter_at_offset (out del_end, cur_abs_end);
+            buffer.delete (ref del_start, ref del_end);
+
+            buffer.get_iter_at_offset (out del_start, prev_abs_start);
+            buffer.get_iter_at_offset (out del_end, prev_abs_end);
+            buffer.delete (ref del_start, ref del_end);
+
+            int target_offset = cur_abs_start - prev_deleted_len;
+            if (target_offset < 0) {
+                target_offset = 0;
+            }
+            buffer.get_iter_at_offset (out target, target_offset);
+            buffer.place_cursor (target);
+
+            buffer.end_user_action ();
+        }
+
         private void handle_markup_cursor_position () {
             if (!markup_inserted_around_selection) {
                 return;
@@ -1298,8 +1520,19 @@ namespace ThiefMD.Enrichments {
             update_bibtex_provider ();
 
             markup_key_controller = new Gtk.EventControllerKey ();
+            markup_key_controller.set_propagation_phase (Gtk.PropagationPhase.CAPTURE);
             markup_key_controller.key_pressed.connect ((keyval, _keycode, _state) => {
+                if (keyval == Gdk.Key.Return || keyval == Gdk.Key.KP_Enter) {
+                    if (handle_list_enter_key ()) {
+                        return true;
+                    }
+                }
                 return handle_markup_navigation_key (keyval);
+            });
+            markup_key_controller.key_released.connect ((keyval, _keycode, _state) => {
+                if (keyval == Gdk.Key.Return || keyval == Gdk.Key.KP_Enter) {
+                    handle_list_enter_release_cleanup ();
+                }
             });
             view.add_controller (markup_key_controller);
             markup_cursor_handler_id = buffer.notify["cursor-position"].connect (handle_markup_cursor_position);

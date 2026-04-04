@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2020 kmwallio
- * 
+ *
  * Modified September 6, 2020
  *
  * This program is free software: you can redistribute it and/or modify
@@ -95,7 +95,7 @@ namespace ThiefMD {
             }
         }
         if (search_path != "") {
-            
+
             int idx = 0;
             while (search_path != "") {
                 try {
@@ -493,7 +493,7 @@ namespace ThiefMD {
         if (test_url.has_suffix ("/")) {
             next_attempt = test_url.substring (0, test_url.length - 1);
             debug (next_attempt);
-            string attempt = try_possible_url_exts (next_attempt);
+            string attempt = try_possible_url_exts (next_attempt, skip_recurse);
             if (attempt != "") {
                 return attempt;
             }
@@ -502,7 +502,7 @@ namespace ThiefMD {
         if (test_url.index_of_char ('#') != -1) {
             next_attempt = test_url.substring (0, test_url.index_of_char ('#'));
             debug (next_attempt);
-            string attempt = try_possible_url_exts (next_attempt);
+            string attempt = try_possible_url_exts (next_attempt, skip_recurse);
             if (attempt != "") {
                 return attempt;
             }
